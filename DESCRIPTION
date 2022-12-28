@@ -1,0 +1,27 @@
+Package: GAMBLR.data
+Title: Collection of Curated Data for Genomic Analysis of Mature B-cell Lymphomas in R
+Version: 0.1
+Authors@R:
+    c(
+        person(given = "Ryan",
+           family = "Morin",
+           role = c("aut", "cre"),
+           email = "rdmorin@sfu.ca",
+           comment = c(ORCID = "0000-0003-2932-7800")),
+        person(given = "Kostiantyn",
+           family = "Dreval",
+           role = c("aut", "cre"),
+           email = "kdreval@sfu.ca",
+           comment = c(ORCID = "0000-0002-6214-2843"))
+    )
+Description: The package contains manually curated data for the genomic Analysis
+    of mature B-cell lymphomas in R, such as regions of somatic hypermutation,
+    lymphoma genes, etc.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Depends: 
+    R (>= 2.10)
+LazyData: true
