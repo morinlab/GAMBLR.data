@@ -1,0 +1,1 @@
+This is a helper repo of the package Genomic Analysis of Mature B-cell Lymphomas in R ([GAMBLR](https://github.com/morinlab/GAMBLR)) developed by the Morin Lab. This repo contains the set of curated data such as regions of somatic hypermutation, lymphoma genes etc. Please refer to the main package for  more information.
