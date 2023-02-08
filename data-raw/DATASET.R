@@ -23,9 +23,9 @@ generate_data <- function(
             "/inst/extdata/",
             Row[["dataset"]],
             "/",
-            Row[["genome_build"]],
-            "/v",
             Row[["version"]],
+            "/",
+            Row[["genome_build"]],
             ".tsv"
         )
 
