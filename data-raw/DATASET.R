@@ -1,43 +1,45 @@
 #!/usr/bin/env Rscript
 
-# May need to call library(usethis)
-
-devtools::load_all()
+library(usethis)
+library(dplyr)
 
 # Helper function to input the data objects
 generate_data <- function(
     Row
     ){
 
-    # What is the name of the object
-    data_file <- paste0(
+    # What is the name of the object?
+    data_object <- paste0(
             Row[["dataset"]],
             "_",
             Row[["genome_build"]],
             "_v",
+            Row[["version"]]
+        )
+
+    # Where is it located?
+    data_file <- paste0(
+            getwd(),
+            "/inst/extdata/",
+            Row[["dataset"]],
+            "/",
+            Row[["genome_build"]],
+            "/v",
             Row[["version"]],
             ".tsv"
         )
-    data <- sub(".tsv", "", data_file)
-
-    # get the path to file
-    incoming_file <- system.file(
-        "extdata",
-        data_file,
-        package = "GAMBLR.data"
-    )
 
     # Use the name of the object to store the associated data
     assign(
-        data,
+        data_object,
         read.delim(
-            incoming_file
+            data_file
         )
     )
     # Generate .rda object with the data in it
     do.call(
         "use_data",
-        list(as.name(data),
+        list(as.name(data_object),
         overwrite = TRUE)
     )
 }
