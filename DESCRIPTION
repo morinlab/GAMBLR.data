@@ -17,8 +17,7 @@ Authors@R:
 Description: The package contains manually curated data for the genomic Analysis
     of mature B-cell lymphomas in R, such as regions of somatic hypermutation,
     lymphoma genes, etc.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
