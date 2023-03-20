@@ -9,7 +9,7 @@
 #' @param Optional vector specifying one or more lymphoma entities e.g. MCL, DLBCL, BL
 #' @param curated_only  Specify FALSE to retrieve all genes or leave default for the curated subset
 #'
-#' @return
+#' @return A character vector of gene symbol or Ensembl IDs
 #' 
 #' @import dplyr 
 #' @export
@@ -46,6 +46,56 @@ get_genes = function(entities=c("DLBCL","MCL","BL"),curated_only=TRUE,gene_forma
   return(unique(all_genes))
 }
 
+#' @title Produce colour palettes from your metadata
+#'
+#' @description Given a data frame and at least one column, the function will determine whether a colour palette exists and assign the colours to all levels of data in that column.
+#'
+#' @details This helper function seeks to help you standardize colour mappings within and across projects. It will return either a vector or a list for compatability with ggplot and ComplexHeatmap, respectively. 
+#'
+#' @param this_df Provide a data frame with at least one column
+#' @param check Perform checks for unsupported values and throw helpful errors and exit (rather than happily returning an incomplete palette)
+#' @param as_list Set to TRUE if you want a named list separating the colours by the original column names, otherwise all mappings will be in a single named vector
+#'
+#' @return Either a vector or list of Hex codes
+#' 
+#' @import dplyr 
+#' @export
+#'
+#' @examples
+#' dplyr::select(this_big_metadata_table, pathology,COO,EBV_status) %>% get_mapped_colours()
+#' 
+
+get_mapped_colours = function(this_df,check=FALSE,as_list=F){
+  column_names = colnames(this_df)
+  #try to map every column to the colour palette using the name and, if available, user-specified aliases
+  mapped_list = list()
+  mapped_vector = c()
+  for(col_name in column_names){
+    unique_values = unique(this_df[[col_name]])
+    
+    df = dplyr::filter(colour_codes,name %in% unique_values) %>%
+      dplyr::select(name,colour) %>% 
+      unique()
+
+    if(any(!unique_values %in% df$name)){
+      message("missing one or more of the values in this set of colours:")
+      missing = unique_values[which(!unique_values %in% df$name)]
+      message(paste(missing,collapse=", "))
+      if(check){
+        stop("you should correct this issue by modifying, dropping or setting the offending values to NA, where applicable")
+      }
+    }
+    col_vec = df$colour
+    names(col_vec) = df$name
+    mapped_list[[col_name]] = col_vec
+    mapped_vector = c(mapped_vector,col_vec)
+  }
+  if(as_list){
+    return(mapped_list)
+  }else{
+    return(mapped_vector)
+  }
+}
 
 #' @title Get standardized colours for lymphoid cancers
 #'
@@ -58,7 +108,7 @@ get_genes = function(entities=c("DLBCL","MCL","BL"),curated_only=TRUE,gene_forma
 #' @param this_group  Optionally supply one of the available groups to see the palette just for this group
 #' @param drop_alias Set to FALSE to see the redundant colours with their aliases
 #'
-#' @return
+#' @return A data frame or named character vector of colour Hex codes
 #' 
 #' @import dplyr 
 #' @export

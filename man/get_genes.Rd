@@ -15,6 +15,9 @@ get_genes(
 
 \item{Optional}{vector specifying one or more lymphoma entities e.g. MCL, DLBCL, BL}
 }
+\value{
+A character vector of gene symbol or Ensembl IDs
+}
 \description{
 Retrieve gene names from bundled lymphoma gene lists.
 }
