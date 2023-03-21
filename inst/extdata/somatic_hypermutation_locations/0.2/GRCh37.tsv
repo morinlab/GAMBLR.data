@@ -1,4 +1,14 @@
 chr_name	hg19_start	hg19_end	gene	region	regulatory_comment
+chr2	96808901	96811913	DUSP2	intron-1	enhancer
+chr17	56407732	56410140	TSPOAP1	intergenic	enhancer
+chr11	128339774	128345731	ETS1	introns	enhancer
+chr11	128388492	128394163	ETS1	TSS-2	active_promoter
+chr6	31548325	31550717	LTB	intron-1	enhancer
+chr3	32020518	32024930	OSBPL10	TSS-1	active_promoter
+chr11	65265237	65268359	MALAT1	ncRNA	enhancer
+chr11	65190369	65192380	NEAT1	ncRNA	enhancer
+chr16	11347512	11350007	SOCS1	intron-1	enhancer
+chr1	226921088	226927982	ITPKB	intron-1	enhancer
 chr19	16434978	16439011	KLF2	TSS	intronic
 chr9	37023396	37027663	PAX5	intron-1	intronic
 chr9	37192080	37207549	ZCCHC7	intron-3	intronic
