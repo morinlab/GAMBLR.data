@@ -60,7 +60,7 @@ genome_builds <- c(
 versions <- c(
     "0.0",
     "0.1",
-    "_latest"
+    "0.2"
 )
 
 # All possible combinations of data/genome build/version
