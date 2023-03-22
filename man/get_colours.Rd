@@ -2,7 +2,7 @@
 % Please edit documentation in R/data.R
 \name{get_colours}
 \alias{get_colours}
-\title{Get standardized colours for lymphoid cancers}
+\title{Get standardized colours for lymphoid cancers.}
 \usage{
 get_colours(
   show_available = FALSE,
@@ -15,28 +15,36 @@ get_colours(
 \arguments{
 \item{show_available}{Set to TRUE to see what options are available.}
 
-\item{this_category}{Optionally supply one of the available categories to see a subset of the options that are available}
+\item{this_category}{Optionally supply one of the available categories to
+see a subset of the options that are available.}
 
-\item{this_group}{Optionally supply one of the available groups to see the palette just for this group}
+\item{this_group}{Optionally supply one of the available groups to see the
+palette just for this group.}
 
-\item{drop_alias}{Set to FALSE to see the redundant colours with their aliases}
+\item{as_named_vector}{Whether to return the colors as named vector.}
+
+\item{drop_alias}{When FALSE, shows the redundant colours with their aliases.}
 }
 \value{
-A data frame or named character vector of colour Hex codes
+A data frame or named character vector of colour Hex codes.
 }
 \description{
-Retrieve and visualize standardized colours schemes for lymphoid cancers
+Retrieve and visualize standardized colours
+schemes for lymphoid cancers.
 }
 \details{
-Colours hand picked to represent various common entities and clinical variables relevant for lymphoid cancers.
+Colours hand picked to represent various common entities and
+clinical variables relevant for lymphoid cancers.
 }
 \examples{
-get_colours(show_available=TRUE)
-# printout shows that "subgroup" is one option to narrow it down, supply this to the function as this_category:
-get_colours(show_available=TRUE,this_category = "subgroup")
-# printout and plot shows several options. Pick the one you want to visualize it in isolation
-get_colours(show_available=TRUE,this_group = "LymphGen")
-#if satisfied, get the result for use with ggplot
-col_vec = get_colours(this_group = "LymphGen",as_named_vector = T)
-#ggplot(some_data) + scale_fill_manual(values=col_vec) 
+get_colours(show_available = TRUE)
+# printout shows that "subgroup" is one option to narrow it down,
+# supply this to the function as this_category:
+get_colours(show_available = TRUE, this_category = "subgroup")
+# printout and plot shows several options.
+# Pick the one you want to visualize it in isolation
+get_colours(show_available = TRUE, this_group = "LymphGen")
+# if satisfied, get the result for use with ggplot
+col_vec <- get_colours(this_group = "LymphGen", as_named_vector = TRUE)
+ggplot(...) + scale_fill_manual(values = col_vec)
 }

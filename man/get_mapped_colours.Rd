@@ -2,27 +2,40 @@
 % Please edit documentation in R/data.R
 \name{get_mapped_colours}
 \alias{get_mapped_colours}
-\title{Produce colour palettes from your metadata}
+\title{Produce colour palettes from your metadata.}
 \usage{
-get_mapped_colours(this_df, check = FALSE, as_list = F)
+get_mapped_colours(this_df, check = FALSE, as_list = FALSE)
 }
 \arguments{
-\item{this_df}{Provide a data frame with at least one column}
+\item{this_df}{Provide a data frame with at least one column. Required.}
 
-\item{check}{Perform checks for unsupported values and throw helpful errors and exit (rather than happily returning an incomplete palette)}
+\item{check}{Optionally, whether to perform checks for unsupported values
+and return helpful errors on exit (rather than happily returning an
+incomplete palette).}
 
-\item{as_list}{Set to TRUE if you want a named list separating the colours by the original column names, otherwise all mappings will be in a single named vector}
+\item{as_list}{Set to TRUE if you want a named list separating the colours
+by the original column names, otherwise all mappings will be in a
+single named vector.}
 }
 \value{
-Either a vector or list of Hex codes
+Either a vector or list of Hex codes.
 }
 \description{
-Given a data frame and at least one column, the function will determine whether a colour palette exists and assign the colours to all levels of data in that column.
+Given a data frame with at least one column, the function will
+determine whether a colour palette exists and assign the colours to all
+levels of data in that column.
 }
 \details{
-This helper function seeks to help you standardize colour mappings within and across projects. It will return either a vector or a list for compatability with ggplot and ComplexHeatmap, respectively.
+This helper function seeks to help you standardize colour mappings
+within and across projects. It will return either a vector or a list for
+compatability with ggplot and ComplexHeatmap, respectively.
 }
 \examples{
-dplyr::select(this_big_metadata_table, pathology,COO,EBV_status) \%>\% get_mapped_colours()
+dplyr::select(
+     this_big_metadata_table,
+     pathology,
+     COO,
+     EBV_status) \%>\%
+get_mapped_colours()
 
 }
