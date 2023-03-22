@@ -12,7 +12,7 @@ generate_data <- function(
     data_object <- paste0(
             Row[["dataset"]],
             "_",
-            Row[["genome_build"]],
+            Row[["focus"]],
             "_v",
             Row[["version"]]
         )
@@ -25,7 +25,7 @@ generate_data <- function(
             "/",
             Row[["version"]],
             "/",
-            Row[["genome_build"]],
+            Row[["focus"]],
             ".tsv"
         )
 
@@ -44,6 +44,7 @@ generate_data <- function(
     )
 }
 
+# Coordinate-based data objects
 # All possible names of datasets
 datasets <- c(
     "somatic_hypermutation_locations"
@@ -66,13 +67,54 @@ versions <- c(
 )
 
 # All possible combinations of data/genome build/version
-all <- expand.grid(
+all_coordinates <- expand.grid(
     dataset = datasets,
-    genome_build = genome_builds,
+    focus = genome_builds,
     version = versions,
     stringsAsFactors = FALSE)
 
-all <- all[apply(all, 1, function(x) {length(unique(x)) == 3}),]
+
+# Pathology-based data objects
+# All possible names of datasets
+datasets <- c(
+    "lymphoma_genes"
+)
+
+# All possible genome builds
+pathologies <- c(
+    "bl",
+    "dlbcl",
+    "mcl"
+)
+
+# All possible versions
+# This will need to be modified with the release of new data
+versions <- c(
+    "0.1",
+    "_latest"
+)
+
+# All possible combinations of data/pathology/version
+all_pathologies <- expand.grid(
+    dataset = datasets,
+    focus = pathologies,
+    version = versions,
+    stringsAsFactors = FALSE)
+
+all <- bind_rows(
+    all_coordinates,
+    all_pathologies
+)
+
+# Manually include legacy datasets
+all <- bind_rows(
+    all,
+    tibble(
+        dataset = c("lymphoma_genes"),
+        focus = c("lymphoma_genes"),
+        version = c("0.0")
+    )
+)
 
 # Generate the rdas for each object
 apply(
