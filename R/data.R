@@ -24,7 +24,7 @@
 #' all_dlbcl_genes <- get_genes(entities = "DLBCL", curated_only = FALSE)
 #' all_curated_genes <- get_genes()
 
-get_genes <- function (
+get_genes <- function(
         entities = c("DLBCL", "MCL", "BL"),
         curated_only = TRUE,
         gene_format = "symbol"
@@ -120,7 +120,7 @@ get_genes <- function (
 #' get_mapped_colours()
 #'
 
-get_mapped_colours <- function (
+get_mapped_colours <- function(
         this_df,
         check = FALSE,
         as_list = FALSE
@@ -218,7 +218,7 @@ get_mapped_colours <- function (
 #' col_vec <- get_colours(this_group = "LymphGen", as_named_vector = TRUE)
 #' ggplot(...) + scale_fill_manual(values = col_vec)
 
-get_colours <- function (
+get_colours <- function(
         show_available = FALSE,
         this_category,
         this_group,
