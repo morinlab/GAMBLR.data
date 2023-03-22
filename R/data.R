@@ -27,15 +27,17 @@
 get_genes <- function(
         entities = c("DLBCL", "MCL", "BL"),
         curated_only = TRUE,
-        gene_format = "symbol"
+        gene_format = "symbol",
+        version = "_latest"
     ) {
     #construct file name using entity
     r_objects <- entities %>%
         tolower() %>%
         paste0(
             . ,
-            "_genes_latest"
-        ) #update this to get the version from the config if specified
+            "_v",
+            version
+        )
 
     all_genes <- c()
 
@@ -67,13 +69,13 @@ get_genes <- function(
             )
         } else if (gene_format == "ensembl") {
 
-        #TO DO: the BL and MCL files need to be updated to support this option
-        stop ("this option is not yet supported")
             these_genes <- pull(
                 this_df,
                 ensembl_gene_id
             )
+
         }
+
         all_genes <- c(
             all_genes,
             these_genes
