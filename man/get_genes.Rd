@@ -7,7 +7,8 @@
 get_genes(
   entities = c("DLBCL", "MCL", "BL"),
   curated_only = TRUE,
-  gene_format = "symbol"
+  gene_format = "symbol",
+  version = "_latest"
 )
 }
 \arguments{

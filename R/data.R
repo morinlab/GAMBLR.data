@@ -30,64 +30,125 @@ get_genes <- function(
         gene_format = "symbol",
         version = "_latest"
     ) {
+
+    # We need to handle the legacy version (0.0) separately
+    # because it was not pathology-specific
+    if (version == "0.0") {
+        message(
+            paste(
+            "You have requested the legacy version of the lymphoma genes.",
+            "It is only provided here for backwards compatibility.",
+            "We recommend you use the most recent version by keeping the",
+            "default value of the argument version. Use at your own risk."
+            )
+        )
+
+        legacy_lymphoma_genes <- lymphoma_genes_lymphoma_genes_v0.0 %>%
+            dplyr::select(
+                Gene, ensembl_gene_id,
+                intersect(
+                    colnames(.),
+                    entities
+                )
+            )
+        if (curated_only) {
+            # drop any row where all pathologies have FALSE
+            legacy_lymphoma_genes <- legacy_lymphoma_genes %>%
+                dplyr::filter(
+                    ! if_all(3:ncol(.), ~ . == "FALSE")
+                )
+        }
+
+        if (gene_format == "symbol") {
+            return(legacy_lymphoma_genes$Gene)
+        } else if (gene_format == "ensemble") {
+            return(legacy_lymphoma_genes$ensembl_gene_id)
+        } else if (gene_format == "data.frame") {
+            return(legacy_lymphoma_genes)
+        } else {
+            stop(
+                "You requested output format that is not supported."
+            )
+        }
+    }
+
     #construct file name using entity
     r_objects <- entities %>%
         tolower() %>%
         paste0(
-            . ,
+            "lymphoma_genes_",
+            .,
             "_v",
             version
         )
 
-    all_genes <- c()
-
-    for (r_object in r_objects){
-        # check for unsupported gene sets
-        if (!exists(r_object)) {
+    # check for unsupported gene sets
+    missing_sets <- c()
+    for (i in seq_along(r_objects)) {
+        if (!exists(r_objects[i])) {
             warning(
                 paste(
                     "Skipping entity because object",
-                    r_object,
+                    r_objects[i],
                     "doesn't exist"
                 )
             )
+        missing_sets <- c(missing_sets, i)
         }
-
-        this_df <- base::get(r_object)
-
-        if (curated_only) {
-            this_df <- dplyr::filter(
-                this_df,
-                curated == TRUE
-            )
-        }
-
-        if (gene_format == "symbol") {
-            these_genes <- pull(
-                this_df,
-                Gene
-            )
-        } else if (gene_format == "ensembl") {
-
-            these_genes <- pull(
-                this_df,
-                ensembl_gene_id
-            )
-
-        }
-
-        all_genes <- c(
-            all_genes,
-            these_genes
-        )
-
     }
 
-    return(
-        unique(
-            all_genes
+
+    if (length(missing_sets) > 0) {
+        r_objects <- r_objects[- missing_sets]
+        entities <- entities[- missing_sets]
+    }
+
+    # Combine all lists into one df
+    all_entities_data <- lapply(
+            r_objects,
+            base::get
+        ) %>%
+        # only select necessary columns
+        lapply(
+            .,
+            `[`,
+            ,
+            c("ensembl_gene_id", "Gene", "curated")
         )
-    )
+
+    names(all_entities_data) <- entities
+
+    all_entities_data <- all_entities_data %>%
+        bind_rows(.id = "entity")
+
+    if (curated_only) {
+        # drop any row where curated is FALSE
+        all_entities_data <- all_entities_data %>%
+            dplyr::filter(
+                curated == "TRUE"
+            )
+    }
+
+    if (gene_format == "symbol") {
+        return(all_entities_data$Gene %>% unique %>% sort)
+    } else if (gene_format == "ensemble") {
+        return(all_entities_data$ensembl_gene_id %>% unique %>% sort)
+    } else if (gene_format == "data.frame") {
+        return(
+            all_entities_data %>%
+            select(-curated) %>%
+            mutate(is_gene = "TRUE") %>%
+            tidyr::pivot_wider(
+                names_from = "entity",
+                values_from = "is_gene"
+            ) %>%
+            replace(is.na(.), "FALSE")
+        )
+    } else {
+        stop(
+            "You requested output format that is not supported."
+        )
+    }
 }
 
 #' @title Produce colour palettes from your metadata.
