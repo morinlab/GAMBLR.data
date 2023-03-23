@@ -7,16 +7,24 @@
 get_genes(
   entities = c("DLBCL", "MCL", "BL"),
   curated_only = TRUE,
-  gene_format = "symbol"
+  gene_format = "symbol",
+  version = "_latest"
 )
 }
 \arguments{
-\item{curated_only}{Specify FALSE to retrieve all genes or leave default for the curated subset}
+\item{entities}{Optional vector specifying one or more lymphoma entities
+e.g. MCL, DLBCL, BL.}
 
-\item{Optional}{vector specifying one or more lymphoma entities e.g. MCL, DLBCL, BL}
+\item{curated_only}{Specify FALSE to retrieve all genes or leave default
+for the curated subset.}
+
+\item{gene_format}{Specify what to return as output. Can be one of:
+* "symbol" (the default): list of gene symbols
+* "ensembl": list of ENSEMBLE IDs
+* "data.frame": data frame with column Gene and per-entity gene status}
 }
 \value{
-A character vector of gene symbol or Ensembl IDs
+A character vector of gene symbol or Ensembl IDs or a data frame.
 }
 \description{
 Retrieve gene names from bundled lymphoma gene lists.
@@ -26,6 +34,6 @@ Complete lists of genes described as significantly mutated in large
 lymphoma studies have been curated and provided with this package.
 }
 \examples{
-all_dlbcl_genes = get_genes(entities="DLBCL",curated_only=FALSE)
-all_curated_genes = get_genes()
+all_dlbcl_genes <- get_genes(entities = "DLBCL", curated_only = FALSE)
+all_curated_genes <- get_genes()
 }
