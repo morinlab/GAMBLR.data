@@ -43,7 +43,15 @@ get_genes <- function(
             )
         )
 
-        legacy_lymphoma_genes <- lymphoma_genes_lymphoma_genes_v0.0 %>%
+        legacy_lymphoma_genes <- eval(
+                parse(
+                    text = paste0(
+                        "GAMBLR.data::",
+                        "lymphoma_genes_lymphoma_genes_v0.0")
+                    )
+            )
+
+        legacy_lymphoma_genes <- legacy_lymphoma_genes %>%
             dplyr::select(
                 Gene, ensembl_gene_id,
                 intersect(
@@ -73,8 +81,9 @@ get_genes <- function(
     }
 
     #construct file name using entity
+    entities <- tolower(entities)
+
     r_objects <- entities %>%
-        tolower() %>%
         paste0(
             "lymphoma_genes_",
             .,
@@ -83,31 +92,71 @@ get_genes <- function(
         )
 
     # check for unsupported gene sets
-    missing_sets <- c()
-    for (i in seq_along(r_objects)) {
-        if (!exists(r_objects[i])) {
-            warning(
-                paste(
-                    "Skipping entity because object",
-                    r_objects[i],
-                    "doesn't exist"
-                )
-            )
-        missing_sets <- c(missing_sets, i)
-        }
-    }
+    all_files <- system.file(
+        "extdata",
+        package = "GAMBLR.data"
+    ) %>%
+    list.files(
+        recursive = TRUE,
+        full.names = TRUE
+    )
 
+    all_files <- gsub(
+        ".*extdata/",
+        "",
+        all_files
+    )
+
+    all_files <- all_files[grepl("lymphoma_genes", all_files)]
+
+    all_files <- all_files[grepl(version, all_files)]
+
+    available_entities <- gsub("(.*/\\s*(.*$))", "\\2", all_files)
+
+    available_entities <- gsub(".tsv", "", available_entities)
+
+    missing_sets <- setdiff(
+        entities,
+        available_entities
+    )
 
     if (length(missing_sets) > 0) {
-        r_objects <- r_objects[- missing_sets]
-        entities <- entities[- missing_sets]
+        warning(
+            paste(
+                "The gene set for the entity",
+                missing_sets,
+                "is not available and will not be returned."
+            )
+        )
+        r_objects <- r_objects[
+                grepl(
+                    paste(
+                        available_entities,
+                        collapse="|"
+                    ),
+                    r_objects
+                )
+            ]
+        entities <- entities[entities %in% available_entities]
     }
 
     # Combine all lists into one df
-    all_entities_data <- lapply(
-            r_objects,
-            base::get
-        ) %>%
+    # Do it in a way that when GAMBLR.data is ot imported, the data objects
+    # are still available
+    all_entities_data <- list()
+
+    for (i in seq_along(r_objects)) {
+        all_entities_data[[i]] <- eval(
+            parse(
+                text = paste0(
+                    "GAMBLR.data::",
+                    r_objects[i]
+                )
+            )
+        )
+    }
+
+    all_entities_data <- all_entities_data %>%
         # only select necessary columns
         lapply(
             .,
@@ -116,7 +165,7 @@ get_genes <- function(
             c("ensembl_gene_id", "Gene", "curated")
         )
 
-    names(all_entities_data) <- entities
+    names(all_entities_data) <- toupper(entities)
 
     all_entities_data <- all_entities_data %>%
         bind_rows(.id = "entity")
