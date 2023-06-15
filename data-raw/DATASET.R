@@ -122,3 +122,33 @@ apply(
     1,
     generate_data
 )
+
+
+grch37_ashm_regions <- read.delim(
+    paste0(
+                getwd(),
+                "/inst/extdata/",
+                "somatic_hypermutation_locations",
+                "/",
+                "_latest",
+                "/",
+                "GRCh37",
+                ".tsv"
+            )
+)
+
+hg38_ashm_regions <- read.delim(
+    paste0(
+                getwd(),
+                "/inst/extdata/",
+                "somatic_hypermutation_locations",
+                "/",
+                "_latest",
+                "/",
+                "GRCh38",
+                ".tsv"
+            )
+)
+
+use_data(grch37_ashm_regions)
+use_data(hg38_ashm_regions)
