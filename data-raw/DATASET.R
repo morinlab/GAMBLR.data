@@ -150,5 +150,5 @@ hg38_ashm_regions <- read.delim(
             )
 )
 
-use_data(grch37_ashm_regions)
-use_data(hg38_ashm_regions)
+use_data(grch37_ashm_regions, overwrite = TRUE)
+use_data(hg38_ashm_regions, overwrite = TRUE)
