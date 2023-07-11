@@ -368,7 +368,7 @@ get_colours <- function(
                     c("example" = "name")
                 )
 
-            message(p)
+            print(p)
 
             message(
                 paste(
@@ -387,13 +387,18 @@ get_colours <- function(
                     c("example"="name")
                 )
 
-            message(p)
+            print(p)
 
         } else if (!missing(this_group)) {
-            p <- colour_codes %>%
+            this_group_df <- colour_codes %>%
                 dplyr::filter(
                     group == this_group
-                ) %>%
+                )
+
+            allcols <- this_group_df$colour
+            names(allcols) <- this_group_df$name
+
+            p <- this_group_df %>%
                 ggplot(
                     aes(
                         x = name,
@@ -418,10 +423,15 @@ get_colours <- function(
 
             return()
         } else if (!missing(this_category)) {
-            p <- colour_codes %>%
+            this_category_df <- colour_codes %>%
                 dplyr::filter(
                     category == this_category
-                ) %>%
+                ) 
+
+            allcols <- this_category_df$colour
+            names(allcols) <- this_category_df$name
+
+            p <- this_category_df %>%
                 group_by(group) %>%
                 mutate(
                     n =n ()
