@@ -69,7 +69,7 @@ get_genes <- function(
 
         if (gene_format == "symbol") {
             return(legacy_lymphoma_genes$Gene)
-        } else if (gene_format == "ensemble") {
+        } else if (gene_format == "ensembl") {
             return(legacy_lymphoma_genes$ensembl_gene_id)
         } else if (gene_format == "data.frame") {
             return(legacy_lymphoma_genes)
@@ -180,7 +180,7 @@ get_genes <- function(
 
     if (gene_format == "symbol") {
         return(all_entities_data$Gene %>% unique %>% sort)
-    } else if (gene_format == "ensemble") {
+    } else if (gene_format == "ensembl") {
         return(all_entities_data$ensembl_gene_id %>% unique %>% sort)
     } else if (gene_format == "data.frame") {
         return(
