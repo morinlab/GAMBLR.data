@@ -228,10 +228,10 @@ get_genes <- function(
 #'
 #' @examples
 #' dplyr::select(
-#'      this_big_metadata_table,
-#'      pathology,
-#'      COO,
-#'      EBV_status) %>%
+#'  GAMBLR::get_gambl_metadata(),
+#'  pathology,
+#'  COO_consensus,
+#'  EBV_status_inf) %>%
 #' get_mapped_colours()
 #'
 
