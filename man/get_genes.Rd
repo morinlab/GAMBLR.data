@@ -22,6 +22,10 @@ for the curated subset.}
 * "symbol" (the default): list of gene symbols
 * "ensembl": list of ENSEMBLE IDs
 * "data.frame": data frame with column Gene and per-entity gene status}
+
+\item{version}{Specify which version to return. Currently supported versions
+are 0.0 (legacy version from original GAMBLR), 0.1, and _latest. The
+latter will always point to the highest numeric version of the genes.}
 }
 \value{
 A character vector of gene symbol or Ensembl IDs or a data frame.

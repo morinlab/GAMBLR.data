@@ -14,6 +14,9 @@
 #'      * "symbol" (the default): list of gene symbols
 #'      * "ensembl": list of ENSEMBLE IDs
 #'      * "data.frame": data frame with column Gene and per-entity gene status
+#' @param version Specify which version to return. Currently supported versions
+#'      are 0.0 (legacy version from original GAMBLR), 0.1, and _latest. The
+#'      latter will always point to the highest numeric version of the genes.
 #'
 #' @return A character vector of gene symbol or Ensembl IDs or a data frame.
 #'
@@ -69,7 +72,7 @@ get_genes <- function(
 
         if (gene_format == "symbol") {
             return(legacy_lymphoma_genes$Gene)
-        } else if (gene_format == "ensemble") {
+        } else if (gene_format == "ensembl") {
             return(legacy_lymphoma_genes$ensembl_gene_id)
         } else if (gene_format == "data.frame") {
             return(legacy_lymphoma_genes)
@@ -180,7 +183,7 @@ get_genes <- function(
 
     if (gene_format == "symbol") {
         return(all_entities_data$Gene %>% unique %>% sort)
-    } else if (gene_format == "ensemble") {
+    } else if (gene_format == "ensembl") {
         return(all_entities_data$ensembl_gene_id %>% unique %>% sort)
     } else if (gene_format == "data.frame") {
         return(
@@ -225,10 +228,10 @@ get_genes <- function(
 #'
 #' @examples
 #' dplyr::select(
-#'      this_big_metadata_table,
-#'      pathology,
-#'      COO,
-#'      EBV_status) %>%
+#'  GAMBLR::get_gambl_metadata(),
+#'  pathology,
+#'  COO_consensus,
+#'  EBV_status_inf) %>%
 #' get_mapped_colours()
 #'
 
@@ -365,7 +368,7 @@ get_colours <- function(
                     c("example" = "name")
                 )
 
-            message(p)
+            print(p)
 
             message(
                 paste(
@@ -384,13 +387,18 @@ get_colours <- function(
                     c("example"="name")
                 )
 
-            message(p)
+            print(p)
 
         } else if (!missing(this_group)) {
-            p <- colour_codes %>%
+            this_group_df <- colour_codes %>%
                 dplyr::filter(
                     group == this_group
-                ) %>%
+                )
+
+            allcols <- this_group_df$colour
+            names(allcols) <- this_group_df$name
+
+            p <- this_group_df %>%
                 ggplot(
                     aes(
                         x = name,
@@ -415,10 +423,15 @@ get_colours <- function(
 
             return()
         } else if (!missing(this_category)) {
-            p <- colour_codes %>%
+            this_category_df <- colour_codes %>%
                 dplyr::filter(
                     category == this_category
-                ) %>%
+                ) 
+
+            allcols <- this_category_df$colour
+            names(allcols) <- this_category_df$name
+
+            p <- this_category_df %>%
                 group_by(group) %>%
                 mutate(
                     n =n ()
