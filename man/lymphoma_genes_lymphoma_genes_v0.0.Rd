@@ -3,7 +3,6 @@
 \docType{data}
 \name{lymphoma_genes_lymphoma_genes_v0.0}
 \alias{lymphoma_genes_lymphoma_genes_v0.0}
-\alias{lymphoma_genes}
 \title{Lymphoma Genes v0.0}
 \format{
 \subsection{\code{lymphoma_genes_lymphoma_genes_v0.0}}{

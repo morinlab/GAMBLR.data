@@ -31,11 +31,13 @@ within and across projects. It will return either a vector or a list for
 compatability with ggplot and ComplexHeatmap, respectively.
 }
 \examples{
+\dontrun{
 dplyr::select(
  GAMBLR::get_gambl_metadata(),
  pathology,
  COO_consensus,
  EBV_status_inf) \%>\%
 get_mapped_colours()
+}
 
 }

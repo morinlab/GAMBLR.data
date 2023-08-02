@@ -227,12 +227,14 @@ get_genes <- function(
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' dplyr::select(
 #'  GAMBLR::get_gambl_metadata(),
 #'  pathology,
 #'  COO_consensus,
 #'  EBV_status_inf) %>%
 #' get_mapped_colours()
+#' }
 #'
 
 get_mapped_colours <- function(
@@ -322,6 +324,7 @@ get_mapped_colours <- function(
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' get_colours(show_available = TRUE)
 #' # printout shows that "subgroup" is one option to narrow it down,
 #' # supply this to the function as this_category:
@@ -332,6 +335,8 @@ get_mapped_colours <- function(
 #' # if satisfied, get the result for use with ggplot
 #' col_vec <- get_colours(this_group = "LymphGen", as_named_vector = TRUE)
 #' ggplot(...) + scale_fill_manual(values = col_vec)
+#' }
+#' 
 
 get_colours <- function(
         show_available = FALSE,

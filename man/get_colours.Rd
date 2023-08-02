@@ -37,6 +37,7 @@ Colours hand picked to represent various common entities and
 clinical variables relevant for lymphoid cancers.
 }
 \examples{
+\dontrun{
 get_colours(show_available = TRUE)
 # printout shows that "subgroup" is one option to narrow it down,
 # supply this to the function as this_category:
@@ -47,4 +48,6 @@ get_colours(show_available = TRUE, this_group = "LymphGen")
 # if satisfied, get the result for use with ggplot
 col_vec <- get_colours(this_group = "LymphGen", as_named_vector = TRUE)
 ggplot(...) + scale_fill_manual(values = col_vec)
+}
+
 }

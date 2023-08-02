@@ -27,4 +27,8 @@ LazyData: true
 Imports: 
     dplyr,
     ggplot2,
-    tibble
+    tibble,
+    tidyr
+Remotes:
+    morinlab/GAMBLR.helpers
+LazyDataCompression: xz

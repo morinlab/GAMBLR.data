@@ -620,8 +620,6 @@
 #' Lymphoma Genes v0.0
 #'
 #' A comprehenssive resource of genes associated with different types of lymphomas.
-#' 
-#' @aliases lymphoma_genes
 #'
 #' @format ## `lymphoma_genes_lymphoma_genes_v0.0`
 #' A data frame with 196 rows and 12 columns.
