@@ -281,7 +281,7 @@ lymphoma_genes$LymphGen=FALSE
 lymphoma_genes[lymphoma_genes$entrezgene_id %in% lymphgen_anno$NCBI_Gene_ID,"LymphGen"] = TRUE
 
 #load the Reddy gene list
-reddy_genes = system.file("extdata","reddy_genes.tsv",package="GAMBLR") %>%
+reddy_genes = system.file("extdata","reddy_genes.tsv",package="GAMBLR.data") %>%
   read_tsv() %>% dplyr::rename("hgnc_symbol"="Approved symbol")
 
 usethis::use_data(reddy_genes, overwrite = TRUE)
@@ -364,14 +364,6 @@ lymphoma_genes = dplyr::select(lymphoma_genes,-entrezgene_id) %>% group_by(Gene,
 #lymphoma_genes_comprehensive[lymphoma_genes_comprehensive$Gene %in% DLBCL_curated_genes,]$curated = TRUE
 #lymphoma_genes_comprehensive = dplyr::filter(lymphoma_genes_comprehensive,Reddy==TRUE | Chapuy == TRUE | LymphGen == TRUE | curated == TRUE)
 #lymphoma_genes_comprehensive$other_support = ""
-
-# Example SSM data from Grande et. al, 2019
-grande_maf = system.file("extdata", "blood8871418-suppl2-ssm.csv", package = "GAMBLR.data") %>%
-  read_tsv(.) %>%
-  as.data.frame
-grande_maf = grande_maf[!colnames(grande_maf) %in% c("tumor_biospecimen_id","normal_biospecimen_id")]
-
-usethis::use_data(grande_maf, overwrite = TRUE)
 
 #download gene annotations
 #load library

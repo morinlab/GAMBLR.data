@@ -29,6 +29,4 @@ Imports:
     ggplot2,
     tibble,
     tidyr
-Remotes:
-    morinlab/GAMBLR.helpers
 LazyDataCompression: xz
