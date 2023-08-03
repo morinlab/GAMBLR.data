@@ -26,6 +26,7 @@ Depends:
 LazyData: true
 Imports: 
     dplyr,
+    GAMBLR.helpers,
     ggplot2,
     tibble,
     tidyr
