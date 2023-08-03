@@ -1,510 +1,745 @@
+#' Oncogenes in grch37 genome build.
+#'
+#' A data frame with the coordinates of lymphoma oncogenes relative to the grch37 genome build.
+#'
+#' @format ## `grch37_oncogene`
+#' A data frame with 19 rows and 5 columns.
+#' \describe{
+#'   \item{chrom}{Chromosomes without chr-prefix, 1:22.}
+#'   \item{start}{Start coordinate for the specified oncogene.}
+#'   \item{end}{End coordinate for the specified oncogene.}
+#'   \item{gene}{Lymphoma oncogene.}
+#'   \item{entrez}{ENTREZ ID for the specified oncogene.}
+#' }
+"grch37_oncogene"
 
-#' @title Get genes from one or more gene lists
+#' Oncogenes in hg38 genome build.
 #'
-#' @description Retrieve gene names from bundled lymphoma gene lists.
+#' A data frame with the coordinates of lymphoma oncogenes relative to the hg38 genome build.
 #'
-#' @details Complete lists of genes described as significantly mutated in large
-#' lymphoma studies have been curated and provided with this package.
+#' @format ## `hg38_oncogene`
+#' A data frame with 19 rows and 5 columns.
+#' \describe{
+#'   \item{chrom}{Chromosomes without chr-prefix, 1:22.}
+#'   \item{start}{Start coordinate for the specified oncogene.}
+#'   \item{end}{End coordinate for the specified oncogene.}
+#'   \item{gene}{Lymphoma oncogene.}
+#'   \item{entrez}{ENTREZ ID for the specified oncogene.}
+#' }
+"hg38_oncogene"
+
+#' Chromosome Arms grch37.
 #'
-#' @param entities Optional vector specifying one or more lymphoma entities
-#'      e.g. MCL, DLBCL, BL.
-#' @param curated_only Specify FALSE to retrieve all genes or leave default
-#'      for the curated subset.
-#' @param gene_format Specify what to return as output. Can be one of:
-#'      * "symbol" (the default): list of gene symbols
-#'      * "ensembl": list of ENSEMBLE IDs
-#'      * "data.frame": data frame with column Gene and per-entity gene status
-#' @param version Specify which version to return. Currently supported versions
-#'      are 0.0 (legacy version from original GAMBLR), 0.1, and _latest. The
-#'      latter will always point to the highest numeric version of the genes.
+#' A data frame with the chromosome arm coordinates in respect to grch37.
 #'
-#' @return A character vector of gene symbol or Ensembl IDs or a data frame.
+#' @format ## `chromosome_arms_grch37`
+#' A data frame with 48 rows and 4 columns.
+#' \describe{
+#'   \item{chromosome}{Chromosomes without chr-prefix, 1:22, X and Y.}
+#'   \item{start}{Start coordinates for the specified chromosome arm.}
+#'   \item{end}{End coordinates for the specified chromosome arm.}
+#'   \item{arm}{Chromosome arm, either p or q.}
+#' }
+"chromosome_arms_grch37"
+
+
+#' Chromosome Arms hg38.
 #'
-#' @import dplyr
-#' @export
+#' A data frame with the chromosome arm coordinates in respect to hg38.
 #'
+#' @format ## `chromosome_arms_hg38`
+#' A data frame with 48 rows and 4 columns.
+#' \describe{
+#'   \item{chromosome}{Chromosomes with chr-prefix, 1:22, X and Y.}
+#'   \item{start}{Start coordinates for the specified chromosome arm.}
+#'   \item{end}{End coordinates for the specified chromosome arm.}
+#'   \item{arm}{Chromosome arm, either p or q.}
+#' }
+"chromosome_arms_hg38"
+
+
+#' Double Hit Signature Genes With Weights.
+#'
+#' A data frame with double hit signature genes (both as ensembl IDs and Hugo symbols) and importance scores.
+#'
+#' @format ## `dhitsig_genes_with_weights`
+#' A data frame with 104 rows and 3 columns.
+#' \describe{
+#'   \item{Ensembl_ID}{Ensembl IDs as factors, 104 levels.}
+#'   \item{ImportanceScore}{Numeric column with importance scores.}
+#'   \item{Hugo_Symbol}{Gene symbols in Hugo format as a factor with 104 levels.}
+#' }
+"dhitsig_genes_with_weights"
+
+
+#' Genes Blacklist.
+#'
+#' A tibble with gene symbols (Hugo) that falls within blacklisted regions of the genome.
+#'
+#' @format ## `gene_blacklist`
+#' A tibble with 291 rows.
+#' \describe{
+#'   \item{Gene}{Genes symbols in Hugo format.}
+#' }
+"gene_blacklist"
+
+
+#' Gene Coordinates for grch37 (all).
+#'
+#' All gene coordinates in respect to grch37.
+#'
+#' @format ## `grch37_all_gene_coordinates`
+#' A data frame with 2602 rows and 6 columns.
+#' \describe{
+#'   \item{ensembl_gene_id}{Ensembl gene ID}
+#'   \item{chromosome}{The chromosome that the gene is residing on}
+#'   \item{start}{The start coordinates for the gene}
+#'   \item{end}{The end coordinates for the gene}
+#'   \item{gene_name}{The gene name}
+#'   \item{hugo_symbol}{Gene symbol in Hugo format}
+#' }
+"grch37_all_gene_coordinates"
+
+
+#' grch37 Gene Coordinates.
+#'
+#' All gene coordinates in respect to grch37.
+#'
+#' @format ## `grch37_gene_coordinates`
+#' A data frame with 63,763 rows and 6 columns.
+#' \describe{
+#'   \item{ensembl_gene_id}{Ensembl gene ID}
+#'   \item{chromosome}{The chromosome that the gene is residing on}
+#'   \item{start}{The start coordinates for the gene}
+#'   \item{end}{The end coordinates for the gene}
+#'   \item{gene_name}{The gene name}
+#'   \item{hugo_symbol}{Gene symbol in Hugo format}
+#' }
+"grch37_gene_coordinates"
+
+
+#' Lymphoma Genes (grch37).
+#'
+#' Lymphoma associated genes in respect to grch37.
+#'
+#' @format ## `grch37_lymphoma_genes_bed`
+#' A data frame with 195 rows and 4 columns.
+#' \describe{
+#'   \item{chromosome_name}{The chromosome for which the gene is residing on}
+#'   \item{start_position}{The start coordinate for the gene}
+#'   \item{end_position}{The end coordinate for the gene}
+#'   \item{hgnc_symbol}{Gene symbol in Hugo format}
+#' }
+"grch37_lymphoma_genes_bed"
+
+
+#' grch37 Partner Genes.
+#'
+#' Translocation partners for oncogenes in with coordinates in respect to grch37.
+#'
+#' @format ## `grch37_partners`
+#' A data frame with 31 rows and 5 columns.
+#' \describe{
+#'   \item{chrom}{The chromosome for which the gene is residing on}
+#'   \item{start}{The start coordinate for the gene}
+#'   \item{end}{The end coordinate for the gene}
+#'   \item{gene}{Gene symbol in Hugo format}
+#'   \item{entrez}{Entrez ID}
+#' }
+"grch37_partners"
+
+#' hg38 Gene Coordinates.
+#'
+#' All gene coordinates in respect to hg38.
+#'
+#' @format ## `hg38_gene_coordinates`
+#' A data frame with 63,763 rows and 6 columns.
+#' \describe{
+#'   \item{ensembl_gene_id}{Ensembl gene ID}
+#'   \item{chromosome}{The chromosome that the gene is residing on}
+#'   \item{start}{The start coordinates for the gene}
+#'   \item{end}{The end coordinates for the gene}
+#'   \item{gene_name}{The gene name}
+#'   \item{hugo_symbol}{Gene symbol in Hugo format}
+#' }
+"hg38_gene_coordinates"
+
+
+#' Lymphoma Genes (hg38).
+#'
+#' Lymphoma associated genes in respect to hg38.
+#'
+#' @format ## `hg38_lymphoma_genes_bed`
+#' A data frame with 195 rows and 4 columns.
+#' \describe{
+#'   \item{chromosome_name}{The chromosome for which the gene is residing on}
+#'   \item{start_position}{The start coordinate for the gene}
+#'   \item{end_position}{The end coordinate for the gene}
+#'   \item{hgnc_symbol}{Gene symbol in Hugo format}
+#' }
+"hg38_lymphoma_genes_bed"
+
+
+#' hg38 Partner Genes.
+#'
+#' Translocation partners for oncogenes in with coordinates in respect to hg38.
+#'
+#' @format ## `hg38_partners`
+#' A data frame with 31 rows and 5 columns.
+#' \describe{
+#'   \item{chrom}{The chromsome for which the gene is residing on}
+#'   \item{start}{The start coordinate for the gene}
+#'   \item{end}{The end coordinate for the gene}
+#'   \item{gene}{Gene symbol in Hugo format}
+#'   \item{entrez}{Entrez ID}
+#' }
+"hg38_partners"
+
+
+#' grch37 Hotspot Regions.
+#'
+#' Mutation hotspot regions in respect to grch37.
+#'
+#' @format ## `hotspot_regions_grch37`
+#' A data frame with 6 rows and 3 columns.
+#' \describe{
+#'   \item{chrom}{Chromosome for the described region}
+#'   \item{start}{The start coordinate for the region}
+#'   \item{end}{The end coordinate for the region}
+#' }
+"hotspot_regions_grch37"
+
+
+#' hg38 Hotspot Regions.
+#'
+#' Mutation hotspot regions in respect to hg38.
+#'
+#' @format ## `hotspot_regions_hg38`
+#' A data frame with 6 rows and 3 columns.
+#' \describe{
+#'   \item{chrom}{Chromosome for the described region}
+#'   \item{start}{The start coordinate for the region}
+#'   \item{end}{The end coordinate for the region}
+#' }
+"hotspot_regions_hg38"
+
+
+#' Lymphoma Genes Comprehensive.
+#'
+#' A detailed data frame with lymphoma genes, annotated with evidence from literature and aSHM.
+#'
+#' @format ## `lymphoma_genes_comprehensive`
+#' A data frame with 127 rows and 9 columns.
+#' \describe{
+#'   \item{ensemble_gene_id}{Gene in Ensemble format}
+#'   \item{Gene}{Gene symbol in Hugo format.}
+#'   \item{Chapuy}{Boolean flag, TRUE if gene verified by the stated study (Chapuy)}
+#'   \item{Reddy}{Boolean flag, TRUE if gene verified by the stated study (Reddy)}
+#'   \item{LymphGen}{Boolean flag, TRUE if lymphGen}
+#'   \item{curated}{Boolean flag, describing if the gene has been curated or not}
+#'   \item{other}{Other support for the described gene}
+#'   \item{Lacy}{Boolean flag, TRUE if gene verified by the stated study (Lacy)}
+#'   \item{aSHM}{Boolean flag for annotating aSHM}
+#' }
+"lymphoma_genes_comprehensive"
+
+
+#' Reddy Genes.
+#'
+#' Genes identified as significantly mutated in DLBCL by the study of Reddy et al.
+#'
+#' @format ## `reddy_genes`
+#' A data frame with 150 rows and 4 columns.
+#' \describe{
+#'   \item{Input}{Input}
+#'   \item{hgnc_symbol}{The HGNC symbol}
+#'   \item{Approved name}{Approved name}
+#'   \item{HGNC ID}{HGNC ID}
+#' }
+"reddy_genes"
+
+
+#' Target Regions grch37.
+#'
+#' Target regions in respect to grch37.
+#'
+#' @format ## `target_regions_grch37`
+#' A data frame with 295994 rows and 3 columns.
+#' \describe{
+#'   \item{chrom}{Chromosome for the descriebd region}
+#'   \item{start}{Start coordinate of the region}
+#'   \item{end}{End coordiante of the region}
+#' }
+"target_regions_grch37"
+
+
+#' Target Regions hg38.
+#'
+#' Target regions in respect to hg38.
+#'
+#' @format ## `target_regions_hg38`
+#' A data frame with 296453 rows and 3 columns.
+#' \describe{
+#'   \item{chrom}{Chromosome for the descriebd region}
+#'   \item{start}{Start coordinate of the region}
+#'   \item{end}{End coordiante of the region}
+#' }
+"target_regions_hg38"
+
+
+#' Wright Genes With Weights.
+#'
+#' Description.
+#'
+#' @format ## `wright_genes_with_weights`
+#' A data frame with 210 rows and 3 columns.
+#' \describe{
+#'   \item{Ensembl_ID}{Gene in Ensembl ID format}
+#'   \item{Hugo_Symbol}{Gene symbol in Hugo format}
+#'   \item{Weight_tValue}{Weight Value for the specified gene}
+#' }
+"wright_genes_with_weights"
+
+
+#' Default mapping table between mutation type (aka, variant classification) to mutation class
+#'
+#' A dataset containing the mapping table between genomic mutation type (aka, variant classification) to mutation class.
+#' This dataset comes from the g3viz package and was obtained via this URL:
+#' https://github.com/morinlab/g3viz/tree/master/data
+#'
+#' @format A data frame with three columns:
+#' \describe{
+#'   \item{Mutation_Type}{Mutation type, aka, variant classification}
+#'   \item{Mutation_Class}{mutation class}
+#'   \item{Short_Name}{short name of mutation type}
+#' }
 #' @examples
-#' all_dlbcl_genes <- get_genes(entities = "DLBCL", curated_only = FALSE)
-#' all_curated_genes <- get_genes()
+#' mutation.table.df
+"mutation.table.df"
 
-get_genes <- function(
-        entities = c("DLBCL", "MCL", "BL"),
-        curated_only = TRUE,
-        gene_format = "symbol",
-        version = "_latest"
-    ) {
-
-    # We need to handle the legacy version (0.0) separately
-    # because it was not pathology-specific
-    if (version == "0.0") {
-        message(
-            paste(
-            "You have requested the legacy version of the lymphoma genes.",
-            "It is only provided here for backwards compatibility.",
-            "We recommend you use the most recent version by keeping the",
-            "default value of the argument version. Use at your own risk."
-            )
-        )
-
-        legacy_lymphoma_genes <- eval(
-                parse(
-                    text = paste0(
-                        "GAMBLR.data::",
-                        "lymphoma_genes_lymphoma_genes_v0.0")
-                    )
-            )
-
-        legacy_lymphoma_genes <- legacy_lymphoma_genes %>%
-            dplyr::select(
-                Gene, ensembl_gene_id,
-                intersect(
-                    colnames(.),
-                    entities
-                )
-            )
-        if (curated_only) {
-            # drop any row where all pathologies have FALSE
-            legacy_lymphoma_genes <- legacy_lymphoma_genes %>%
-                dplyr::filter(
-                    ! if_all(3:ncol(.), ~ . == "FALSE")
-                )
-        }
-
-        if (gene_format == "symbol") {
-            return(legacy_lymphoma_genes$Gene)
-        } else if (gene_format == "ensembl") {
-            return(legacy_lymphoma_genes$ensembl_gene_id)
-        } else if (gene_format == "data.frame") {
-            return(legacy_lymphoma_genes)
-        } else {
-            stop(
-                "You requested output format that is not supported."
-            )
-        }
-    }
-
-    #construct file name using entity
-    entities <- tolower(entities)
-
-    r_objects <- entities %>%
-        paste0(
-            "lymphoma_genes_",
-            .,
-            "_v",
-            version
-        )
-
-    # check for unsupported gene sets
-    all_files <- system.file(
-        "extdata",
-        package = "GAMBLR.data"
-    ) %>%
-    list.files(
-        recursive = TRUE,
-        full.names = TRUE
-    )
-
-    all_files <- gsub(
-        ".*extdata/",
-        "",
-        all_files
-    )
-
-    all_files <- all_files[grepl("lymphoma_genes", all_files)]
-
-    all_files <- all_files[grepl(version, all_files)]
-
-    available_entities <- gsub("(.*/\\s*(.*$))", "\\2", all_files)
-
-    available_entities <- gsub(".tsv", "", available_entities)
-
-    missing_sets <- setdiff(
-        entities,
-        available_entities
-    )
-
-    if (length(missing_sets) > 0) {
-        warning(
-            paste(
-                "The gene set for the entity",
-                missing_sets,
-                "is not available and will not be returned."
-            )
-        )
-        r_objects <- r_objects[
-                grepl(
-                    paste(
-                        available_entities,
-                        collapse="|"
-                    ),
-                    r_objects
-                )
-            ]
-        entities <- entities[entities %in% available_entities]
-    }
-
-    # Combine all lists into one df
-    # Do it in a way that when GAMBLR.data is ot imported, the data objects
-    # are still available
-    all_entities_data <- list()
-
-    for (i in seq_along(r_objects)) {
-        all_entities_data[[i]] <- eval(
-            parse(
-                text = paste0(
-                    "GAMBLR.data::",
-                    r_objects[i]
-                )
-            )
-        )
-    }
-
-    all_entities_data <- all_entities_data %>%
-        # only select necessary columns
-        lapply(
-            .,
-            `[`,
-            ,
-            c("ensembl_gene_id", "Gene", "curated")
-        )
-
-    names(all_entities_data) <- toupper(entities)
-
-    all_entities_data <- all_entities_data %>%
-        bind_rows(.id = "entity")
-
-    if (curated_only) {
-        # drop any row where curated is FALSE
-        all_entities_data <- all_entities_data %>%
-            dplyr::filter(
-                curated == "TRUE"
-            )
-    }
-
-    if (gene_format == "symbol") {
-        return(all_entities_data$Gene %>% unique %>% sort)
-    } else if (gene_format == "ensembl") {
-        return(all_entities_data$ensembl_gene_id %>% unique %>% sort)
-    } else if (gene_format == "data.frame") {
-        return(
-            all_entities_data %>%
-            select(-curated) %>%
-            mutate(is_gene = "TRUE") %>%
-            tidyr::pivot_wider(
-                names_from = "entity",
-                values_from = "is_gene"
-            ) %>%
-            replace(is.na(.), "FALSE")
-        )
-    } else {
-        stop(
-            "You requested output format that is not supported."
-        )
-    }
-}
-
-#' @title Produce colour palettes from your metadata.
+#' Mapping table between gene.symbol, uniprot.id, and pfam
 #'
-#' @description Given a data frame with at least one column, the function will
-#' determine whether a colour palette exists and assign the colours to all
-#' levels of data in that column.
+#' A dataset containing the mapping table between Hugo symbol, UniProt ID, and
+#' Pfam ACC. This dataset comes from the g3viz package and was obtained via this URL:
+#' https://github.com/morinlab/g3viz/tree/master/data
 #'
-#' @details This helper function seeks to help you standardize colour mappings
-#' within and across projects. It will return either a vector or a list for
-#' compatability with ggplot and ComplexHeatmap, respectively.
-#'
-#' @param this_df Provide a data frame with at least one column. Required.
-#' @param check Optionally, whether to perform checks for unsupported values
-#'      and return helpful errors on exit (rather than happily returning an
-#'      incomplete palette).
-#' @param as_list Set to TRUE if you want a named list separating the colours
-#'      by the original column names, otherwise all mappings will be in a
-#'      single named vector.
-#'
-#' @return Either a vector or list of Hex codes.
-#'
-#' @import dplyr
-#' @export
-#'
+#' @format A data frame with columns:
+#' \describe{
+#'   \item{symbol}{Gene symbol}
+#'   \item{uniprot}{UniProt ID}
+#'   \item{length}{protein length}
+#'   \item{start}{starting position of Pfam domain}
+#'   \item{end}{ending position of Pfam domain}
+#'   \item{hmm.acc}{Pfam accession number}
+#'   \item{hmm.name}{Pfam name}
+#'   \item{type}{Pfam type, i.e., domain/family/motif/repeat/disordered/coiled-coil}
+#' }
 #' @examples
-#' dplyr::select(
-#'  GAMBLR::get_gambl_metadata(),
-#'  pathology,
-#'  COO_consensus,
-#'  EBV_status_inf) %>%
-#' get_mapped_colours()
+#' hgnc2pfam.df
+#' @source Pfam (v31.0) and UniProt
+"hgnc2pfam.df"
+
+
+#' Colour Codes
 #'
-
-get_mapped_colours <- function(
-        this_df,
-        check = FALSE,
-        as_list = FALSE
-    ) {
-
-    column_names <- colnames(this_df)
-
-    # try to map every column to the colour palette using the name and,
-    # if available, user-specified aliases
-    mapped_list <- list()
-    mapped_vector <- c()
-    for (col_name in column_names) {
-
-        unique_values <- unique(this_df[[col_name]])
-
-        df <- dplyr::filter(
-            colour_codes,
-            name %in% unique_values
-        ) %>%
-        dplyr::select(
-            name,
-            colour
-        ) %>%
-        unique()
-
-        if (any(!unique_values %in% df$name)) {
-            message(
-                "missing one or more of the values in this set of colours:"
-            )
-            missing <- unique_values[which(!unique_values %in% df$name)]
-            message(
-                paste(
-                    missing,
-                    collapse = ", "
-                )
-            )
-
-            if (check) {
-                stop(
-                    paste(
-                    "you should correct this issue by modifying, dropping",
-                    "or setting the offending values to NA, where applicable"
-                    )
-                )
-            }
-        }
-
-        col_vec <- df$colour
-        names(col_vec) <- df$name
-        mapped_list[[col_name]] <- col_vec
-        mapped_vector <- c(
-            mapped_vector,
-            col_vec
-        )
-    }
-
-    if (as_list) {
-        return(mapped_list)
-    } else {
-        return(mapped_vector)
-    }
-
-}
-
-#' @title Get standardized colours for lymphoid cancers.
+#' A data frame with colour codes (hex) arranged into different categories, groups.
 #'
-#' @description Retrieve and visualize standardized colours
-#'      schemes for lymphoid cancers.
+#' @format ## `colour_codes`
+#' A data frame with 221 rows and 5 columns.
+#' \describe{
+#'   \item{category}{Describes category for any given colour.}
+#'   \item{group}{Describes the group for any given colour.}
+#'   \item{name}{The name for any given colour.}
+#'   \item{colour}{Colour annotated in HEX format.}
+#'   \item{is_alias}{Describes if the colour has an alias (yes) or not (NA)}
+#' }
+"colour_codes"
+
+
+#' GRCh37 ASHM Regions
 #'
-#' @details Colours hand picked to represent various common entities and
-#'      clinical variables relevant for lymphoid cancers.
+#' Aberrant Somatic Hyper Mutation (ASHM) regions in respect to GRCh37.
 #'
-#' @param show_available Set to TRUE to see what options are available.
-#' @param this_category Optionally supply one of the available categories to
-#'      see a subset of the options that are available.
-#' @param this_group Optionally supply one of the available groups to see the
-#'      palette just for this group.
-#' @param as_named_vector Whether to return the colors as named vector.
-#' @param drop_alias When FALSE, shows the redundant colours with their aliases.
+#' @format ## `grch37_ashm_regions`
+#' A data frame with 129 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg19_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"grch37_ashm_regions"
+
+
+#' hg38 ASHM Regions
 #'
-#' @return A data frame or named character vector of colour Hex codes.
+#' Aberrant Somatic Hyper Mutation (ASHM) regions in respect to hg38.
 #'
-#' @import dplyr ggplot2 tibble
-#' @export
+#' @format ## `hg38_ashm_regions`
+#' A data frame with 129 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg38_start}{Start coordinate for region in respect to hg38.}
+#'   \item{hg38_end}{End coordinate for region in respect to hg38.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"hg38_ashm_regions"
+
+
+#' Lymphoma Genes BL v0.1
 #'
-#' @examples
-#' get_colours(show_available = TRUE)
-#' # printout shows that "subgroup" is one option to narrow it down,
-#' # supply this to the function as this_category:
-#' get_colours(show_available = TRUE, this_category = "subgroup")
-#' # printout and plot shows several options.
-#' # Pick the one you want to visualize it in isolation
-#' get_colours(show_available = TRUE, this_group = "LymphGen")
-#' # if satisfied, get the result for use with ggplot
-#' col_vec <- get_colours(this_group = "LymphGen", as_named_vector = TRUE)
-#' ggplot(...) + scale_fill_manual(values = col_vec)
+#' Genes frequently associated with Burkitt Lymphome (BL). This is version 0.1.
+#'
+#' @format ## `lymphoma_genes_bl_v0.1`
+#' A data frame withh 128 rows and 11 columns.
+#' \describe{
+#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
+#'   \item{Gene}{Gene symbol in Hugo format.}
+#'   \item{earliest_support_BL}{Pubmeed ID to associated study.}
+#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
+#'   \item{aSHM_target_DLBCL}{Boolean variable annotating if the event is an aSHM target in DLBCL or not.}
+#'   \item{Currator_comments}{Comments from the currator.}
+#'   \item{Enrichment_DLBCL_BL}{Annotates the event if it is enriched in BL or DLBCL.}
+#'   \item{frequency_BL_Thomas}{The frequency of which the event was reported in the Thomas study.}
+#'   \item{frequency_BL_Panea}{The frequency of which the event was reported in the Panea study.}
+#'   \item{n_BL_Panea_original}{Total number of mutated tumors as originally reported in Panea study.}
+#'   \item{frequency_BL_Panea_original}{Frequency of mutation as originally reported in Panea study.}
+#' }
+"lymphoma_genes_bl_v0.1"
 
-get_colours <- function(
-        show_available = FALSE,
-        this_category,
-        this_group,
-        as_named_vector = FALSE,
-        drop_alias = TRUE
-    ) {
 
-    if (drop_alias) {
-        colour_codes <- dplyr::filter(
-            colour_codes,
-            is.na(is_alias)
-        )
-    }
+#' Lymphoma Genes BL Latest
+#'
+#' Genes frequently associated with Burkitt Lymphome (BL). This is the most up-to-date version of this dataset.
+#'
+#' @format ## `lymphoma_genes_bl_v_latest`
+#' A data frame withh 128 rows and 11 columns.
+#' \describe{
+#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
+#'   \item{Gene}{Gene symbol in Hugo format.}
+#'   \item{earliest_support_BL}{Pubmeed ID to associated study.}
+#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
+#'   \item{aSHM_target_DLBCL}{Boolean variable annotating if the event is an aSHM target in DLBCL or not.}
+#'   \item{Currator_comments}{Comments from the currator.}
+#'   \item{Enrichment_DLBCL_BL}{Annotates the event if it is enriched in BL or DLBCL.}
+#'   \item{frequency_BL_Thomas}{The frequency of which the event was reported in the Thomas study.}
+#'   \item{frequency_BL_Panea}{The frequency of which the event was reported in the Panea study.}
+#'   \item{n_BL_Panea_original}{Total number of mutated tumors as originally reported in Panea study.}
+#'   \item{frequency_BL_Panea_original}{Frequency of mutation as originally reported in Panea study.}
+#' }
+"lymphoma_genes_bl_v_latest"
 
-    if (show_available) {
-        if (missing(this_category) & missing(this_group)) {
 
-            message(
-                paste(
-                    "Supply a category using this_category parameter.",
-                    "Current options for 'category' are:"
-                )
-            )
+#' Lymphoma Genes DLBCL v0.1
+#'
+#' Genes frequently associated with Diffuse large B cell lymphoma (DLBCL). This is version 0.1.
+#'
+#' @format ## `lymphoma_genes_dlbcl_v0.1`
+#' A data frame with 143 rows and 13 columns.
+#' \describe{
+#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
+#'   \item{Gene}{Gene symbol in Hugo format.}
+#'   \item{Chappuy}{Boolean variable stating if the event is described in the study (Chappuy).}
+#'   \item{Reddy}{Boolean variable stating if the event is described in the study (Reddy).}
+#'   \item{LymphGen}{Boolean variable stating if the event is a described lymphgen or not.}
+#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
+#'   \item{other_support}{Variable that annotates the event if there are other support available.}
+#'   \item{Lacy}{Boolean variable stating if the event is described in the study (Lacy).}
+#'   \item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
+#'   \item{known_hotspots}{Boolean varaible annotating if the event is a known hotspot or not.}
+#'   \item{earliest_support}{Pubmeed ID to associated study.}
+#'   \item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
+#'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
+#' }
+"lymphoma_genes_dlbcl_v0.1"
 
-            p <- colour_codes %>%
-                group_by(category) %>%
-                mutate(
-                    n = n()
-                ) %>%
-                slice_head() %>%
-                rename(
-                    c("example" = "name")
-                )
 
-            print(p)
+#' Lymphoma Genes DLBCL Latest
+#'
+#' Genes frequently associated with Diffuse large B cell lymphoma (DLBCL). 
+#' This is the most up-to-date version of this dataset.
+#'
+#' @format ## `lymphoma_genes_dlbcl_v_latest`
+#' A data frame with 243 rows and 13 columns.
+#' \describe{
+#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
+#'   \item{Gene}{Gene symbol in Hugo format.}
+#'   \item{Chappuy}{Boolean variable stating if the event is described in the study (Chappuy).}
+#'   \item{Reddy}{Boolean variable stating if the event is described in the study (Reddy).}
+#'   \item{LymphGen}{Boolean variable stating if the event is a described lymphgen or not.}
+#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
+#'   \item{other_support}{Variable that annotates the event if there are other support available.}
+#'   \item{Lacy}{Boolean variable stating if the event is described in the study (Lacy).}
+#'   \item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
+#'   \item{known_hotspots}{Boolean varaible annotating if the event is a known hotspot or not.}
+#'   \item{earliest_support}{Pubmeed ID to associated study.}
+#'   \item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
+#'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
+#' }
+"lymphoma_genes_dlbcl_v_latest"
 
-            message(
-                paste(
-                    "Supply a group using this_group parameter.",
-                    "Current options for 'group' are:"
-                )
-            )
 
-            p <- colour_codes  %>%
-                group_by(group) %>%
-                mutate(
-                    n = n()
-                ) %>%
-                slice_head() %>%
-                rename(
-                    c("example"="name")
-                )
+#' Lymphoma Genes v0.0
+#'
+#' A comprehenssive resource of genes associated with different types of lymphomas.
+#' 
+#' @aliases lymphoma_genes
+#'
+#' @format ## `lymphoma_genes_lymphoma_genes_v0.0`
+#' A data frame with 196 rows and 12 columns.
+#' \describe{
+#'   \item{Gene}{Gene symbol in Hugo format.}
+#'   \item{DLBCL}{Boolean varaible annotating if the event (genne) is associated with DLBCL.}
+#'   \item{FL}{Boolean varaible annotating if the event (genne) is associated with FL.}
+#'   \item{BL}{Boolean varaible annotating if the event (genne) is associated with BL.}
+#'   \item{MCL}{Boolean varaible annotating if the event (genne) is associated with MCL.}
+#'   \item{CLL}{Boolean varaible annotating if the event (genne) is associated with CLL.}
+#'   \item{ensembl_geene_id}{Gene ID in ensembl format.}
+#'   \item{hgnc_symbol}{Gene symbol in HGNC format.}
+#'   \item{LymphGen}{Boolean variable stating if the event is a described lymphgen or not.}
+#'   \item{Reddy}{Boolean variable stating if the event is described in the study (Reddy).}
+#'   \item{Chappuy}{Boolean variable stating if the event is described in the study (Chappuy).}
+#'   \item{entrezgene_id}{Gene ID in entrez fromat.}
+#' }
+"lymphoma_genes_lymphoma_genes_v0.0"
 
-            print(p)
 
-        } else if (!missing(this_group)) {
-            this_group_df <- colour_codes %>%
-                dplyr::filter(
-                    group == this_group
-                )
+#' Lymphoma Genes MCL v0.1
+#'
+#' Genes frequently associated with Mantle cell lymphoma (MCL). This is version 0.1.
+#'
+#' @format ## `lymphoma_genes_mcl_v0.1`
+#' A data frame with 53 rows and 13 columns. 
+#' \describe{
+#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
+#'   \item{Gene}{Gene symbol in Hugo format.v}
+#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
+#'   \item{Bea}{Boolean variable stating if the event is described in the study (Bea).}
+#'   \item{Zhang}{Boolean variable stating if the event is described in the study (Zhang).}
+#'   \item{Pararajalingam}{Boolean variable stating if the event is described in the study (Pararajalingam).}
+#'   \item{Nadeu}{Boolean variable stating if the event is described in the study (Nadeu).}
+#'   \item{Other_support}{Variable that annotates the event if there are other support available.}
+#'   \item{appx_overall_freq}{Approximate overall frequency.}
+#'   \item{gambl_freq}{Frequency of event described in GAMBL.}
+#'   \item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
+#'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
+#'   \item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
+#' }
+"lymphoma_genes_mcl_v0.1"
 
-            allcols <- this_group_df$colour
-            names(allcols) <- this_group_df$name
 
-            p <- this_group_df %>%
-                ggplot(
-                    aes(
-                        x = name,
-                        fill = name,
-                        y = 1
-                    )
-                ) +
-                geom_col() +
-                theme(
-                    legend.position = "none"
-                ) +
-                facet_wrap(
-                    ~category,
-                    scales = "free_y"
-                ) +
-                scale_fill_manual(
-                    values = allcols
-                ) +
-                coord_flip()
+#' Lymphoma Genes MCL Latest
+#'
+#' Genes frequently associated with Mantle cell lymphoma (MCL).
+#' #' This is the most up-to-date version of this dataset.
+#'
+#' @format ## `lymphoma_genes_mcl_v_latest`
+#' A data frame with 53 rows and 13 columns. 
+#' \describe{
+#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
+#'   \item{Gene}{Gene symbol in Hugo format.v}
+#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
+#'   \item{Bea}{Boolean variable stating if the event is described in the study (Bea).}
+#'   \item{Zhang}{Boolean variable stating if the event is described in the study (Zhang).}
+#'   \item{Pararajalingam}{Boolean variable stating if the event is described in the study (Pararajalingam).}
+#'   \item{Nadeu}{Boolean variable stating if the event is described in the study (Nadeu).}
+#'   \item{Other_support}{Variable that annotates the event if there are other support available.}
+#'   \item{appx_overall_freq}{Approximate overall frequency.}
+#'   \item{gambl_freq}{Frequency of event described in GAMBL.}
+#'   \item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
+#'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
+#'   \item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
+#' }
+"lymphoma_genes_mcl_v_latest"
 
-            print(p)
 
-            return()
-        } else if (!missing(this_category)) {
-            this_category_df <- colour_codes %>%
-                dplyr::filter(
-                    category == this_category
-                ) 
+#' Sample Data
+#'
+#' Sample data bunlded as a list of 3 elements. Metadata (data frame) and sample data from two projections (grch37 and hg38),
+#' Each projection is organized as a list of 3 elements; maf, seg, and bedpe (all data frames).
+#'
+#' @format ## `sample_data`
+#' A list of three elements. 
+#' Two elements are lists with three data frames in each list and the last element (metadata) is a data frame.
+#' \describe{
+#'   \item{meta}{A data frame with metadata.}
+#'   \item{grch37}{A list containing 3 data frames; maf, seg, and bedpe. All in respect to grch37.}
+#'   \item{hg38}{A list containing 3 data frames; maf, seg, and bedpe. All in respect to hg38.}
+#' }
+"sample_data"
 
-            allcols <- this_category_df$colour
-            names(allcols) <- this_category_df$name
 
-            p <- this_category_df %>%
-                group_by(group) %>%
-                mutate(
-                    n =n ()
-                ) %>%
-                slice_head()
+#' Somatic Hypermutation Locations GRCh37 v0.0
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh37, version 0.0.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh37_v0.0`
+#' A data frame with 76 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg19_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh37_v0.0"
 
-            message("Current options for 'group' within this category are:")
 
-            g <- pull(p ,group)
-            g <- paste(g, collapse = ",")
-            message(g)
+#' Somatic Hypermutation Locations GRCh37 v0.1
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh37, version 0.1.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh37_v0.1`
+#' A data frame with 78 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg19_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh37_v0.1"
 
-            p <- colour_codes %>%
-                dplyr::filter(
-                    category == this_category
-                ) %>%
-                ggplot(
-                    aes(
-                        x = name,
-                        fill = name,
-                        y = 1
-                    )
-                ) +
-                geom_col() +
-                theme(
-                    legend.position = "none"
-                ) +
-                facet_wrap(
-                    ~group,
-                    scales = "free_y"
-                ) +
-                scale_fill_manual(
-                    values = allcols
-                ) +
-                coord_flip()
 
-            print(p)
-            return()
-        }
+#' Somatic Hypermutation Locations GRCh37 v0.2
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh37, version 0.2.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh37_v0.2`
+#' A data frame with 88 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg19_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh37_v0.2"
 
-    }
 
-    if (missing(this_category) & missing(this_group)) {
-        stop(
-            paste(
-                "Provide a category or group via this_category or this_group.",
-                "To see what's available run this function with",
-                "show_available = TRUE"
-            )
-        )
-    } else if (!missing(this_group)) {
-        colour_list <- dplyr::filter(
-            colour_codes,
-            group == this_group
-        ) %>%
-        dplyr::select(
-            name,
-            colour
-        ) %>%
-        column_to_rownames("name")
-    } else if (!missing(this_category)) {
-        colour_list <- dplyr::filter(
-            colour_codes,
-            category == this_category
-        ) %>%
-        dplyr::select(name, colour) %>%
-        column_to_rownames("name")
-    }
-    if (as_named_vector) {
-        #useful for ggplot scale_X_manual
-        allcols <- colour_list$colour
-        names(allcols) <- rownames(colour_list)
-        return(allcols)
-    }
-    return(colour_list)
-}
+#' Somatic Hypermutation Locations GRCh37 v0.3
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh37, version 0.3.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh37_v0.3`
+#' A data frame with 101 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg19_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh37_v0.3"
+
+
+#' Somatic Hypermutation Locations GRCh37 Latest
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh37, the latest version.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh37_v_latest`
+#' A data frame with 129 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg19_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh37_v_latest"
+
+
+#' Somatic Hypermutation Locations GRCh38 v0.0
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh38, version 0.0.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh38_v0.0`
+#' A data frame with 76 rows and 7 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg38_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg38_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#'   \item{name}{Location name.}
+#' }
+"somatic_hypermutation_locations_GRCh38_v0.0"
+
+
+#' Somatic Hypermutation Locations GRCh38 v0.1
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh38, version 0.1.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh38_v0.1`
+#' A data frame with 77 rows and 7 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg38_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg38_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#'   \item{name}{Location name.}v
+#' }
+"somatic_hypermutation_locations_GRCh38_v0.1"
+
+
+#' Somatic Hypermutation Locations GRCh38 v0.2
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh38, version 0.2.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh38_v0.2`
+#' A data frame with 88 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg38_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg38_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh38_v0.2"
+
+
+#' Somatic Hypermutation Locations GRCh38 v0.3
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh38, version 0.3.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh38_v0.3`
+#' A data frame with 101 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg38_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg38_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh38_v0.3"
+
+
+#' Somatic Hypermutation Locations GRCh38 Latest
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh38, the latest version.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh38_v_latest`
+#' A data frame with 129 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg38_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg38_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh38_v_latest"
