@@ -26,10 +26,7 @@ Depends:
 LazyData: true
 Imports: 
     dplyr,
-    GAMBLR.helpers,
     ggplot2,
     tibble,
     tidyr
-Remotes:
-    morinlab/GAMBLR.helpers
 LazyDataCompression: xz

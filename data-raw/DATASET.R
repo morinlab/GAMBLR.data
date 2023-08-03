@@ -281,7 +281,7 @@ lymphoma_genes$LymphGen=FALSE
 lymphoma_genes[lymphoma_genes$entrezgene_id %in% lymphgen_anno$NCBI_Gene_ID,"LymphGen"] = TRUE
 
 #load the Reddy gene list
-reddy_genes = system.file("extdata","reddy_genes.tsv",package="GAMBLR") %>%
+reddy_genes = system.file("extdata","reddy_genes.tsv",package="GAMBLR.data") %>%
   read_tsv() %>% dplyr::rename("hgnc_symbol"="Approved symbol")
 
 usethis::use_data(reddy_genes, overwrite = TRUE)
