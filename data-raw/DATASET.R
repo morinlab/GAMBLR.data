@@ -190,7 +190,7 @@ grch37_oncogene = system.file("extdata", "oncogene_regions.grch37.tsv", package 
 
 usethis::use_data(grch37_oncogene, overwrite = TRUE)
 
-hg38_partners = system.file("extdata","superenhancer_regions.hg38.tsv",package="GAMBLR") %>%
+hg38_partners = system.file("extdata","superenhancer_regions.hg38.tsv",package="GAMBLR.data") %>%
   read_tsv(col_types="ciici")
 
 usethis::use_data(hg38_partners, overwrite = TRUE)
@@ -200,56 +200,56 @@ grch37_partners = system.file("extdata", "superenhancer_regions.grch37.tsv", pac
 
 
 #THis needs to be syncronized with the list above (it currently is out of sync!)
-grch37_lymphoma_genes_bed = system.file("extdata","lymphoma_genes.grch37.bed",package="GAMBLR") %>%
+grch37_lymphoma_genes_bed = system.file("extdata","lymphoma_genes.grch37.bed",package="GAMBLR.data") %>%
   read_tsv()
 
 usethis::use_data(grch37_lymphoma_genes_bed, overwrite = TRUE)
 
-hg38_lymphoma_genes_bed = system.file("extdata","lymphoma_genes.hg38.bed",package="GAMBLR") %>%
+hg38_lymphoma_genes_bed = system.file("extdata","lymphoma_genes.hg38.bed",package="GAMBLR.data") %>%
   read_tsv()
 
 usethis::use_data(hg38_lymphoma_genes_bed, overwrite = TRUE)
 
 
-wright_genes_with_weights = system.file("extdata","WrightGenesWithWeights.txt",package="GAMBLR") %>%
+wright_genes_with_weights = system.file("extdata","WrightGenesWithWeights.txt",package="GAMBLR.data") %>%
   read.table(sep="\t",header=1) %>% rename(Ensembl_ID=EnsemblGeneID,Hugo_Symbol=GeneName)
 
 usethis::use_data(wright_genes_with_weights, overwrite = TRUE)
 
-dhitsig_genes_with_weights = system.file("extdata","DHITsigGenesWithWeights.txt",package="GAMBLR") %>%
+dhitsig_genes_with_weights = system.file("extdata","DHITsigGenesWithWeights.txt",package="GAMBLR.data") %>%
   read.table(sep="\t",header=1) %>% rename(Ensembl_ID=ensembl_gene_id,Hugo_Symbol=GeneName)
 usethis::use_data(dhitsig_genes_with_weights, overwrite = TRUE)
 
-target_regions_hg38 = system.file("extdata","target_regions_hg38.txt",package="GAMBLR") %>%
+target_regions_hg38 = system.file("extdata","target_regions_hg38.txt",package="GAMBLR.data") %>%
   read.table(sep="\t",header=1)
 usethis::use_data(target_regions_hg38, overwrite = TRUE)
 
-target_regions_grch37 = system.file("extdata","target_regions_grch37.txt",package="GAMBLR") %>%
+target_regions_grch37 = system.file("extdata","target_regions_grch37.txt",package="GAMBLR.data") %>%
   read.table(sep="\t",header=1)
 usethis::use_data(target_regions_grch37, overwrite = TRUE)
 
-hotspot_regions_grch37 = system.file("extdata","hotspot_regions.grch37.tsv",package="GAMBLR") %>%
+hotspot_regions_grch37 = system.file("extdata","hotspot_regions.grch37.tsv",package="GAMBLR.data") %>%
   read.table(sep="\t",header=1) %>%
   column_to_rownames("gene")
 usethis::use_data(hotspot_regions_grch37, overwrite = TRUE)
 
-hotspot_regions_hg38 = system.file("extdata","hotspot_regions.hg38.tsv",package="GAMBLR") %>%
+hotspot_regions_hg38 = system.file("extdata","hotspot_regions.hg38.tsv",package="GAMBLR.data") %>%
   read.table(sep="\t",header=1) %>%
   column_to_rownames("gene")
 usethis::use_data(hotspot_regions_hg38, overwrite = TRUE)
 
-chromosome_arms_grch37 = system.file("extdata","chromosome_arms_grch37.tsv",package="GAMBLR") %>%
+chromosome_arms_grch37 = system.file("extdata","chromosome_arms_grch37.tsv",package="GAMBLR.data") %>%
   read.table(sep="\t",header=1)
 usethis::use_data(chromosome_arms_grch37, overwrite = TRUE)
 
-chromosome_arms_hg38 = system.file("extdata","chromosome_arms_hg38.tsv",package="GAMBLR") %>%
+chromosome_arms_hg38 = system.file("extdata","chromosome_arms_hg38.tsv",package="GAMBLR.data") %>%
   read.table(sep="\t",header=1)
 usethis::use_data(chromosome_arms_hg38, overwrite = TRUE)
 
-lymphgen_entrez = system.file("extdata","lymphgen_genes_entrez.txt",package="GAMBLR") %>%
+lymphgen_entrez = system.file("extdata","lymphgen_genes_entrez.txt",package="GAMBLR.data") %>%
   read_tsv()
 
-entrez_map = system.file("extdata","hugo2entrez.tsv",package="GAMBLR") %>%
+entrez_map = system.file("extdata","hugo2entrez.tsv",package="GAMBLR.data") %>%
   read_tsv()
 
 lymphgen_anno = left_join(lymphgen_entrez,entrez_map) %>% dplyr::rename("Hugo_Symbol"="Approved symbol") %>% dplyr::select(1:3)
@@ -310,7 +310,7 @@ lymphoma_genes[lymphoma_genes$ensembl_gene_id %in% reddy_detail$ensembl_gene_id,
 
 
 
-chapuy_genes = system.file("extdata","chapuy_genes.tsv",package="GAMBLR") %>%
+chapuy_genes = system.file("extdata","chapuy_genes.tsv",package="GAMBLR.data") %>%
   read_tsv() %>% dplyr::rename("hgnc_symbol"="gene")
 
 lymphoma_genes$Chapuy = FALSE
