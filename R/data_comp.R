@@ -254,7 +254,7 @@ get_mapped_colours <- function(
         unique_values <- unique(this_df[[col_name]])
 
         df <- dplyr::filter(
-            colour_codes,
+            GAMBLR.data::colour_codes,
             name %in% unique_values
         ) %>%
         dplyr::select(
@@ -349,15 +349,15 @@ get_colours <- function(
     ) {
 
     if (legacy_mode) {
-        allcols <- colour_codes$colour
-        names(allcols) <- colour_codes$name
+        allcols <- GAMBLR.data::colour_codes$colour
+        names(allcols) <- GAMBLR.data::colour_codes$name
 
         return(allcols)
     }
 
     if (drop_alias) {
-        colour_codes <- dplyr::filter(
-            colour_codes,
+        GAMBLR.data::colour_codes <- dplyr::filter(
+            GAMBLR.data::colour_codes,
             is.na(is_alias)
         )
     }
@@ -372,7 +372,7 @@ get_colours <- function(
                 )
             )
 
-            p <- colour_codes %>%
+            p <- GAMBLR.data::colour_codes %>%
                 group_by(category) %>%
                 mutate(
                     n = n()
@@ -391,7 +391,7 @@ get_colours <- function(
                 )
             )
 
-            p <- colour_codes  %>%
+            p <- GAMBLR.data::colour_codes  %>%
                 group_by(group) %>%
                 mutate(
                     n = n()
@@ -404,7 +404,7 @@ get_colours <- function(
             print(p)
 
         } else if (!missing(this_group)) {
-            this_group_df <- colour_codes %>%
+            this_group_df <- GAMBLR.data::colour_codes %>%
                 dplyr::filter(
                     group == this_group
                 )
@@ -437,7 +437,7 @@ get_colours <- function(
 
             return()
         } else if (!missing(this_category)) {
-            this_category_df <- colour_codes %>%
+            this_category_df <- GAMBLR.data::colour_codes %>%
                 dplyr::filter(
                     category == this_category
                 )
@@ -458,7 +458,7 @@ get_colours <- function(
             g <- paste(g, collapse = ",")
             message(g)
 
-            p <- colour_codes %>%
+            p <- GAMBLR.data::colour_codes %>%
                 dplyr::filter(
                     category == this_category
                 ) %>%
@@ -498,7 +498,7 @@ get_colours <- function(
         )
     } else if (!missing(this_group)) {
         colour_list <- dplyr::filter(
-            colour_codes,
+            GAMBLR.data::colour_codes,
             group == this_group
         ) %>%
         dplyr::select(
@@ -508,7 +508,7 @@ get_colours <- function(
         column_to_rownames("name")
     } else if (!missing(this_category)) {
         colour_list <- dplyr::filter(
-            colour_codes,
+            GAMBLR.data::colour_codes,
             category == this_category
         ) %>%
         dplyr::select(name, colour) %>%
