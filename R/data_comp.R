@@ -317,6 +317,7 @@ get_mapped_colours <- function(
 #'      palette just for this group.
 #' @param as_named_vector Whether to return the colors as named vector.
 #' @param drop_alias When FALSE, shows the redundant colours with their aliases.
+#' @param legacy_mode When TRUE, will return named list similar to the first implementation of get_gambl_colours
 #'
 #' @return A data frame or named character vector of colour Hex codes.
 #'
@@ -336,15 +337,23 @@ get_mapped_colours <- function(
 #' col_vec <- get_colours(this_group = "LymphGen", as_named_vector = TRUE)
 #' ggplot(...) + scale_fill_manual(values = col_vec)
 #' }
-#' 
+#'
 
 get_colours <- function(
         show_available = FALSE,
         this_category,
         this_group,
         as_named_vector = FALSE,
-        drop_alias = TRUE
+        drop_alias = TRUE,
+        legacy_mode = FALSE
     ) {
+
+    if (legacy_mode) {
+        allcols <- colour_codes$colour
+        names(allcols) <- colour_codes$name
+
+        return(allcols)
+    }
 
     if (drop_alias) {
         colour_codes <- dplyr::filter(
@@ -431,7 +440,7 @@ get_colours <- function(
             this_category_df <- colour_codes %>%
                 dplyr::filter(
                     category == this_category
-                ) 
+                )
 
             allcols <- this_category_df$colour
             names(allcols) <- this_category_df$name
