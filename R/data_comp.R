@@ -356,7 +356,7 @@ get_colours <- function(
     }
 
     if (drop_alias) {
-        GAMBLR.data::colour_codes <- dplyr::filter(
+        colour_codes <- dplyr::filter(
             GAMBLR.data::colour_codes,
             is.na(is_alias)
         )
