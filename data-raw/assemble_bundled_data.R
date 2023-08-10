@@ -288,6 +288,11 @@ sample_data$hg38$maf <- bind_rows(
     cell_lines_data$hg38$ssm
 )
 
+# add column to indicate which pipeline the data were derived from
+sample_data$grch37$maf$Pipeline = "SLMS-3"
+sample_data$hg38$maf$Pipeline = "SLMS-3"
+
+
 sample_data$grch37$seg <- bind_rows(
     fl_data$cnv_to_bundle,
     cell_lines_data$grch37$cnv
