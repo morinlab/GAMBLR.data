@@ -23,7 +23,8 @@ colnames_for_bundled_meta <- c(
 pmids <- list(
     "Dreval_FL" = 37084389,
     "Grande_BL" = 30617194,
-    "Thomas_BL" = 36201743
+    "Thomas_BL" = 36201743,
+    "Reddy_DLBCL" = 28985567
 )
 
 
@@ -198,6 +199,47 @@ dlbcl_data$cnv_to_bundle <- read_xlsx(
 
 # Importing DLBCL cell lines
 setwd("~/GAMBLR/")
+
+reddy_data <- list()
+
+# Importing metadata from Reddy et al and updating IDs to be consistent with GAMBL metadata
+reddy_meta = readxl::read_excel("inst/extdata/studies/DLBCL_Reddy.xlsx",sheet=1) %>% 
+  mutate(patient_id=paste0("Reddy_",`Sample  ID`),sample_id=paste0("Reddy_",`Sample  ID`,"T")) %>%
+  mutate(Tumor_Sample_Barcode=sample_id) %>%
+  dplyr::rename("Sex"="Gender") %>%
+  dplyr::rename("COO_consensus"="ABC GCB (RNAseq)") %>%
+  mutate(COO_consensus=ifelse(COO_consensus=="Unclassified","UNCLASS",COO_consensus)) %>%
+  dplyr::select(sample_id,patient_id,Tumor_Sample_Barcode,Sex,COO_consensus)
+
+reddy_meta_gambl = get_gambl_metadata(seq_type_filter="capture") %>% 
+  dplyr::filter(cohort == "dlbcl_reddy") %>% 
+  dplyr::select(sample_id,lymphgen,EBV_status_inf,cohort,pathology) %>%
+  rename("LymphGen" = "lymphgen") 
+
+reddy_meta_gambl$reference_PMID = pmids$Reddy_DLBCL
+
+reddy_data$meta_to_bundle = left_join(reddy_meta,reddy_meta_gambl)
+
+
+reddy_meta_gambl$seq_type = "capture"
+reddy_meta_gambl$unix_group = "icgc_dart"
+reddy_meta_gambl$genome_build = "hg19-reddy"
+reddy_meta_gambl$pairing_status = "unmatched"
+
+#warning: this is very slow!
+reddy_full_ssm <- get_ssm_by_samples(
+  these_samples_metadata = reddy_meta_gambl
+)
+
+#restrict to the most inclusive DLBCL gene list
+all_lymphoma_genes = read_tsv("inst/extdata/lymphoma_genes_comprehensive.tsv") %>% 
+  pull(Gene)
+
+reddy_data$grch37$ssm_to_bundle <- dplyr::filter(reddy_full_ssm,Hugo_Symbol %in% all_lymphoma_genes)
+
+
+
+
 cell_lines_data <- list()
 
 cell_lines_data$meta <- get_gambl_metadata() %>%
@@ -277,9 +319,12 @@ sample_data$meta <- sample_data$meta %>%
     rename("LymphGen" = "lymphgen") %>%
     select(all_of(colnames_for_bundled_meta))
 
+sample_data$meta = bind_rows(sample_data$meta,reddy_data$meta_to_bundle)
+
 sample_data$grch37$maf <- bind_rows(
     fl_data$ssm_to_bundle,
-    cell_lines_data$grch37$ssm
+    cell_lines_data$grch37$ssm,
+    reddy_data$grch37$ssm_to_bundle
 )
 
 sample_data$hg38$maf <- bind_rows(
@@ -287,6 +332,11 @@ sample_data$hg38$maf <- bind_rows(
     dlbcl_data$ssm_to_bundle,
     cell_lines_data$hg38$ssm
 )
+
+# add column to indicate which pipeline the data were derived from
+sample_data$grch37$maf$Pipeline = "SLMS-3"
+sample_data$hg38$maf$Pipeline = "SLMS-3"
+
 
 sample_data$grch37$seg <- bind_rows(
     fl_data$cnv_to_bundle,
