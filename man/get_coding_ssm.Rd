@@ -71,9 +71,10 @@ It relies on the bundled sample data in this package.
 }
 \examples{
 #return SSMs in reference to GRCh37:
-ssm_grch37 = get_coding_ssm()
+ssm_grch37 = get_coding_ssm(seq_type = "genome")
 
 #return SSMs in reference to hg38:
-ssm_hg38 = get_coding_ssm(this_projection = "hg38")
+dohh2_meta = GAMBLR.data::sample_data$meta \%>\% dplyr::filter(sample_id == "DOHH-2")
+ssm_hg38 = get_coding_ssm(projection = "hg38", these_samples_metadata = dohh2_meta, seq_type = "genome")
 
 }
