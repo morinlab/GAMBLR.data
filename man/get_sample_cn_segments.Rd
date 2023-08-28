@@ -5,9 +5,8 @@
 \title{Get Sample CN Segments.}
 \usage{
 get_sample_cn_segments(
-  this_sample_id,
-  multiple_samples = FALSE,
-  sample_list,
+  these_sample_ids,
+  these_samples_metadata,
   from_flatfile = NULL,
   projection = "grch37",
   this_seq_type = "genome",
@@ -16,11 +15,9 @@ get_sample_cn_segments(
 )
 }
 \arguments{
-\item{this_sample_id}{Optional argument, single sample_id for the sample to retrieve segments for.}
+\item{these_sample_ids}{Optional argument, sample_id (vector of characters) for the sample(s) to retrieve segments for. If not provided, the function will return CN segments for all available sample IDs present in the current metadata.}
 
-\item{multiple_samples}{Set to TRUE to return cn segments for multiple samples specified in \code{samples_list} parameter. Default is FALSE.}
-
-\item{sample_list}{Optional vector of type character with one sample per row, required if multiple_samples is set to TRUE.}
+\item{these_samples_metadata}{Optional, provide a metadata (data frame) subset to the sample IDs of interest.}
 
 \item{from_flatfile}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_sample_cn_segments]{GAMBLR.results::get_sample_cn_segments} for more info.}
 
@@ -40,19 +37,18 @@ Get all segments for a single (or multiple) sample_id(s).
 }
 \details{
 This function returns CN segments for samples. This works for single sample or multiple samples.
-For multiple samples, remember to set the Boolean parameter \code{multiple_samples = TRUE} and give the \code{sample_lsit} a vector of characters with one sample ID per row.
-For more information on how this function can be run in different ways, refer to the parameter descriptions, examples and vignettes.
+Specify the sample IDs you are interested in with \code{these_sample_ids} (as a vector of characters),
+Or call this function with \code{these_samples_metadata} if you already ahve a metadata table subset to the sample IDs of interest.
+If none off the above parameters are specified, the function will return CN segments for available samples.
+Note, this. function internally calls \link[GAMBLR:id_ease]{GAMBLR::id_ease} for dealing with sample IDs and metadata tables.
 Is this function not what you are looking for? Try one of the following, similar, functions; \link[GAMBLR:assign_cn_to_ssm]{GAMBLR::assign_cn_to_ssm}, \link[GAMBLR:get_cn_segments]{GAMBLR::get_cn_segments}, \link[GAMBLR:get_cn_states]{GAMBLR::get_cn_states},
 }
 \examples{
-#return sample CNN segmetns for one sample
-my_segs = get_sample_cn_segments(this_sample_id = "DOHH-2", projection = "hg38", streamlined = TRUE)
+#get CN segments for one sample
+dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2", projection = "hg38", streamlined = TRUE)
 
-#define some samples
-my_samples = c("SU-DHL-4", "DOHH-2")
-
-#return CN segments for thhese samples
-these_segs = get_sample_cn_segments(multiple_samples = TRUE,
-                                    sample_list = my_samples)
+#get CN segments for DLBCL cell line
+cell_line_meta = GAMBLR.data::sample_data$meta \%>\% dplyr::filter(cohort == "DLBCL_cell_lines")
+dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta, streamlined = TRUE)
 
 }

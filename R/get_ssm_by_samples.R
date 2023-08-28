@@ -1,16 +1,16 @@
-#' @title Get SSM By Sample.
+#' @title Get SSM By Samples.
 #'
-#' @description Get the SSMs (i.e. load MAF) for a single sample.
+#' @description Get the SSMs (i.e. load MAF) for a single sample or a collection fo samples.
+#' 
+#' @aliases get_ssm_by_sample
 #'
-#' @details This was implemented to allow flexibility because there are some samples that we may want to use a different set of variants than those in the main GAMBL merge.
-#' The current use case is to allow a force_unmatched output to be used to replace the SSMs from the merge for samples with known contamination in the normal.
-#' This will also be useful to apply a blacklist to individual MAFs when coupled with [GAMBLR::annotate_ssm_blacklist].
-#' Is this function not what you are looking for? Try one of the following, similar, functions; [GAMBLR::get_coding_ssm], [GAMBLR::get_coding_ssm_status],
-#' [GAMBLR::get_ssm_by_patients], [GAMBLR::get_ssm_by_samples], [GAMBLR::get_ssm_by_region], [GAMBLR::get_ssm_by_regions]
+#' @details Retrieve a maf for a specific sample or a set of samples. 
+#' Either specify the sample IDs of interest with `these_sample_ids`.
+#' Or a metadata table subset to the sample IDs of interest.
 #'
-#' @param this_sample_id Required. The sample_id you want the data from.
+#' @param these_sample_ids The sample_id you want the data from.
+#' @param these_samples_metadata Required if not specifying this_sample_id.
 #' @param this_seq_type Required if not specifying these_samples_metadata. The seq_type of the sample you want data from.
-#' @param these_samples_metadata Required if not specifying both this_sample_id and this_seq_type a single row or entire metadata table containing your sample_id.
 #' @param tool_name This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_ssm_by_sample] for more info.
 #' @param projection The projection genome build. Supports hg38 and grch37.
 #' @param these_genes A vector of genes to subset ssm to.
@@ -28,34 +28,25 @@
 #' @export
 #'
 #' @examples
-#' #Basic usage:
-#' this_sample_df = get_ssm_by_sample(this_sample_id = "DOHH-2",
-#'                                    this_seq_type = "genome",
-#'                                    projection = "grch37")
-#'
-#' #Get meta
-#' dohh2_meta = GAMBLR.data::sample_data$meta %>% dplyr::filter(sample_id == "DOHH-2")
-#'
-#' #Get SSM with some filters applied:
-#' dohh2_ssm = get_ssm_by_sample(this_sample_id = "DOHH-2", 
-#'                               these_samples_metadata = dohh2_meta, 
-#'                               these_genes = c("MYC", "BCL2"), 
-#'                               verbose = FALSE,
-#'                               this_seq_type = "genome",
-#'                               projection = "grch37")
-#'
-get_ssm_by_sample = function(this_sample_id,
-                             this_seq_type,
-                             these_samples_metadata,
-                             tool_name = NULL,
-                             projection = "grch37",
-                             these_genes,
-                             augmented = NULL,
-                             flavour = NULL,
-                             min_read_support = 3,
-                             basic_columns = TRUE,
-                             maf_cols = NULL,
-                             verbose = FALSE){
+#' #Basic usage, using a sample ID
+#' dohh2_maf = get_ssm_by_sample(these_sample_ids = "DOHH-2")
+#' 
+#' #Return a MAF for DLBCL cell line
+#' cell_line_meta = GAMBLR.data::sample_data$meta %>% dplyr::filter(cohort == "DLBCL_cell_lines")
+#' dlbcl_maf = get_ssm_by_samples(these_samples_metadata = cell_line_meta)
+#' 
+get_ssm_by_samples <- function(these_sample_ids,
+                              these_samples_metadata,
+                              this_seq_type = "genome",
+                              tool_name = NULL,
+                              projection = "grch37",
+                              these_genes,
+                              augmented = NULL,
+                              flavour = NULL,
+                              min_read_support = 3,
+                              basic_columns = TRUE,
+                              maf_cols = NULL,
+                              verbose = FALSE){
   
   #warn/notify the user what version of this function they are using
   message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
@@ -71,15 +62,13 @@ get_ssm_by_sample = function(this_sample_id,
     }
   }
   
-  #figure out which unix_group this sample belongs to
-  if(missing(these_samples_metadata)){
-    these_samples_metadata = GAMBLR.data::get_gambl_metadata(seq_type_filter = this_seq_type) %>%
-      dplyr::filter(sample_id == this_sample_id)
-    
-  }else{
-    these_samples_metadata = these_samples_metadata %>%
-      dplyr::filter(sample_id == this_sample_id)
-  }
+  #get sample IDs
+  meta_ids = id_ease(these_sample_ids = these_sample_ids, 
+                     these_samples_metadata = these_samples_metadata, 
+                     this_seq_type = this_seq_type)
+  
+  #extract sample IDs
+  these_ids = meta_ids$these_samples
   
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
@@ -87,7 +76,7 @@ get_ssm_by_sample = function(this_sample_id,
   #return SSMs based on the selected projection
   if(projection %in% valid_projections){
     sample_ssm = GAMBLR.data::sample_data[[projection]]$maf %>%
-      dplyr::filter(Tumor_Sample_Barcode == this_sample_id)
+      dplyr::filter(Tumor_Sample_Barcode %in% these_ids)
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))

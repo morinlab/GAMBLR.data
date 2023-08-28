@@ -34,8 +34,8 @@
 #' ssm_grch37 = get_coding_ssm(seq_type = "genome")
 #'
 #' #return SSMs in reference to hg38:
-#' dohh2_meta = GAMBLR.data::sample_data$meta %>% dplyr::filter(sample_id == "DOHH-2")
-#' ssm_hg38 = get_coding_ssm(projection = "hg38", these_samples_metadata = dohh2_meta, seq_type = "genome")
+#' cell_line_meta = GAMBLR.data::sample_data$meta %>% dplyr::filter(cohort == "DLBCL_cell_lines")
+#' ssm_hg38 = get_coding_ssm(projection = "hg38", these_samples_metadata = cell_line_meta, seq_type = "genome")
 #' 
 get_coding_ssm = function(limit_cohort,
                           exclude_cohort,
@@ -122,8 +122,10 @@ get_coding_ssm = function(limit_cohort,
   #pull info for loading .CDS.maf
   sample_ids = pull(all_meta, sample_id)
   
-  #drop variants with low read support (default is 3)
-  muts = dplyr::filter(muts, t_alt_count >= min_read_support)
+  #drop variants with low read support (default is 3), enforce sample IDs and keep only coding variants
+  muts = dplyr::filter(muts, t_alt_count >= min_read_support) %>%
+    dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+    dplyr::filter(Variant_Classification %in% coding_class)
   
   #filter maf on selected sample ids
   muts = muts %>%

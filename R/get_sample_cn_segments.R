@@ -3,13 +3,14 @@
 #' @description Get all segments for a single (or multiple) sample_id(s).
 #'
 #' @details This function returns CN segments for samples. This works for single sample or multiple samples.
-#' For multiple samples, remember to set the Boolean parameter `multiple_samples = TRUE` and give the `sample_lsit` a vector of characters with one sample ID per row.
-#' For more information on how this function can be run in different ways, refer to the parameter descriptions, examples and vignettes.
+#' Specify the sample IDs you are interested in with `these_sample_ids` (as a vector of characters),
+#' Or call this function with `these_samples_metadata` if you already ahve a metadata table subset to the sample IDs of interest.
+#' If none off the above parameters are specified, the function will return CN segments for available samples.
+#' Note, this. function internally calls [GAMBLR::id_ease] for dealing with sample IDs and metadata tables. 
 #' Is this function not what you are looking for? Try one of the following, similar, functions; [GAMBLR::assign_cn_to_ssm], [GAMBLR::get_cn_segments], [GAMBLR::get_cn_states],
 #'
-#' @param this_sample_id Optional argument, single sample_id for the sample to retrieve segments for.
-#' @param multiple_samples Set to TRUE to return cn segments for multiple samples specified in `samples_list` parameter. Default is FALSE.
-#' @param sample_list Optional vector of type character with one sample per row, required if multiple_samples is set to TRUE.
+#' @param these_sample_ids Optional argument, sample_id (vector of characters) for the sample(s) to retrieve segments for. If not provided, the function will return CN segments for all available sample IDs present in the current metadata.
+#' @param these_samples_metadata Optional, provide a metadata (data frame) subset to the sample IDs of interest.
 #' @param from_flatfile This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_sample_cn_segments] for more info.
 #' @param projection Selected genome projection for returned CN segments. Default is "grch37".
 #' @param this_seq_type Seq type for returned CN segments. One of "genome" (default) or "capture".
@@ -19,23 +20,18 @@
 #' @return A data frame of segments for a specific or multiple sample ID(s).
 #'
 #' @import dplyr readr
-#' 
 #' @export
 #'
 #' @examples
-#' #return sample CNN segmetns for one sample
-#' my_segs = get_sample_cn_segments(this_sample_id = "DOHH-2", projection = "hg38", streamlined = TRUE)
+#' #get CN segments for one sample
+#' dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2", projection = "hg38", streamlined = TRUE)
 #'
-#' #define some samples
-#' my_samples = c("SU-DHL-4", "DOHH-2")
+#' #get CN segments for DLBCL cell line
+#' cell_line_meta = GAMBLR.data::sample_data$meta %>% dplyr::filter(cohort == "DLBCL_cell_lines")
+#' dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta, streamlined = TRUE)
 #'
-#' #return CN segments for thhese samples
-#' these_segs = get_sample_cn_segments(multiple_samples = TRUE,
-#'                                     sample_list = my_samples)
-#'
-get_sample_cn_segments = function(this_sample_id,
-                                  multiple_samples = FALSE,
-                                  sample_list,
+get_sample_cn_segments = function(these_sample_ids,
+                                  these_samples_metadata,
                                   from_flatfile = NULL,
                                   projection = "grch37",
                                   this_seq_type = "genome",
@@ -46,7 +42,15 @@ get_sample_cn_segments = function(this_sample_id,
   if(this_seq_type != "genome"){
     stop("Currently, only CN segments available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
   }
-
+  
+  #get sample IDs
+  meta_ids = id_ease(these_sample_ids = these_sample_ids, 
+                     these_samples_metadata = these_samples_metadata, 
+                     this_seq_type = this_seq_type)
+  
+  #subset returned list to sample IDs
+  these_samples = meta_ids$these_samples
+  
   #warn/notify the user what version of this function they are using
   message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
   
@@ -66,16 +70,11 @@ get_sample_cn_segments = function(this_sample_id,
   
   #return CN segments based on the selected projection
   if(projection %in% valid_projections){
-    all_segs = GAMBLR.data::sample_data[[projection]]$seg
+    all_segs = GAMBLR.data::sample_data[[projection]]$seg %>%
+      dplyr::filter(ID %in% these_samples)
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
-  }
-  
-  if(!missing(this_sample_id) & !multiple_samples){
-    all_segs = dplyr::filter(all_segs, ID %in% this_sample_id)
-  }else if(!missing(sample_list)){
-    all_segs = dplyr::filter(all_segs, ID %in% sample_list)
   }
   
   #deal with chr prefixes
@@ -88,9 +87,7 @@ get_sample_cn_segments = function(this_sample_id,
     }
   }
   
-  if(streamlined){
-    all_segs = dplyr::select(all_segs, ID, CN)
-    }
+  if(streamlined){all_segs = dplyr::select(all_segs, ID, CN)}
   
   return(all_segs)
 }

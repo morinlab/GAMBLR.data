@@ -76,8 +76,9 @@ These parameters are only used in \link[GAMBLR.results:get_manta_sv]{GAMBLR.resu
 #lazily get every SV in the table with default quality filters
 all_sv = get_manta_sv()
 
-#get all SVs for a single sample
-some_sv = get_manta_sv(these_sample_ids = "DOHH-2")
+#get all SVs DLBCL cell line samples
+cell_line_meta = GAMBLR.data::sample_data$meta \%>\% dplyr::filter(cohort == "DLBCL_cell_lines")
+dlbcl_sv = get_manta_sv(these_samples_metadata = cell_line_meta)
 
 #get the SVs in a region around MYC
 myc_locus_sv = get_manta_sv(region = "8:128723128-128774067")
