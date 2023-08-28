@@ -1,21 +1,17 @@
 #' @title Get Manta SVs
 #'
-#' @description Convenience function for loading Manta Structural Variants (SVs) from the bundled data [GAMBLR.data::sample_data].
+#' @description Convenience function for retrieving Manta Structural Variants (SVs) from the bundled data [GAMBLR.data::sample_data].
 #'
-#' @details This "bare bones" function was developed to retrieve Manta SV calls for non-GSC-users.
-#' For users with GSC access it is highly recommended to instead call [GAMBLR.results::get_manta_sv].
-#' Return Manta SVs with additional VCF information to allow for filtering of high-confidence variants.
-#' To return SV calls for multiple samples, give `these_sample_ids` a vector of sample IDs, if only one sample is desired,
-#' give this parameter one sample ID, as a string (or a vector of characters). The user can also call the `these_samples_metadata`
-#' parameter to make use of an already subset metadata table. In this case, the returned calls will be restricted to the sample_ids
+#' @details This "bare bones" function was developed to retrieve Manta SV calls bundled within GAMBLR.data. 
+#' To obtain SV calls for multiple samples, give `these_sample_ids` a vector of one or more sample IDs. 
+#' Alternatively, the user can also provide the `these_samples_metadata`
+#' parameter to make use of an already subset metadata table. In this case, the returned SVs will be restricted to the sample_ids
 #' within that data frame. This function internally calls [GAMBLR.results::id_ease] to streamline sample ID/metadata parameters.
 #' This function can also restrict the returned calls to any genomic regions specified within `chromosome`, `qstart`, `qend`,
 #' or the complete region specified under `region` (in chr:start-end format), note that chromosome can be either prefixed or not prefixed.
 #' Useful filtering parameters are also available, use `min_vaf` to set the minimum tumour VAF for a SV to be returned and `min_score`
 #' to set the lowest Manta somatic score for a SV to be returned. `pair_status` can be used to return variants from either matched or unmatched samples.
 #' In addition, the user can chose to return all variants, even the ones not passing the filter criteria. To do so, set `pass = FALSE` (default is TRUE).
-#' Warning, the following parameters are not available in this version of get_manta_sv; `from_flatfile`, `from_cache`, `write_to_file`.
-#' These parameters are only used in [GAMBLR.results::get_manta_sv]. 
 #'
 #' @param these_sample_ids A vector of multiple sample_id (or a single sample ID as a string) that you want results for.
 #' @param these_samples_metadata A metadata table to auto-subset the data to samples in that table before returning.
@@ -28,10 +24,7 @@
 #' @param min_vaf The minimum tumour VAF for a SV to be returned. Default is 0.1.
 #' @param min_score The lowest Manta somatic score for a SV to be returned. Default is 40.
 #' @param pass If TRUE (default) only return SVs that are annotated with PASS in the FILTER column. Set to FALSE to keep all variants, regardless if they PASS the filters.
-#' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbose-ness of any helper function internally called inside the main function.
-#' @param from_cache This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_manta_sv] for more info.
-#' @param from_flatfile This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_manta_sv] for more info.
-#' @param write_to_file This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_manta_sv] for more info.
+#' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' 
 #' @export
 #' 
@@ -57,24 +50,14 @@ get_manta_sv = function(these_sample_ids,
                         min_vaf = 0.1,
                         min_score = 40,
                         pass = TRUE,
-                        verbose = TRUE,
-                        from_cache = NULL,
-                        from_flatfile = NULL,
-                        write_to_file = NULL){
+                        verbose = FALSE,
+                        ...){
   
   #warn/notify the user what version of this function they are using
   message("Using the bundled Manta SV (.bedpe) calls in GAMBLR.data...")
   
-  #get invalid parameters for this function
-  invalid_params = c("from_cache", "write_to_file", "from_flatfile")
-  
-  #check if any such parameters are provided
-  for(param in invalid_params){
-    if(!is.null(get(param))){
-      print(paste("Unsupported parameter supplied. This is only available in GAMBLR.results:", param))
-      stop()
-    }
-  }
+  #check if any invalid parameters are provided
+  check_excess_params(...)
   
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
