@@ -25,15 +25,23 @@
 #' @param min_score The lowest Manta somatic score for a SV to be returned. Default is 40.
 #' @param pass If TRUE (default) only return SVs that are annotated with PASS in the FILTER column. Set to FALSE to keep all variants, regardless if they PASS the filters.
 #' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.
+#' @param ... Any additional parameters.
 #' 
 #' @export
 #' 
+#' @import dplyr
+#' 
 #' @examples
+#' #load packages
+#' library(dplyr)
+#' 
 #' #lazily get every SV in the table with default quality filters
 #' all_sv = get_manta_sv()
 #'
 #' #get all SVs DLBCL cell line samples
-#' cell_line_meta = GAMBLR.data::sample_data$meta %>% dplyr::filter(cohort == "DLBCL_cell_lines")
+#' cell_line_meta = GAMBLR.data::sample_data$meta %>% 
+#'   dplyr::filter(cohort == "DLBCL_cell_lines")
+#'   
 #' dlbcl_sv = get_manta_sv(these_samples_metadata = cell_line_meta)
 #'
 #' #get the SVs in a region around MYC

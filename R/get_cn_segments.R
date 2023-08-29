@@ -16,7 +16,7 @@
 #' @param this_seq_type Seq type for returned CN segments. This version of this function currently only supports "genome". See [GAMBLR.results::get_cn_segments] for capture samples.
 #' @param with_chr_prefix Boolean parameter for toggling if chr prefixes should be present in the return, default is FALSE.
 #' @param streamlined Return a basic rather than full MAF format. Default is FALSE.
-#' @param from_flatfile This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_cn_segments] for more info.
+#' @param ... Any additional parameters.
 #'
 #' @return A data frame with CN segments for the specified region.
 #'
@@ -43,7 +43,7 @@ get_cn_segments = function(region,
                            this_seq_type = "genome",
                            with_chr_prefix = FALSE,
                            streamlined = FALSE,
-                           from_flatfile = NULL){
+                           ...){
   
   #check seq type
   if(this_seq_type != "genome"){
@@ -53,16 +53,8 @@ get_cn_segments = function(region,
   #warn/notify the user what version of this function they are using
   message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
   
-  #get invalid parameters for this function
-  invalid_params = c("from_flatfile")
-  
-  #check if any such parameters are provided
-  for(param in invalid_params){
-    if(!is.null(get(param))){
-      print(paste("Unsupported parameter supplied. This is only available in GAMBLR.results:", param))
-      stop()
-    }
-  }
+  #check if any invalid parameters are provided
+  check_excess_params(...)
   
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)

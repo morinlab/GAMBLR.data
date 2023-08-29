@@ -18,24 +18,28 @@
 #' @param seq_type The seq_type you want back, default is genome.
 #' @param basic_columns Set to FALSE to override the default behavior of returning only the first 45 columns of MAF data.
 #' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).
-#' @param from_flatfile This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_coding_ssm] for more info.
-#' @param augmented This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_coding_ssm] for more info.
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs)
-#' @param groups This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_coding_ssm] for more info.
 #' @param include_silent Logical parameter indicating whether to include silent mutations into coding mutations. Default is TRUE.
-#' @param engine This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_coding_ssm] for more info.
+#' @param ... Any additional parameters.
 #'
 #' @return A data frame (.maf) with coding SSMs in reference to the selected projection.
 #' 
 #' @export
 #' 
 #' @examples
+#' #load pacakges
+#' library(dplyr)
+#' 
 #' #return SSMs in reference to GRCh37:
 #' ssm_grch37 = get_coding_ssm(seq_type = "genome")
 #'
 #' #return SSMs in reference to hg38:
-#' cell_line_meta = GAMBLR.data::sample_data$meta %>% dplyr::filter(cohort == "DLBCL_cell_lines")
-#' ssm_hg38 = get_coding_ssm(projection = "hg38", these_samples_metadata = cell_line_meta, seq_type = "genome")
+#' cell_line_meta = GAMBLR.data::sample_data$meta %>% 
+#'   dplyr::filter(cohort == "DLBCL_cell_lines")
+#' 
+#' ssm_hg38 = get_coding_ssm(projection = "hg38", 
+#'                           these_samples_metadata = cell_line_meta, 
+#'                           seq_type = "genome")
 #' 
 get_coding_ssm = function(limit_cohort,
                           exclude_cohort,
@@ -47,26 +51,15 @@ get_coding_ssm = function(limit_cohort,
                           seq_type,
                           basic_columns = TRUE,
                           maf_cols = NULL,
-                          from_flatfile = NULL,
-                          augmented = NULL,
                           min_read_support = 3,
-                          groups = NULL,
                           include_silent = TRUE,
-                          engine = NULL){
+                          ...){
   
   #warn/notify the user what version of this function they are using
   message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
   
-  #get invalid parameters for this function
-  invalid_params = c("from_flatfile", "augmented", "engine", "groups")
-  
-  #check if any such parameters are provided
-  for(param in invalid_params){
-    if(!is.null(get(param))){
-      print(paste("Unsupported parameter supplied. This is only available in GAMBLR.results:", param))
-      stop()
-    }
-  }
+  #check if any invalid parameters are provided
+  check_excess_params(...)
   
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)

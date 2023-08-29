@@ -11,11 +11,11 @@
 #'
 #' @param these_sample_ids Optional argument, sample_id (vector of characters) for the sample(s) to retrieve segments for. If not provided, the function will return CN segments for all available sample IDs present in the current metadata.
 #' @param these_samples_metadata Optional, provide a metadata (data frame) subset to the sample IDs of interest.
-#' @param from_flatfile This parameter does not do anything for this version of get_manta_sv. See [GAMBLR.results::get_sample_cn_segments] for more info.
 #' @param projection Selected genome projection for returned CN segments. Default is "grch37".
 #' @param this_seq_type Seq type for returned CN segments. One of "genome" (default) or "capture".
 #' @param with_chr_prefix Set to TRUE to add a chr prefix to chromosome names. Default is FALSE.
 #' @param streamlined Return a minimal output rather than full details. Default is FALSE.
+#' @param ... Any additional parameters.
 #'
 #' @return A data frame of segments for a specific or multiple sample ID(s).
 #'
@@ -23,20 +23,28 @@
 #' @export
 #'
 #' @examples
+#' #load pacakges
+#' library(dplyr)
+#' 
 #' #get CN segments for one sample
-#' dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2", projection = "hg38", streamlined = TRUE)
+#' dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2",
+#'                                     projection = "hg38", 
+#'                                     streamlined = TRUE)
 #'
 #' #get CN segments for DLBCL cell line
-#' cell_line_meta = GAMBLR.data::sample_data$meta %>% dplyr::filter(cohort == "DLBCL_cell_lines")
-#' dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta, streamlined = TRUE)
+#' cell_line_meta = GAMBLR.data::sample_data$meta %>% 
+#'   dplyr::filter(cohort == "DLBCL_cell_lines")
+#'   
+#' dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta, 
+#'                                     streamlined = TRUE)
 #'
 get_sample_cn_segments = function(these_sample_ids,
                                   these_samples_metadata,
-                                  from_flatfile = NULL,
                                   projection = "grch37",
                                   this_seq_type = "genome",
                                   with_chr_prefix = FALSE,
-                                  streamlined = FALSE){
+                                  streamlined = FALSE,
+                                  ...){
   
   #check seq type
   if(this_seq_type != "genome"){
@@ -54,16 +62,8 @@ get_sample_cn_segments = function(these_sample_ids,
   #warn/notify the user what version of this function they are using
   message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
   
-  #get invalid parameters for this function
-  invalid_params = c("from_flatfile")
-  
-  #check if any such parameters are provided
-  for(param in invalid_params){
-    if(!is.null(get(param))){
-      print(paste("Unsupported parameter supplied. This is only available in GAMBLR.results:", param))
-      stop()
-    }
-  }
+  #check if any invalid parameters are provided
+  check_excess_params(...)
   
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)

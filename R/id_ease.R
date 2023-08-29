@@ -26,6 +26,9 @@
 #' @return A list with metadata (data frame) as the first element and sample IDs (vector of characters) as the second element.
 #'
 #' @examples
+#' #load packages
+#' library(dplyr)
+#' 
 #' #give the function nothing (i.e return all sample IDs in the metadata for the default seq type)
 #' #return metadata for all samples in the default seq type
 #' all_meta = id_ease()
@@ -37,7 +40,7 @@
 #' this_metadata = get_gambl_metadata(seq_type_filter = "genome") %>% 
 #'   head(5)
 #'
-#' thes_ids = id_ease(these_samples_metadata = this_metadata)
+#' these_ids = id_ease(these_samples_metadata = this_metadata)
 #'
 id_ease = function(these_samples_metadata,
                    these_sample_ids,
