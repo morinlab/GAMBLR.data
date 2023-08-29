@@ -197,13 +197,11 @@ dlbcl_data$cnv_to_bundle <- read_xlsx(
     filter(ID %in% dlbcl_data$meta_to_bundle$sample_id) %>%
 	mutate(CN = round(2 * 2^log.ratio))
 
-# Importing DLBCL cell lines
-setwd("~/GAMBLR/")
-
+# Importing DLBCL Reddy data
 reddy_data <- list()
 
 # Importing metadata from Reddy et al and updating IDs to be consistent with GAMBL metadata
-reddy_meta = readxl::read_excel("inst/extdata/studies/DLBCL_Reddy.xlsx",sheet=1) %>% 
+reddy_meta = readxl::read_excel("inst/extdata/studies/DLBCL_Reddy.xlsx",sheet=1) %>%
   mutate(patient_id=paste0("Reddy_",`Sample  ID`),sample_id=paste0("Reddy_",`Sample  ID`,"T")) %>%
   mutate(Tumor_Sample_Barcode=sample_id) %>%
   dplyr::rename("Sex"="Gender") %>%
@@ -211,10 +209,12 @@ reddy_meta = readxl::read_excel("inst/extdata/studies/DLBCL_Reddy.xlsx",sheet=1)
   mutate(COO_consensus=ifelse(COO_consensus=="Unclassified","UNCLASS",COO_consensus)) %>%
   dplyr::select(sample_id,patient_id,Tumor_Sample_Barcode,Sex,COO_consensus)
 
-reddy_meta_gambl = get_gambl_metadata(seq_type_filter="capture") %>% 
-  dplyr::filter(cohort == "dlbcl_reddy") %>% 
+setwd("~/GAMBLR/")
+
+reddy_meta_gambl = get_gambl_metadata(seq_type_filter="capture") %>%
+  dplyr::filter(cohort == "dlbcl_reddy") %>%
   dplyr::select(sample_id,lymphgen,EBV_status_inf,cohort,pathology) %>%
-  rename("LymphGen" = "lymphgen") 
+  rename("LymphGen" = "lymphgen")
 
 reddy_meta_gambl$reference_PMID = pmids$Reddy_DLBCL
 
@@ -232,14 +232,14 @@ reddy_full_ssm <- get_ssm_by_samples(
 )
 
 #restrict to the most inclusive DLBCL gene list
-all_lymphoma_genes = read_tsv("inst/extdata/lymphoma_genes_comprehensive.tsv") %>% 
+all_lymphoma_genes = read_tsv("inst/extdata/lymphoma_genes_comprehensive.tsv") %>%
   pull(Gene)
 
 reddy_data$grch37$ssm_to_bundle <- dplyr::filter(reddy_full_ssm,Hugo_Symbol %in% all_lymphoma_genes)
 
 
 
-
+# Importing DLBCL cell lines
 cell_lines_data <- list()
 
 cell_lines_data$meta <- get_gambl_metadata() %>%
@@ -293,6 +293,61 @@ cell_lines_data$hg38$sv_to_bundle <- get_manta_sv_by_samples(
     these_samples_metadata = cell_lines_data$meta,
     projection = "hg38"
 )
+
+# Adding the manta SVs for published studies
+full_genome_meta = get_gambl_metadata(seq_type_filter = "genome")
+
+bundled_meta = dplyr::filter(
+    full_genome_meta,
+    sample_id %in% GAMBLR.data::sample_data$meta$sample_id
+)
+
+full_sv_to_bundle = get_manta_sv_by_samples(
+  these_samples_metadata = bundled_meta,projection="hg38")
+
+annotated_sv_to_bundle = annotate_sv(full_sv_to_bundle,genome_build = "hg38")
+annotated_sv_to_bundle= dplyr::filter(annotated_sv_to_bundle,!is.na(partner)) %>%
+  mutate(chrom1=paste0("chr",chrom1),chrom2=paste0("chr",chrom2))
+
+#drop all annotation columns to restore original data subset just to the putative driver SVs
+annotated_sv_keep = left_join(
+    full_sv_to_bundle,
+    annotated_sv_to_bundle,
+    by=c(
+        "CHROM_A"="chrom1",
+        "CHROM_B"="chrom2",
+        "START_A"="start1",
+        "tumour_sample_id")
+    ) %>%
+    dplyr::filter(!is.na(partner)) %>%
+    select(c(1:16))
+
+# Now same for the grch37 projection
+full_sv_to_bundle_grch37 <- get_manta_sv_by_samples(
+    these_samples_metadata = bundled_meta
+)
+
+annotated_sv_to_bundle_grch37 = annotate_sv(
+    full_sv_to_bundle_grch37)
+
+annotated_sv_to_bundle_grch37 = dplyr::filter(
+    annotated_sv_to_bundle_grch37,
+    !is.na(partner)
+)
+
+#drop all annotation columns to restore original data subset just to the putative driver SVs
+annotated_sv_keep_grch37 = left_join(
+    full_sv_to_bundle_grch37,
+    annotated_sv_to_bundle_grch37,
+    by=c(
+        "CHROM_A"="chrom1",
+        "CHROM_B"="chrom2",
+        "START_A"="start1",
+        "tumour_sample_id")
+    ) %>%
+    dplyr::filter(!is.na(partner)) %>%
+    select(c(1:16))
+
 
 # Combine everything together
 sample_data <- list()
@@ -349,9 +404,10 @@ sample_data$hg38$seg <- bind_rows(
     cell_lines_data$hg38$cnv
 )
 
-sample_data$grch37$bedpe <- cell_lines_data$grch37$sv_to_bundle
+#add SVs
+sample_data$grch37$bedpe <- annotated_sv_keep_grch37
 
-sample_data$hg38$bedpe <- cell_lines_data$hg38$sv_to_bundle
+sample_data$hg38$bedpe <- annotated_sv_keep
 
 setwd("~/my_dir/repos/GAMBLR.data/")
 

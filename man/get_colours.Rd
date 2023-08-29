@@ -9,7 +9,8 @@ get_colours(
   this_category,
   this_group,
   as_named_vector = FALSE,
-  drop_alias = TRUE
+  drop_alias = TRUE,
+  legacy_mode = FALSE
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ palette just for this group.}
 \item{as_named_vector}{Whether to return the colors as named vector.}
 
 \item{drop_alias}{When FALSE, shows the redundant colours with their aliases.}
+
+\item{legacy_mode}{When TRUE, will return named list similar to the first implementation of get_gambl_colours}
 }
 \value{
 A data frame or named character vector of colour Hex codes.
