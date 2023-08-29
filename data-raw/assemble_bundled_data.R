@@ -294,6 +294,24 @@ cell_lines_data$hg38$sv_to_bundle <- get_manta_sv_by_samples(
     projection = "hg38"
 )
 
+full_genome_meta = get_gambl_metadata(seq_type_filter = "genome")
+
+bundled_meta = dplyr::filter(full_genome_meta,sample_id %in% GAMBLR.data::sample_data$meta$sample_id)
+
+full_sv_to_bundle = get_manta_sv_by_samples(
+  these_samples_metadata = bundled_meta,projection="hg38")
+
+annotated_sv_to_bundle = annotate_sv(full_sv_to_bundle,genome_build = "hg38")
+annotated_sv_to_bundle= dplyr::filter(annotated_sv_to_bundle,!is.na(partner)) %>% 
+  mutate(chrom1=paste0("chr",chrom1),chrom2=paste0("chr",chrom2))
+
+#drop all annotation columns to restore original data subset just to the putative driver SVs
+annotated_sv_keep = left_join(full_sv_to_bundle,annotated_sv_to_bundle,
+                              by=c("CHROM_A"="chrom1","CHROM_B"="chrom2","START_A"="start1","tumour_sample_id")) %>% 
+  dplyr::filter(!is.na(partner)) %>% 
+  select(c(1:16))
+
+
 # Combine everything together
 sample_data <- list()
 
@@ -351,7 +369,9 @@ sample_data$hg38$seg <- bind_rows(
 
 sample_data$grch37$bedpe <- cell_lines_data$grch37$sv_to_bundle
 
-sample_data$hg38$bedpe <- cell_lines_data$hg38$sv_to_bundle
+#add patient SV instead to cell lines 
+sv_to_bundle = bind_rows(sv_to_bundle,annotated_sv_keep)
+sample_data$hg38$bedpe <- annotated_sv_keep
 
 setwd("~/my_dir/repos/GAMBLR.data/")
 
