@@ -9,15 +9,26 @@ get_ssm_by_samples(
   these_sample_ids,
   these_samples_metadata,
   this_seq_type = "genome",
-  tool_name = NULL,
   projection = "grch37",
   these_genes,
-  augmented = NULL,
-  flavour = NULL,
   min_read_support = 3,
   basic_columns = TRUE,
   maf_cols = NULL,
-  verbose = FALSE
+  verbose = FALSE,
+  ...
+)
+
+get_ssm_by_sample(
+  these_sample_ids,
+  these_samples_metadata,
+  this_seq_type = "genome",
+  projection = "grch37",
+  these_genes,
+  min_read_support = 3,
+  basic_columns = TRUE,
+  maf_cols = NULL,
+  verbose = FALSE,
+  ...
 )
 }
 \arguments{
@@ -27,15 +38,9 @@ get_ssm_by_samples(
 
 \item{this_seq_type}{Required if not specifying these_samples_metadata. The seq_type of the sample you want data from.}
 
-\item{tool_name}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_ssm_by_sample]{GAMBLR.results::get_ssm_by_sample} for more info.}
-
 \item{projection}{The projection genome build. Supports hg38 and grch37.}
 
 \item{these_genes}{A vector of genes to subset ssm to.}
-
-\item{augmented}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_ssm_by_sample]{GAMBLR.results::get_ssm_by_sample} for more info.}
-
-\item{flavour}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_ssm_by_sample]{GAMBLR.results::get_ssm_by_sample} for more info.}
 
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
 
@@ -44,6 +49,8 @@ get_ssm_by_samples(
 \item{maf_cols}{if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters.}
 
 \item{verbose}{Enable for debugging/noisier output.}
+
+\item{...}{Any additional parameters.}
 }
 \value{
 data frame in MAF format.
@@ -57,11 +64,16 @@ Either specify the sample IDs of interest with \code{these_sample_ids}.
 Or a metadata table subset to the sample IDs of interest.
 }
 \examples{
-#Basic usage, using a sample ID
-dohh2_maf = get_ssm_by_sample(these_sample_ids = "DOHH-2")
+#load packages
+library(dplyr)
 
-#Return a MAF for DLBCL cell line
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\% dplyr::filter(cohort == "DLBCL_cell_lines")
+#return a MAF for DLBCL cell line
+cell_line_meta = GAMBLR.data::sample_data$meta \%>\% 
+  dplyr::filter(cohort == "DLBCL_cell_lines")
+  
 dlbcl_maf = get_ssm_by_samples(these_samples_metadata = cell_line_meta)
+
+#basic usage, using a sample ID
+dohh2_maf = get_ssm_by_samples(these_sample_ids = "DOHH-2")
 
 }

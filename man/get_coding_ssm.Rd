@@ -15,12 +15,9 @@ get_coding_ssm(
   seq_type,
   basic_columns = TRUE,
   maf_cols = NULL,
-  from_flatfile = NULL,
-  augmented = NULL,
   min_read_support = 3,
-  groups = NULL,
   include_silent = TRUE,
-  engine = NULL
+  ...
 )
 }
 \arguments{
@@ -44,17 +41,11 @@ get_coding_ssm(
 
 \item{maf_cols}{if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).}
 
-\item{from_flatfile}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_coding_ssm]{GAMBLR.results::get_coding_ssm} for more info.}
-
-\item{augmented}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_coding_ssm]{GAMBLR.results::get_coding_ssm} for more info.}
-
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs)}
-
-\item{groups}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_coding_ssm]{GAMBLR.results::get_coding_ssm} for more info.}
 
 \item{include_silent}{Logical parameter indicating whether to include silent mutations into coding mutations. Default is TRUE.}
 
-\item{engine}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_coding_ssm]{GAMBLR.results::get_coding_ssm} for more info.}
+\item{...}{Any additional parameters.}
 }
 \value{
 A data frame (.maf) with coding SSMs in reference to the selected projection.
@@ -70,11 +61,18 @@ For more information on how to implement the filtering parameters, refer to the 
 It relies on the bundled sample data in this package.
 }
 \examples{
+#load pacakges
+library(dplyr)
+
 #return SSMs in reference to GRCh37:
 ssm_grch37 = get_coding_ssm(seq_type = "genome")
 
 #return SSMs in reference to hg38:
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\% dplyr::filter(cohort == "DLBCL_cell_lines")
-ssm_hg38 = get_coding_ssm(projection = "hg38", these_samples_metadata = cell_line_meta, seq_type = "genome")
+cell_line_meta = GAMBLR.data::sample_data$meta \%>\% 
+  dplyr::filter(cohort == "DLBCL_cell_lines")
+
+ssm_hg38 = get_coding_ssm(projection = "hg38", 
+                          these_samples_metadata = cell_line_meta, 
+                          seq_type = "genome")
 
 }

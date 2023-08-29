@@ -4,11 +4,13 @@
 \alias{get_gambl_metadata}
 \title{Get GAMBL Metadata.}
 \usage{
-get_gambl_metadata(seq_type_filter = c("genome", "capture"))
+get_gambl_metadata(seq_type_filter = c("genome", "capture"), ...)
 }
 \arguments{
 \item{seq_type_filter}{Specify the seq type you want to return metadata for.
 Default is both genome and capture (all samples).}
+
+\item{...}{Any additional parameters.}
 }
 \value{
 A data frame with metadata, tailored for user without GSC access.
@@ -18,7 +20,6 @@ Convenience function for loading the bundled metadata, \link{gambl_metadata}.
 }
 \details{
 This bare bones function was developed to retrieve metadata for non-GSC-users.
-For users with GSC access it is highly recommended to instead call \link[GAMBLR.results:get_gambl_metadata]{GAMBLR.results::get_gambl_metadata}.
 Specify the seq type (\code{seq_type_filter}) for the samples you want returned as the only argument.
 It relies on the bundled metadata in this package.
 }
@@ -27,9 +28,9 @@ It relies on the bundled metadata in this package.
 genome_meta = get_gambl_metadata(seq_type_filter = "genome")
 
 #return metadata for capture samples
-genome_meta = get_gambl_metadata(seq_type_filter = "capture")
+capture_meta = get_gambl_metadata(seq_type_filter = "capture")
 
 #return metadata for genome and capture samples
-genome_meta = get_gambl_metadata(seq_type_filter = c("genome", "capture"))
+all_meta = get_gambl_metadata(seq_type_filter = c("genome", "capture"))
 
 }

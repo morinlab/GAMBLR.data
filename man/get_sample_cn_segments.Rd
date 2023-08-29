@@ -7,19 +7,17 @@
 get_sample_cn_segments(
   these_sample_ids,
   these_samples_metadata,
-  from_flatfile = NULL,
   projection = "grch37",
   this_seq_type = "genome",
   with_chr_prefix = FALSE,
-  streamlined = FALSE
+  streamlined = FALSE,
+  ...
 )
 }
 \arguments{
 \item{these_sample_ids}{Optional argument, sample_id (vector of characters) for the sample(s) to retrieve segments for. If not provided, the function will return CN segments for all available sample IDs present in the current metadata.}
 
 \item{these_samples_metadata}{Optional, provide a metadata (data frame) subset to the sample IDs of interest.}
-
-\item{from_flatfile}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_sample_cn_segments]{GAMBLR.results::get_sample_cn_segments} for more info.}
 
 \item{projection}{Selected genome projection for returned CN segments. Default is "grch37".}
 
@@ -28,6 +26,8 @@ get_sample_cn_segments(
 \item{with_chr_prefix}{Set to TRUE to add a chr prefix to chromosome names. Default is FALSE.}
 
 \item{streamlined}{Return a minimal output rather than full details. Default is FALSE.}
+
+\item{...}{Any additional parameters.}
 }
 \value{
 A data frame of segments for a specific or multiple sample ID(s).
@@ -44,11 +44,19 @@ Note, this. function internally calls \link[GAMBLR:id_ease]{GAMBLR::id_ease} for
 Is this function not what you are looking for? Try one of the following, similar, functions; \link[GAMBLR:assign_cn_to_ssm]{GAMBLR::assign_cn_to_ssm}, \link[GAMBLR:get_cn_segments]{GAMBLR::get_cn_segments}, \link[GAMBLR:get_cn_states]{GAMBLR::get_cn_states},
 }
 \examples{
+#load pacakges
+library(dplyr)
+
 #get CN segments for one sample
-dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2", projection = "hg38", streamlined = TRUE)
+dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2",
+                                    projection = "hg38", 
+                                    streamlined = TRUE)
 
 #get CN segments for DLBCL cell line
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\% dplyr::filter(cohort == "DLBCL_cell_lines")
-dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta, streamlined = TRUE)
+cell_line_meta = GAMBLR.data::sample_data$meta \%>\% 
+  dplyr::filter(cohort == "DLBCL_cell_lines")
+  
+dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta, 
+                                    streamlined = TRUE)
 
 }

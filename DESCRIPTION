@@ -12,7 +12,12 @@ Authors@R:
            family = "Dreval",
            role = c("aut", "cre"),
            email = "kdreval@sfu.ca",
-           comment = c(ORCID = "0000-0002-6214-2843"))
+           comment = c(ORCID = "0000-0002-6214-2843")),
+        person(given = "Adam",
+           family = "Mattsson",
+           role = c("aut"),
+           email = "cmattsson@bcgsc.ca",
+           comment = c(ORCID = "0000-0002-6318-7912"))
     )
 Description: The package contains manually curated data for the genomic Analysis
     of mature B-cell lymphomas in R, such as regions of somatic hypermutation,
@@ -27,6 +32,8 @@ LazyData: true
 Imports: 
     dplyr,
     ggplot2,
+    readr,
+    stringr,
     tibble,
     tidyr
 LazyDataCompression: xz

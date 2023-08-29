@@ -13,7 +13,7 @@ get_cn_segments(
   this_seq_type = "genome",
   with_chr_prefix = FALSE,
   streamlined = FALSE,
-  from_flatfile = NULL
+  ...
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ get_cn_segments(
 
 \item{streamlined}{Return a basic rather than full MAF format. Default is FALSE.}
 
-\item{from_flatfile}{This parameter does not do anything for this version of get_manta_sv. See \link[GAMBLR.results:get_cn_segments]{GAMBLR.results::get_cn_segments} for more info.}
+\item{...}{Any additional parameters.}
 }
 \value{
 A data frame with CN segments for the specified region.

@@ -42,6 +42,9 @@ In addition, the function also notifies the dimensions of the returned object, p
 As with all GAMBLR functions, providing a curated metadata table to any GAMBLR function (as opposed to a vector of IDs) is the safest way to ensure you get the expected result.
 }
 \examples{
+#load packages
+library(dplyr)
+
 #give the function nothing (i.e return all sample IDs in the metadata for the default seq type)
 #return metadata for all samples in the default seq type
 all_meta = id_ease()
@@ -53,6 +56,6 @@ sample_meta = id_ease(these_sample_ids = "94-15772_tumorA")
 this_metadata = get_gambl_metadata(seq_type_filter = "genome") \%>\% 
   head(5)
 
-thes_ids = id_ease(these_samples_metadata = this_metadata)
+these_ids = id_ease(these_samples_metadata = this_metadata)
 
 }
