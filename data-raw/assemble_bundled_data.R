@@ -10,6 +10,7 @@ colnames_for_bundled_meta <- c(
     "patient_id",
     "sample_id",
     "Tumor_Sample_Barcode",
+    "seq_type",
     "Sex",
     "COO_consensus",
     "LymphGen",
@@ -38,6 +39,7 @@ bl_data$meta_to_bundle <- data.frame(
     bl_data$meta$`Patient barcode`,
     bl_data$meta$`Genome sample id`,
     bl_data$meta$`Genome sample id`,
+    rep("genome", nrow(bl_data$meta)),
     bl_data$meta$Sex,
     rep(NA, nrow(bl_data$meta)),
     rep(NA, nrow(bl_data$meta)),
@@ -103,6 +105,7 @@ fl_data$meta_to_bundle <- data.frame(
     fl_data$meta$`Patient barcode`,
     fl_data$meta$`Genome sample id`,
     fl_data$meta$`Genome sample id`,
+    rep("genome", nrow(fl_data$meta)),
     fl_data$meta$Sex,
     rep(NA, nrow(fl_data$meta)),
     rep(NA, nrow(fl_data$meta)),
@@ -157,6 +160,7 @@ dlbcl_data$meta_to_bundle <- data.frame(
     dlbcl_data$meta$`Patient barcode`,
     dlbcl_data$meta$`Genome sample id`,
     dlbcl_data$meta$`Genome sample id`,
+    rep("genome", nrow(dlbcl_data$meta)),
     dlbcl_data$meta$Sex,
     rep(NA, nrow(dlbcl_data$meta)),
     rep(NA, nrow(dlbcl_data$meta)),
@@ -213,7 +217,7 @@ setwd("~/GAMBLR/")
 
 reddy_meta_gambl = get_gambl_metadata(seq_type_filter="capture") %>%
   dplyr::filter(cohort == "dlbcl_reddy") %>%
-  dplyr::select(sample_id,lymphgen,EBV_status_inf,cohort,pathology) %>%
+  dplyr::select(sample_id,lymphgen,EBV_status_inf,cohort,pathology, seq_type) %>%
   rename("LymphGen" = "lymphgen")
 
 reddy_meta_gambl$reference_PMID = pmids$Reddy_DLBCL
@@ -221,7 +225,6 @@ reddy_meta_gambl$reference_PMID = pmids$Reddy_DLBCL
 reddy_data$meta_to_bundle = left_join(reddy_meta,reddy_meta_gambl)
 
 
-reddy_meta_gambl$seq_type = "capture"
 reddy_meta_gambl$unix_group = "icgc_dart"
 reddy_meta_gambl$genome_build = "hg19-reddy"
 reddy_meta_gambl$pairing_status = "unmatched"
@@ -252,6 +255,7 @@ cell_lines_data$meta_to_bundle <- data.frame(
     cell_lines_data$meta$patient_id,
     cell_lines_data$meta$sample_id,
     cell_lines_data$meta$sample_id,
+    cell_lines_data$meta$seq_type,
     cell_lines_data$meta$sex,
     rep(NA, nrow(cell_lines_data$meta)),
     rep(NA, nrow(cell_lines_data$meta)),
