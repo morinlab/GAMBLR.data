@@ -45,13 +45,13 @@ get_cn_segments = function(region,
                            streamlined = FALSE,
                            ...){
   
+  #warn/notify the user what version of this function they are using
+  message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+  
   #check seq type
   if(this_seq_type != "genome"){
     stop("Currently, only CN segments available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
   }
-  
-  #warn/notify the user what version of this function they are using
-  message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
   
   #check if any invalid parameters are provided
   check_excess_params(...)
@@ -75,6 +75,10 @@ get_cn_segments = function(region,
     startend = unlist(strsplit(split_chunks[2], "-"))
     qstart = startend[1]
     qend = startend[2]
+  }else{
+    if(missing(chromosome)){
+      stop("You have not provided a region, or a region in an acceptable format..") 
+    }
   }
   
   #deal with chr prefixes for region, based on selected genome projection.

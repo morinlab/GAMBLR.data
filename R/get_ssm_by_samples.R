@@ -44,6 +44,11 @@ get_ssm_by_samples <- function(these_sample_ids,
                                verbose = FALSE,
                                ...){
   
+  #check seq type
+  if(this_seq_type != "genome"){
+    stop("Currently, SSM results are only available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
+  }
+  
   #warn/notify the user what version of this function they are using
   message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
   
@@ -53,10 +58,11 @@ get_ssm_by_samples <- function(these_sample_ids,
   #get sample IDs
   meta_ids = id_ease(these_sample_ids = these_sample_ids, 
                      these_samples_metadata = these_samples_metadata, 
-                     this_seq_type = this_seq_type)
+                     this_seq_type = "genome",
+                     verbose = verbose) #currently, only genome samples are bundled in the repo.
   
   #extract sample IDs
-  these_ids = meta_ids$these_samples
+  these_ids = meta_ids$sample_id
   
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)

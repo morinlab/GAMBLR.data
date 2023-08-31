@@ -6,8 +6,7 @@
 #' Specify the sample IDs you are interested in with `these_sample_ids` (as a vector of characters),
 #' Or call this function with `these_samples_metadata` if you already ahve a metadata table subset to the sample IDs of interest.
 #' If none off the above parameters are specified, the function will return CN segments for available samples.
-#' Note, this. function internally calls [GAMBLR::id_ease] for dealing with sample IDs and metadata tables. 
-#' Is this function not what you are looking for? Try one of the following, similar, functions; [GAMBLR::assign_cn_to_ssm], [GAMBLR::get_cn_segments], [GAMBLR::get_cn_states],
+#' Note, this. function internally calls [GAMBLR.data::id_ease] for dealing with sample IDs and metadata tables. 
 #'
 #' @param these_sample_ids Optional argument, sample_id (vector of characters) for the sample(s) to retrieve segments for. If not provided, the function will return CN segments for all available sample IDs present in the current metadata.
 #' @param these_samples_metadata Optional, provide a metadata (data frame) subset to the sample IDs of interest.
@@ -15,6 +14,7 @@
 #' @param this_seq_type Seq type for returned CN segments. One of "genome" (default) or "capture".
 #' @param with_chr_prefix Set to TRUE to add a chr prefix to chromosome names. Default is FALSE.
 #' @param streamlined Return a minimal output rather than full details. Default is FALSE.
+#' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.
 #'
 #' @return A data frame of segments for a specific or multiple sample ID(s).
@@ -44,7 +44,11 @@ get_sample_cn_segments = function(these_sample_ids,
                                   this_seq_type = "genome",
                                   with_chr_prefix = FALSE,
                                   streamlined = FALSE,
+                                  verbose = FALSE,
                                   ...){
+  
+  #warn/notify the user what version of this function they are using
+  message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
   
   #check seq type
   if(this_seq_type != "genome"){
@@ -54,13 +58,11 @@ get_sample_cn_segments = function(these_sample_ids,
   #get sample IDs
   meta_ids = id_ease(these_sample_ids = these_sample_ids, 
                      these_samples_metadata = these_samples_metadata, 
-                     this_seq_type = this_seq_type)
+                     this_seq_type = this_seq_type,
+                     verbose = verbose)
   
   #subset returned list to sample IDs
-  these_samples = meta_ids$these_samples
-  
-  #warn/notify the user what version of this function they are using
-  message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+  these_samples = meta_ids$sample_id
   
   #check if any invalid parameters are provided
   check_excess_params(...)

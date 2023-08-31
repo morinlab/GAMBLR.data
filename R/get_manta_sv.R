@@ -88,12 +88,10 @@ get_manta_sv = function(these_sample_ids,
   }
   
   #get samples with the dedicated helper function
-  meta_ids = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = "genome") #only genome samples have manta results
-  
-  this_meta = meta_ids$this_metadata
+  this_meta = id_ease(these_samples_metadata = these_samples_metadata,
+                      these_sample_ids = these_sample_ids,
+                      verbose = verbose,
+                      this_seq_type = "genome") #only genome samples have manta results
   
   manta_sv = manta_sv %>%
     dplyr::filter(tumour_sample_id %in% this_meta$sample_id,

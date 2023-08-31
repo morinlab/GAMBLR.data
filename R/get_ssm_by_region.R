@@ -43,10 +43,9 @@ get_ssm_by_region = function(chromosome,
                              min_read_support = 3,
                              verbose = TRUE,
                              ...){
-  
   if(verbose){
     #warn/notify the user what version of this function they are using
-    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...") 
+    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")  
   }
   
   #check if any invalid parameters are provided
@@ -67,12 +66,18 @@ get_ssm_by_region = function(chromosome,
   this_maf = dplyr::filter(this_maf, t_alt_count >= min_read_support)
   
   #split region into chunks (chr, start, end) and deal with chr prefixes based on the selected projection
+  if(length(region) > 1){
+    stop("You are providing more than one region, please refer to get_ssm_by_regions for multiple regions...")
+  }
+  
   if(!region == ""){
     region = gsub(",", "", region)
     split_chunks = unlist(strsplit(region, ":"))
+    
     if(projection == "grch37"){
       region = stringr::str_replace(region, "chr", "")
     }
+    
     chromosome = split_chunks[1]
     startend = unlist(strsplit(split_chunks[2], "-"))
     qstart = as.numeric(startend[1])

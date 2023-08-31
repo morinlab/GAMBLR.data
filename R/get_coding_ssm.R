@@ -20,6 +20,7 @@
 #' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs)
 #' @param include_silent Logical parameter indicating whether to include silent mutations into coding mutations. Default is TRUE.
+#' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.
 #'
 #' @return A data frame (.maf) with coding SSMs in reference to the selected projection.
@@ -48,15 +49,21 @@ get_coding_ssm = function(limit_cohort,
                           these_samples_metadata,
                           force_unmatched_samples,
                           projection = "grch37",
-                          seq_type,
+                          seq_type = "genome",
                           basic_columns = TRUE,
                           maf_cols = NULL,
                           min_read_support = 3,
                           include_silent = TRUE,
+                          verbose = FALSE,
                           ...){
   
   #warn/notify the user what version of this function they are using
   message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+  
+  #check seq type
+  if(seq_type != "genome"){
+    stop("Currently, SSM results are only available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
+  }
   
   #check if any invalid parameters are provided
   check_excess_params(...)
@@ -76,36 +83,29 @@ get_coding_ssm = function(limit_cohort,
     coding_class = coding_class[coding_class != "Silent"]
   }
   
-  if(!missing(these_samples_metadata)){
-    #sanity check if the metadata table used with these_samples_metadata is empty, if so, return an useful error.
-    if(nrow(these_samples_metadata) == 0){
-      stop("The provided metadata table is empty.\n  If you have subset the incoming metadata table (these_samples_metadata) to specific samples, ensure sample/patient IDs are actually avaialble in the original metadata...")
-    }
-    all_meta = these_samples_metadata
-  }else{
-    if(missing(seq_type)){
-      stop("you must provide either seq_type or these_samples_metadata")
-    }
-    all_meta = GAMBLR.data::get_gambl_metadata(seq_type_filter = seq_type)
-  }
+  #get samples with the dedicated helper function
+  all_meta = id_ease(these_samples_metadata = these_samples_metadata,
+                     verbose = verbose,
+                     this_seq_type = "genome") #currently, only genome samples are bundled in the repo.
   
-  all_meta = dplyr::filter(all_meta, seq_type == {{ seq_type }})
-  
-  #lmit cohort
+  #limit cohort
   if(!missing(limit_cohort)){
     all_meta = all_meta %>%
       dplyr::filter(cohort %in% limit_cohort)
   }
+  
   #exclude cohort
   if(!missing(exclude_cohort)){
     all_meta = all_meta %>%
       dplyr::filter(!cohort %in% exclude_cohort)
   }
+  
   #limit pathology
   if(!missing(limit_pathology)){
     all_meta = all_meta %>%
       dplyr::filter(pathology %in% limit_pathology)
   }
+  
   #limit samples
   if(!missing(limit_samples)){
     all_meta = all_meta %>%
@@ -127,15 +127,10 @@ get_coding_ssm = function(limit_cohort,
   mutated_samples = length(unique(muts$Tumor_Sample_Barcode))
   message(paste("after linking with metadata, we have mutations from", mutated_samples, "samples"))
   
-  #subset maf to a specific set of columns (defined in maf_cols)
-  if(!is.null(maf_cols) && !basic_columns){
-    muts = dplyr::select(muts, all_of(maf_cols))
-  }
-  
   #drop rows for these samples so we can swap in the force_unmatched outputs instead
   if(!missing(force_unmatched_samples)){
     muts = muts %>%
-      dplyr::filter(!sample_id %in% force_unmatched_samples)
+      dplyr::filter(!Tumor_Sample_Barcode %in% force_unmatched_samples)
     
     nsamp = length(force_unmatched_samples)
     message(paste("dropping variants from", nsamp, "samples and replacing with force_unmatched outputs"))
@@ -144,5 +139,11 @@ get_coding_ssm = function(limit_cohort,
     fu_muts = GAMBLR.data::get_ssm_by_samples(these_sample_ids = force_unmatched_samples)
     muts = bind_rows(muts, fu_muts)
   }
+  
+  #subset maf to a specific set of columns (defined in maf_cols)
+  if(!is.null(maf_cols) && !basic_columns){
+    muts = dplyr::select(muts, all_of(maf_cols))
+  }
+  
   return(muts)
 }

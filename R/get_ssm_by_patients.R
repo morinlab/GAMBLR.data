@@ -19,6 +19,7 @@
 #' @param basic_columns Return first 45 columns of MAF rather than full details. Default is TRUE.
 #' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. 
 #' This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).
+#' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.
 #'
 #' @return A data frame with SSM calls for the selected patients in MAF format.
@@ -48,7 +49,13 @@ get_ssm_by_patients = function(these_patient_ids,
                                min_read_support = 3,
                                basic_columns = TRUE,
                                maf_cols = NULL,
+                               verbose = FALSE,
                                ...){
+  
+  #check seq type
+  if(this_seq_type != "genome"){
+    stop("Currently, SSM results are only available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
+  }
   
   #check if any invalid parameters are provided
   check_excess_params(...)
@@ -64,6 +71,7 @@ get_ssm_by_patients = function(these_patient_ids,
     if(missing(these_samples_metadata)){
       these_samples_metadata = GAMBLR.data::get_gambl_metadata(seq_type_filter = this_seq_type)
     }
+    message("Patient IDs and metadata were provided, this function will resort to all available patient IDs in the provided metadata.")
     these_samples_metadata = these_samples_metadata %>%
       dplyr::filter(patient_id %in% these_patient_ids)
   }
@@ -75,5 +83,6 @@ get_ssm_by_patients = function(these_patient_ids,
                                          min_read_support = min_read_support,
                                          basic_columns = basic_columns,
                                          maf_cols = maf_cols,
+                                         verbose = verbose,
                                          ...))
 }

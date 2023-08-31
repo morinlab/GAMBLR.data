@@ -31,7 +31,7 @@ get_gambl_metadata = function(seq_type_filter = c("genome", "capture"),
   
   #check if any invalid parameters are provided
   check_excess_params(...)
-  
+
   message("Using the bundled metadata in GAMBLR.data...")
   return(GAMBLR.data::gambl_metadata %>% 
            dplyr::filter(seq_type %in% seq_type_filter))
