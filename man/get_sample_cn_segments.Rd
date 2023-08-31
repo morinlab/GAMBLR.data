@@ -11,6 +11,7 @@ get_sample_cn_segments(
   this_seq_type = "genome",
   with_chr_prefix = FALSE,
   streamlined = FALSE,
+  verbose = FALSE,
   ...
 )
 }
@@ -27,6 +28,8 @@ get_sample_cn_segments(
 
 \item{streamlined}{Return a minimal output rather than full details. Default is FALSE.}
 
+\item{verbose}{Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.}
+
 \item{...}{Any additional parameters.}
 }
 \value{
@@ -40,8 +43,7 @@ This function returns CN segments for samples. This works for single sample or m
 Specify the sample IDs you are interested in with \code{these_sample_ids} (as a vector of characters),
 Or call this function with \code{these_samples_metadata} if you already ahve a metadata table subset to the sample IDs of interest.
 If none off the above parameters are specified, the function will return CN segments for available samples.
-Note, this. function internally calls \link[GAMBLR:id_ease]{GAMBLR::id_ease} for dealing with sample IDs and metadata tables.
-Is this function not what you are looking for? Try one of the following, similar, functions; \link[GAMBLR:assign_cn_to_ssm]{GAMBLR::assign_cn_to_ssm}, \link[GAMBLR:get_cn_segments]{GAMBLR::get_cn_segments}, \link[GAMBLR:get_cn_states]{GAMBLR::get_cn_states},
+Note, this. function internally calls \link{id_ease} for dealing with sample IDs and metadata tables.
 }
 \examples{
 #load pacakges

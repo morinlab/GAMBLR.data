@@ -5,31 +5,38 @@
 \title{Get SSM By Regions.}
 \usage{
 get_ssm_by_regions(
-  regions_list,
+  regions_vector,
   regions_bed,
   streamlined = TRUE,
   basic_columns = FALSE,
   use_name_column = FALSE,
   projection = "grch37",
   min_read_support = 3,
+  verbose = FALSE,
   ...
 )
 }
 \arguments{
-\item{regions_list}{Either provide a vector of regions in the chr:start-end format OR.}
+\item{regions_vector}{Either provide a vector of regions in the chr:start-end format.
+If this parameter is provided, the function will auto set \code{use_name_column} to FALSE.}
 
-\item{regions_bed}{Better yet, provide a bed file with the coordinates you want to retrieve.}
+\item{regions_bed}{Provide a data frame in BED format with the coordinates you want to retrieve (recommended).
+This parameter can also accept an additional column with region names that will be added to the return if \code{use_name_column = TRUE}}
 
 \item{streamlined}{If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).
 Set to FALSE to return 6 columns. See \code{basic_columns} for more information on what columns to include in the return.}
 
 \item{basic_columns}{Set to TRUE for returning a maf with standarad 45 columns. Default is FALSE. If TRUE, \code{streamlined} and \code{use_name_column} will be ignored.}
 
-\item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.}
+\item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.
+This parameter. is nott accepted if \code{regions_vector} is provided.}
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38).}
 
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
+
+\item{verbose}{Set to TRUE to maximize the output to console. Default is TRUE.
+This parameter also dictates the verbosity of any helper function internally called inside the main function.}
 
 \item{...}{Any additional parameters.}
 }
@@ -41,7 +48,6 @@ Efficiently retrieve all mutations across a range of genomic regions.
 }
 \details{
 This function internally calls \link{get_ssm_by_region} to retrieve SSM calls for the specified regions.
-See parameter descriptions for \link[GAMBLR:get_ssm_by_region]{GAMBLR::get_ssm_by_region} for more information on how the different parameters can be called.
 }
 \examples{
 #basic usage, adding custom names from bundled ashm data frame

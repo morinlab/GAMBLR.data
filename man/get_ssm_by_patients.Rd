@@ -12,6 +12,7 @@ get_ssm_by_patients(
   min_read_support = 3,
   basic_columns = TRUE,
   maf_cols = NULL,
+  verbose = FALSE,
   ...
 )
 }
@@ -32,6 +33,8 @@ If the vector of patient IDs is missing (\code{these_patient_ids}), this functio
 
 \item{maf_cols}{if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF.
 This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).}
+
+\item{verbose}{Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.}
 
 \item{...}{Any additional parameters.}
 }

@@ -12,11 +12,12 @@ get_coding_ssm(
   these_samples_metadata,
   force_unmatched_samples,
   projection = "grch37",
-  seq_type,
+  seq_type = "genome",
   basic_columns = TRUE,
   maf_cols = NULL,
   min_read_support = 3,
   include_silent = TRUE,
+  verbose = FALSE,
   ...
 )
 }
@@ -44,6 +45,8 @@ get_coding_ssm(
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs)}
 
 \item{include_silent}{Logical parameter indicating whether to include silent mutations into coding mutations. Default is TRUE.}
+
+\item{verbose}{Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.}
 
 \item{...}{Any additional parameters.}
 }
