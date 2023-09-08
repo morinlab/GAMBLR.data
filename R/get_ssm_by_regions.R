@@ -10,9 +10,9 @@
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE` 
 #' @param streamlined If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name). 
 #' Set to FALSE to return 6 columns. See `basic_columns` for more information on what columns to include in the return.
-#' @param basic_columns Set to TRUE for returning a maf with standarad 45 columns. Default is FALSE. If TRUE, `streamlined` and `use_name_column` will be ignored.
+#' @param basic_columns Set to TRUE for returning a maf with standard 45 columns. Default is FALSE. If TRUE, `streamlined` and `use_name_column` will be ignored.
 #' @param use_name_column If your bed-format data frame has a name column (must be named "name") these can be used to name your regions. 
-#' This parameter. is nott accepted if `regions_vector` is provided.
+#' This parameter is not accepted if `regions_vector` is provided.
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38).
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).
 #' @param verbose Set to TRUE to maximize the output to console. Default is TRUE. 

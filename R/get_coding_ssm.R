@@ -110,6 +110,14 @@ get_coding_ssm = function(limit_cohort,
   if(!missing(limit_samples)){
     all_meta = all_meta %>%
       dplyr::filter(sample_id %in% limit_samples)
+    
+    #check if any samples were not found in the metadata
+    not_in_meta = setdiff(limit_samples, all_meta$sample_id)
+    
+    #check so that the sample ID actually exists
+    if(length(not_in_meta > 0)){
+      message(paste0("The follwoing sample ID(s) were not found in the metadata: ", not_in_meta))
+    }
   }
   
   #pull info for loading .CDS.maf

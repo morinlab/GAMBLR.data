@@ -69,6 +69,9 @@ get_cn_segments = function(region,
   
   #perform wrangling on the region to have it in the correct format.
   if(!missing(region)){
+    if(length(region) > 1){
+      stop("You are providing more than one region...")
+    }
     region = gsub(",", "", region)
     split_chunks = unlist(strsplit(region, ":"))
     chromosome = split_chunks[1]
@@ -78,16 +81,20 @@ get_cn_segments = function(region,
   }else{
     if(missing(chromosome)){
       stop("You have not provided a region, or a region in an acceptable format..") 
+    }else{
+      if(length(chromosome) > 1){
+        stop("You are providing more than one region...")
+      }
     }
   }
   
   #deal with chr prefixes for region, based on selected genome projection.
   if(projection == "grch37"){
-    if(grepl("chr", chromosome)){
+    if(all(grepl("chr", chromosome))){
       chromosome = gsub("chr", "", chromosome)
     }
   }else{
-    if(!grepl("chr", chromosome)){
+    if(all(!grepl("chr", chromosome))){
       chromosome = paste0("chr", chromosome)
     }
   }
