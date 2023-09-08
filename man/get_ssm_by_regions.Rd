@@ -26,10 +26,10 @@ This parameter can also accept an additional column with region names that will 
 \item{streamlined}{If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).
 Set to FALSE to return 6 columns. See \code{basic_columns} for more information on what columns to include in the return.}
 
-\item{basic_columns}{Set to TRUE for returning a maf with standarad 45 columns. Default is FALSE. If TRUE, \code{streamlined} and \code{use_name_column} will be ignored.}
+\item{basic_columns}{Set to TRUE for returning a maf with standard 45 columns. Default is FALSE. If TRUE, \code{streamlined} and \code{use_name_column} will be ignored.}
 
 \item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.
-This parameter. is nott accepted if \code{regions_vector} is provided.}
+This parameter is not accepted if \code{regions_vector} is provided.}
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38).}
 
