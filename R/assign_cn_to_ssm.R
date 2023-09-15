@@ -46,10 +46,8 @@ assign_cn_to_ssm = function(this_sample_id,
   #get maf
   maf_sample = get_ssm_by_sample(these_sample_ids = this_sample_id, 
                                  projection = projection, 
-                                 this_seq_type = this_seq_type)
-
-  #convert to data table
-  maf_sample = data.table::as.data.table(maf_sample)
+                                 this_seq_type = this_seq_type) %>%
+    data.table::as.data.table()
   
   #maf filtering
   #silent mutations
@@ -83,23 +81,20 @@ assign_cn_to_ssm = function(this_sample_id,
   
   #wrangle the seg file
   seg_sample = seg_sample %>%
-    mutate(size = end - start) %>%
-    dplyr::filter(size > 100) %>%
+    dplyr::filter(end - start > 100) %>%
     mutate(chrom = gsub("chr", "", chrom)) %>%
     rename(Chromosome = chrom, Start_Position = start, End_Position = end) %>%
-    mutate(CN = round(2*2^log.ratio)) %>%
     mutate(across(LOH_flag, as.factor)) %>%
     data.table::as.data.table() %>%
     data.table::setkey(Chromosome, Start_Position, End_Position)
   
   #perform an overlap join and add CN columns from the seg file and subset MAF to basic columns (first 45)
-  tmp_maf = data.table::foverlaps(maf_sample, seg_sample, type = "any")
-  maf_with_segs = dplyr::select(tmp_maf, maf_header[1:45])
+  maf_tmp = data.table::foverlaps(maf_sample, seg_sample, type = "any")
   
-  #add CN columns to MAF file
-  maf_with_segs$log.ratio = tmp_maf$log.ratio
-  maf_with_segs$LOH = tmp_maf$LOH_flag
-  maf_with_segs$CN = tmp_maf$CN
-  
+  #rename and change order of columns to match expected format
+  maf_with_segs = subset(maf_tmp, select = -c(ID, Start_Position, End_Position)) %>%
+    rename(Start_Position = i.Start_Position, End_Position = i.End_Position) %>%
+    dplyr::select(colnames(maf_sample), LOH_flag, log.ratio, CN)
+
   return(list(maf = maf_with_segs, seg = seg_sample))
 }
