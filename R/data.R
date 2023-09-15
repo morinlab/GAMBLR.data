@@ -745,18 +745,6 @@
 "somatic_hypermutation_locations_GRCh38_v_latest"
 
 
-#' Coding Class
-#'
-#' A vector with characters detailing different coding classes.
-#'
-#' @format ## `coding_class`
-#' A vector of characters with 12 elements.
-#' \describe{
-#'   \item{coding_class}{Different coding classes.}
-#' }
-"coding_class"
-
-
 #' GAMBL Metadata
 #'
 #' A data frame with metadata for a collection of GAMBL smaples.
