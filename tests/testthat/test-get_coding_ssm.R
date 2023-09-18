@@ -13,7 +13,7 @@ test_that("Check for rows and column consistencies", {
 })
 
 
-test_that("Does inlcude_silent worka s intended", {
+test_that("Does inlcude_silent work as intended", {
   expect_true(all(grepl("Silent", get_coding_ssm(include_silent = TRUE)[,"Variant_Classification"]))) #include `Variant_Classification == Silent`
   expect_true(all(!grepl("Silent", get_coding_ssm(include_silent = FALSE)[,"Variant_Classification"]))) #exclude `Variant_Classification == Silent`
 })
