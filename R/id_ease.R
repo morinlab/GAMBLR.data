@@ -23,7 +23,7 @@
 #' 
 #' @export
 #'
-#' @return A list with metadata (data frame) as the first element and sample IDs (vector of characters) as the second element.
+#' @return Metadata (data frame).
 #'
 #' @examples
 #' #load packages
