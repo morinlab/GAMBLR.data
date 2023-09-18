@@ -13,7 +13,7 @@
 #' @param qstart Start coordinate of the range you are restricting to. Required parameter if region is not specified.
 #' @param qend End coordinate of the range you are restricting to. Required parameter if region is not specified.
 #' @param projection Selected genome projection for returned CN segments. Default is "grch37".
-#' @param this_seq_type Seq type for returned CN segments. This version of this function currently only supports "genome". See [GAMBLR.results::get_cn_segments] for capture samples.
+#' @param this_seq_type Seq type for returned CN segments. This version of this function currently only supports "genome".
 #' @param with_chr_prefix Boolean parameter for toggling if chr prefixes should be present in the return, default is FALSE.
 #' @param streamlined Return a basic rather than full MAF format. Default is FALSE.
 #' @param ... Any additional parameters.

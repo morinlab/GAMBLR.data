@@ -19,7 +19,7 @@
 #'
 #' @return data frame in MAF format.
 #'
-#' @import dplyr tidyr
+#' @import dplyr
 #' 
 #' @export
 #'

@@ -19,7 +19,7 @@
 #' If not provided will retrieve GAMBL metadata for all available samples.
 #' @param these_sample_ids Optional character vector of GAMBL sample IDs.
 #' @param this_seq_type The seq type of interest. Default is both genome and exome, with priority for genome when a sample has >1 seq_type. 
-#' @param verbose Set to FALSE to limit the information that gets printed to the console. Default is TRUE.
+#' @param verbose Set to FALSE to limit the information that gets printed to the console. Default is FALSE.
 #' 
 #' @export
 #'

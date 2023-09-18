@@ -27,7 +27,7 @@ get_cn_segments(
 
 \item{projection}{Selected genome projection for returned CN segments. Default is "grch37".}
 
-\item{this_seq_type}{Seq type for returned CN segments. This version of this function currently only supports "genome". See \link[GAMBLR.results:get_cn_segments]{GAMBLR.results::get_cn_segments} for capture samples.}
+\item{this_seq_type}{Seq type for returned CN segments. This version of this function currently only supports "genome".}
 
 \item{with_chr_prefix}{Boolean parameter for toggling if chr prefixes should be present in the return, default is FALSE.}
 

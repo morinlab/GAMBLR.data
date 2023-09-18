@@ -19,7 +19,7 @@
 #'
 #' @return A data frame of segments for a specific or multiple sample ID(s).
 #'
-#' @import dplyr readr
+#' @import dplyr
 #' @export
 #'
 #' @examples

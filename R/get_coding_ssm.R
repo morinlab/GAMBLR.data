@@ -25,6 +25,8 @@
 #'
 #' @return A data frame (.maf) with coding SSMs in reference to the selected projection.
 #' 
+#' @import dplyr
+#' 
 #' @export
 #' 
 #' @examples

@@ -14,6 +14,7 @@
 #' @param coding_only Optional. set to TRUE to restrict to only coding variants.
 #' @param assume_diploid Optional. If no local seg file is provided, instead of defaulting to a GAMBL sample, this parameter annotates every mutation as copy neutral.
 #' @param include_silent Logical parameter indicating whether to include silent mutations into coding mutations. Default is FALSE. This parameter only makes sense if coding only is set to TRUE.
+#' @param ... Any additional parameters.
 #'
 #' @return A list containing a data frame (MAF-like format) with two extra columns:
 #' log.ratio is the log ratio from the seg file (NA when no overlap was found)
@@ -21,7 +22,7 @@
 #' CN is the rounded absolute copy number estimate of the region based on log.ratio (NA when no overlap was found)
 #'
 #' @rawNamespace import(data.table, except = c("last", "first", "between", "transpose"))
-#' @import dplyr readr
+#' @import dplyr
 #' @export
 #'
 #' @examples

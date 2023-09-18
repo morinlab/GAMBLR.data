@@ -6,7 +6,7 @@
 #' To obtain SV calls for multiple samples, give `these_sample_ids` a vector of one or more sample IDs. 
 #' Alternatively, the user can also provide the `these_samples_metadata`
 #' parameter to make use of an already subset metadata table. In this case, the returned SVs will be restricted to the sample_ids
-#' within that data frame. This function internally calls [GAMBLR.results::id_ease] to streamline sample ID/metadata parameters.
+#' within that data frame. This function internally calls [GAMBLR.data::id_ease] to streamline sample ID/metadata parameters.
 #' This function can also restrict the returned calls to any genomic regions specified within `chromosome`, `qstart`, `qend`,
 #' or the complete region specified under `region` (in chr:start-end format), note that chromosome can be either prefixed or not prefixed.
 #' Useful filtering parameters are also available, use `min_vaf` to set the minimum tumour VAF for a SV to be returned and `min_score`

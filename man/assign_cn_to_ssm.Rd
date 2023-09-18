@@ -28,7 +28,9 @@ assign_cn_to_ssm(
 
 \item{assume_diploid}{Optional. If no local seg file is provided, instead of defaulting to a GAMBL sample, this parameter annotates every mutation as copy neutral.}
 
-\item{include_silent}{Logical parameter indicating whether to include silent mutations into coding mutations. Default is FALSE}
+\item{include_silent}{Logical parameter indicating whether to include silent mutations into coding mutations. Default is FALSE. This parameter only makes sense if coding only is set to TRUE.}
+
+\item{...}{Any additional parameters.}
 }
 \value{
 A list containing a data frame (MAF-like format) with two extra columns:

@@ -1,4 +1,4 @@
-#laod pacakges
+#load packages
 library(testthat)
 
 test_that("Check for rows and column consistencies", {
