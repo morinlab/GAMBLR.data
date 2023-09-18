@@ -13,7 +13,7 @@
 #' @param projection specified genome projection that returned data is in reference to.
 #' @param coding_only Optional. set to TRUE to restrict to only coding variants.
 #' @param assume_diploid Optional. If no local seg file is provided, instead of defaulting to a GAMBL sample, this parameter annotates every mutation as copy neutral.
-#' @param include_silent Logical parameter indicating whether to include silent mutations into coding mutations. Default is FALSE
+#' @param include_silent Logical parameter indicating whether to include silent mutations into coding mutations. Default is FALSE. This parameter only makes sense if coding only is set to TRUE.
 #'
 #' @return A list containing a data frame (MAF-like format) with two extra columns:
 #' log.ratio is the log ratio from the seg file (NA when no overlap was found)
@@ -42,6 +42,11 @@ assign_cn_to_ssm = function(this_sample_id,
   
   #check if any invalid parameters are provided
   check_excess_params(...)
+  
+  #ensure only one sample ID is provided
+  if(length(this_sample_id) > 1){
+    stop("This function only supports queries of 1 sample ID at the time...")
+  }
 
   #get maf
   maf_sample = get_ssm_by_sample(these_sample_ids = this_sample_id, 
