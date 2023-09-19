@@ -11,6 +11,7 @@ get_ssm_by_region(
   region = "",
   streamlined = FALSE,
   projection = "grch37",
+  seq_type = "genome",
   min_read_support = 3,
   verbose = TRUE,
   ...
@@ -28,6 +29,8 @@ get_ssm_by_region(
 \item{streamlined}{Return Start_Position and Tumor_Smaple_Barcode as the only two MAF columns. Default is FALSE.}
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38).}
+
+\item{seq_type}{The seq_type you want back, default is genome.}
 
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
 
