@@ -12,6 +12,7 @@
 #' @param region Region formatted like chrX:1234-5678 instead of specifying chromosome, start and end separately.
 #' @param streamlined Return Start_Position and Tumor_Smaple_Barcode as the only two MAF columns. Default is FALSE.
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38).
+#' @param seq_type The seq_type you want back, default is genome.
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).
 #' @param verbose Set to FALSE to prevent ANY message to be printed. 
 #' In most cases, this parameter should be left to TRUE. 
@@ -40,9 +41,16 @@ get_ssm_by_region = function(chromosome,
                              region = "",
                              streamlined = FALSE,
                              projection = "grch37",
+                             seq_type = "genome",
                              min_read_support = 3,
                              verbose = TRUE,
                              ...){
+  
+  #check seq type
+  if(seq_type != "genome"){
+    stop("Currently, SSM results are only available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
+  }
+  
   if(verbose){
     #warn/notify the user what version of this function they are using
     message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")  
