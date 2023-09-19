@@ -89,8 +89,8 @@ assign_cn_to_ssm = function(this_sample_id,
   seg_sample = seg_sample %>%
     dplyr::filter(end - start > 100) %>%
     mutate(chrom = gsub("chr", "", chrom)) %>%
-    rename(Chromosome = chrom, Start_Position = start, End_Position = end) %>%
-    mutate(across(LOH_flag, as.factor)) %>%
+    rename(Chromosome = chrom, Start_Position = start, End_Position = end, LOH = LOH_flag) %>%
+    mutate(across(LOH, as.factor)) %>%
     data.table::as.data.table() %>%
     data.table::setkey(Chromosome, Start_Position, End_Position)
   
@@ -100,7 +100,7 @@ assign_cn_to_ssm = function(this_sample_id,
   #rename and change order of columns to match expected format
   maf_with_segs = subset(maf_tmp, select = -c(ID, Start_Position, End_Position)) %>%
     rename(Start_Position = i.Start_Position, End_Position = i.End_Position) %>%
-    dplyr::select(colnames(maf_sample), LOH_flag, log.ratio, CN)
+    dplyr::select(colnames(maf_sample), LOH, log.ratio, CN)
 
   return(list(maf = maf_with_segs, seg = seg_sample))
 }
