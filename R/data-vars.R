@@ -4,8 +4,6 @@
 #' 
 #' @details This object is called by [GAMBLR.data::get_coding_ssm] and [GAMBLR.data::assign_cn_to_ssm].
 #' 
-#' @export
-#' 
 #' @noRd
 #' 
 coding_class = c("Frame_Shift_Del", "Frame_Shift_Ins", "In_Frame_Del", 
