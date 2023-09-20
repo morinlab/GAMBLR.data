@@ -390,3 +390,22 @@ gene_annotations_hg38 = as.data.frame(gtf_hg38) %>% #convert to data frame
 
 #save gene coordinates to file (rda)
 save(gene_annotations_hg38, file = "data/hg38_gene_coordinates.rda")
+
+
+
+# Add QC data from the MIRAGE paper supplement
+library(readr)
+mirage_metrics <- read_tsv("inst/extdata/studies/mirage.csv")
+mirage_metrics <- mirage_metrics %>%
+    select(-c(TissuePreservation, SeqType, genome_build))
+
+mirage_metrics <- mirage_metrics %>%
+    left_join(
+        .,
+        read_tsv("inst/extdata/studies/mirage_ProportionCoverage30x.tsv"),
+        by = "UID"
+    ) %>%
+    dplyr::rename("sample_id" = "UID")
+
+colnames(mirage_metrics)
+usethis::use_data(mirage_metrics, overwrite = TRUE)
