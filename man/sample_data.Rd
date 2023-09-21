@@ -20,7 +20,7 @@ Two elements are lists with three data frames in each list and the last element 
 sample_data
 }
 \description{
-Sample data bunlded as a list of 3 elements. Metadata (data frame) and sample data from two projections (grch37 and hg38),
+Sample data bundled as a list of 3 elements. Metadata (data frame) and sample data from two projections (grch37 and hg38),
 Each projection is organized as a list of 3 elements; maf, seg, and bedpe (all data frames).
 }
 \keyword{datasets}

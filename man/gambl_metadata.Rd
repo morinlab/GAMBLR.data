@@ -43,6 +43,6 @@ A data frame with 4785 rows and 27 columns
 gambl_metadata
 }
 \description{
-A data frame with metadata for a collection of GAMBL smaples.
+A data frame with metadata for a collection of GAMBL samples.
 }
 \keyword{datasets}
