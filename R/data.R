@@ -559,7 +559,7 @@
 
 #' Sample Data
 #'
-#' Sample data bunlded as a list of 3 elements. Metadata (data frame) and sample data from two projections (grch37 and hg38),
+#' Sample data bundled as a list of 3 elements. Metadata (data frame) and sample data from two projections (grch37 and hg38),
 #' Each projection is organized as a list of 3 elements; maf, seg, and bedpe (all data frames).
 #'
 #' @format ## `sample_data`
@@ -747,7 +747,7 @@
 
 #' GAMBL Metadata
 #'
-#' A data frame with metadata for a collection of GAMBL smaples.
+#' A data frame with metadata for a collection of GAMBL samples.
 #'
 #' @format ## `gambl_metadata`
 #' A data frame with 4785 rows and 27 columns
@@ -781,3 +781,32 @@
 #'   \item{time_point}{Smaple timepoint.}
 #' }
 "gambl_metadata"
+
+
+#' Mirage Metrics
+#'
+#' A data frame with Quality Control metrics for a collection of GAMBL samples.
+#' This resource is from the supplemental table of PMID: 36219881.
+#'
+#' @format ## `mirage_metrics`
+#' A data frame with 2376 rows and 17 columns
+#' \describe{
+#'   \item{sample_id}{Sample identifier.}
+#'   \item{AverageBaseQuality}{Average base quality.}
+#'   \item{AverageInsertSize}{Average insert size.}
+#'   \item{AverageReadLength}{Average read length.}
+#'   \item{PairsOnDiffCHR}{}
+#'   \item{TotalReads}{Total reads.}
+#'   \item{TotallyUniquelyMapped}{Total uniquely mapped reads.}
+#'   \item{TotalUnmappedreads}{Total unmapped reads.}
+#'   \item{TotalDuplicatedreads}{Total duplicated reads.}
+#'   \item{ProportionReadsDuplicated}{Proportion of duplicated reads.}
+#'   \item{ProportionReadsMapped}{Proportion of mapepd reads.}
+#'   \item{MeanCorrectedCoverage}{Mean corrected coverage.}
+#'   \item{ProportionTargetsNoCoverage}{Proportion of targets with no coverage.}
+#'   \item{ProportionCoverage10x}{Proportion of reads with at least 10x coverage.}
+#'   \item{study}{Study name}
+#'   \item{coding_mutations}{Number of coding mutations.}
+#'   \item{ProportionCoverage30x}{Proportions of reads with at least 30x coverage.}
+#' }
+"mirage_metrics"
