@@ -795,7 +795,7 @@
 #'   \item{AverageBaseQuality}{Average base quality.}
 #'   \item{AverageInsertSize}{Average insert size.}
 #'   \item{AverageReadLength}{Average read length.}
-#'   \item{PairsOnDiffCHR}{}
+#'   \item{PairsOnDiffCHR}{Pairs on different chromosomes.}
 #'   \item{TotalReads}{Total reads.}
 #'   \item{TotallyUniquelyMapped}{Total uniquely mapped reads.}
 #'   \item{TotalUnmappedreads}{Total unmapped reads.}
@@ -804,9 +804,9 @@
 #'   \item{ProportionReadsMapped}{Proportion of mapepd reads.}
 #'   \item{MeanCorrectedCoverage}{Mean corrected coverage.}
 #'   \item{ProportionTargetsNoCoverage}{Proportion of targets with no coverage.}
-#'   \item{ProportionCoverage10x}{Proportion of reads with at least 10x coverage.}
+#'   \item{ProportionCoverage10x}{Proportion of genome or target space with at least 10X coverage.}
 #'   \item{study}{Study name}
 #'   \item{coding_mutations}{Number of coding mutations.}
-#'   \item{ProportionCoverage30x}{Proportions of reads with at least 30x coverage.}
+#'   \item{ProportionCoverage30x}{Proportion of genome or target space with at least 30X coverage.}
 #' }
 "mirage_metrics"
