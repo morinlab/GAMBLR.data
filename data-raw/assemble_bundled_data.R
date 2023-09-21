@@ -11,9 +11,9 @@ colnames_for_bundled_meta <- c(
     "sample_id",
     "Tumor_Sample_Barcode",
     "seq_type",
-    "Sex",
+    "sex",
     "COO_consensus",
-    "LymphGen",
+    "lymphgen",
     "genetic_subgroup",
     "EBV_status_inf",
     "cohort",
@@ -208,17 +208,16 @@ reddy_data <- list()
 reddy_meta = readxl::read_excel("inst/extdata/studies/DLBCL_Reddy.xlsx",sheet=1) %>%
   mutate(patient_id=paste0("Reddy_",`Sample  ID`),sample_id=paste0("Reddy_",`Sample  ID`,"T")) %>%
   mutate(Tumor_Sample_Barcode=sample_id) %>%
-  dplyr::rename("Sex"="Gender") %>%
+  dplyr::rename("sex"="Gender") %>%
   dplyr::rename("COO_consensus"="ABC GCB (RNAseq)") %>%
   mutate(COO_consensus=ifelse(COO_consensus=="Unclassified","UNCLASS",COO_consensus)) %>%
-  dplyr::select(sample_id,patient_id,Tumor_Sample_Barcode,Sex,COO_consensus)
+  dplyr::select(sample_id,patient_id,Tumor_Sample_Barcode,sex,COO_consensus)
 
 setwd("~/GAMBLR/")
 
 reddy_meta_gambl = get_gambl_metadata(seq_type_filter="capture") %>%
   dplyr::filter(cohort == "dlbcl_reddy") %>%
-  dplyr::select(sample_id,lymphgen,EBV_status_inf,cohort,pathology, seq_type) %>%
-  rename("LymphGen" = "lymphgen")
+  dplyr::select(sample_id,lymphgen,EBV_status_inf,cohort,pathology, seq_type)
 
 reddy_meta_gambl$reference_PMID = pmids$Reddy_DLBCL
 
@@ -364,7 +363,7 @@ sample_data$meta <- bind_rows(
 )
 
 sample_data$meta <- sample_data$meta %>%
-    select(-COO_consensus, -LymphGen, -EBV_status_inf) %>%
+    select(-COO_consensus, -lymphgen, -EBV_status_inf) %>%
     left_join(
         .,
         get_gambl_metadata() %>%
@@ -375,7 +374,6 @@ sample_data$meta <- sample_data$meta %>%
                 EBV_status_inf
             )
     ) %>%
-    rename("LymphGen" = "lymphgen") %>%
     select(all_of(colnames_for_bundled_meta))
 
 sample_data$meta = bind_rows(sample_data$meta,reddy_data$meta_to_bundle)
