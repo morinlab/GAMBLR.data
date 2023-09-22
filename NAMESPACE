@@ -2,6 +2,7 @@
 
 export(assign_cn_to_ssm)
 export(check_excess_params)
+export(collate_results)
 export(get_cn_segments)
 export(get_coding_ssm)
 export(get_colours)
