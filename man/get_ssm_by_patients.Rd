@@ -18,16 +18,16 @@ get_ssm_by_patients(
 }
 \arguments{
 \item{these_patient_ids}{A vector of patient IDs that you want results for.
-The user can also use a metadata table that has been subset to the patient IDs of interest (\code{these_samples_metadata}).}
+The user can also use a metadata table that has been subset to the patient IDs of interest (see \code{these_samples_metadata}).}
 
 \item{these_samples_metadata}{A metadata subset to contain the rows corresponding to the patients of interest.
 If the vector of patient IDs is missing (\code{these_patient_ids}), this function will default to all patient IDs in the metadata table given to this parameter.}
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38). Default is grch37.}
 
-\item{this_seq_type}{The seq type you want results for. Default is "genome".}
+\item{this_seq_type}{The seq type you want results for. Default is "genome". Currently, only genome is supported.}
 
-\item{min_read_support}{Subset returned variants to a set minimum read support. Default si 3.}
+\item{min_read_support}{Subset returned variants to a set minimum read support. Default is 3.}
 
 \item{basic_columns}{Return first 45 columns of MAF rather than full details. Default is TRUE.}
 
@@ -47,8 +47,8 @@ Get MAF-format data frame for more than one patient.
 \details{
 This function returns variants from a set of patients.
 This function internally calls \link{get_ssm_by_samples}.
-Thus, the main contents of this function is to wrangel the provided patient IDs,
-so that the corresponding sample IDs can be provided to the internal call of \code{get_sssm_by_samples}
+Thus, the main contents of this function is to wrangle the provided patient IDs,
+so that the corresponding sample IDs can be provided to the internal call of \code{get_ssm_by_samples}.
 This function expects either a vector of patient IDs (\code{these_patients_ids})
 or an already subset metadata table (\code{these_samples_metadata}).
 }

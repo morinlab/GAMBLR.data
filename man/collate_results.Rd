@@ -18,11 +18,11 @@ If provided, this will overwrite any sample subsets provided these_samples_metad
 
 \item{these_samples_metadata}{A metadata table with sample IDs of interest.
 If not provided, the function will get metadata for all available samples.
-This parameter is inteded to use in combination with \code{join_with_full_metadata}.}
+This parameter is intended to use in combination with \code{join_with_full_metadata}.}
 
 \item{join_with_full_metadata}{Set to TRUE to horizontally expand metadata with QC results.
-Default is FALSE. If \code{these_samples_metadata} is provided, colalted resutls will be added to this metadata table.
-If not provided, the function will join collated results with all avaialble metadata in the specified seq_type (\code{seq_type_filter}).}
+Default is FALSE. If \code{these_samples_metadata} is provided, collated resutls will be added to this metadata table.
+If not provided, the function will join collated results with all available metadata in the specified seq_type (\code{seq_type_filter}).}
 
 \item{seq_type_filter}{Filtering criteria for \code{get_gambl_metadata} if \code{these_samples_metadata} is not provided, default is genomes and captures.}
 

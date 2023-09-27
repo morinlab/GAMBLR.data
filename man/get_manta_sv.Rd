@@ -23,7 +23,7 @@ get_manta_sv(
 \arguments{
 \item{these_sample_ids}{A vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
 
-\item{these_samples_metadata}{A metadata table to auto-subset the data to samples in that table before returning.}
+\item{these_samples_metadata}{A metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.}
 
 \item{projection}{The projection genome build. Default is grch37.}
 
@@ -52,10 +52,10 @@ Convenience function for retrieving Manta Structural Variants (SVs) from the bun
 }
 \details{
 This "bare bones" function was developed to retrieve Manta SV calls bundled within GAMBLR.data.
-To obtain SV calls for multiple samples, give \code{these_sample_ids} a vector of one or more sample IDs.
-Alternatively, the user can also provide the \code{these_samples_metadata}
-parameter to make use of an already subset metadata table. In this case, the returned SVs will be restricted to the sample_ids
-within that data frame. This function internally calls \link{id_ease} to streamline sample ID/metadata parameters.
+To obtain SV calls for multiple samples, give \code{these_sample_ids} a vector of sample IDs.
+Alternatively, the user can also provide the \code{these_samples_metadata} parameter to make use of an already subset metadata table.
+In this case, the returned SVs will be restricted to the sample_ids within that data frame.
+This function internally calls \link{id_ease} to streamline sample ID/metadata parameters.
 This function can also restrict the returned calls to any genomic regions specified within \code{chromosome}, \code{qstart}, \code{qend},
 or the complete region specified under \code{region} (in chr:start-end format), note that chromosome can be either prefixed or not prefixed.
 Useful filtering parameters are also available, use \code{min_vaf} to set the minimum tumour VAF for a SV to be returned and \code{min_score}

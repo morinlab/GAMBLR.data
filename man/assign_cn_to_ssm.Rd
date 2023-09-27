@@ -18,25 +18,24 @@ assign_cn_to_ssm(
 \arguments{
 \item{this_sample_id}{Sample ID of the sample you want to annotate.}
 
-\item{genes}{Genes of interest.}
+\item{genes}{A vector of characters with gene symbols (Hugo).}
 
-\item{this_seq_type}{Specified seq type for returned data.}
+\item{this_seq_type}{Specified seq type for returned data. Currently, this function only supports genome.}
 
-\item{projection}{specified genome projection that returned data is in reference to.}
+\item{projection}{Specified genome projection that returned data is in reference to. Default is grch37.}
 
-\item{coding_only}{Optional. set to TRUE to restrict to only coding variants.}
+\item{coding_only}{Optional. set to TRUE to restrict to only coding variants (ssm).}
 
-\item{assume_diploid}{Optional. If no local seg file is provided, instead of defaulting to a GAMBL sample, this parameter annotates every mutation as copy neutral.}
+\item{assume_diploid}{Optional, this parameter annotates every mutation as copy neutral. Default is FALSE.}
 
-\item{include_silent}{Logical parameter indicating whether to include silent mutations into coding mutations. Default is FALSE. This parameter only makes sense if coding only is set to TRUE.}
+\item{include_silent}{Logical parameter indicating whether to include silent mutations into coding mutations. Default is FALSE. This parameter only makes sense if \code{coding_only} is set to TRUE.}
 
 \item{...}{Any additional parameters.}
 }
 \value{
-A list containing a data frame (MAF-like format) with two extra columns:
-log.ratio is the log ratio from the seg file (NA when no overlap was found)
-as well as the segmented copy number data with the same copy number information
-CN is the rounded absolute copy number estimate of the region based on log.ratio (NA when no overlap was found)
+A list containing a data frame (MAF-like format) with three extra columns:
+log.ratio is the log ratio from the seg file (NA when no overlap was found).
+LOH and CN (the rounded absolute copy number estimate of the region based on log.ratio, NA when no overlap was found).
 }
 \description{
 Annotate mutations with their copy number information.

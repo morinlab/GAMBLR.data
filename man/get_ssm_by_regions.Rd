@@ -5,10 +5,9 @@
 \title{Get SSM By Regions.}
 \usage{
 get_ssm_by_regions(
-  regions_vector,
+  regions_list,
   regions_bed,
   streamlined = TRUE,
-  basic_columns = FALSE,
   use_name_column = FALSE,
   projection = "grch37",
   min_read_support = 3,
@@ -17,21 +16,16 @@ get_ssm_by_regions(
 )
 }
 \arguments{
-\item{regions_vector}{Either provide a vector of regions in the chr:start-end format.
-If this parameter is provided, the function will auto set \code{use_name_column} to FALSE.}
+\item{regions_list}{A vector of regions in the chr:start-end format to restrict the returned SSM calls to.}
 
-\item{regions_bed}{Provide a data frame in BED format with the coordinates you want to retrieve (recommended).
+\item{regions_bed}{A data frame in BED format with the coordinates you want to retrieve (recommended).
 This parameter can also accept an additional column with region names that will be added to the return if \code{use_name_column = TRUE}}
 
-\item{streamlined}{If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).
-Set to FALSE to return 6 columns. See \code{basic_columns} for more information on what columns to include in the return.}
+\item{streamlined}{If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).}
 
-\item{basic_columns}{Set to TRUE for returning a maf with standard 45 columns. Default is FALSE. If TRUE, \code{streamlined} and \code{use_name_column} will be ignored.}
+\item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions in the returned data frame.}
 
-\item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.
-This parameter is not accepted if \code{regions_vector} is provided.}
-
-\item{projection}{Obtain variants projected to this reference (one of grch37 or hg38).}
+\item{projection}{Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.}
 
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
 

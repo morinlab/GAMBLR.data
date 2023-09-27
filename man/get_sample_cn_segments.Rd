@@ -22,7 +22,7 @@ get_sample_cn_segments(
 
 \item{projection}{Selected genome projection for returned CN segments. Default is "grch37".}
 
-\item{this_seq_type}{Seq type for returned CN segments. One of "genome" (default) or "capture".}
+\item{this_seq_type}{Seq type for returned CN segments. Default is genome. Currently only genome samples are supported.}
 
 \item{with_chr_prefix}{Set to TRUE to add a chr prefix to chromosome names. Default is FALSE.}
 
@@ -39,10 +39,10 @@ A data frame of segments for a specific or multiple sample ID(s).
 Get all segments for a single (or multiple) sample_id(s).
 }
 \details{
-This function returns CN segments for samples. This works for single sample or multiple samples.
+This function returns CN segments. This works for single sample or multiple samples.
 Specify the sample IDs you are interested in with \code{these_sample_ids} (as a vector of characters),
-Or call this function with \code{these_samples_metadata} if you already ahve a metadata table subset to the sample IDs of interest.
-If none off the above parameters are specified, the function will return CN segments for available samples.
+Or call this function with \code{these_samples_metadata} if you already have a metadata table subset to the sample IDs of interest.
+If none of the above parameters are specified, the function will return CN segments for available samples (from get_gambl_metadata).
 Note, this. function internally calls \link{id_ease} for dealing with sample IDs and metadata tables.
 }
 \examples{

@@ -30,7 +30,7 @@ get_ssm_by_region(
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38).}
 
-\item{seq_type}{The seq_type you want back, default is genome.}
+\item{seq_type}{The seq_type you want back, default is genome. Currently only genome is supported.}
 
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
 

@@ -36,7 +36,7 @@ get_ssm_by_sample(
 
 \item{these_samples_metadata}{Required if not specifying this_sample_id.}
 
-\item{this_seq_type}{Required if not specifying these_samples_metadata. The seq_type of the sample you want data from.}
+\item{this_seq_type}{Default is genome and currently, this is the only supported seq type.}
 
 \item{projection}{The projection genome build. Supports hg38 and grch37.}
 
@@ -61,7 +61,7 @@ Get the SSMs (i.e. load MAF) for a single sample or a collection fo samples.
 \details{
 Retrieve a maf for a specific sample or a set of samples.
 Either specify the sample IDs of interest with \code{these_sample_ids}.
-Or a metadata table subset to the sample IDs of interest.
+Or a metadata table subset to the sample IDs of interest with \code{these_samples_metadata}.
 }
 \examples{
 #load packages

@@ -22,27 +22,27 @@ get_coding_ssm(
 )
 }
 \arguments{
-\item{limit_cohort}{Supply this to restrict mutations to one or more cohorts in a vector.}
+\item{limit_cohort}{Optional, supply this to restrict mutations to one or more cohorts in a vector.}
 
-\item{exclude_cohort}{Supply this to exclude mutations from one or more cohorts in a vector.}
+\item{exclude_cohort}{Optional, supply this to exclude mutations from one or more cohorts in a vector.}
 
-\item{limit_pathology}{Supply this to restrict mutations to one pathology.}
+\item{limit_pathology}{Optional, supply this to restrict mutations to one pathology.}
 
-\item{limit_samples}{Supply this to restrict mutations to a vector of sample_id (instead of subsetting using the provided metadata)}
+\item{limit_samples}{Optional, supply this to restrict mutations to a vector of sample_id (instead of sub-setting using the provided metadata).}
 
-\item{these_samples_metadata}{Supply a metadata table to auto-subset the data to samples in that table before returning}
+\item{these_samples_metadata}{Optional, supply a metadata table to auto-subset the data to samples in that table before returning}
 
 \item{force_unmatched_samples}{Optional argument for forcing unmatched samples, using \link{get_ssm_by_samples}.}
 
-\item{projection}{Reference genome build for the coordinates in the MAF file. The default is hg19 genome build.}
+\item{projection}{Reference genome build for the coordinates in the MAF file. The default is grch37.}
 
-\item{seq_type}{The seq_type you want back, default is genome.}
+\item{seq_type}{The seq_type you want back, default is genome and currently, this is the only supported seq type.}
 
 \item{basic_columns}{Set to FALSE to override the default behavior of returning only the first 45 columns of MAF data.}
 
-\item{maf_cols}{if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).}
+\item{maf_cols}{if \code{basic_columns} is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).}
 
-\item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs)}
+\item{min_read_support}{Only returns variants with at least this many reads in t_alt_count.}
 
 \item{include_silent}{Logical parameter indicating whether to include silent mutations into coding mutations. Default is TRUE.}
 
@@ -61,7 +61,7 @@ This "bare bones" function was developed to retrieve coding SSM calls for non-GS
 For users with GSC access it is highly recommended to instead call \link[GAMBLR.results:get_coding_ssm]{GAMBLR.results::get_coding_ssm}.
 Effectively retrieve coding SSM calls. Multiple filtering parameters are available for this function.
 For more information on how to implement the filtering parameters, refer to the parameter descriptions as well as examples in the vignettes.
-It relies on the bundled sample data in this package.
+This function depends on the bundled sample data in this package.
 }
 \examples{
 #load pacakges
