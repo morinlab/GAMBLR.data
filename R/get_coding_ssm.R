@@ -6,19 +6,19 @@
 #' For users with GSC access it is highly recommended to instead call [GAMBLR.results::get_coding_ssm].
 #' Effectively retrieve coding SSM calls. Multiple filtering parameters are available for this function.
 #' For more information on how to implement the filtering parameters, refer to the parameter descriptions as well as examples in the vignettes.
-#' It relies on the bundled sample data in this package. 
+#' This function depends on the bundled sample data in this package. 
 #'
-#' @param limit_cohort Supply this to restrict mutations to one or more cohorts in a vector.
-#' @param exclude_cohort  Supply this to exclude mutations from one or more cohorts in a vector.
-#' @param limit_pathology Supply this to restrict mutations to one pathology.
-#' @param limit_samples Supply this to restrict mutations to a vector of sample_id (instead of subsetting using the provided metadata)
-#' @param these_samples_metadata Supply a metadata table to auto-subset the data to samples in that table before returning
+#' @param limit_cohort Optional, supply this to restrict mutations to one or more cohorts in a vector.
+#' @param exclude_cohort Optional, supply this to exclude mutations from one or more cohorts in a vector.
+#' @param limit_pathology Optional, supply this to restrict mutations to one pathology.
+#' @param limit_samples Optional, supply this to restrict mutations to a vector of sample_id (instead of sub-setting using the provided metadata).
+#' @param these_samples_metadata Optional, supply a metadata table to auto-subset the data to samples in that table before returning
 #' @param force_unmatched_samples Optional argument for forcing unmatched samples, using [GAMBLR.data::get_ssm_by_samples].
-#' @param projection Reference genome build for the coordinates in the MAF file. The default is hg19 genome build.
-#' @param seq_type The seq_type you want back, default is genome.
+#' @param projection Reference genome build for the coordinates in the MAF file. The default is grch37.
+#' @param seq_type The seq_type you want back, default is genome and currently, this is the only supported seq type.
 #' @param basic_columns Set to FALSE to override the default behavior of returning only the first 45 columns of MAF data.
-#' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).
-#' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs)
+#' @param maf_cols if `basic_columns` is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).
+#' @param min_read_support Only returns variants with at least this many reads in t_alt_count.
 #' @param include_silent Logical parameter indicating whether to include silent mutations into coding mutations. Default is TRUE.
 #' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.

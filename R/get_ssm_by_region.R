@@ -12,7 +12,7 @@
 #' @param region Region formatted like chrX:1234-5678 instead of specifying chromosome, start and end separately.
 #' @param streamlined Return Start_Position and Tumor_Smaple_Barcode as the only two MAF columns. Default is FALSE.
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38).
-#' @param seq_type The seq_type you want back, default is genome.
+#' @param seq_type The seq_type you want back, default is genome. Currently only genome is supported.
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).
 #' @param verbose Set to FALSE to prevent ANY message to be printed. 
 #' In most cases, this parameter should be left to TRUE. 

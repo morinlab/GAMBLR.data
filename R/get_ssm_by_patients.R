@@ -4,18 +4,18 @@
 #'
 #' @details This function returns variants from a set of patients.
 #' This function internally calls [GAMBLR.data::get_ssm_by_samples]. 
-#' Thus, the main contents of this function is to wrangel the provided patient IDs, 
-#' so that the corresponding sample IDs can be provided to the internal call of `get_sssm_by_samples`
+#' Thus, the main contents of this function is to wrangle the provided patient IDs, 
+#' so that the corresponding sample IDs can be provided to the internal call of `get_ssm_by_samples`.
 #' This function expects either a vector of patient IDs (`these_patients_ids`) 
 #' or an already subset metadata table (`these_samples_metadata`).
 #'
 #' @param these_patient_ids A vector of patient IDs that you want results for. 
-#' The user can also use a metadata table that has been subset to the patient IDs of interest (`these_samples_metadata`).
+#' The user can also use a metadata table that has been subset to the patient IDs of interest (see `these_samples_metadata`).
 #' @param these_samples_metadata A metadata subset to contain the rows corresponding to the patients of interest. 
 #' If the vector of patient IDs is missing (`these_patient_ids`), this function will default to all patient IDs in the metadata table given to this parameter.
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38). Default is grch37.
-#' @param this_seq_type The seq type you want results for. Default is "genome".
-#' @param min_read_support Subset returned variants to a set minimum read support. Default si 3.
+#' @param this_seq_type The seq type you want results for. Default is "genome". Currently, only genome is supported.
+#' @param min_read_support Subset returned variants to a set minimum read support. Default is 3.
 #' @param basic_columns Return first 45 columns of MAF rather than full details. Default is TRUE.
 #' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. 
 #' This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).

@@ -4,11 +4,11 @@
 #'
 #' @details Retrieve a maf for a specific sample or a set of samples. 
 #' Either specify the sample IDs of interest with `these_sample_ids`.
-#' Or a metadata table subset to the sample IDs of interest.
+#' Or a metadata table subset to the sample IDs of interest with `these_samples_metadata`.
 #'
 #' @param these_sample_ids The sample_id you want the data from.
 #' @param these_samples_metadata Required if not specifying this_sample_id.
-#' @param this_seq_type Required if not specifying these_samples_metadata. The seq_type of the sample you want data from.
+#' @param this_seq_type Default is genome and currently, this is the only supported seq type.
 #' @param projection The projection genome build. Supports hg38 and grch37.
 #' @param these_genes A vector of genes to subset ssm to.
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).

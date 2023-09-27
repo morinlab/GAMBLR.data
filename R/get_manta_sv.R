@@ -3,10 +3,10 @@
 #' @description Convenience function for retrieving Manta Structural Variants (SVs) from the bundled data [GAMBLR.data::sample_data].
 #'
 #' @details This "bare bones" function was developed to retrieve Manta SV calls bundled within GAMBLR.data. 
-#' To obtain SV calls for multiple samples, give `these_sample_ids` a vector of one or more sample IDs. 
-#' Alternatively, the user can also provide the `these_samples_metadata`
-#' parameter to make use of an already subset metadata table. In this case, the returned SVs will be restricted to the sample_ids
-#' within that data frame. This function internally calls [GAMBLR.data::id_ease] to streamline sample ID/metadata parameters.
+#' To obtain SV calls for multiple samples, give `these_sample_ids` a vector of sample IDs. 
+#' Alternatively, the user can also provide the `these_samples_metadata` parameter to make use of an already subset metadata table. 
+#' In this case, the returned SVs will be restricted to the sample_ids within that data frame. 
+#' This function internally calls [GAMBLR.data::id_ease] to streamline sample ID/metadata parameters.
 #' This function can also restrict the returned calls to any genomic regions specified within `chromosome`, `qstart`, `qend`,
 #' or the complete region specified under `region` (in chr:start-end format), note that chromosome can be either prefixed or not prefixed.
 #' Useful filtering parameters are also available, use `min_vaf` to set the minimum tumour VAF for a SV to be returned and `min_score`
@@ -14,7 +14,7 @@
 #' In addition, the user can chose to return all variants, even the ones not passing the filter criteria. To do so, set `pass = FALSE` (default is TRUE).
 #'
 #' @param these_sample_ids A vector of multiple sample_id (or a single sample ID as a string) that you want results for.
-#' @param these_samples_metadata A metadata table to auto-subset the data to samples in that table before returning.
+#' @param these_samples_metadata A metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.
 #' @param projection The projection genome build. Default is grch37.
 #' @param chromosome Optional, the chromosome you are restricting to (can be prefixed or not prefixed).
 #' @param qstart Optional, query start coordinate of the range you are restricting to.

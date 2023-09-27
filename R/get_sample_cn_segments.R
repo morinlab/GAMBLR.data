@@ -2,16 +2,16 @@
 #'
 #' @description Get all segments for a single (or multiple) sample_id(s).
 #'
-#' @details This function returns CN segments for samples. This works for single sample or multiple samples.
+#' @details This function returns CN segments. This works for single sample or multiple samples.
 #' Specify the sample IDs you are interested in with `these_sample_ids` (as a vector of characters),
-#' Or call this function with `these_samples_metadata` if you already ahve a metadata table subset to the sample IDs of interest.
-#' If none off the above parameters are specified, the function will return CN segments for available samples.
+#' Or call this function with `these_samples_metadata` if you already have a metadata table subset to the sample IDs of interest.
+#' If none of the above parameters are specified, the function will return CN segments for available samples (from get_gambl_metadata).
 #' Note, this. function internally calls [GAMBLR.data::id_ease] for dealing with sample IDs and metadata tables. 
 #'
 #' @param these_sample_ids Optional argument, sample_id (vector of characters) for the sample(s) to retrieve segments for. If not provided, the function will return CN segments for all available sample IDs present in the current metadata.
 #' @param these_samples_metadata Optional, provide a metadata (data frame) subset to the sample IDs of interest.
 #' @param projection Selected genome projection for returned CN segments. Default is "grch37".
-#' @param this_seq_type Seq type for returned CN segments. One of "genome" (default) or "capture".
+#' @param this_seq_type Seq type for returned CN segments. Default is genome. Currently only genome samples are supported.
 #' @param with_chr_prefix Set to TRUE to add a chr prefix to chromosome names. Default is FALSE.
 #' @param streamlined Return a minimal output rather than full details. Default is FALSE.
 #' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.
