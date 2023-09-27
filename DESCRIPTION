@@ -32,7 +32,9 @@ LazyData: true
 Imports: 
     data.table,
     dplyr,
+    GAMBLR.helpers,
     ggplot2,
+    parallel,
     stringr,
     tibble,
     tidyr
