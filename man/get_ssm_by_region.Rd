@@ -52,6 +52,10 @@ Retrieve all SSMs from the GAMBL database within a single genomic coordinate ran
 This function lets the user specify a region of interest for returning SSM calls within that region.
 There are multiple ways a region can be specified. For example, the user can provide the full region in a "region" format (chr:start-end) to the \code{region} parameter.
 Or, the user can provide chromosome, start and end coordinates individually with \code{chr}, \code{start}, and \code{end} parameters.
+
+Unlike its counterpart version from \code{GAMBLR.results}, this function does not have the
+\code{basic_columns} argument, since the bundled MAF, from which it fetches data, already
+contains only the 45 basic columns, plus the additional "Pipeline" column (46 in total).
 }
 \examples{
 my_mutations = get_ssm_by_region(region = "chr8:128,723,128-128,774,067")

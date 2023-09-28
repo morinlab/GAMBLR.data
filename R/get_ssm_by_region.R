@@ -6,6 +6,10 @@
 #' There are multiple ways a region can be specified. For example, the user can provide the full region in a "region" format (chr:start-end) to the `region` parameter.
 #' Or, the user can provide chromosome, start and end coordinates individually with `chr`, `start`, and `end` parameters.
 #' 
+#' Unlike its counterpart version from `GAMBLR.results`, this function does not have the 
+#'   `basic_columns` argument, since the bundled MAF, from which it fetches data, already 
+#'   contains only the 45 basic columns, plus the additional "Pipeline" column (46 in total).
+#' 
 #' @param chromosome The chromosome you are restricting to (with or without a chr prefix).
 #' @param qstart Query start coordinate of the range you are restricting to.
 #' @param qend Query end coordinate of the range you are restricting to.
