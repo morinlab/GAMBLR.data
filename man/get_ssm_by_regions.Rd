@@ -8,7 +8,6 @@ get_ssm_by_regions(
   regions_vector,
   regions_bed,
   streamlined = TRUE,
-  basic_columns = FALSE,
   use_name_column = FALSE,
   projection = "grch37",
   min_read_support = 3,
@@ -23,10 +22,7 @@ If this parameter is provided, the function will auto set \code{use_name_column}
 \item{regions_bed}{Provide a data frame in BED format with the coordinates you want to retrieve (recommended).
 This parameter can also accept an additional column with region names that will be added to the return if \code{use_name_column = TRUE}}
 
-\item{streamlined}{If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).
-Set to FALSE to return 6 columns. See \code{basic_columns} for more information on what columns to include in the return.}
-
-\item{basic_columns}{Set to TRUE for returning a maf with standard 45 columns. Default is FALSE. If TRUE, \code{streamlined} and \code{use_name_column} will be ignored.}
+\item{streamlined}{If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).}
 
 \item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.
 This parameter is not accepted if \code{regions_vector} is provided.}
@@ -48,6 +44,10 @@ Efficiently retrieve all mutations across a range of genomic regions.
 }
 \details{
 This function internally calls \link{get_ssm_by_region} to retrieve SSM calls for the specified regions.
+
+Unlike its counterpart version from \code{GAMBLR.results}, this function does not have the
+\code{basic_columns} argument, since the bundled MAF, from which it fetches data, already
+contains only the 45 basic columns, plus the additional "Pipeline" column (46 in total).
 }
 \examples{
 #basic usage, adding custom names from bundled ashm data frame
