@@ -8,6 +8,7 @@ get_manta_sv(
   these_sample_ids,
   these_samples_metadata,
   projection = "grch37",
+  this_seq_type = "genome",
   chromosome,
   qstart,
   qend,
@@ -21,11 +22,14 @@ get_manta_sv(
 )
 }
 \arguments{
-\item{these_sample_ids}{A vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
+\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
 
-\item{these_samples_metadata}{A metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.}
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
+If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
 
 \item{projection}{The projection genome build. Default is grch37.}
+
+\item{this_seq_type}{The this_seq_type you want back, default is genome.}
 
 \item{chromosome}{Optional, the chromosome you are restricting to (can be prefixed or not prefixed).}
 

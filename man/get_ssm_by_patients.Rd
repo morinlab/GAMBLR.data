@@ -25,7 +25,7 @@ If the vector of patient IDs is missing (\code{these_patient_ids}), this functio
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38). Default is grch37.}
 
-\item{this_seq_type}{The seq type you want results for. Default is "genome". Currently, only genome is supported.}
+\item{this_seq_type}{The seq type you want results for. Default is "genome".}
 
 \item{min_read_support}{Subset returned variants to a set minimum read support. Default is 3.}
 

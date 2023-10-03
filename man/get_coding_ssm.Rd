@@ -9,10 +9,11 @@ get_coding_ssm(
   exclude_cohort,
   limit_pathology,
   limit_samples,
+  these_sample_ids,
   these_samples_metadata,
   force_unmatched_samples,
   projection = "grch37",
-  seq_type = "genome",
+  this_seq_type = "genome",
   basic_columns = TRUE,
   maf_cols = NULL,
   min_read_support = 3,
@@ -30,13 +31,16 @@ get_coding_ssm(
 
 \item{limit_samples}{Optional, supply this to restrict mutations to a vector of sample_id (instead of sub-setting using the provided metadata).}
 
-\item{these_samples_metadata}{Optional, supply a metadata table to auto-subset the data to samples in that table before returning}
+\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
+
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
+If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
 
 \item{force_unmatched_samples}{Optional argument for forcing unmatched samples, using \link{get_ssm_by_samples}.}
 
 \item{projection}{Reference genome build for the coordinates in the MAF file. The default is grch37.}
 
-\item{seq_type}{The seq_type you want back, default is genome and currently, this is the only supported seq type.}
+\item{this_seq_type}{The this_seq_type you want back, default is genome.}
 
 \item{basic_columns}{Set to FALSE to override the default behavior of returning only the first 45 columns of MAF data.}
 
@@ -68,7 +72,7 @@ This function depends on the bundled sample data in this package.
 library(dplyr)
 
 #return SSMs in reference to GRCh37:
-ssm_grch37 = get_coding_ssm(seq_type = "genome")
+ssm_grch37 = get_coding_ssm(this_seq_type = "genome")
 
 #return SSMs in reference to hg38:
 cell_line_meta = GAMBLR.data::sample_data$meta \%>\% 
@@ -76,6 +80,6 @@ cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
 
 ssm_hg38 = get_coding_ssm(projection = "hg38", 
                           these_samples_metadata = cell_line_meta, 
-                          seq_type = "genome")
+                          this_seq_type = "genome")
 
 }

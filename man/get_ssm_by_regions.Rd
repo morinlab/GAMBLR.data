@@ -5,6 +5,9 @@
 \title{Get SSM By Regions.}
 \usage{
 get_ssm_by_regions(
+  these_sample_ids,
+  these_samples_metadata,
+  this_seq_type = "genome",
   regions_list,
   regions_bed,
   streamlined = TRUE,
@@ -16,6 +19,13 @@ get_ssm_by_regions(
 )
 }
 \arguments{
+\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
+
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
+If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
+
+\item{this_seq_type}{The this_seq_type you want back, default is genome.}
+
 \item{regions_list}{A vector of regions in the chr:start-end format to restrict the returned SSM calls to.}
 
 \item{regions_bed}{A data frame in BED format with the coordinates you want to retrieve (recommended).

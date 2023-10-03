@@ -20,7 +20,7 @@ assign_cn_to_ssm(
 
 \item{genes}{A vector of characters with gene symbols (Hugo).}
 
-\item{this_seq_type}{Specified seq type for returned data. Currently, this function only supports genome.}
+\item{this_seq_type}{Specified seq type for returned data. Default is genome.}
 
 \item{projection}{Specified genome projection that returned data is in reference to. Default is grch37.}
 

@@ -16,13 +16,14 @@ get_sample_cn_segments(
 )
 }
 \arguments{
-\item{these_sample_ids}{Optional argument, sample_id (vector of characters) for the sample(s) to retrieve segments for. If not provided, the function will return CN segments for all available sample IDs present in the current metadata.}
+\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
 
-\item{these_samples_metadata}{Optional, provide a metadata (data frame) subset to the sample IDs of interest.}
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
+If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
 
 \item{projection}{Selected genome projection for returned CN segments. Default is "grch37".}
 
-\item{this_seq_type}{Seq type for returned CN segments. Default is genome. Currently only genome samples are supported.}
+\item{this_seq_type}{Seq type for returned CN segments. Default is genome.}
 
 \item{with_chr_prefix}{Set to TRUE to add a chr prefix to chromosome names. Default is FALSE.}
 

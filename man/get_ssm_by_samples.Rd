@@ -34,9 +34,10 @@ get_ssm_by_sample(
 \arguments{
 \item{these_sample_ids}{The sample_id you want the data from.}
 
-\item{these_samples_metadata}{Required if not specifying this_sample_id.}
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.
+If not not provided and these_sample_ids is also not provided, the function will return SSM for all samples from the specified seq_type in the bundled metadata.}
 
-\item{this_seq_type}{Default is genome and currently, this is the only supported seq type.}
+\item{this_seq_type}{Default is genome.}
 
 \item{projection}{The projection genome build. Supports hg38 and grch37.}
 
