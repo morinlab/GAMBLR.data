@@ -9,7 +9,7 @@
 #'
 #' @param this_sample_id Sample ID of the sample you want to annotate.
 #' @param genes A vector of characters with gene symbols (Hugo).
-#' @param this_seq_type Specified seq type for returned data. Currently, this function only supports genome.
+#' @param this_seq_type Specified seq type for returned data. Default is genome. 
 #' @param projection Specified genome projection that returned data is in reference to. Default is grch37.
 #' @param coding_only Optional. set to TRUE to restrict to only coding variants (ssm).
 #' @param assume_diploid Optional, this parameter annotates every mutation as copy neutral. Default is FALSE.

@@ -4,6 +4,10 @@
 #'
 #' @details This function internally calls [GAMBLR.data::get_ssm_by_region] to retrieve SSM calls for the specified regions.
 #'
+#' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
+#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to. 
+#' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
+#' @param this_seq_type The this_seq_type you want back, default is genome.
 #' @param regions_list A vector of regions in the chr:start-end format to restrict the returned SSM calls to.
 #' @param regions_bed A data frame in BED format with the coordinates you want to retrieve (recommended). 
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE` 
@@ -30,7 +34,10 @@
 #'                                         streamlined = FALSE,
 #'                                         use_name_column = TRUE)
 #'
-get_ssm_by_regions = function(regions_list,
+get_ssm_by_regions = function(these_sample_ids,
+                              these_samples_metadata,
+                              this_seq_type = "genome",
+                              regions_list,
                               regions_bed,
                               streamlined = TRUE,
                               use_name_column = FALSE,
@@ -44,6 +51,12 @@ get_ssm_by_regions = function(regions_list,
   
   #check if any invalid parameters are provided
   check_excess_params(...)
+  
+  #get samples with the dedicated helper function
+  metadata = id_ease(these_samples_metadata = these_samples_metadata,
+                     these_sample_ids = these_sample_ids,
+                     verbose = verbose,
+                     this_seq_type = this_seq_type)
   
   bed2region = function(x){
     paste0(x[1], ":", as.numeric(x[2]), "-", as.numeric(x[3]))
@@ -64,6 +77,8 @@ get_ssm_by_regions = function(regions_list,
   }
   
   region_mafs = lapply(regions, function(x){GAMBLR.data::get_ssm_by_region(region = x,
+                                                                           these_samples_metadata = metadata,
+                                                                           this_seq_type = this_seq_type,
                                                                            streamlined = streamlined,
                                                                            projection = projection, 
                                                                            min_read_support = min_read_support,

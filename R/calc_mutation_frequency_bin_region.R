@@ -70,11 +70,6 @@ calc_mutation_frequency_bin_region <- function(region,
                                                drop_unmutated = FALSE,
                                                ...) {
   
-  #check seq type
-  if(this_seq_type != "genome"){
-    stop("Currently, SSM results are only available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
-  }
-  
   #check if any invalid parameters are provided
   check_excess_params(...)
   

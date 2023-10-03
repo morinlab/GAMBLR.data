@@ -12,10 +12,12 @@
 #' @param exclude_cohort Optional, supply this to exclude mutations from one or more cohorts in a vector.
 #' @param limit_pathology Optional, supply this to restrict mutations to one pathology.
 #' @param limit_samples Optional, supply this to restrict mutations to a vector of sample_id (instead of sub-setting using the provided metadata).
-#' @param these_samples_metadata Optional, supply a metadata table to auto-subset the data to samples in that table before returning
+#' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
+#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to. 
+#' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
 #' @param force_unmatched_samples Optional argument for forcing unmatched samples, using [GAMBLR.data::get_ssm_by_samples].
 #' @param projection Reference genome build for the coordinates in the MAF file. The default is grch37.
-#' @param seq_type The seq_type you want back, default is genome and currently, this is the only supported seq type.
+#' @param this_seq_type The this_seq_type you want back, default is genome.
 #' @param basic_columns Set to FALSE to override the default behavior of returning only the first 45 columns of MAF data.
 #' @param maf_cols if `basic_columns` is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count.
@@ -34,7 +36,7 @@
 #' library(dplyr)
 #' 
 #' #return SSMs in reference to GRCh37:
-#' ssm_grch37 = get_coding_ssm(seq_type = "genome")
+#' ssm_grch37 = get_coding_ssm(this_seq_type = "genome")
 #'
 #' #return SSMs in reference to hg38:
 #' cell_line_meta = GAMBLR.data::sample_data$meta %>% 
@@ -42,16 +44,17 @@
 #' 
 #' ssm_hg38 = get_coding_ssm(projection = "hg38", 
 #'                           these_samples_metadata = cell_line_meta, 
-#'                           seq_type = "genome")
+#'                           this_seq_type = "genome")
 #' 
 get_coding_ssm = function(limit_cohort,
                           exclude_cohort,
                           limit_pathology,
                           limit_samples,
+                          these_sample_ids,
                           these_samples_metadata,
                           force_unmatched_samples,
                           projection = "grch37",
-                          seq_type = "genome",
+                          this_seq_type = "genome",
                           basic_columns = TRUE,
                           maf_cols = NULL,
                           min_read_support = 3,
@@ -62,20 +65,24 @@ get_coding_ssm = function(limit_cohort,
   #warn/notify the user what version of this function they are using
   message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
   
-  #check seq type
-  if(seq_type != "genome"){
-    stop("Currently, SSM results are only available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
-  }
-  
   #check if any invalid parameters are provided
   check_excess_params(...)
   
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
   
+  #get samples with the dedicated helper function
+  metadata = id_ease(these_samples_metadata = these_samples_metadata,
+                     these_sample_ids = these_sample_ids,
+                     verbose = verbose,
+                     this_seq_type = this_seq_type)
+  
+  sample_ids = metadata$sample_id
+  
   #return SSMs based on the selected projection
   if(projection %in% valid_projections){
-    muts = GAMBLR.data::sample_data[[projection]]$maf
+    muts = GAMBLR.data::sample_data[[projection]]$maf %>% 
+      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids)
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
@@ -85,36 +92,31 @@ get_coding_ssm = function(limit_cohort,
     coding_class = coding_class[coding_class != "Silent"]
   }
   
-  #get samples with the dedicated helper function
-  all_meta = id_ease(these_samples_metadata = these_samples_metadata,
-                     verbose = verbose,
-                     this_seq_type = "genome") #currently, only genome samples are bundled in the repo.
-  
   #limit cohort
   if(!missing(limit_cohort)){
-    all_meta = all_meta %>%
+    metadata = metadata %>%
       dplyr::filter(cohort %in% limit_cohort)
   }
   
   #exclude cohort
   if(!missing(exclude_cohort)){
-    all_meta = all_meta %>%
+    metadata = metadata %>%
       dplyr::filter(!cohort %in% exclude_cohort)
   }
   
   #limit pathology
   if(!missing(limit_pathology)){
-    all_meta = all_meta %>%
+    metadata = metadata %>%
       dplyr::filter(pathology %in% limit_pathology)
   }
   
   #limit samples
   if(!missing(limit_samples)){
-    all_meta = all_meta %>%
+    metadata = metadata %>%
       dplyr::filter(sample_id %in% limit_samples)
     
     #check if any samples were not found in the metadata
-    not_in_meta = setdiff(limit_samples, all_meta$sample_id)
+    not_in_meta = setdiff(limit_samples, metadata$sample_id)
     
     #check so that the sample ID actually exists
     if(length(not_in_meta > 0)){
@@ -122,8 +124,7 @@ get_coding_ssm = function(limit_cohort,
     }
   }
   
-  #pull info for loading .CDS.maf
-  sample_ids = pull(all_meta, sample_id)
+  sample_ids = pull(metadata, sample_id)
   
   #drop variants with low read support (default is 3), enforce sample IDs and keep only coding variants
   muts = dplyr::filter(muts, t_alt_count >= min_read_support) %>%

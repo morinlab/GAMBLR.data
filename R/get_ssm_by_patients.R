@@ -14,7 +14,7 @@
 #' @param these_samples_metadata A metadata subset to contain the rows corresponding to the patients of interest. 
 #' If the vector of patient IDs is missing (`these_patient_ids`), this function will default to all patient IDs in the metadata table given to this parameter.
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38). Default is grch37.
-#' @param this_seq_type The seq type you want results for. Default is "genome". Currently, only genome is supported.
+#' @param this_seq_type The seq type you want results for. Default is "genome".
 #' @param min_read_support Subset returned variants to a set minimum read support. Default is 3.
 #' @param basic_columns Return first 45 columns of MAF rather than full details. Default is TRUE.
 #' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. 
@@ -51,11 +51,6 @@ get_ssm_by_patients = function(these_patient_ids,
                                maf_cols = NULL,
                                verbose = FALSE,
                                ...){
-  
-  #check seq type
-  if(this_seq_type != "genome"){
-    stop("Currently, SSM results are only available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
-  }
   
   #check if any invalid parameters are provided
   check_excess_params(...)
