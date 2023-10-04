@@ -4,8 +4,8 @@ library(testthat)
 test_that("Returned rows an columns consitency check", {
   expect_equal(nrow(get_ssm_by_region(region = "chr8:128,723,128-128,774,067")), 71) #grch37
   expect_equal(nrow(get_ssm_by_region(region = "chr5:1000-1000000", projection = "hg38")), 79) #hg38
-  expect_equal(ncol(get_ssm_by_region(region = "chr8:128,723,128-128,774,067")), 46) #grch37
-  expect_equal(ncol(get_ssm_by_region(region = "chr5:1000-1000000", projection = "hg38")), 46) #hg38
+  expect_equal(ncol(get_ssm_by_region(region = "chr8:128,723,128-128,774,067")), 45) #grch37
+  expect_equal(ncol(get_ssm_by_region(region = "chr5:1000-1000000", projection = "hg38")), 45) #hg38
 })
 
 
@@ -49,4 +49,40 @@ test_that("Non-sense examples, expected to fail", {
 
 test_that("Try to give the function more than one region", {
   expect_error(get_ssm_by_region(region = c("8:128,723,128-128,774,067", "chr8:127736231-127742951")))
+})
+
+
+test_that("Check if `(this_seq_type = capture)` is working as inteded, i.e only capture samples are returned", {
+  #get samples for each seq_type
+  cap_samples = unique(get_gambl_metadata(seq_type_filter = "capture") %>% 
+                         pull(sample_id))
+  
+  gen_samples = unique(get_gambl_metadata(seq_type_filter = "genome") %>% 
+                         pull(sample_id))
+  
+  #request capture samples for tested get function
+  cap_ssm = unique(get_ssm_by_region(region = "chr8:128,723,128-128,774,067", this_seq_type = "capture") %>% 
+                     pull(Tumor_Sample_Barcode))
+  
+  #are all the requested samples in fact capture samples?
+  expect_true(all(cap_ssm %in% cap_samples))
+  
+  #are the same sample set found in the genome sample pool?
+  expect_false(all(cap_ssm %in% gen_samples))
+})
+
+
+test_that("Does these_sample_ids and these_sample_metadata work as inteded", {
+  #get ssm for DOHH2 (using these_sample_ids)
+  dohh2_ssm = unique(get_ssm_by_region(region = "chr8:128,723,128-128,774,067", these_sample_ids = "DOHH-2") %>% 
+                       pull(Tumor_Sample_Barcode))
+  
+  #is DOHH-2 the only sample returned
+  expect_true(dohh2_ssm %in% "DOHH-2")
+  
+  #get ssm for dlbcl cell lines (using these_samples_metadata)
+  dlbcl_ssm = get_ssm_by_region(region = "chr8:128,723,128-128,774,067", these_samples_metadata = get_gambl_metadata() %>% dplyr::filter(cohort == "DLBCL_cell_lines")) %>% pull(Tumor_Sample_Barcode)
+  
+  #are ssm returned for the expected sample IDs?
+  expect_true(all(dlbcl_ssm %in% c("DOHH-2", "OCI-Ly10", "OCI-Ly3", "SU-DHL-10", "SU-DHL-4")))
 })

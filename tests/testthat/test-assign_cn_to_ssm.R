@@ -51,11 +51,30 @@ test_that("Tests meant to fail", {
   expect_error(assign_cn_to_ssm(this_sample_id = "DOHH-2", this_is_not_a_paraemter = TRUE)) # This is not a parameter
   expect_error(assign_cn_to_ssm(this_sample_id = c("DOHH-2", "HT", "Toledo", "MD903"))) #Provide more than one sample ID
   expect_error(assign_cn_to_ssm(projection = "HG38", this_sample_id = "DOHH-2")) #provide a non-valid projection
-  expect_error(assign_cn_to_ssm(this_seq_type = "capture", this_sample_id = "DOHH-2")) #Try to get capture calls back
 })
 
 
 test_that("Only coding mutations are kept", {
   expect_true(all(assign_cn_to_ssm(this_sample_id = "DOHH-2", coding_only = TRUE)[['maf']][, Variant_Classification] %in% coding_class)) #Check if all returned variants has the variant classification dictated by the coding_class object.
+})
+
+
+test_that("Check if `(this_seq_type = capture)` is working as inteded, i.e only capture samples are returned", {
+  #get samples for each seq_type
+  cap_samples = unique(get_gambl_metadata(seq_type_filter = "capture") %>% 
+                         pull(sample_id))
+  
+  gen_samples = unique(get_gambl_metadata(seq_type_filter = "genome") %>% 
+                         pull(sample_id))
+  
+  #request capture samples for tested get function
+  cap_ssm = unique(assign_cn_to_ssm(this_seq_type = "capture", this_sample_id = "Reddy_2895T")[['maf']] %>% 
+                     pull(Tumor_Sample_Barcode))
+  
+  #are all the requested samples in fact capture samples?
+  expect_true(all(cap_ssm %in% cap_samples))
+  
+  #are the same sample set found in the genome sample pool?
+  expect_false(all(cap_ssm %in% gen_samples))
 })
 

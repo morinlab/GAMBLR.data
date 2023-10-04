@@ -2,7 +2,7 @@
 library(testthat)
 
 test_that("Check for rows and column consistencies", {
-  expect_equal(nrow(get_ssm_by_patients(these_samples_metadata = get_gambl_metadata())), 188294)
+  expect_equal(nrow(get_ssm_by_patients(these_samples_metadata = get_gambl_metadata())), 208708)
   expect_equal(nrow(get_ssm_by_patients(these_patient_ids = "DOHH-2")), 22089)
   expect_equal(ncol(get_ssm_by_patients(these_patient_ids = "DOHH-2")), 45)
   expect_equal(nrow(get_ssm_by_patients(these_samples_metadata = get_gambl_metadata() %>% dplyr::filter(sample_id == "DOHH-2"))), 22089)

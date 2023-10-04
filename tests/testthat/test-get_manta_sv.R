@@ -5,7 +5,7 @@ test_that("Check for consistency in rows and columns", {
   expect_equal(nrow(get_manta_sv()), 1045) #all default parameters
   expect_equal(nrow(get_manta_sv(these_samples_metadata = get_gambl_metadata(seq_type_filter = "genome"))), 1045) #provide metadata for genome samples (this is default behavior)
   expect_equal(nrow(get_manta_sv(projection = "hg38")), 1083) #all default parameters, except projection
-  expect_equal(nrow(get_manta_sv(these_samples_metadata = get_gambl_metadata() %>% head(100))), 4) #return manta calls for the first 100 samples in the bundled metadata (4 samples should ahve manta calls)
+  expect_equal(nrow(get_manta_sv(these_samples_metadata = get_gambl_metadata() %>% head(100))), 4) #return manta calls for the first 100 samples in the bundled metadata (4 samples should have manta calls)
   expect_equal(nrow(unique(get_manta_sv()["tumour_sample_id"])), 520) #how many samples do we get manta calls for with default parameters
   expect_equal(nrow(unique(get_manta_sv(projection = "hg38")["tumour_sample_id"])), 532) #how many samples from hg38 do we have manta calls for
   expect_equal(nrow(get_manta_sv(region = "8:128723128-128774067")), 245) #expected manta calls for a given region
@@ -93,4 +93,9 @@ test_that("Check if the function correctly subsets to the specified region", {
 
 test_that("Check the verboseness of the function", {
   expect_message(get_coding_ssm(verbose = TRUE)) #does the verbose option actually output a verbose output
+})
+
+
+test_that("See if no variants are returned when seq type is set to capture (yet, no SVs for capture samples in the bundled data)", {
+  expect_equal(nrow(get_manta_sv(this_seq_type = "capture")), 0)
 })

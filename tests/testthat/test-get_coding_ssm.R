@@ -3,7 +3,7 @@ library(testthat)
 
 test_that("Check for rows and column consistencies", {
   expect_equal(nrow(get_coding_ssm()), 46559)
-  expect_equal(nrow(get_coding_ssm(these_samples_metadata = get_gambl_metadata())), 46559)
+  expect_equal(nrow(get_coding_ssm(these_samples_metadata = get_gambl_metadata())), 60392)
   expect_equal(ncol(get_coding_ssm()), 46)
   expect_equal(nrow(get_coding_ssm(these_samples_metadata = get_gambl_metadata() %>% dplyr::filter(sample_id == "DOHH-2"))), 234)
   expect_equal(nrow(get_coding_ssm(projection = "hg38")), 59143)
@@ -74,11 +74,6 @@ test_that("Do the built in metadata subset options work as advertised?", {
 })
 
 
-test_that("Request capture samples, should fail since this is currently not supported in the bundled data", {
-  expect_error(get_coding_ssm(seq_type = "capture"))
-})
-
-
 test_that("Force unmatched samples", {
   expect_false(isTRUE(all.equal(get_coding_ssm(force_unmatched_samples = "DOHH-2", 
                                                these_samples_metadata = get_gambl_metadata() %>% 
@@ -86,4 +81,24 @@ test_that("Force unmatched samples", {
                                 
                get_coding_ssm(these_samples_metadata = get_gambl_metadata() %>% 
                                 dplyr::filter(cohort == "DLBCL_cell_lines")))))
+})
+
+
+test_that("Check if `(this_seq_type = capture)` is working as inteded, i.e only capture samples are returned", {
+  #get samples for each seq_type
+  cap_samples = unique(get_gambl_metadata(seq_type_filter = "capture") %>% 
+                         pull(sample_id))
+  
+  gen_samples = unique(get_gambl_metadata(seq_type_filter = "genome") %>% 
+                         pull(sample_id))
+  
+  #request capture samples for tested get function
+  cap_ssm = unique(get_coding_ssm(this_seq_type = "capture") %>% 
+                     pull(Tumor_Sample_Barcode))
+  
+  #are all the requested samples in fact capture samples?
+  expect_true(all(cap_ssm %in% cap_samples))
+  
+  #are the same sample set found in the genome sample pool?
+  expect_false(all(cap_ssm %in% gen_samples))
 })

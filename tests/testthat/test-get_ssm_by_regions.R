@@ -72,9 +72,9 @@ test_that("Is the streamlined option only returning the expected columns", {
                           end = c("6662702", "232574297", "75451177"),
                           name = c("one_region", "another_region", "my_last_region"))
   
-  expect_equal(ncol(get_ssm_by_regions(regions_bed = regions_df, streamlined = FALSE)), 46)
+  expect_equal(ncol(get_ssm_by_regions(regions_bed = regions_df, streamlined = FALSE)), 45)
   expect_equal(ncol(get_ssm_by_regions(regions_bed = regions_df)), 3)
-  expect_equal(ncol(get_ssm_by_regions(projection = "hg38", regions_bed = regions_df, streamlined = FALSE)), 46)
+  expect_equal(ncol(get_ssm_by_regions(projection = "hg38", regions_bed = regions_df, streamlined = FALSE)), 45)
   expect_equal(ncol(get_ssm_by_regions(projection = "hg38", regions_bed = regions_df)), 3)
 })
 
@@ -87,4 +87,51 @@ test_that("Non-sense examples, expected to fail", {
   
   expect_error(get_ssm_by_regions(regions_bed = regions_df, from_flatfile = TRUE)) #parameter not should not be available for the GAMBLR.data version of this function
   expect_error(get_ssm_by_regions(regions_bed = regions_df, this_is_not_a_parameter = TRUE)) #this parameter does not exist
+})
+
+
+test_that("Check if `(this_seq_type = capture)` is working as inteded, i.e only capture samples are returned", {
+  #get samples for each seq_type
+  cap_samples = unique(get_gambl_metadata(seq_type_filter = "capture") %>% 
+                         pull(sample_id))
+  
+  gen_samples = unique(get_gambl_metadata(seq_type_filter = "genome") %>% 
+                         pull(sample_id))
+  
+  regions_df = data.frame(chr = c("1", "6"), 
+                          start = c("2488019", "47125723"), 
+                          end = c("2488105", "187447758"),
+                          name = c("one_region", "another_region"))
+  
+  #request capture samples for tested get function
+  cap_ssm = unique(get_ssm_by_regions(regions_bed = regions_df, this_seq_type = "capture") %>% 
+                     pull(sample_id))
+  
+  #are all the requested samples in fact capture samples?
+  expect_true(all(cap_ssm %in% cap_samples))
+  
+  #are the same sample set found in the genome sample pool?
+  expect_false(all(cap_ssm %in% gen_samples))
+})
+
+
+test_that("Does these_sample_ids and these_sample_metadata work as inteded", {
+  #define a region
+  regions_df = data.frame(chr = c("1", "6"), 
+                          start = c("2488019", "47125723"), 
+                          end = c("2488105", "187447758"),
+                          name = c("one_region", "another_region"))
+  
+  #get ssm for DOHH2 (using these_sample_ids)
+  dohh2_ssm = unique(get_ssm_by_regions(regions_bed = regions_df, these_sample_ids = "DOHH-2") %>% 
+                       pull(sample_id))
+  
+  #is DOHH-2 the only sample returned
+  expect_true(dohh2_ssm %in% "DOHH-2")
+  
+  #get ssm for dlbcl cell lines (using these_samples_metadata)
+  dlbcl_ssm = get_ssm_by_regions(regions_bed = regions_df, these_samples_metadata = get_gambl_metadata() %>% dplyr::filter(cohort == "DLBCL_cell_lines")) %>% pull(sample_id)
+  
+  #are ssm returned for the expected sample IDs?
+  expect_true(all(dlbcl_ssm %in% c("DOHH-2", "OCI-Ly10", "OCI-Ly3", "SU-DHL-10", "SU-DHL-4")))
 })
