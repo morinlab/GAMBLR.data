@@ -44,7 +44,7 @@
 #' @return A table of mutation counts for sliding windows across one or more regions. May be long or wide.
 #'
 #' @rawNamespace import(data.table, except = c("last", "first", "between", "transpose"))
-#' @import dplyr tidyr tibble GAMBLR.helpers parallel
+#' @import dplyr tidyr tibble parallel
 #' @export
 #'
 #' @examples
@@ -54,13 +54,12 @@
 #' reg_bed <- these_regions$regions_bed
 #'
 #' #use a set of user defined regions (from genes) and calculate mut frequency across all available samples
-#' mult_freq_all = calc_mutation_frequency_bin_regions(regions_list = regions_vec)
+#' mult_freq_all = calc_mutation_frequency_bin_regions(regions_list = reg_vec)
 #' mult_freq_all = calc_mutation_frequency_bin_regions(regions_bed = reg_bed)
 #'
 #' #subset to a specific sample ID
-#' mult_reg_freq_dohh2 = calc_mutation_frequency_bin_regions(regions_list = regions_vec,
-#'                                                           these_sample_ids = "DOHH-2", 
-#'                                                           projection = "hg38")
+#' mult_reg_freq_dohh2 = calc_mutation_frequency_bin_regions(regions_list = reg_vec,
+#'                                                           these_sample_ids = "DOHH-2")
 #'
 calc_mutation_frequency_bin_regions <- function(regions_list = NULL,
                                                 regions_bed = NULL,
@@ -81,11 +80,11 @@ calc_mutation_frequency_bin_regions <- function(regions_list = NULL,
   #check if any invalid parameters are provided
   check_excess_params(...)
   
-  regions <- GAMBLR.helpers::process_regions(regions_list = regions_list,
-                                             regions_bed = regions_bed,
-                                             region_padding = region_padding,
-                                             skip_regions = skip_regions,
-                                             only_regions = only_regions)
+  regions <- process_regions(regions_list = regions_list,
+                             regions_bed = regions_bed,
+                             region_padding = region_padding,
+                             skip_regions = skip_regions,
+                             only_regions = only_regions)
   
   regions_bed <- regions$regions_bed
   regions <- regions$regions_list
