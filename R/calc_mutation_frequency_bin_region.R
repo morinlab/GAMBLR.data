@@ -88,18 +88,6 @@ calc_mutation_frequency_bin_region <- function(region,
       end_pos
     )
   } else {
-    region_to_chunks = function(region){
-      region = unname(region)
-      region = gsub(",", "", region)
-      #format is chr6:37060224-37151701
-      split_chunks = unlist(strsplit(region, ":"))
-      chromosome = split_chunks[1]
-      startend = unlist(strsplit(split_chunks[2], "-"))
-      qstart = startend[1]
-      qend = startend[2]
-      return(list(chromosome = chromosome, start = qstart, end = qend))
-    }
-    
     chunks <- region_to_chunks(region)
     chromosome <- chunks$chromosome
     start_pos <- as.numeric(chunks$start)
