@@ -411,6 +411,83 @@ sample_data$grch37$bedpe <- annotated_sv_keep_grch37
 
 sample_data$hg38$bedpe <- annotated_sv_keep
 
+# This is needed for the proteinpainter compatibility
+GAMBLR.data::sample_data$meta$cohort %>% table
+
+selected_columns <- c(
+        "Tumor_Sample_Barcode", "Hugo_Symbol",
+        "NCBI_Build", "Chromosome", "Start_Position", "End_Position",
+        "Tumor_Seq_Allele2", "RefSeq"
+)
+
+these_samples <- GAMBLR.data::sample_data$meta %>%
+    filter(cohort %in% c("BL_Thomas")) %>%
+    pull(sample_id)
+
+these_samples_dlbcl <- GAMBLR.data::sample_data$meta %>%
+    filter(cohort %in% c("DLBCL_Thomas", "DLBCL_cell_lines")) %>%
+    pull(sample_id)
+
+coding_maf <- read_tsv("/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf") %>% # get from flat maf file to show SSM in hg38 coordinates similar to the original manuscript
+  filter(Tumor_Sample_Barcode %in% these_samples & # drop BL58 cell line
+           ! str_detect(Tumor_Sample_Barcode, "^SP|^06")) %>% # drop ICGC and 1 LLMPP case
+    select(
+        all_of(selected_columns)
+    )
+
+coding_maf_dlbcl = get_coding_ssm(
+    limit_samples = these_samples_dlbcl,
+    seq_type = "genome",
+    projection = "hg38",
+    basic_columns = FALSE) %>%
+    select(
+        all_of(selected_columns)
+    )
+
+coding_maf <- bind_rows(
+    coding_maf,
+    coding_maf_dlbcl)
+
+dim(GAMBLR.data::sample_data$hg38$maf)
+
+sample_data$hg38$maf <- GAMBLR.data::sample_data$hg38$maf %>%
+left_join(coding_maf)
+
+this_study_samples <- GAMBLR.data::sample_data$meta %>%
+    filter(cohort %in% c("FL_Dreval", "DLBCL_cell_lines")) %>%
+    pull(sample_id)
+
+# FLs in grch37
+coding_maf <- get_ssm_by_samples(
+    these_sample_ids = this_study_samples,
+    basic_columns = FALSE) %>%
+    select(
+        all_of(selected_columns)
+    )
+
+these_samples_reddy <- GAMBLR.data::sample_data$meta %>%
+    filter(cohort %in% c("dlbcl_reddy")) %>%
+    pull(sample_id)
+
+coding_maf_reddy <- get_ssm_by_samples(
+    these_sample_ids = these_samples_reddy,
+    seq_type = "capture",
+    basic_columns = FALSE) %>%
+    select(
+        all_of(selected_columns)
+    )
+
+coding_maf <- bind_rows(
+    coding_maf,
+    coding_maf_reddy)
+
+dim(GAMBLR.data::sample_data$grch37$maf)
+
+sample_data$grch37$maf <- GAMBLR.data::sample_data$grch37$maf %>%
+left_join(coding_maf)
+
+dim(sample_data$grch37$maf)
+
 setwd("~/my_dir/repos/GAMBLR.data/")
 
 usethis::use_data(
