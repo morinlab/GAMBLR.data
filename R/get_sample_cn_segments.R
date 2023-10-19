@@ -39,8 +39,8 @@
 #' dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta, 
 #'                                     streamlined = TRUE)
 #'
-get_sample_cn_segments = function(these_sample_ids,
-                                  these_samples_metadata,
+get_sample_cn_segments = function(these_sample_ids = NULL,
+                                  these_samples_metadata = NULL,
                                   projection = "grch37",
                                   this_seq_type = "genome",
                                   with_chr_prefix = FALSE,

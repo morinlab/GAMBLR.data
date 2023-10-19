@@ -34,8 +34,8 @@
 #'   
 #' dlbcl_maf = get_ssm_by_samples(these_samples_metadata = cell_line_meta)
 #' 
-get_ssm_by_samples <- function(these_sample_ids,
-                               these_samples_metadata,
+get_ssm_by_samples <- function(these_sample_ids = NULL,
+                               these_samples_metadata = NULL,
                                this_seq_type = "genome",
                                projection = "grch37",
                                these_genes,

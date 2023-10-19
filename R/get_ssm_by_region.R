@@ -38,8 +38,8 @@
 #'                                  qstart = 128723128,
 #'                                  qend = 128774067)
 #'
-get_ssm_by_region = function(these_sample_ids,
-                             these_samples_metadata,
+get_ssm_by_region = function(these_sample_ids = NULL,
+                             these_samples_metadata = NULL,
                              chromosome,
                              qstart,
                              qend,

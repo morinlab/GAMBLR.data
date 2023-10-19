@@ -49,8 +49,8 @@
 #' #get the SVs in a region around MYC
 #' myc_locus_sv = get_manta_sv(region = "8:128723128-128774067")
 #' 
-get_manta_sv = function(these_sample_ids,
-                        these_samples_metadata,
+get_manta_sv = function(these_sample_ids = NULL,
+                        these_samples_metadata = NULL,
                         projection = "grch37",
                         this_seq_type = "genome",
                         chromosome,

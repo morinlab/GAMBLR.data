@@ -42,13 +42,13 @@
 #'
 #' these_ids = id_ease(these_samples_metadata = this_metadata)
 #'
-id_ease = function(these_samples_metadata,
-                   these_sample_ids,
+id_ease = function(these_samples_metadata = NULL,
+                   these_sample_ids = NULL,
                    this_seq_type = c("genome", "capture"),
                    verbose = FALSE){
   
   #check for provided metadata, else use GAMBL metadata
-  if(missing(these_samples_metadata)){
+  if(is.null(these_samples_metadata)){
     if(verbose){
       message("id_ease: No metadata provided, the helper function will fetch metadata for all gambl samples in the selected seq type...") 
     }
@@ -61,7 +61,7 @@ id_ease = function(these_samples_metadata,
   }
   
   #ensure metadata is subset to specified sample IDs
-  if(!missing(these_sample_ids)){
+  if(!is.null(these_sample_ids)){
     if(verbose){
       message("id_ease: Sample IDs are provided, filtering the metadata for selected sample IDs...") 
     }

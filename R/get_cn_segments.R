@@ -38,8 +38,8 @@
 #'                                        projection = "hg38",
 #'                                        with_chr_prefix = TRUE)
 #'
-get_cn_segments = function(these_sample_ids,
-                           these_samples_metadata,
+get_cn_segments = function(these_sample_ids = NULL,
+                           these_samples_metadata = NULL,
                            region,
                            chromosome,
                            qstart,

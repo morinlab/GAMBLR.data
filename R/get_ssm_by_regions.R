@@ -34,8 +34,8 @@
 #'                                         streamlined = FALSE,
 #'                                         use_name_column = TRUE)
 #'
-get_ssm_by_regions = function(these_sample_ids,
-                              these_samples_metadata,
+get_ssm_by_regions = function(these_sample_ids = NULL,
+                              these_samples_metadata = NULL,
                               this_seq_type = "genome",
                               regions_list,
                               regions_bed,
