@@ -11,8 +11,6 @@
 #' @param only_regions Character vector of genes to include from GAMBLR aSHM regions.
 #' @param projection Specify which genome build to use. [grch37]
 #'
-#' @import GAMBLR.data
-#'
 #' @return Numeric value.
 #'
 #' @noRd
@@ -122,3 +120,4 @@ process_regions <- function(regions_list = NULL,
     )
   )
 }
+
