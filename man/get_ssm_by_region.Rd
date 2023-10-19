@@ -5,8 +5,8 @@
 \title{Get SSM By Region.}
 \usage{
 get_ssm_by_region(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   chromosome,
   qstart,
   qend,

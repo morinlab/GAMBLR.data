@@ -5,8 +5,8 @@
 \title{Get Sample CN Segments.}
 \usage{
 get_sample_cn_segments(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   projection = "grch37",
   this_seq_type = "genome",
   with_chr_prefix = FALSE,

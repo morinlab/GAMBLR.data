@@ -5,8 +5,8 @@
 \title{Get Manta SVs}
 \usage{
 get_manta_sv(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   projection = "grch37",
   this_seq_type = "genome",
   chromosome,

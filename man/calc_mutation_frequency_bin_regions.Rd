@@ -7,8 +7,8 @@
 calc_mutation_frequency_bin_regions(
   regions_list = NULL,
   regions_bed = NULL,
-  these_samples_metadata,
-  these_sample_ids,
+  these_samples_metadata = NULL,
+  these_sample_ids = NULL,
   this_seq_type = "genome",
   maf_data = NULL,
   projection = "grch37",

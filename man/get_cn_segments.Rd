@@ -5,8 +5,8 @@
 \title{Get CN Segments.}
 \usage{
 get_cn_segments(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   region,
   chromosome,
   qstart,

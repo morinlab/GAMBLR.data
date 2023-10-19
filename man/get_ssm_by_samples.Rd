@@ -6,8 +6,8 @@
 \title{Get SSM By Samples.}
 \usage{
 get_ssm_by_samples(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   this_seq_type = "genome",
   projection = "grch37",
   these_genes,
@@ -19,8 +19,8 @@ get_ssm_by_samples(
 )
 
 get_ssm_by_sample(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   this_seq_type = "genome",
   projection = "grch37",
   these_genes,

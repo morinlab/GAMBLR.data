@@ -5,8 +5,8 @@
 \title{Get SSM By Regions.}
 \usage{
 get_ssm_by_regions(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   this_seq_type = "genome",
   regions_list,
   regions_bed,
