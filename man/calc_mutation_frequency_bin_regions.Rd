@@ -80,8 +80,6 @@ parameter and internally calls \code{calc_mutation_frequency_bin_region}
 to retrieve mutation counts for sliding windows across one or more regions.
 May optionally provide any combination of a maf data frame, existing metadata,
 or a regions data frame or named vector.
-The heatmap plotting portion of this function has been moved to
-\link[GAMBLR.viz:heatmap_mutation_frequency_bin]{GAMBLR.viz::heatmap_mutation_frequency_bin}.
 }
 \examples{
 #get some regions

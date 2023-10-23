@@ -9,8 +9,6 @@
 #' to retrieve mutation counts for sliding windows across one or more regions. 
 #' May optionally provide any combination of a maf data frame, existing metadata,
 #' or a regions data frame or named vector.
-#' The heatmap plotting portion of this function has been moved to 
-#' [GAMBLR.viz::heatmap_mutation_frequency_bin].
 #'
 #' @param regions_list Named vector of regions in the format 
 #' c(name1 = "chr:start-end", name2 = "chr:start-end"). If neither `regions` nor 
