@@ -8,8 +8,8 @@
 \title{ID Ease}
 \usage{
 id_ease(
-  these_samples_metadata,
-  these_sample_ids,
+  these_samples_metadata = NULL,
+  these_sample_ids = NULL,
   this_seq_type = c("genome", "capture"),
   verbose = FALSE
 )

@@ -4,11 +4,12 @@
 #'
 #' @details Retrieve a maf for a specific sample or a set of samples. 
 #' Either specify the sample IDs of interest with `these_sample_ids`.
-#' Or a metadata table subset to the sample IDs of interest.
+#' Or a metadata table subset to the sample IDs of interest with `these_samples_metadata`.
 #'
 #' @param these_sample_ids The sample_id you want the data from.
-#' @param these_samples_metadata Required if not specifying this_sample_id.
-#' @param this_seq_type Required if not specifying these_samples_metadata. The seq_type of the sample you want data from.
+#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.
+#' If not not provided and these_sample_ids is also not provided, the function will return SSM for all samples from the specified seq_type in the bundled metadata.
+#' @param this_seq_type Default is genome.
 #' @param projection The projection genome build. Supports hg38 and grch37.
 #' @param these_genes A vector of genes to subset ssm to.
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).
@@ -33,8 +34,8 @@
 #'   
 #' dlbcl_maf = get_ssm_by_samples(these_samples_metadata = cell_line_meta)
 #' 
-get_ssm_by_samples <- function(these_sample_ids,
-                               these_samples_metadata,
+get_ssm_by_samples <- function(these_sample_ids = NULL,
+                               these_samples_metadata = NULL,
                                this_seq_type = "genome",
                                projection = "grch37",
                                these_genes,
@@ -44,25 +45,19 @@ get_ssm_by_samples <- function(these_sample_ids,
                                verbose = FALSE,
                                ...){
   
-  #check seq type
-  if(this_seq_type != "genome"){
-    stop("Currently, SSM results are only available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
-  }
-  
   #warn/notify the user what version of this function they are using
   message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
   
   #check if any invalid parameters are provided
   check_excess_params(...)
   
-  #get sample IDs
-  meta_ids = id_ease(these_sample_ids = these_sample_ids, 
-                     these_samples_metadata = these_samples_metadata, 
-                     this_seq_type = "genome",
-                     verbose = verbose) #currently, only genome samples are bundled in the repo.
+  #get samples with the dedicated helper function
+  metadata = id_ease(these_samples_metadata = these_samples_metadata,
+                     these_sample_ids = these_sample_ids,
+                     verbose = verbose,
+                     this_seq_type = this_seq_type)
   
-  #extract sample IDs
-  these_ids = meta_ids$sample_id
+  sample_ids = metadata$sample_id
   
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
@@ -70,7 +65,7 @@ get_ssm_by_samples <- function(these_sample_ids,
   #return SSMs based on the selected projection
   if(projection %in% valid_projections){
     sample_ssm = GAMBLR.data::sample_data[[projection]]$maf %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% these_ids)
+      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids)
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))

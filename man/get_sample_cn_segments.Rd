@@ -5,8 +5,8 @@
 \title{Get Sample CN Segments.}
 \usage{
 get_sample_cn_segments(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   projection = "grch37",
   this_seq_type = "genome",
   with_chr_prefix = FALSE,
@@ -16,13 +16,14 @@ get_sample_cn_segments(
 )
 }
 \arguments{
-\item{these_sample_ids}{Optional argument, sample_id (vector of characters) for the sample(s) to retrieve segments for. If not provided, the function will return CN segments for all available sample IDs present in the current metadata.}
+\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
 
-\item{these_samples_metadata}{Optional, provide a metadata (data frame) subset to the sample IDs of interest.}
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
+If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
 
 \item{projection}{Selected genome projection for returned CN segments. Default is "grch37".}
 
-\item{this_seq_type}{Seq type for returned CN segments. One of "genome" (default) or "capture".}
+\item{this_seq_type}{Seq type for returned CN segments. Default is genome.}
 
 \item{with_chr_prefix}{Set to TRUE to add a chr prefix to chromosome names. Default is FALSE.}
 
@@ -39,10 +40,10 @@ A data frame of segments for a specific or multiple sample ID(s).
 Get all segments for a single (or multiple) sample_id(s).
 }
 \details{
-This function returns CN segments for samples. This works for single sample or multiple samples.
+This function returns CN segments. This works for single sample or multiple samples.
 Specify the sample IDs you are interested in with \code{these_sample_ids} (as a vector of characters),
-Or call this function with \code{these_samples_metadata} if you already ahve a metadata table subset to the sample IDs of interest.
-If none off the above parameters are specified, the function will return CN segments for available samples.
+Or call this function with \code{these_samples_metadata} if you already have a metadata table subset to the sample IDs of interest.
+If none of the above parameters are specified, the function will return CN segments for available samples (from get_gambl_metadata).
 Note, this. function internally calls \link{id_ease} for dealing with sample IDs and metadata tables.
 }
 \examples{

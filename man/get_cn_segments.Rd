@@ -5,6 +5,8 @@
 \title{Get CN Segments.}
 \usage{
 get_cn_segments(
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   region,
   chromosome,
   qstart,
@@ -17,6 +19,11 @@ get_cn_segments(
 )
 }
 \arguments{
+\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
+
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
+If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
+
 \item{region}{Region formatted like chrX:1234-5678 or X:1234-56789.}
 
 \item{chromosome}{The chromosome you are restricting to. Required parameter if region is not specified.}
@@ -27,7 +34,7 @@ get_cn_segments(
 
 \item{projection}{Selected genome projection for returned CN segments. Default is "grch37".}
 
-\item{this_seq_type}{Seq type for returned CN segments. This version of this function currently only supports "genome".}
+\item{this_seq_type}{Seq type for returned CN segments. Default is genome.}
 
 \item{with_chr_prefix}{Boolean parameter for toggling if chr prefixes should be present in the return, default is FALSE.}
 

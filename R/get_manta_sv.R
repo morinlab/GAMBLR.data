@@ -3,19 +3,21 @@
 #' @description Convenience function for retrieving Manta Structural Variants (SVs) from the bundled data [GAMBLR.data::sample_data].
 #'
 #' @details This "bare bones" function was developed to retrieve Manta SV calls bundled within GAMBLR.data. 
-#' To obtain SV calls for multiple samples, give `these_sample_ids` a vector of one or more sample IDs. 
-#' Alternatively, the user can also provide the `these_samples_metadata`
-#' parameter to make use of an already subset metadata table. In this case, the returned SVs will be restricted to the sample_ids
-#' within that data frame. This function internally calls [GAMBLR.data::id_ease] to streamline sample ID/metadata parameters.
+#' To obtain SV calls for multiple samples, give `these_sample_ids` a vector of sample IDs. 
+#' Alternatively, the user can also provide the `these_samples_metadata` parameter to make use of an already subset metadata table. 
+#' In this case, the returned SVs will be restricted to the sample_ids within that data frame. 
+#' This function internally calls [GAMBLR.data::id_ease] to streamline sample ID/metadata parameters.
 #' This function can also restrict the returned calls to any genomic regions specified within `chromosome`, `qstart`, `qend`,
 #' or the complete region specified under `region` (in chr:start-end format), note that chromosome can be either prefixed or not prefixed.
 #' Useful filtering parameters are also available, use `min_vaf` to set the minimum tumour VAF for a SV to be returned and `min_score`
 #' to set the lowest Manta somatic score for a SV to be returned. `pair_status` can be used to return variants from either matched or unmatched samples.
 #' In addition, the user can chose to return all variants, even the ones not passing the filter criteria. To do so, set `pass = FALSE` (default is TRUE).
 #'
-#' @param these_sample_ids A vector of multiple sample_id (or a single sample ID as a string) that you want results for.
-#' @param these_samples_metadata A metadata table to auto-subset the data to samples in that table before returning.
+#' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
+#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to. 
+#' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
 #' @param projection The projection genome build. Default is grch37.
+#' @param this_seq_type The this_seq_type you want back, default is genome.
 #' @param chromosome Optional, the chromosome you are restricting to (can be prefixed or not prefixed).
 #' @param qstart Optional, query start coordinate of the range you are restricting to.
 #' @param qend Optional, query end coordinate of the range you are restricting to.
@@ -47,9 +49,10 @@
 #' #get the SVs in a region around MYC
 #' myc_locus_sv = get_manta_sv(region = "8:128723128-128774067")
 #' 
-get_manta_sv = function(these_sample_ids,
-                        these_samples_metadata,
+get_manta_sv = function(these_sample_ids = NULL,
+                        these_samples_metadata = NULL,
                         projection = "grch37",
+                        this_seq_type = "genome",
                         chromosome,
                         qstart,
                         qend,
@@ -70,9 +73,18 @@ get_manta_sv = function(these_sample_ids,
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
   
+  #get samples with the dedicated helper function
+  metadata = id_ease(these_samples_metadata = these_samples_metadata,
+                     these_sample_ids = these_sample_ids,
+                     verbose = verbose,
+                     this_seq_type = this_seq_type)
+  
+  sample_ids = metadata$sample_id
+  
   #return manta SV based on the selected projection
   if(projection %in% valid_projections){
-    manta_sv = GAMBLR.data::sample_data[[projection]]$bedpe
+    manta_sv = GAMBLR.data::sample_data[[projection]]$bedpe %>% 
+      dplyr::filter(tumour_sample_id %in% sample_ids)
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
@@ -87,19 +99,12 @@ get_manta_sv = function(these_sample_ids,
     qend = startend[2]
   }
   
-  #get samples with the dedicated helper function
-  this_meta = id_ease(these_samples_metadata = these_samples_metadata,
-                      these_sample_ids = these_sample_ids,
-                      verbose = verbose,
-                      this_seq_type = "genome") #only genome samples have manta results
-  
   manta_sv = manta_sv %>%
-    dplyr::filter(tumour_sample_id %in% this_meta$sample_id,
-                  VAF_tumour >= min_vaf,
+    dplyr::filter(VAF_tumour >= min_vaf,
                   SCORE >= min_score)
   
   if(verbose){
-    no_manta = setdiff(this_meta$sample_id, manta_sv$tumour_sample_id)
+    no_manta = setdiff(metadata$sample_id, manta_sv$tumour_sample_id)
     
     if(length(no_manta) > 0){
       message(paste0("No Manta results found for ", length(no_manta), " samples..."))

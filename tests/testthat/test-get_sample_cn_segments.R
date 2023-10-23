@@ -64,3 +64,7 @@ test_that("Provide both sample IDs and metadata", {
                    get_sample_cn_segments(these_samples_metadata = get_gambl_metadata() %>% 
                                             dplyr::filter(sample_id == "DOHH-2")))
 })
+
+test_that("See if no variants are returned when seq type is set to capture (yet, no segments for capture samples in the bundled data)", {
+  expect_equal(nrow(get_sample_cn_segments(this_seq_type = "capture")), 0)
+})

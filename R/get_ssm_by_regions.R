@@ -4,16 +4,16 @@
 #'
 #' @details This function internally calls [GAMBLR.data::get_ssm_by_region] to retrieve SSM calls for the specified regions.
 #'
-#' @param regions_vector Either provide a vector of regions in the chr:start-end format. 
-#' If this parameter is provided, the function will auto set `use_name_column` to FALSE.
-#' @param regions_bed Provide a data frame in BED format with the coordinates you want to retrieve (recommended). 
+#' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
+#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to. 
+#' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
+#' @param this_seq_type The this_seq_type you want back, default is genome.
+#' @param regions_list A vector of regions in the chr:start-end format to restrict the returned SSM calls to.
+#' @param regions_bed A data frame in BED format with the coordinates you want to retrieve (recommended). 
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE` 
 #' @param streamlined If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name). 
-#' Set to FALSE to return 6 columns. See `basic_columns` for more information on what columns to include in the return.
-#' @param basic_columns Set to TRUE for returning a maf with standard 45 columns. Default is FALSE. If TRUE, `streamlined` and `use_name_column` will be ignored.
-#' @param use_name_column If your bed-format data frame has a name column (must be named "name") these can be used to name your regions. 
-#' This parameter is not accepted if `regions_vector` is provided.
-#' @param projection Obtain variants projected to this reference (one of grch37 or hg38).
+#' @param use_name_column If your bed-format data frame has a name column (must be named "name") these can be used to name your regions in the returned data frame.
+#' @param projection Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).
 #' @param verbose Set to TRUE to maximize the output to console. Default is TRUE. 
 #' This parameter also dictates the verbosity of any helper function internally called inside the main function.
@@ -34,10 +34,12 @@
 #'                                         streamlined = FALSE,
 #'                                         use_name_column = TRUE)
 #'
-get_ssm_by_regions = function(regions_vector,
+get_ssm_by_regions = function(these_sample_ids = NULL,
+                              these_samples_metadata = NULL,
+                              this_seq_type = "genome",
+                              regions_list,
                               regions_bed,
                               streamlined = TRUE,
-                              basic_columns = FALSE,
                               use_name_column = FALSE,
                               projection = "grch37",
                               min_read_support = 3,
@@ -50,24 +52,24 @@ get_ssm_by_regions = function(regions_vector,
   #check if any invalid parameters are provided
   check_excess_params(...)
   
-  #streamline parameter combinations
-  if(basic_columns){
-    streamlined = FALSE
-  }
+  #get samples with the dedicated helper function
+  metadata = id_ease(these_samples_metadata = these_samples_metadata,
+                     these_sample_ids = these_sample_ids,
+                     verbose = verbose,
+                     this_seq_type = this_seq_type)
   
   bed2region = function(x){
     paste0(x[1], ":", as.numeric(x[2]), "-", as.numeric(x[3]))
   }
   
-  if(missing(regions_vector)){
+  if(missing(regions_list)){
     if(!missing(regions_bed)){
       regions = apply(regions_bed, 1, bed2region)
     }else{
-      warning("You must supply either regions_vector or regions_bed")
+      warning("You must supply either regions_list or regions_bed")
     }
   }else{
-    use_name_column = FALSE #override behavior of this parameter if a region vector is provided.
-    regions = regions_vector
+    regions = regions_list
   }
 
   if(verbose){
@@ -75,23 +77,23 @@ get_ssm_by_regions = function(regions_vector,
   }
   
   region_mafs = lapply(regions, function(x){GAMBLR.data::get_ssm_by_region(region = x,
+                                                                           these_samples_metadata = metadata,
+                                                                           this_seq_type = this_seq_type,
                                                                            streamlined = streamlined,
                                                                            projection = projection, 
                                                                            min_read_support = min_read_support,
                                                                            verbose = FALSE, #force to FALSE, suppressing noisy output
                                                                            ...)})
 
-  #return the standard 45 columns (default)
-  if(basic_columns){
-    print("bind_rows")
-    return(bind_rows(region_mafs))
-  }
-
   #deal with region names
   if(!use_name_column){
     rn = regions
   }else{
-    rn = regions_bed[["name"]]
+    if(missing(regions_bed)){
+      stop("use_name_column = TRUE is only available if regions are provided with `regions_bed`")
+    }else{
+      rn = regions_bed[["name"]] 
+    }
   }
   
   #add the region name to the to-be-returned maf
@@ -101,13 +103,12 @@ get_ssm_by_regions = function(regions_vector,
   unnested_df = tibbled_data %>%
     unnest_longer(region_mafs)
   
-  #return only 3 columns, if streamlined or 6 columns if FALSE (and basic_columns = FALSE)
   if(streamlined){
     unlisted_df = mutate(unnested_df, start = region_mafs$Start_Position, sample_id = region_mafs$Tumor_Sample_Barcode) %>%
       dplyr::select(start, sample_id, region_name)
   }else{
-    unlisted_df = mutate(unnested_df, Chromosome = region_mafs$Chromosome, End_Position = region_mafs$End_Position, Start_Position = region_mafs$Start_Position, Tumor_Sample_Barcode = region_mafs$Tumor_Sample_Barcode) %>%
-      dplyr::select(Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, region_name)
+      print("bind_rows")
+      return(bind_rows(region_mafs))
   }
   return(unlisted_df)
 }

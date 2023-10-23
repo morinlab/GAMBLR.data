@@ -5,19 +5,26 @@
 \title{Get SSM By Region.}
 \usage{
 get_ssm_by_region(
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   chromosome,
   qstart,
   qend,
   region = "",
   streamlined = FALSE,
   projection = "grch37",
-  seq_type = "genome",
+  this_seq_type = "genome",
   min_read_support = 3,
-  verbose = TRUE,
+  verbose = FALSE,
   ...
 )
 }
 \arguments{
+\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
+
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
+If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
+
 \item{chromosome}{The chromosome you are restricting to (with or without a chr prefix).}
 
 \item{qstart}{Query start coordinate of the range you are restricting to.}
@@ -30,7 +37,7 @@ get_ssm_by_region(
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38).}
 
-\item{seq_type}{The seq_type you want back, default is genome.}
+\item{this_seq_type}{The seq_type you want back, default is genome.}
 
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
 

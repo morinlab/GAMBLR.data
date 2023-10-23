@@ -33,6 +33,7 @@ Imports:
     data.table,
     dplyr,
     ggplot2,
+    parallel,
     stringr,
     tibble,
     tidyr

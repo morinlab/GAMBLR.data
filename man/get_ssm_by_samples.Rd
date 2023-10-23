@@ -6,8 +6,8 @@
 \title{Get SSM By Samples.}
 \usage{
 get_ssm_by_samples(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   this_seq_type = "genome",
   projection = "grch37",
   these_genes,
@@ -19,8 +19,8 @@ get_ssm_by_samples(
 )
 
 get_ssm_by_sample(
-  these_sample_ids,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   this_seq_type = "genome",
   projection = "grch37",
   these_genes,
@@ -34,9 +34,10 @@ get_ssm_by_sample(
 \arguments{
 \item{these_sample_ids}{The sample_id you want the data from.}
 
-\item{these_samples_metadata}{Required if not specifying this_sample_id.}
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.
+If not not provided and these_sample_ids is also not provided, the function will return SSM for all samples from the specified seq_type in the bundled metadata.}
 
-\item{this_seq_type}{Required if not specifying these_samples_metadata. The seq_type of the sample you want data from.}
+\item{this_seq_type}{Default is genome.}
 
 \item{projection}{The projection genome build. Supports hg38 and grch37.}
 
@@ -61,7 +62,7 @@ Get the SSMs (i.e. load MAF) for a single sample or a collection fo samples.
 \details{
 Retrieve a maf for a specific sample or a set of samples.
 Either specify the sample IDs of interest with \code{these_sample_ids}.
-Or a metadata table subset to the sample IDs of interest.
+Or a metadata table subset to the sample IDs of interest with \code{these_samples_metadata}.
 }
 \examples{
 #load packages

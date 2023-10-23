@@ -8,12 +8,15 @@
 #' Or, the user can provide chromosome, start and end coordinates individually with `chr`, `start`, and `end` parameters.
 #' For more usage examples, refer to the parameter descriptions and examples in the vignettes.
 #'
+#' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
+#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to. 
+#' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
 #' @param region Region formatted like chrX:1234-5678 or X:1234-56789.
 #' @param chromosome The chromosome you are restricting to. Required parameter if region is not specified.
 #' @param qstart Start coordinate of the range you are restricting to. Required parameter if region is not specified.
 #' @param qend End coordinate of the range you are restricting to. Required parameter if region is not specified.
 #' @param projection Selected genome projection for returned CN segments. Default is "grch37".
-#' @param this_seq_type Seq type for returned CN segments. This version of this function currently only supports "genome".
+#' @param this_seq_type Seq type for returned CN segments. Default is genome.
 #' @param with_chr_prefix Boolean parameter for toggling if chr prefixes should be present in the return, default is FALSE.
 #' @param streamlined Return a basic rather than full MAF format. Default is FALSE.
 #' @param ... Any additional parameters.
@@ -35,7 +38,9 @@
 #'                                        projection = "hg38",
 #'                                        with_chr_prefix = TRUE)
 #'
-get_cn_segments = function(region,
+get_cn_segments = function(these_sample_ids = NULL,
+                           these_samples_metadata = NULL,
+                           region,
                            chromosome,
                            qstart,
                            qend,
@@ -48,20 +53,23 @@ get_cn_segments = function(region,
   #warn/notify the user what version of this function they are using
   message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
   
-  #check seq type
-  if(this_seq_type != "genome"){
-    stop("Currently, only CN segments available for genome samples (in GAMBLR.data). Please run this function with `this_seq_type` set to genome...")
-  }
-  
   #check if any invalid parameters are provided
   check_excess_params(...)
   
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
   
+  #get samples with the dedicated helper function
+  metadata = id_ease(these_samples_metadata = these_samples_metadata,
+                     these_sample_ids = these_sample_ids,
+                     this_seq_type = this_seq_type)
+  
+  sample_ids = metadata$sample_id
+  
   #return CN segments based on the selected projection
   if(projection %in% valid_projections){
-    all_segs = GAMBLR.data::sample_data[[projection]]$seg
+    all_segs = GAMBLR.data::sample_data[[projection]]$seg %>% 
+      dplyr::filter(ID %in% sample_ids)
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))

@@ -44,15 +44,31 @@ test_that("Try non-existing parameters", {
 })
 
 
-test_that("Non-supported seq type", {
-  expect_error(get_cn_segments(region = "8:128723128-128774067", this_seq_type = "capture")) #this seq type does not CURRENTLY exist in the bundled data
-  expect_error(get_cn_segments(region = "8:128723128-128774067", this_seq_type = "capture", projection = "hg38"))
-})
-
-
 test_that("Is the streamlined option only returning the two expected columns", {
   expect_equal(ncol(get_cn_segments(region = "8:128723128-128774067", streamlined = TRUE)), 2)
   expect_true(all(c("ID", "CN") %in% names(get_cn_segments(region = "8:128723128-128774067", streamlined = TRUE))))
   expect_equal(ncol(get_cn_segments(region = "8:128723128-128774067", streamlined = TRUE, projection = "hg38")), 2)
   expect_true(all(c("ID", "CN") %in% names(get_cn_segments(region = "8:128723128-128774067", streamlined = TRUE, projection = "hg38"))))  
+})
+
+test_that("See if no variants are returned when seq type is set to capture (yet, no segments for capture samples in the bundled data)", {
+  expect_equal(nrow(get_cn_segments(region = "8:128723128-128774067", this_seq_type = "capture")), 0)
+})
+
+
+test_that("Does these_sample_ids and these_sample_metadata work as inteded", {
+  #get CN for DOHH2 (using these_sample_ids)
+  dohh2_cn = unique(get_cn_segments(region = "8:128723128-128774067", these_sample_ids = "DOHH-2") %>% 
+                       pull(ID))
+  
+  #is DOHH-2 the only sample returned
+  expect_true(dohh2_cn %in% "DOHH-2")
+  
+  #get CN for dlbcl cell lines (using these_samples_metadata)
+  dlbcl_cn = get_cn_segments(region = "8:128723128-128774067", these_samples_metadata = get_gambl_metadata() %>% 
+                                                  dplyr::filter(cohort == "DLBCL_cell_lines")) %>% 
+                                  pull(ID)
+  
+  #are CNs returned for the expected sample IDs?
+  expect_true(all(dlbcl_cn %in% c("DOHH-2", "OCI-Ly10", "OCI-Ly3", "SU-DHL-10", "SU-DHL-4")))
 })

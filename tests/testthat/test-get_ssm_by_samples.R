@@ -2,8 +2,9 @@
 library(testthat)
 
 test_that("Check for rows and column consistencies", {
-  expect_equal(nrow(get_ssm_by_samples()), 188294)
-  expect_equal(nrow(get_ssm_by_samples(these_samples_metadata = get_gambl_metadata())), 188294)
+  expect_equal(nrow(get_ssm_by_samples(this_seq_type = "genome")), 188294)
+  expect_equal(nrow(get_ssm_by_samples(this_seq_type = "capture")), 20414)
+  expect_equal(nrow(get_ssm_by_samples(these_samples_metadata = get_gambl_metadata(seq_type_filter = "genome"))), 188294)
   expect_equal(nrow(get_ssm_by_samples(these_sample_ids = "DOHH-2")), 22089)
   expect_equal(ncol(get_ssm_by_samples(these_sample_ids = "DOHH-2")), 45)
   expect_equal(nrow(get_ssm_by_samples(these_samples_metadata = get_gambl_metadata() %>% dplyr::filter(sample_id == "DOHH-2"))), 22089)
@@ -47,11 +48,26 @@ test_that("Do the min vaf filters work as advertised?", {
 })
 
 
-test_that("Request capture samples, should fail since this is currently not supported in the bundled data", {
-  expect_error(get_ssm_by_sample(these_sample_ids = "DOHH-2", seq_type = "capture"))
+test_that("Check the verboseness of the function", {
+  expect_message(get_ssm_by_sample(these_sample_ids = "DOHH-2", verbose = TRUE)) #does the verbose option actually output a verbose output
 })
 
 
-test_that("Check the verboseness of the function", {
-  expect_message(get_ssm_by_sample(these_sample_ids = "DOHH-2", verbose = TRUE)) #does the verbose option actually output a verbose output
+test_that("Check if `(this_seq_type = capture)` is working as inteded, i.e only capture samples are returned", {
+  #get samples for each seq_type
+  cap_samples = unique(get_gambl_metadata(seq_type_filter = "capture") %>% 
+                         pull(sample_id))
+  
+  gen_samples = unique(get_gambl_metadata(seq_type_filter = "genome") %>% 
+                         pull(sample_id))
+  
+  #request capture samples for tested get function
+  cap_ssm = unique(get_ssm_by_samples(this_seq_type = "capture") %>% 
+                     pull(Tumor_Sample_Barcode))
+  
+  #are all the requested samples in fact capture samples?
+  expect_true(all(cap_ssm %in% cap_samples))
+  
+  #are the same sample set found in the genome sample pool?
+  expect_false(all(cap_ssm %in% gen_samples))
 })
