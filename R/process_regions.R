@@ -4,43 +4,47 @@
 #'
 #' @details INTERNAL FUNCTION to harmonize genomic regions specified as character vectors or data frames.
 #'
-#' @param regions Character vector of genomic regions. If neither regions nor regions_df is specified, will use GAMBLR aSHM regions
-#' @param regions_df Data frame of genomic regions with column names "chrom", "start", "end", "name"
+#' @param regions_list Character vector of genomic regions. If neither regions nor regions_df is specified, will use GAMBLR aSHM regions
+#' @param regions_bed Data frame of genomic regions with column names "chrom", "start", "end", "name"
 #' @param region_padding Amount to pad the start and end coordinates by. [0]
 #' @param skip_regions Character vector of genes to drop from GAMBLR aSHM regions.
 #' @param only_regions Character vector of genes to include from GAMBLR aSHM regions.
 #' @param projection Specify which genome build to use. [grch37]
 #'
-#' @return Numeric value.
+#' @return A list with two objects, regions as a vector and in bed format.
 #'
-#' @noRd
+#' @export
 #'
 #' @examples
-#' regions <- c("chr18:63074150-63369324")
-#' process_regions(regions)
+#' library(dplyr)
 #' 
-#' these_regions <- process_regions(
-#'  only_regions = c("MYC", "BCL2", "BCL6")
-#' )
-#' regions_bed <- these_regions$regions_bed
-#' regions_vec <- these_regions$regions
-#' @export
+#' regions <- setNames(c("chr1:10000-15000", "chr1:100000000-100005000"), c("one_region", "another_region"))
+#' process_regions(regions_list = regions)
+#' 
+#' reg_bed = GAMBLR.data::grch37_ashm_regions %>% 
+#' dplyr::filter(chr_name == "chr17") %>% 
+#'   mutate(name = region, chrom = chr_name, start = hg19_start, end = hg19_end) %>% 
+#'   select(chrom, start, end, name)
+#'
+#' process_regions(regions_bed = reg_bed)
+#' 
 process_regions <- function(regions_list = NULL,
                             regions_bed = NULL,
                             region_padding = 0,
                             skip_regions = NULL,
                             only_regions = NULL,
                             projection = "grch37") {
+  
   # Use default ashm region table if no regions are provided
   if (is.null(regions_list)) {
     if (is.null(regions_bed)) {
       message("Using default GAMBLR aSHM regions. ")
       if (projection == "grch37") {
-        regions_bed <- GAMBLR.data::grch37_ashm_regions %>%
+        regions_bed <- grch37_ashm_regions %>%
           dplyr::mutate(chr_name = str_remove(chr_name, "chr")) %>% 
           dplyr::mutate(name = str_c(gene, region, sep = "_"))
       } else {
-        regions_bed <- GAMBLR.data::hg38_ashm_regions %>%
+        regions_bed <- hg38_ashm_regions %>%
           dplyr::mutate(name = str_c(gene, region, sep = "_"))
       }
       # Fix column names
@@ -84,9 +88,7 @@ process_regions <- function(regions_list = NULL,
       regions_bed$name <- names(regions_list)
       regions_bed$gene <- names(regions_list)
     } else {
-      message("WARNING: Regions provided as an unnamed character vector. It is strongly recommended to provide a named vector with a unique name per region, or a bed file-formatted data frame. ")
-      regions_bed$name <- regions_bed$chrom
-      regions_bed$gene <- regions_bed$chrom
+      stop("Regions provided as an unnamed character vector. Please use a named vector instead...")
     }
   }
   
@@ -120,4 +122,3 @@ process_regions <- function(regions_list = NULL,
     )
   )
 }
-
