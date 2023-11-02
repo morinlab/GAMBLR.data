@@ -6,6 +6,9 @@
 #'
 #' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
 #' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to. 
+#' @param maf_data Optional data frame with mutations in MAF format. 
+#' If user provides a maf, the function trusts that the user has already subset this to samples of interest, correct seq_type. 
+#' i.e the following parameters are ignored; `these_samples_metadata`, `these_sample_ids`, and `this_seq_type`
 #' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
 #' @param this_seq_type The this_seq_type you want back, default is genome.
 #' @param regions_list A vector of regions in the chr:start-end format to restrict the returned SSM calls to.
@@ -36,6 +39,7 @@
 #'
 get_ssm_by_regions = function(these_sample_ids = NULL,
                               these_samples_metadata = NULL,
+                              maf_data,
                               this_seq_type = "genome",
                               regions_list,
                               regions_bed,
@@ -46,17 +50,8 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                               verbose = FALSE,
                               ...){
   
-  #warn/notify the user what version of this function they are using
-  message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
-  
   #check if any invalid parameters are provided
   check_excess_params(...)
-  
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
   
   bed2region = function(x){
     paste0(x[1], ":", as.numeric(x[2]), "-", as.numeric(x[3]))
@@ -76,15 +71,35 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
     print(regions)  
   }
   
-  region_mafs = lapply(regions, function(x){GAMBLR.data::get_ssm_by_region(region = x,
-                                                                           these_samples_metadata = metadata,
-                                                                           this_seq_type = this_seq_type,
-                                                                           streamlined = streamlined,
-                                                                           projection = projection, 
-                                                                           min_read_support = min_read_support,
-                                                                           verbose = FALSE, #force to FALSE, suppressing noisy output
-                                                                           ...)})
-
+  if(missing(maf_data)){
+    #warn/notify the user what version of this function they are using
+    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+    
+    #get samples with the dedicated helper function
+    metadata = id_ease(these_samples_metadata = these_samples_metadata,
+                       these_sample_ids = these_sample_ids,
+                       verbose = verbose,
+                       this_seq_type = this_seq_type)
+    
+    region_mafs = lapply(regions, function(x){GAMBLR.data::get_ssm_by_region(region = x,
+                                                                             these_samples_metadata = metadata,
+                                                                             this_seq_type = this_seq_type,
+                                                                             streamlined = streamlined,
+                                                                             projection = projection, 
+                                                                             min_read_support = min_read_support,
+                                                                             verbose = FALSE, #force to FALSE, suppressing noisy output
+                                                                             ...)})
+  }else{
+    region_mafs = lapply(regions, function(x){GAMBLR.data::get_ssm_by_region(region = x,
+                                                                             maf_data = maf_data,
+                                                                             streamlined = streamlined,
+                                                                             projection = projection, 
+                                                                             min_read_support = min_read_support,
+                                                                             verbose = FALSE, #force to FALSE, suppressing noisy output
+                                                                             ...)})
+    
+  }
+  
   #deal with region names
   if(!use_name_column){
     rn = regions
@@ -107,7 +122,6 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
     unlisted_df = mutate(unnested_df, start = region_mafs$Start_Position, sample_id = region_mafs$Tumor_Sample_Barcode) %>%
       dplyr::select(start, sample_id, region_name)
   }else{
-      print("bind_rows")
       return(bind_rows(region_mafs))
   }
   return(unlisted_df)

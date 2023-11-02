@@ -9,6 +9,9 @@
 #' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
 #' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to. 
 #' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
+#' @param maf_data Optional data frame with mutations in MAF format. 
+#' If user provides a maf, the function trusts that the user has already subset this to samples of interest, correct seq_type. 
+#' i.e the following parameters are ignored; `these_samples_metadata`, `these_sample_ids`, and `this_seq_type`
 #' @param chromosome The chromosome you are restricting to (with or without a chr prefix).
 #' @param qstart Query start coordinate of the range you are restricting to.
 #' @param qend Query end coordinate of the range you are restricting to.
@@ -40,6 +43,7 @@
 #'
 get_ssm_by_region = function(these_sample_ids = NULL,
                              these_samples_metadata = NULL,
+                             maf_data,
                              chromosome,
                              qstart,
                              qend,
@@ -52,31 +56,37 @@ get_ssm_by_region = function(these_sample_ids = NULL,
                              ...){
   
   if(verbose){
-    #warn/notify the user what version of this function they are using
-    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")  
+    if(missing(maf_data)){
+      #warn/notify the user what version of this function they are using
+      message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")   
+    }
   }
   
   #check if any invalid parameters are provided
   check_excess_params(...)
   
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
-  
-  sample_ids = metadata$sample_id
-  
-  #get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
-  
   #return SSMs based on the selected projection
-  if(projection %in% valid_projections){
-    this_maf = GAMBLR.data::sample_data[[projection]]$maf %>% 
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids)
+  if(missing(maf_data)){
+    #get samples with the dedicated helper function
+    metadata = id_ease(these_samples_metadata = these_samples_metadata,
+                       these_sample_ids = these_sample_ids,
+                       verbose = verbose,
+                       this_seq_type = this_seq_type)
+    
+    sample_ids = metadata$sample_id
+    
+    #get valid projections
+    valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
+    
+    if(projection %in% valid_projections){
+      this_maf = GAMBLR.data::sample_data[[projection]]$maf %>% 
+        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids)
+    }else{
+      stop(paste("please provide a valid projection. The following are available:",
+                 paste(valid_projections,collapse=", ")))
+    } 
   }else{
-    stop(paste("please provide a valid projection. The following are available:",
-               paste(valid_projections,collapse=", ")))
+    this_maf = maf_data
   }
   
   #drop poorly supported reads
