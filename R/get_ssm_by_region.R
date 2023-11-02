@@ -120,9 +120,14 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     chromosome = gsub("chr", "", chromosome)
   }
   
+  #remove the Pipeline variable if present 
+  #it's in the bundled MAF calls, but typically not in a MAF from elsewhere
+  if("Pipeline" %in% colnames(this_maf)){
+    this_maf = dplyr::select(this_maf, -Pipeline)
+  }
+  
   #subset the maf to the specified region
-  muts_region = dplyr::filter(this_maf, Chromosome == chromosome & Start_Position > qstart & Start_Position < qend) %>%
-    dplyr::select(-Pipeline)
+  muts_region = dplyr::filter(this_maf, Chromosome == chromosome & Start_Position > qstart & Start_Position < qend)
 
   if(streamlined){
     muts_region = muts_region %>%
