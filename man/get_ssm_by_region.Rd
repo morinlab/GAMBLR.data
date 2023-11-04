@@ -7,6 +7,7 @@
 get_ssm_by_region(
   these_sample_ids = NULL,
   these_samples_metadata = NULL,
+  maf_data,
   chromosome,
   qstart,
   qend,
@@ -24,6 +25,10 @@ get_ssm_by_region(
 
 \item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
 If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
+
+\item{maf_data}{Optional data frame with mutations in MAF format.
+If user provides a maf, the function trusts that the user has already subset this to samples of interest, correct seq_type.
+i.e the following parameters are ignored; \code{these_samples_metadata}, \code{these_sample_ids}, and \code{this_seq_type}}
 
 \item{chromosome}{The chromosome you are restricting to (with or without a chr prefix).}
 
