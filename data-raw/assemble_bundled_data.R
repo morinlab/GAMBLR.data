@@ -25,7 +25,9 @@ pmids <- list(
     "Dreval_FL" = 37084389,
     "Grande_BL" = 30617194,
     "Thomas_BL" = 36201743,
-    "Reddy_DLBCL" = 28985567
+    "Reddy_DLBCL" = 28985567,
+    "Schmitz_DLBCL" = 29641966,
+    "Chapuy_DLBCL" = 29713087
 )
 
 
@@ -239,6 +241,50 @@ all_lymphoma_genes = read_tsv("inst/extdata/lymphoma_genes_comprehensive.tsv") %
 
 reddy_data$grch37$ssm_to_bundle <- dplyr::filter(reddy_full_ssm,Hugo_Symbol %in% all_lymphoma_genes)
 
+# Importing DLBCL Schmitz data
+schmitz_data <- list()
+
+schmitz_data$meta <- get_gambl_metadata(seq_type_filter="capture") %>%
+  dplyr::filter(cohort == "dlbcl_schmitz") %>%
+  mutate(reference_PMID = pmids$Schmitz_DLBCL) %>%
+  mutate(
+    genetic_subgroup = lymphgen_wright,
+    lymphgen = lymphgen_wright
+  )
+
+schmitz_data$full_ssm <- get_ssm_by_samples(
+  these_samples_metadata = schmitz_data$meta
+)
+
+schmitz_data$grch37$ssm_to_bundle <- dplyr::filter(
+    schmitz_data$full_ssm,
+    Hugo_Symbol %in% all_lymphoma_genes
+)
+
+schmitz_data$meta <- schmitz_data$meta %>%
+  select(all_of(colnames_for_bundled_meta))
+
+
+# Importing DLBCL Chapuy data
+chapuy_data <- list()
+
+chapuy_data$meta <- get_gambl_metadata(seq_type_filter="capture") %>%
+  dplyr::filter(cohort == "dlbcl_chapuy") %>%
+  mutate(reference_PMID = pmids$Chapuy_DLBCL) %>%
+  mutate(genetic_subgroup = lymphgen)
+
+chapuy_data$full_ssm <- get_ssm_by_samples(
+  these_samples_metadata = chapuy_data$meta
+)
+
+chapuy_data$grch37$ssm_to_bundle <- dplyr::filter(
+    chapuy_data$full_ssm,
+    Hugo_Symbol %in% all_lymphoma_genes
+)
+
+chapuy_data$meta <- chapuy_data$meta %>%
+  select(all_of(colnames_for_bundled_meta)) %>%
+  filter(!sample_id == "DLBCL-RICOVER_148-Tumor")
 
 
 # Importing DLBCL cell lines
@@ -377,11 +423,18 @@ sample_data$meta <- sample_data$meta %>%
     select(all_of(colnames_for_bundled_meta))
 
 sample_data$meta = bind_rows(sample_data$meta,reddy_data$meta_to_bundle)
+sample_data$meta = bind_rows(
+    sample_data$meta,
+    schmitz_data$meta,
+    chapuy_data$meta
+)
 
 sample_data$grch37$maf <- bind_rows(
     fl_data$ssm_to_bundle,
     cell_lines_data$grch37$ssm,
-    reddy_data$grch37$ssm_to_bundle
+    reddy_data$grch37$ssm_to_bundle,
+    schmitz_data$grch37$ssm_to_bundle,
+    chapuy_data$grch37$ssm_to_bundle
 )
 
 sample_data$hg38$maf <- bind_rows(
@@ -465,12 +518,12 @@ coding_maf <- get_ssm_by_samples(
         all_of(selected_columns)
     )
 
-these_samples_reddy <- GAMBLR.data::sample_data$meta %>%
-    filter(cohort %in% c("dlbcl_reddy")) %>%
+these_samples_capture <- sample_data$meta %>%
+    filter(cohort %in% c("dlbcl_reddy", "dlbcl_schmitz", "dlbcl_chapuy")) %>%
     pull(sample_id)
 
-coding_maf_reddy <- get_ssm_by_samples(
-    these_sample_ids = these_samples_reddy,
+coding_maf_capture <- get_ssm_by_samples(
+    these_sample_ids = these_samples_capture,
     seq_type = "capture",
     basic_columns = FALSE) %>%
     select(
@@ -479,11 +532,11 @@ coding_maf_reddy <- get_ssm_by_samples(
 
 coding_maf <- bind_rows(
     coding_maf,
-    coding_maf_reddy)
+    coding_maf_capture)
 
 dim(GAMBLR.data::sample_data$grch37$maf)
 
-sample_data$grch37$maf <- GAMBLR.data::sample_data$grch37$maf %>%
+sample_data$grch37$maf <- sample_data$grch37$maf %>%
 left_join(coding_maf)
 
 dim(sample_data$grch37$maf)
