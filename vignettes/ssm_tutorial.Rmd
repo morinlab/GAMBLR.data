@@ -1,5 +1,5 @@
 ---
-title: "Test"
+title: "SSM Tutorial"
 output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{SSM Tutorial}
@@ -11,312 +11,284 @@ knitr::opts_chunk$set(warning = FALSE, fig.width = 7, fig.height = 5, fig.align 
 ```
 
 ```{r load_packages, message = FALSE, warning = FALSE}
+#Load packages
 library(GAMBLR.data)
 library(GAMBLR.viz)
 library(GAMBLR.helpers)
 library(GAMBLR.utils)
+library(dplyr)
 ```
 
 # Simple Somatic Mutations
 This vignette demonstrates how to work with Simple Somatic Mutations (SSM) results within GAMBLR, all the way from obtaining results (in various ways), linking with metadata, performing data analysis and annotations to producing publication ready figures.
 
 ## Metadata
-First, lets start with retrieving metadata for all GAMBL samples with `seqtype` *genome*.
+First, lets start with retrieving metadata for all GAMBL samples with `seqtype` *genome*. To return metadata for capture samples, set `seq_type_filter = "capture"`. It is also possible to return metadata for more than one seq type, e.g `seq_type_filter = c("genome", "capture")`. Depending on what GAMBLR setup you are running (GAMBLR.results or GAMBLR.data) the return will be different. This vignette is built using the bundled data in GAMBLR.data and thus, the dimensions reported here are in respect to what is available in the bundled data. Note, in all examples throughout this vignette, sample IDs are being used that are readily available in both setups. While we are at it, let us also printout the column names (metadata information) we have at our disposal.
 ```{r metadata}
-#get gambl metadata for all samples
+#Get gambl metadata for all samples
 this_metadata = get_gambl_metadata(seq_type_filter = "genome")
 
-#subset metadata on a set of samples (samples classified as DLBCL for pathology)
+#The dimensions of the returned metadata object
+dim(this_metadata)
+
+#These are the metadata columns that are available within the bundled data
+colnames(this_metadata)
+
+#Subset metadata on a set of samples (samples classified as DLBCL for pathology)
 dlbcl_metadata = dplyr::filter(this_metadata, 
                                pathology == "DLBCL")
+
+#Dimension of metadata subset (restricted to samples with pathology classified as DLBCL)
+dim(dlbcl_metadata)
 ```
 
 ## Get SSM data
-Based on the information available to the user, application, or downstream analysis, there are multiple ways to retrieve SSM data. For example, if the user knows the sample ID and is only interested in looking at SSM results for that particular sample, one can use `get_ssm_by_sample`. If multiple samples are to be queried, `get_ssm_by_samples` is recommended. The user can also use patient IDs for retrieving this data, in this case `get_ssm_by_patients` is available. In addition, the user can also restrict SSM calls to specific genomic regions with `get_ssm_by_regions` or `get_ssm_by_region`. Another possibility for returning coding SSM is to call `get_coding_ssm`, this function returns all coding SSMs from the GAMBL database in MAF-like format. If the user have an already subset metadata, the `these_samples_metadata` parameter can be used with most ssm functions to restrict the variants returned to the sample IDs in this data frame, handy! In this section we will be demonstrating how these functions can be used.
+Based on the information available to the user, application, or downstream analysis, there are multiple ways to retrieve SSM data. For example, if the user knows the sample ID and is only interested in looking at SSM results for that particular sample, one can use `get_ssm_by_sample`. If multiple samples are to be queried, `get_ssm_by_samples` is recommended. The user can also use patient IDs for retrieving this data, in this case `get_ssm_by_patients` is available. In addition, the user can also restrict SSM calls to specific genomic regions with `get_ssm_by_regions` or `get_ssm_by_region`. Another possibility for returning coding SSM is to call `get_coding_ssm`, this function returns all coding SSMs from the GAMBL database in MAF-like format. If the user have an already subset metadata, the `these_samples_metadata` parameter can be used with all SSM functions to restrict the variants returned to the sample IDs in this data frame, handy! In this section we will be demonstrating how these functions can be used with a variety of parameters and parameter combinations.
 
-### By Sample
-Return SSMs for one specific sample with `get_ssm_by_sample`. In the example bellow, the augmented MAF is loaded (grch37, slims-3 and clustered) and variants with a minimum read support of 3 are kept. Basic column is set to *TRUE*, this means the function will only return the standard 45 columns out of all 116 columns present in the original MAF. In addition, the parameter `these_genes` is available for easy subset of variants to specific genomic loci.
-```{r get_ssm_by_sample}
-#get_ssm_by_sample
-this_sample_ssm = get_ssm_by_sample(these_samples_metadata = get_gambl_metadata() %>% 
-                                      dplyr::filter(sample_id == "DOHH-2"),
-                                    projection = "hg38")
+### By Samples
+Return SSMs for one or more samples with `get_ssm_by_samples`. In the examples bellow, we are requesting SSM for the DOHH-2 cell line in two different ways, first using the `these_sample_ids` parameter and next with giving the function a metadata table that has already been subset to the sample ID of interest. In the third example, we are further restricting the returned SSM to mutations withing a specified gene **MYC** with the parameter `these_genes` and only keeping variants with a minimum read support of 3. Lastly, it is also possible top dictate what MAF columns we want back. To do this, call the function with the `maf_col` parameter and specify the columns of interest as a vector of characters. In example 5 we are requesting SSM calls for multiple samples (using all sample IDs available in the bundled metadata). Note, if we do not give this function any sample IDs or metadata to work with, the function will per default return SSM for all samples available in the bundled metadata.
+
+#### Example 1
+Using the `these_sample_id` parameter. Other parameters are left at default in this example. Let us also print the dimensions of the return MAF (i.e how many mutations do we get back and the names of the available MAF columns.
+```{r get_ssm_by_samples_example_1}
+#Example 1 - Using the these_samples_id parameter
+sample_dohh2_ssm = get_ssm_by_samples(these_sample_ids = "DOHH-2")
+
+#How manny mutations do we get back?
+dim(sample_dohh2_ssm)
+
+#What columns are available?
+colnames(sample_dohh2_ssm)
+
+#What Variant Types are called in this MAF?
+table(sample_dohh2_ssm$Variant_Type)
+
+#What are the available Variant Classifications?
+table(sample_dohh2_ssm$Variant_Classification)
+```
+#### Example 2
+Requesting the same sample ID but this time using a metadata table that has already been subset to the sample ID of interest. We can also confirm that this method creates the same return as it would if we used `these_sample_ids` as in the previous example. For this reason, let us also print the dimensions of the returned MAF and compare it with the previous example.
+```{r get_ssm_by_samples_example_2}
+#Subset a metadata to the sample ID of interest (DOHH-2)
+dohh2_meta = get_gambl_metadata(seq_type_filter = "genome") %>% dplyr::filter(sample_id == "DOHH-2")
+
+#Run get_ssm_by_sample with metadata dictating what samples are of interest
+meta_dohh2_ssm = get_ssm_by_samples(these_samples_metadata = dohh2_meta)
+
+#How many mutations do we get back?
+dim(meta_dohh2_ssm)
+
+#Is the function returning the same data in the two examples?
+all.equal(meta_dohh2_ssm, sample_dohh2_ssm)
 ```
 
-To return SSMs for multiple samples one can use `get_ssm_by_samples`. Note, this function wraps `get_ssm_by_sample`.
-```{r get_ssm_by_samples}
-#get_ssm_by_samples
-these_samples_ssm = get_ssm_by_samples(these_sample_ids = c("Reddy_813T", 
-                                                            "Reddy_2044T", 
-                                                            "Reddy_831T"),
-                                       this_seq_type = "capture")
+#### Example 3
+Let us explore some of the other parameters that are available. Here we are requesting the same sample ID (DOHH-2) but in respect to another genome build (hg38). In addition, the returned mutation calls are limited to the ones intersecting with MYC and that have a read support of at least 3 reads. Lastly, we are also calling this function with `verbose = TRUE`. 
+```{r get_ssm_by_samples_example_3}
+#Example 3 - Use a combination of different parameters provided by this function
+this_ssm = get_ssm_by_samples(these_sample_ids = "DOHH-2",
+                              projection = "hg38",
+                              these_genes = "MYC",
+                              min_read_support = 3,
+                              verbose = TRUE)
+
+#Print the returned MAF, subset to the first 10 columns
+select(this_ssm, 1:10)
+```
+
+#### Example 4
+In this last example, we are requesting SSM calls for all capture samples that are available in the bundled metadata. We are also setting `basic_columns = FALSE` which returns two additional columns. Note, in the GAMBLR.results version of this function, setting basic columns to FALSE will return a MAF with 116 columns. This is because not all MAF columns are kept in the bundled version of this data set.
+```{r get_ssm_by_samples_example_4}
+#Get capture metadata
+capture_meta = get_gambl_metadata(seq_type_filter = "capture")
+
+#Get capture ssm
+capture_ssm = get_ssm_by_samples(these_samples_metadata = capture_meta,
+                                 this_seq_type = "capture",
+                                 basic_columns = FALSE)
+
+#What are the dimensions for the capture SSM calls?
+dim(capture_ssm)
+
+#For how many capture samples do we have SSM calls for?
+length(unique(capture_ssm$Tumor_Sample_Barcode))
+
+#What are the extra columns we get when basic_columns = FALSE?
+colnames(select(capture_ssm, 46:47))
+```
+#### Example 5
+It is also possible to query a specify set of sample IDs of interest with the `these_sample_ids` parameter, as such.
+```{r get_ssm_by_samples_example_5}
+these_samples_ssm = get_ssm_by_samples(these_sample_ids = c("SU-DHL-4",
+                                                            "DOHH-2",
+                                                            "SU-DHL-10"))
+```
+
+#### Example 6
+If no sample IDs or metadata is provided, the function will per default return all SSM calls in the specified seq type. Let us also call this example using the `maf_cols` parameter to control what columns are returned. Note, that if we want to dictate what columns we want back, we need to call the function with `basic_columns = FALSE` otherwise, the function will disregard anything specified under `maf_cols`.
+```{r get_ssm_by_samples_example_6}
+all_ssm = get_ssm_by_samples(this_seq_type = c("genome", "capture"), 
+                             basic_columns = FALSE, 
+                             maf_cols = c("Tumor_Sample_Barcode",
+                                          "Variant_Type",
+                                          "t_alt_count",
+                                          "Variant_Classification"))
+
+#In total, how many samples do we have SSM calls for?
+length(unique(all_ssm$Tumor_Sample_Barcode))
+
+#Can we control what columns we get back (as advertised)
+colnames(all_ssm)
 ```
 
 ### By Patient
-Return SSMs for a set of patients with `get_ssm_by_patients`.
+Return SSM for a set of patients with `get_ssm_by_patients`. Similarly to `get_ssm_by_samples` this function can accept the same parameters, allowing the user more control of what gets returned. This is because `get_ssm_by_patients` internally calls `get_ssm_by_samples` but with an additional data processing step that takes a patient ID and converts it to a sample ID (which is forwarded to `get_ssm_by_samples`). Note that in the example bellow, the patient ID and sample ID are the same, this is not true for all samples.
 ```{r get_ssm_by_patients}
 #get_ssm_by_patients
 these_patients_ssm = get_ssm_by_patients(these_patient_ids = "DOHH-2")
+
+#Do we get the same MAF back as we do with get_ssm_by_samples, with the same sample specified?
+all.equal(these_patients_ssm, sample_dohh2_ssm)
 ```
 
 ### By Region
-Return SSMs based on a specific region with `get_ssm_by_region`. In this example we are using `gene_to_region` to get genomic coordinates for a specific gene that will be called by `get_ssm_by_region`.
-```{r get_ssm_by_region}
-#get all SSMs that are residing in the defined MYC region
-myc_ssm = get_ssm_by_region(region = gene_to_region(gene_symbol = "MYC", 
-                            return_as = "region"))
+In this section we are exploring the different way you can call `get_ssm_by_region` and `get_ssm_by_regions`.
+
+#### Example 1
+Return SSM based on a specific region with `get_ssm_by_region`. In this example we are using `gene_to_region` to get genomic coordinates for a specific gene that will be called by `get_ssm_by_region`.
+```{r get_ssm_by_region_example_1}
+#Get the region back for MYC (grch37)
+myc_region = gene_to_region(gene_symbol = "MYC", 
+                            return_as = "region")
+
+#Get all SSMs that are residing in the defined MYC region
+myc_ssm = get_ssm_by_region(region = myc_region)
+
+#Do we get the same mutations back as if we're calling get_ssm_by_samples with these_genes restricted to MYC?
+all.equal(select(myc_ssm, 1:45), get_ssm_by_samples(these_genes = "MYC"))
 ```
 
-For multiple regions, refer to `get_ssm_by_regions`. In this example we are returning SSMs for all ASHM regions (hyper mutated) across all samples. 
-```{r get_sm_by_regions}
-#convert regions to bed format
-my_bed = gene_to_region(gene_symbol = c("MYC", "CD58"), 
-                        return_as = "bed")
+#### Example 2
+We can also specify the coordinates we are interested in using the `chromosome`, `qstart`, and `qend` parameters, Let us also check if the returned MAF is the same we get back with the `region` parameter.
+```{r get_ssm_by_region_example_2}
+myc_ssm_chrom = get_ssm_by_region(chromosome = 8,
+                                  qstart = 128747680,
+                                  qend = 128753674)
 
-#get ssm for all ashm regions
-bed_ssm = get_ssm_by_regions(regions_bed = my_bed, 
-                             streamlined = FALSE)
+#Comapre the return, are they the same?
+all.equal(myc_ssm, myc_ssm_chrom)
+```
+
+#### Example 3
+It is also possible to call this function and provide an already loaded MAF object to subset to the desired regions. To do so, specify the MAF of interest with `maf_data`. 
+```{r get_ssm_by_region_example_3}
+dohh2_myc_ssm = get_ssm_by_region(maf_data = sample_dohh2_ssm,
+                                  chromosome = 8,
+                                  qstart = 128747680,
+                                  qend = 128753674)
+
+```
+
+#### Example 4
+In addition to the previous explored get_ssm function, this function also has a streamlined option available. If set to TRUE, only two columns are kept in the returned MAF (start_position and Tumour_Sample_Barcode). In this example, we are extending the coordinates to encapsulate the whole p-arm of chromosome 1. Note, since we are requesting hg38 calls, we have to add the chr prefix for the specified chromosome. Let us also further restrict the returned mutation calls to the ones with a read support of at least five.
+```{r get_ssm_by_region_example_4}
+streamlined_ssm = get_ssm_by_region(chromosome = "chr1",
+                                    qstart = 10000,
+                                    qend = 121700000, 
+                                    streamlined = TRUE, 
+                                    projection = "hg38", 
+                                    min_read_support = 5)
+
+#What columns are kept with streamlined = TRUE?
+colnames(streamlined_ssm)
+
+#How many variants do we find within the specified region?
+nrow(streamlined_ssm)
+```
+
+#### Example 5
+Similarly to other get_ssm functions we can also call `get_ssm_by_region` with either `these_sample_ids` or `these_samples_metadata` to restrict the return to specific sample IDs. In this example, we a re first calling the function with `these_sample_ids = "DOHH-2"` and then with `these_samples_metadata` giving the function a metadata that has been subset to the same sample ID. Note, The metadata table given to the function can obviously contain more than one sample ID and the function will return SSM calls for all such samples IDs, given that they have SSM calls in the bundled data.
+
+```{r get_ssm_by_region_example_5}
+dohh2_region_sample = get_ssm_by_region(these_sample_ids = "DOHH-2", 
+                                        region = myc_region)
+
+dohh2_region_metadata = get_ssm_by_region(these_samples_metadata = dohh2_meta,
+                                          region = myc_region)
+
+#Are the two returned data frames identical?
+all.equal(dohh2_region_sample, dohh2_region_metadata)
+```
+
+#### Example 6
+For multiple regions, refer to `get_ssm_by_regions`. In this example we are returning SSM calls for all ASHM regions (hyper mutated) across all available samples. With this multiple-region-version of this function we also get the region name added to the returned data frame and there are a couple of different ways this can be done. If you are providing regions as a bed file (`regions_bed`), you have the option of setting `use_name_column = TRUE`. If you do so your bed file can have a fourth column simply named "name", in this case, the function will keep this column for naming the returned regions in the MAF. With `streamlined = TRUE` the function returns the minimal number of columns.
+```{r get_sm_by_regions_example_6}
+#Get aSHM genes, select the columns of interest and rename for get_ssm_by_regions compatibility 
+ashm_regions = grch37_ashm_regions %>% 
+  dplyr::select(chr_name, hg19_start, hg19_end, gene) %>% 
+  dplyr::rename(chromosome = chr_name, start = hg19_start, end = hg19_end, name = gene)
+
+#Get ssm for all ashm regions
+ashm_ssm = get_ssm_by_regions(regions_bed = ashm_regions, 
+                              use_name_column = TRUE, 
+                              streamlined = TRUE)
+
+head(ashm_ssm)
+```
+
+#### Example 7
+If the use instead wish to specify regions as a vector of characters (`regions_list`) instead of using a bed file. The function will not accept a fourth element for naming the returned regions. If so, the function defaults to printing the specified regions instead.
+```{r get_sm_by_regions_7}
+ssm_region_list = get_ssm_by_regions(regions_list = c("chr1:6661482-6662702",
+                                                      "chr2:232572640-232574297",
+                                                      "chr17:75443766-75451177"), 
+                                     streamlined = TRUE)
+
+head(ssm_region_list)
+```
+
+#### Example 8
+In the last example of this function, let us use a combination of non-default parameters, just for fun! Please note, that the specified regions must be formatted to match the specified projection. This means if `projection = "hg38"` chromosome names must be "chr" prefixed. If `projection = "grch37"` then chromosome names must not be prefixed.
+```{r get_sm_by_regions_8}
+#Create a data frame in bed format
+my_regions = data.frame(chr = c("chr1", "chr2", "chr17"), 
+                        start = c("10000", "10000", "10000"), 
+                        end = c("248956422", "242193529", "83257441"),
+                        name = c("Chromosome 1", "Chromosome 2", "Chromosome 17"))
+
+fun_ssm = get_ssm_by_regions(these_sample_ids = "Akata",
+                             projection = "hg38",
+                             regions_bed = my_regions,
+                             streamlined = TRUE,
+                             use_name_column = TRUE,
+                             min_read_support = 1,
+                             verbose = TRUE)
 ```
 
 ### Coding SSM
-Lastly, another way to retrieve SSMs is to call `get_coding_ssm`. This function returns coding SSMs for any given sample. This function is a convenient option for anyone interested in plotting coding mutations. Convenient filtering parameters are included in this function for easy and straight-forward subset to specific pathologist, cohorts, and sample IDs. If these parameters are not called, coding SSMs will be returned for all samples. In the example bellow, we are using a metadata subset (DLBCL cases) for retrieving coding ssm.
+Lastly, another way to retrieve SSM is to call `get_coding_ssm`. This function returns coding SSM for any given sample. This function is a convenient option for anyone interested in plotting coding mutations. Convenient filtering parameters are included in this function for easy and straight-forward subset to specific pathologist, cohorts, and sample IDs. If these parameters are not called, coding SSM will be returned for all samples. In the example bellow, we are calling this function with no samples or metadata provided, instead we're using the in-0house filtering options to subset the return to our desire. Of course, the user can provide a metadata subset that has already been filtered to the sample IDs of interest (using `these_samples_metadata`).
 ```{r get_coding_ssm}
-#create metadata subset
-dlbcl_metadata = get_gambl_metadata(seq_type_filter = "genome") %>%
-  dplyr::filter(pathology == "DLBCL")
+#First, let us have a look at all the valid cohorts and pathology
+unique(get_gambl_metadata()[,"cohort"])
+unique(get_gambl_metadata()[,"pathology"])
 
-#get SSMs for all samples in metadata subset
-dlbcl_coding_ssm = get_coding_ssm(these_samples_metadata = dlbcl_metadata,
-                                projection = "hg38")
-```
+#Limit_cohort
+dlbcl_cell_lines = get_coding_ssm(these_samples_metadata = get_gambl_metadata(),
+                                  limit_cohort = "DLBCL_cell_lines")
+dim(dlbcl_cell_lines)
 
-## Annotating SSMs
-In this section we are exploring functions that can be used to annotate SSMs that were retrieved in the previous section. 
+#Exclude_cohort
+no_dlbcl_cell_lines = get_coding_ssm(exclude_cohort =  "DLBCL_cell_lines")
+dim(no_dlbcl_cell_lines)
 
-### Drivers
-Another useful way to annotate SSMs is with `annotate_driver_ssm`. This function indicates what rows (mutations) are putative driver mutations. For this example, we are annotating the single-sample MAF file that got returned with `get_ssm_by_sample`. This function can also take additional optional parameters to restrict the annotations to specific lymphoma types and known driver genes.
-```{r annotate_driver_ssm}
-#annotate sample-level maf with putative driver mutations
-driver_ssm = annotate_driver_ssm(maf_df = this_sample_ssm, 
-                                 lymphoma_type = c("DLBCL"))
-```
+#limit_pathology
+fl_coding_ssm = get_coding_ssm(limit_pathology = "FL")
+dim(fl_coding_ssm)
 
-## SSM Visualization
-### Variant Counts
-Interested in how many variants are present in a given sample? A quick way to overview such information would be to call `fancy_svbar` on a given sample ID. This function returns a bar plot visualizing SVs or SSMs. A variety of sub-setting options are also available. Such as chromosome selection and variant types to be included in plot. In the example bellow, we are looking at genome-wide SSMs for one selected sample.
-```{r fancy_v_count}
-fancy_v_count(maf_data = this_sample_ssm,
-              ssm = TRUE,
-              log10_y = TRUE, 
-              variant_select = c("DEL", "DNP", "INS", "SNP"), 
-              snp_colours = c("SNP" = "#2B9971", "DNP" = "#993F2B"),
-              plot_subtitle = "grch37",
-              plot_title = "Fig 1.",
-              chr_select = paste0("chr", c(1:22)))
-```
+#exclude silent mutations
+no_silent = get_coding_ssm(these_sample_ids = "DOHH-2",
+                           include_silent = FALSE)
 
-### Variant Counts Per Chromosome.
-Sometimes it can be useful to overview variant distributions across the complete genomic landscape. To do so, one could call `fancy_v_chrcount` with sample ID. Optional arguments for sub-setting your data are available (see parameter descriptions for more information). In the following example we're plotting SSM counts for all autosomes. One can also call `add_qc_metric` to add a second y-axis annotating mean corrected coverage for the selected sample.
-```{r fancy_v_chrcount}
-fancy_v_chrcount(maf_data = this_sample_ssm,  
-                 plot_subtitle =  "grch37",
-                 plot_title = "Fig 2.",
-                 y_interval = 5,
-                 projection = "grch37",
-                 min_vaf = 4,
-                 chr_select = paste0("chr", c(1:22)),
-                 ssm = TRUE,
-                 coding_only = FALSE)
-```
-
-### Variant Size Distributions
-A useful way to visualize variant size distributions is to call `fancy_v_sizedis` to generate a violin plot showing  variant size distributions (sample-level) across selected contigs (per default chr1-22). Optional parameters to sub-set data to include only coding regions are also available for this function, as well as to plot SVs by setting `ssm = FALSE`.
-```{r fancy_v_sizedis}
-fancy_v_sizedis(maf_data = this_sample_ssm,
-                ssm = TRUE,
-                plot_trim = FALSE,
-                log_10 = TRUE,
-                scale_value = "width",
-                plot_title = "Fig 3.",
-                plot_subtitle =  "grch37",
-                chr_select = paste0("chr", c(1:22)))
-```
-
-### Single Nucleotide Variants Chromosome Distributions
-Curious to see how SNVs are distributed across specific chromosomes? For this purpose `fancy_snv_chrdistplot` was developed. This function takes a sample ID and retrieves SNV information (using `assign_cn_to_ssm`) and plots variants in an ideogram dependent manner. Similarly to other `fanxy_x_plot` functions, a selection of parameters are available for data sub-setting and plot customization. For example, by calling the include_dnp, DNP counts will be added to each bar.
-```{r fancy_snv_chrdistplot}
-fancy_snv_chrdistplot(maf_data = this_sample_ssm,
-                      plot_subtitle = "SNV Distribution Example",
-                      plot_title = "Fig 4.",
-                      chr_select = paste0("chr", c(1:22)),
-                      include_dnp = TRUE)
-```
-
-### Forest Plot
-The `prettyForestPlot` function is used to compare mutation frequencies for a set of genes between two groups. In this example, pathology is set to **FL** and **DLBCL** (the two groups to be compared). Next, to get coding mutations for the selected samples, `get_coding_ssm` is called with `limit_samples` parameter, giving it the sample id column from the recently subset metadata. This function returns two types of plot (box plot and forest plot), the user can either view them separately or arranged on the same grob (showed in this example).
-```{r pretyyForestPlot}
-metadata_fl_dlbcl = get_gambl_metadata() %>%
-  dplyr::filter(pairing_status == "matched") %>%
-  dplyr::filter(pathology %in% c("FL", "DLBCL"))
-
-maf_fl_dlbcl_coding = get_coding_ssm(limit_samples = metadata_fl_dlbcl$sample_id,
-                                     basic_columns = TRUE)
-
-forest_plot = prettyForestPlot(maf = maf_fl_dlbcl_coding,
-                               metadata = metadata_fl_dlbcl,
-                               genes = c("ATP6V1B2", "EZH2", "TNFRSF14", "RRAGC"),
-                               comparison_column = "pathology",
-                               comparison_values = c("DLBCL", "FL"),
-                               separate_hotspots = FALSE,
-                               comparison_name = "FL vs DLBCL")
-
-forest_plot$arranged
-```
-
-### Rainbow Plots
-The `ashm_rainbow_plot` allows the user to plot all mutations in a region, ordered and coloured by defined metadata columns. This function also has convenient parameters for highlighting specific regions within the larger defined region. For example, here we are looking at mutations withing MYC, the plot is showing 10K bases upstream and downstream of MYC, with MYC highlighted. Samples are plotted along the y-axis and genomic positions are in respect to the x-axis. On this example, samples are colour-coded based on their pathology status. 
-```{r ashm_rainbow_plot, fig.height = 6, fig.width = 10, fig.align = "center"}
-#set region for the plot to highlight.
-mybed = data.frame(start = 128747680,
-                   end = 128753674,
-                   name = "MYC")
-
-#full region to be plotted.
-region = "chr8:128737680-128763674"
-
-#get gambl metadata for all FL and DLBCL samples.
-fl_dlbcl_metadata = get_gambl_metadata() %>%
-  dplyr::filter(pathology %in% c("FL", "DLBCL"))
-
-#get SSm data for the specified region.
-my_mutations = get_ssm_by_region(region = region)
-
-#construct plot
-ashm_rainbow_plot(mutations_maf = my_mutations,
-                  drop_unmutated = TRUE,
-                  metadata = fl_dlbcl_metadata,
-                  hide_ids = TRUE,
-                  bed = mybed,
-                  region = region,
-                  classification_column = "pathology",
-                  custom_colours = c("FL" = "#EA8368", "DLBCL" = "#479450"))
-```
-
-If you are in fact interested in plotting multi-panel overview of hypermutations in regions of interest across many samples. You should try out `ashm_multi_rainbow_plot`.
-```{r ashm_multi-rainbow_plot, fig.height = 6, fig.width = 10, fig.align = "center"}
-#construct a multi-panel ashm rainbow plot
-ashm_multi_rainbow_plot(custom_colours = get_gambl_colours("pathology"),
-                        metadata = fl_dlbcl_metadata,
-                        classification_column = "pathology",
-                        this_seq_type = "genome",
-                        verbose = FALSE,
-                        regions_to_display = c("BCL2-TSS", "MYC-TSS"))
-```
-
-### Rainfall Plot
-This plotting function is available for plotting one or multiple samples and takes either an already loaded MAF data frame or a MAF path. If none are supplied the function will get ssm data using one of the functions available in GAMBLR. There are also other convenient parameters for further customizing the returned plot. For example, we can label ASHM genes `(label_ashm_genes = TRUE)`, subset to specific chromosomes, zoom in to regions of interest. If plot is restricted to specific chromosomes or zoomed in to a region, we can also add SV labels, with the `labe_sv = TRUE`. In this example, we are looking at one sample (HTMCP-01-06-0042-01A-01D), all chromosomes with ASHM genes labeled. 
-```{r prettyRainfallPlot, fig.height = 12, fig.width = 18, fig.align = "center"}
-#build plot
-prettyRainfallPlot(this_sample_id = "DOHH-2",
-                   label_ashm_genes = TRUE)
-```
-
-### Lollipop Plot
-The function `pretty_lollipop_plot` is perfect for creating an appealing, flexible and interactive HTML-style lollipop plot from mutational data using a modified version of g3Lollipop function from g3viz package. This function only takes for parameters; `maf_df` which is the data frame containing the mutations to be plotted. `gene` this parameter controls what gene to plot mutations for. Lastly, `plot_title` lets you specify the name of the plot and with `plot_theme` you can specify the plot theme. Please note that in order for this function to run, you must first installed the forked version of [g3viz](https://github.com/morinlab/g3viz/).  
-```{r pretty_lollipop_plot}
-#get metadata (Fl and DLBCL) with pairing status matched 
-metadata = get_gambl_metadata() %>%
-  dplyr::filter(pairing_status == "matched") %>%
-  dplyr::filter(pathology %in% c("FL", "DLBCL"))
-
-#get maf data for returned samples
-maf = get_coding_ssm(limit_samples = metadata$sample_id, 
-                     basic_columns = TRUE, 
-                     this_seq_type = "genome")
-
-#construct pretty_lollipop_plot.
-pretty_lollipop_plot(maf_df = maf, 
-                     gene = "MYC",
-                     plot_title = "Mutation data for MYC", 
-                     plot_theme = "nature2")
-```
-
-
-### Oncoplots
-Commonly, we will want to generate visualizations that only show genes deemed relevant for a given malignancy (and above some frequency threshold). For this purpose we have `prettyOncoplot` available. In the example bellow, we are looking at all coding SSM (genome samples) and the relevant genes for two malignancies (BL and DLBCL). This plotting function has a large collection of parameters that are available for further customization and manipulation of the returned plot. Please refer to the documentation for a complete explanation of each parameter. 
-```{r pretty_oncoplot_1, fig.height = 12, fig.width = 18, fig.align = "center"}
-# Load the master merged MAF (coding only). It's usually more efficient to do this than to try to add filters to this query. Instead, just filter the data afterward
-maf_data = get_coding_ssm(this_seq_type = "genome")
-maf_metadata = get_gambl_metadata()
-maf = read.maf(maf_data, clinicalData = maf_metadata)
-
-#define some genes of interest
-bl_genes = c("NFKBIZ", "ID3", "TP53", "ARID1A", "FBXO11", 
-             "GNA13", "TCF3", "TFAP4", "HNRNPU", "FOXO1",
-             "CCND3", "SMARCA4", "DDX3X")
-
-dlbcl_genes = c("EZH2", "KMT2D", "MEF2B", "CREBBP", "MYD88")
-
-genes = c(bl_genes, dlbcl_genes)
-
-#define gene groups
-gene_groups = c(rep("BL", length(bl_genes)), rep("DLBCL", length(dlbcl_genes)))
-names(gene_groups) = genes
-
-#filter metadata
-maf_metadata = dplyr::filter(maf_metadata,!lymphgen %in% c("COMPOSITE"))
-
-#convert metadata column into factor
-maf_metadata$pathology = as.factor(maf_metadata$pathology)
-
-#define order of factors for selected metadata column
-maf_metadata$pathology = factor(maf_metadata$pathology, 
-                                levels = c("DLBCL", "BL",
-                                           "B-ALL", "CLL",
-                                           "COMFL", "DLBCL-BL-like",
-                                           "FL", "HGBL",
-                                           "MCL", "PBL",
-                                           "SCBC", "UNSPECIFIED"))
-
-maf_metadata = with(maf_metadata, maf_metadata[order(pathology),])
-
-#create prettyOncoplot
-prettyOncoplot(maftools_obj = maf,
-               genes = genes,
-               these_samples_metadata = maf_metadata,
-               splitGeneGroups = gene_groups,
-               keepGeneOrder = TRUE,
-               splitColumnName = "pathology",
-               metadataBarHeight = 5,
-               metadataBarFontsize = 8,
-               fontSizeGene = 11,
-               metadataColumns = c("pathology", "lymphgen", "sex", "EBV_status_inf", "cohort"),
-               sortByColumns = c("pathology", "lymphgen", "sex", "EBV_status_inf", "cohort"))
-```
-
-As previous stated, `prettyOncoplot` has many parameters that can be called to further customize the plot and aggregate the data that are to be plotted. In reality, if all features of this plotting functions were to be demonstrated, a dedicated vignette for this purpose might be the way to go. Even so, here is another example were we include non coding regions (3' UTR, NFKBIZ).
-```{r pretty_oncoplot_2, fig.height = 12, fig.width = 18, fig.align = "center"}
-#get SSM for NFKBIZ UTR region
-nfkbiz_utr_region = "chr3:101,578,185-101,579,902"
-nfkbiz_ssm = get_ssm_by_region(region = nfkbiz_utr_region,
-                               this_seq_type = "genome",
-                               projection = "grch37")
-
-#rbind nfkbiz SSM with big mutation data frame
-maf_data = rbind(maf_data, nfkbiz_ssm)
-maf = read.maf(maf_data, clinicalData = maf_metadata)
-
-#create prettyOncoplot
-prettyOncoplot(maftools_obj = maf,
-               genes = genes,
-               these_samples_metadata = maf_metadata,
-               include_noncoding=list("NFKBIZ" = c("3'UTR")),
-               splitGeneGroups = gene_groups,
-               keepGeneOrder = TRUE,
-               splitColumnName = "pathology",
-               metadataBarHeight = 5,
-               metadataBarFontsize = 8,
-               fontSizeGene = 11,
-               metadataColumns = c("pathology", "lymphgen", "sex", "EBV_status_inf", "cohort"),
-               sortByColumns = c("pathology", "lymphgen", "sex", "EBV_status_inf", "cohort"))
+#Do we have any variants classified as "silent"?
+table(no_silent$Variant_Classification)
 ```
