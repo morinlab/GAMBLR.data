@@ -2,16 +2,13 @@
 #'
 #' @description Annotate mutations with their copy number information.
 #'
-#' @details This function takes a sample ID with the `this_sample_id` parameter and annotates mutations with copy number information.
-#' A variety of parameters are at hand for a customized workflow. For example, the user can specify if only coding mutations are of interest.
-#' To do so, set `coding_only = TRUE`. This function internally calls `get_ssm_by_samples` and `get_sample_cn_segments`.
-#' This function can also take a vector with genes of interest (`genes`) that the returned data frame will be restricted to.
+#' @details This function  
 #'
 #' @param this_sample_id Sample ID of the sample you want to annotate.
 #' @param genes A vector of characters with gene symbols (Hugo).
 #' @param this_seq_type Specified seq type for returned data. Default is genome. 
 #' @param projection Specified genome projection that returned data is in reference to. Default is grch37.
-#' @param coding_only Optional. set to TRUE to restrict to only coding variants (ssm).
+#' @param coding_only Optional. Set to TRUE to restrict to only coding variants (ssm). Deafult is FALSE.
 #' @param assume_diploid Optional, this parameter annotates every mutation as copy neutral. Default is FALSE.
 #' @param include_silent Logical parameter indicating whether to include silent mutations into coding mutations. Default is FALSE. This parameter only makes sense if `coding_only` is set to TRUE.
 #' @param ... Any additional parameters.
