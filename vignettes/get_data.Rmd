@@ -13,9 +13,6 @@ knitr::opts_chunk$set(warning = FALSE, fig.width = 7, fig.height = 5, fig.align 
 ```{r load_packages, message = FALSE, warning = FALSE}
 #Load packages
 library(GAMBLR.data)
-library(GAMBLR.viz)
-library(GAMBLR.helpers)
-library(GAMBLR.utils)
 library(dplyr)
 ```
 
