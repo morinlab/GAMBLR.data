@@ -2,7 +2,10 @@
 #'
 #' @description Annotate mutations with their copy number information.
 #'
-#' @details This function  
+#' @details This function takes a sample ID with the `this_sample_id` parameter and annotates mutations with copy number information.
+#' A variety of parameters are at hand for a customized workflow. For example, the user can specify if only coding mutations are of interest.
+#' To do so, set `coding_only = TRUE`. This function internally calls `get_ssm_by_samples` and `get_sample_cn_segments`.
+#' This function can also take a vector with genes of interest (`genes`) that the returned data frame will be restricted to.
 #'
 #' @param this_sample_id Sample ID of the sample you want to annotate.
 #' @param genes A vector of characters with gene symbols (Hugo).

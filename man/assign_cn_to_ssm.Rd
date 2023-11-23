@@ -41,7 +41,10 @@ LOH and CN (the rounded absolute copy number estimate of the region based on log
 Annotate mutations with their copy number information.
 }
 \details{
-This function
+This function takes a sample ID with the \code{this_sample_id} parameter and annotates mutations with copy number information.
+A variety of parameters are at hand for a customized workflow. For example, the user can specify if only coding mutations are of interest.
+To do so, set \code{coding_only = TRUE}. This function internally calls \code{get_ssm_by_samples} and \code{get_sample_cn_segments}.
+This function can also take a vector with genes of interest (\code{genes}) that the returned data frame will be restricted to.
 }
 \examples{
 cn_list = assign_cn_to_ssm(this_sample_id = "DOHH-2",
