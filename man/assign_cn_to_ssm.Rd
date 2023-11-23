@@ -24,7 +24,7 @@ assign_cn_to_ssm(
 
 \item{projection}{Specified genome projection that returned data is in reference to. Default is grch37.}
 
-\item{coding_only}{Optional. set to TRUE to restrict to only coding variants (ssm).}
+\item{coding_only}{Optional. Set to TRUE to restrict to only coding variants (ssm). Deafult is FALSE.}
 
 \item{assume_diploid}{Optional, this parameter annotates every mutation as copy neutral. Default is FALSE.}
 
@@ -41,10 +41,7 @@ LOH and CN (the rounded absolute copy number estimate of the region based on log
 Annotate mutations with their copy number information.
 }
 \details{
-This function takes a sample ID with the \code{this_sample_id} parameter and annotates mutations with copy number information.
-A variety of parameters are at hand for a customized workflow. For example, the user can specify if only coding mutations are of interest.
-To do so, set \code{coding_only = TRUE}. This function internally calls \code{get_ssm_by_samples} and \code{get_sample_cn_segments}.
-This function can also take a vector with genes of interest (\code{genes}) that the returned data frame will be restricted to.
+This function
 }
 \examples{
 cn_list = assign_cn_to_ssm(this_sample_id = "DOHH-2",
