@@ -52,7 +52,7 @@ Retrieve all copy number segments from the GAMBL database that overlap with a si
 This function returns CN segments for s specified region.
 There are multiple ways a region can be specified.
 For example, the user can provide the full region in a "region" format (chr:start-end) to the \code{region} parameter.
-Or, the user can provide chromosome, start and end coordinates individually with \code{chr}, \code{start}, and \code{end} parameters.
+Or, the user can provide chromosome, start and end coordinates individually with \code{chr}, \code{qstart}, and \code{qend} parameters.
 For more usage examples, refer to the parameter descriptions and examples in the vignettes.
 }
 \examples{
