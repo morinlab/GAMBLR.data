@@ -71,7 +71,7 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
   }
-
+  
   #drop poorly supported reads
   sample_ssm = dplyr::filter(sample_ssm, t_alt_count >= min_read_support)
   
@@ -114,13 +114,13 @@ get_ssm_by_sample = function(this_sample_id = NULL,
                              ...){
   
   get_ssm_by_samples(these_sample_ids = this_sample_id,
-                     these_samples_metadata = NULL,
-                     this_seq_type = "genome",
-                     projection = "grch37",
-                     these_genes,
-                     min_read_support = 3,
-                     basic_columns = TRUE,
-                     maf_cols = NULL,
-                     verbose = FALSE,
+                     these_samples_metadata = these_samples_metadata,
+                     this_seq_type = this_seq_type,
+                     projection = projection,
+                     these_genes = these_genes,
+                     min_read_support = min_read_support,
+                     basic_columns = basic_columns,
+                     maf_cols = maf_cols,
+                     verbose = verbose,
                      ...)
 }
