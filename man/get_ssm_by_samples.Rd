@@ -19,7 +19,7 @@ get_ssm_by_samples(
 )
 
 get_ssm_by_sample(
-  these_sample_ids = NULL,
+  this_sample_id = NULL,
   these_samples_metadata = NULL,
   this_seq_type = "genome",
   projection = "grch37",
@@ -32,10 +32,10 @@ get_ssm_by_sample(
 )
 }
 \arguments{
-\item{these_sample_ids}{The sample_id you want the data from.}
+\item{these_sample_ids}{A vector of sample IDs that you want results for.}
 
 \item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.
-If not not provided and these_sample_ids is also not provided, the function will return SSM for all samples from the specified seq_type in the bundled metadata.}
+If not provided and these_sample_ids is also not provided, the function will return SSM for all samples from the specified seq_type in the bundled metadata.}
 
 \item{this_seq_type}{Default is genome.}
 
@@ -52,6 +52,8 @@ If not not provided and these_sample_ids is also not provided, the function will
 \item{verbose}{Enable for debugging/noisier output.}
 
 \item{...}{Any additional parameters.}
+
+\item{this_sample_id}{A single sample ID you want the data from.}
 }
 \value{
 data frame in MAF format.
@@ -74,7 +76,7 @@ cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
   
 dlbcl_maf = get_ssm_by_samples(these_samples_metadata = cell_line_meta)
 
-#basic usage, using a sample ID
-dohh2_maf = get_ssm_by_samples(these_sample_ids = "DOHH-2")
+#basic usage, using a single sample ID
+dohh2_maf = get_ssm_by_sample(this_sample_id = "DOHH-2")
 
 }

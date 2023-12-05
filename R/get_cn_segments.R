@@ -5,7 +5,7 @@
 #' @details This function returns CN segments for s specified region.
 #' There are multiple ways a region can be specified.
 #' For example, the user can provide the full region in a "region" format (chr:start-end) to the `region` parameter.
-#' Or, the user can provide chromosome, start and end coordinates individually with `chr`, `start`, and `end` parameters.
+#' Or, the user can provide chromosome, start and end coordinates individually with `chr`, `qstart`, and `qend` parameters.
 #' For more usage examples, refer to the parameter descriptions and examples in the vignettes.
 #'
 #' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.

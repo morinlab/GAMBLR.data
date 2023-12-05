@@ -2,8 +2,7 @@
 #'
 #' @description Convenience function for retrieving Manta Structural Variants (SVs) from the bundled data [GAMBLR.data::sample_data].
 #'
-#' @details This "bare bones" function was developed to retrieve Manta SV calls bundled within GAMBLR.data. 
-#' To obtain SV calls for multiple samples, give `these_sample_ids` a vector of sample IDs. 
+#' @details To obtain SV calls for multiple samples, give `these_sample_ids` a vector of sample IDs. 
 #' Alternatively, the user can also provide the `these_samples_metadata` parameter to make use of an already subset metadata table. 
 #' In this case, the returned SVs will be restricted to the sample_ids within that data frame. 
 #' This function internally calls [GAMBLR.data::id_ease] to streamline sample ID/metadata parameters.

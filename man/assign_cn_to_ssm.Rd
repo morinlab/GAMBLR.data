@@ -24,7 +24,7 @@ assign_cn_to_ssm(
 
 \item{projection}{Specified genome projection that returned data is in reference to. Default is grch37.}
 
-\item{coding_only}{Optional. set to TRUE to restrict to only coding variants (ssm).}
+\item{coding_only}{Optional. Set to TRUE to restrict to only coding variants (ssm). Deafult is FALSE.}
 
 \item{assume_diploid}{Optional, this parameter annotates every mutation as copy neutral. Default is FALSE.}
 

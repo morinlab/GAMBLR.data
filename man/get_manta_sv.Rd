@@ -55,7 +55,6 @@ If not provided (and if \code{these_sample_ids} is not provided), the function w
 Convenience function for retrieving Manta Structural Variants (SVs) from the bundled data \link{sample_data}.
 }
 \details{
-This "bare bones" function was developed to retrieve Manta SV calls bundled within GAMBLR.data.
 To obtain SV calls for multiple samples, give \code{these_sample_ids} a vector of sample IDs.
 Alternatively, the user can also provide the \code{these_samples_metadata} parameter to make use of an already subset metadata table.
 In this case, the returned SVs will be restricted to the sample_ids within that data frame.
