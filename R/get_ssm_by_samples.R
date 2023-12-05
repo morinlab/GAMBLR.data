@@ -6,9 +6,10 @@
 #' Either specify the sample IDs of interest with `these_sample_ids`.
 #' Or a metadata table subset to the sample IDs of interest with `these_samples_metadata`.
 #'
-#' @param these_sample_ids The sample_id you want the data from.
+#' @param this_sample_id A single sample ID you want the data from.
+#' @param these_sample_ids A vector of sample IDs that you want results for.
 #' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.
-#' If not not provided and these_sample_ids is also not provided, the function will return SSM for all samples from the specified seq_type in the bundled metadata.
+#' If not provided and these_sample_ids is also not provided, the function will return SSM for all samples from the specified seq_type in the bundled metadata.
 #' @param this_seq_type Default is genome.
 #' @param projection The projection genome build. Supports hg38 and grch37.
 #' @param these_genes A vector of genes to subset ssm to.
@@ -70,7 +71,7 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
   }
-
+  
   #drop poorly supported reads
   sample_ssm = dplyr::filter(sample_ssm, t_alt_count >= min_read_support)
   
@@ -96,9 +97,30 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
 #' @rdname get_ssm_by_samples
 #' 
 #' @examples
-#' #basic usage, using a sample ID
-#' dohh2_maf = get_ssm_by_samples(these_sample_ids = "DOHH-2")
+#' #basic usage, using a single sample ID
+#' dohh2_maf = get_ssm_by_sample(this_sample_id = "DOHH-2")
 #' 
 #' @export
 #' 
-get_ssm_by_sample <- get_ssm_by_samples
+get_ssm_by_sample = function(this_sample_id = NULL,
+                             these_samples_metadata = NULL,
+                             this_seq_type = "genome",
+                             projection = "grch37",
+                             these_genes,
+                             min_read_support = 3,
+                             basic_columns = TRUE,
+                             maf_cols = NULL,
+                             verbose = FALSE,
+                             ...){
+  
+  get_ssm_by_samples(these_sample_ids = this_sample_id,
+                     these_samples_metadata = these_samples_metadata,
+                     this_seq_type = this_seq_type,
+                     projection = projection,
+                     these_genes = these_genes,
+                     min_read_support = min_read_support,
+                     basic_columns = basic_columns,
+                     maf_cols = maf_cols,
+                     verbose = verbose,
+                     ...)
+}
