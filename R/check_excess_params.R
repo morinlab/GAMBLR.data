@@ -17,6 +17,10 @@ check_excess_params = function(...){
   arguments <- list(...)
   extraneous = names(arguments)
   if(length(arguments)>0){
-    stop(paste(" You have given one or more unsupported or deprecated argument to ",callingFun,". Please check the documentation and spelling of your arguments.\nOffending argument(s):", paste(extraneous, collapse = ",")), call. = FALSE)
+    k <- gettextf("Warning: You have given one or more unsupported or deprecated arguments to %s and they are going to be ignored. Please check the documentation and spelling of your arguments.\nIgnored argument(s): %s.",
+                  as.character(callingFun), 
+                  paste(extraneous, collapse = ", "))
+    message(k)
   }
+  
 }

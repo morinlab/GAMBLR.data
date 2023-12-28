@@ -18,13 +18,13 @@ process_regions(
 
 \item{regions_bed}{Data frame of genomic regions with column names "chrom", "start", "end", "name"}
 
-\item{region_padding}{Amount to pad the start and end coordinates by. \link{0}}
+\item{region_padding}{Amount to pad the start and end coordinates by. The default is 0 (no padding).}
 
 \item{skip_regions}{Character vector of genes to drop from GAMBLR aSHM regions.}
 
 \item{only_regions}{Character vector of genes to include from GAMBLR aSHM regions.}
 
-\item{projection}{Specify which genome build to use. \link{grch37}}
+\item{projection}{Specify which genome build projection to use. The default is "grch37", also accepts "hg38".}
 }
 \value{
 A list with two objects, regions as a vector and in bed format.
@@ -41,9 +41,9 @@ library(dplyr)
 regions <- setNames(c("chr1:10000-15000", "chr1:100000000-100005000"), c("one_region", "another_region"))
 process_regions(regions_list = regions)
 
-reg_bed = GAMBLR.data::grch37_ashm_regions \%>\% 
-dplyr::filter(chr_name == "chr17") \%>\% 
-  mutate(name = region, chrom = chr_name, start = hg19_start, end = hg19_end) \%>\% 
+reg_bed = GAMBLR.data::grch37_ashm_regions \%>\%
+dplyr::filter(chr_name == "chr17") \%>\%
+  mutate(name = region, chrom = chr_name, start = hg19_start, end = hg19_end) \%>\%
   select(chrom, start, end, name)
 
 process_regions(regions_bed = reg_bed)
