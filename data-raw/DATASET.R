@@ -409,3 +409,15 @@ mirage_metrics <- mirage_metrics %>%
 
 colnames(mirage_metrics)
 usethis::use_data(mirage_metrics, overwrite = TRUE)
+
+
+hotspots_annotations <- system.file(
+        "extdata",
+        "hotspots_annotations.tsv",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv() %>%
+    mutate(
+        Chromosome = as.character(Chromosome)
+    )
+usethis::use_data(hotspots_annotations, overwrite = TRUE)
