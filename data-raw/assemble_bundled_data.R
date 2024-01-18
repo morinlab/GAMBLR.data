@@ -496,7 +496,7 @@ coding_maf <- bind_rows(
 
 dim(GAMBLR.data::sample_data$hg38$maf)
 
-sample_data$hg38$maf <- GAMBLR.data::sample_data$hg38$maf %>%
+sample_data$hg38$maf <- sample_data$hg38$maf %>%
 left_join(coding_maf)
 
 this_study_samples <- GAMBLR.data::sample_data$meta %>%
@@ -561,6 +561,52 @@ hg38_ashm <- hg38_ashm %>% mutate(Pipeline = "SLMS-3")
 sample_data$grch37$ashm <- grch37_ashm
 sample_data$hg38$ashm <- hg38_ashm
 
+
+# Now add the SLMS-3 calls in both projections for those samples that
+# are bundled as publication data
+publication_samples_grch37 <- sample_data$grch37$maf %>%
+    filter(Pipeline == "Publication") %>%
+    pull(Tumor_Sample_Barcode) %>%
+    unique %>% sort
+
+publication_samples_hg38 <- sample_data$hg38$maf %>%
+    filter(Pipeline == "Publication") %>%
+    pull(Tumor_Sample_Barcode) %>%
+    unique %>% sort
+
+publication_samples <- c(
+    publication_samples_grch37,
+    publication_samples_hg38
+)
+
+grch37 <- get_ssm_by_samples(
+    these_sample_ids = publication_samples,
+    basic_columns = FALSE,
+    these_genes = all_lymphoma_genes
+)
+
+sample_data$grch37$maf <- grch37 %>%
+    mutate(Pipeline = "SLMS-3") %>%
+    select(colnames(sample_data$grch37$maf)) %>%
+    bind_rows(
+        .,
+        sample_data$grch37$maf
+    )
+
+hg38 <- get_ssm_by_samples(
+    these_sample_ids = publication_samples,
+    projection = "hg38",
+    basic_columns = FALSE,
+    these_genes = all_lymphoma_genes
+)
+
+sample_data$hg38$maf <- hg38 %>%
+    mutate(Pipeline = "SLMS-3") %>%
+    select(colnames(sample_data$hg38$maf)) %>%
+    bind_rows(
+        .,
+        sample_data$hg38$maf
+    )
 
 setwd("~/my_dir/repos/GAMBLR.data/")
 
