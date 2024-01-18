@@ -534,6 +534,34 @@ left_join(coding_maf)
 
 dim(sample_data$grch37$maf)
 
+
+# Add aSHM mutations for the already released samples
+grch37_ashm <- get_ssm_by_regions(
+    regions_bed = grch37_ashm_regions,
+    streamlined = FALSE,
+    basic_columns = TRUE
+)
+grch37_ashm <- grch37_ashm %>%
+    filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
+
+grch37_ashm <- grch37_ashm %>% mutate(Pipeline = "SLMS-3")
+
+hg38_ashm <- get_ssm_by_regions(
+    regions_bed = hg38_ashm_regions,
+    projection = "hg38",
+    streamlined = FALSE,
+    basic_columns = TRUE
+)
+hg38_ashm <- hg38_ashm %>%
+    filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
+
+hg38_ashm <- hg38_ashm %>% mutate(Pipeline = "SLMS-3")
+
+
+sample_data$grch37$ashm <- grch37_ashm
+sample_data$hg38$ashm <- hg38_ashm
+
+
 setwd("~/my_dir/repos/GAMBLR.data/")
 
 usethis::use_data(
