@@ -68,10 +68,14 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
   #return SSMs based on the selected projection
   if(projection %in% valid_projections){
     sample_ssm = GAMBLR.data::sample_data[[projection]]$maf %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids)
-    sample_ssm <- sample_ssm %>%
-        filter((tolower(!!sym("Pipeline")) == tool_name))
-    return(sample_ssm)
+        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+        dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
+    sample_ssm <- bind_rows(
+        sample_ssm,
+        GAMBLR.data::sample_data[[projection]]$ashm %>%
+            dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+            dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
+    )
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
