@@ -80,7 +80,7 @@ bl_data$ssm_to_bundle <- read_xlsx(
         "Tumor_Sample_Barcode" = "tumor_biospecimen_id",
         "Matched_Norm_Sample_Barcode" = "normal_biospecimen_id"
     ) %>%
-    select(names(GAMBLR:::maf_header[1:45])) %>%
+    select(names(GAMBLR.helpers:::maf_header[1:45])) %>%
     filter(Tumor_Sample_Barcode %in% bl_data$meta_to_bundle$sample_id)
 
 
@@ -131,7 +131,7 @@ fl_data$ssm_to_bundle <- read_xlsx(
     )
 
 difference <- setdiff(
-    names(GAMBLR:::maf_header[1:45]),
+    names(GAMBLR.helpers:::maf_header[1:45]),
     colnames(fl_data$ssm_to_bundle)
 )
 
@@ -139,7 +139,7 @@ new_cols <- setNames(rep(NA, length(difference)), difference)
 
 fl_data$ssm_to_bundle  <- fl_data$ssm_to_bundle %>%
     mutate(!!! new_cols) %>%
-    select(names(GAMBLR:::maf_header[1:45]))
+    select(names(GAMBLR.helpers:::maf_header[1:45]))
 
 
 fl_data$cnv_to_bundle <- read_xlsx(
@@ -187,7 +187,7 @@ dlbcl_data$ssm_to_bundle <- read_xlsx(
         "Tumor_Sample_Barcode" = "tumor_biospecimen_id",
         "Matched_Norm_Sample_Barcode" = "normal_biospecimen_id"
     ) %>%
-    select(names(GAMBLR:::maf_header[1:45])) %>%
+    select(names(GAMBLR.helpers:::maf_header[1:45])) %>%
     filter(Tumor_Sample_Barcode %in% dlbcl_data$meta_to_bundle$sample_id)
 
 dlbcl_data$cnv_to_bundle <- read_xlsx(
@@ -323,22 +323,20 @@ cell_lines_data$hg38$ssm_to_bundle <- get_ssm_by_samples(
 )
 
 cell_lines_data$grch37$cnv_to_bundle <- get_sample_cn_segments(
-    sample_list = cell_lines_data$meta$sample_id,
-    multiple_samples = TRUE
+    these_sample_ids = cell_lines_data$meta$sample_id
 )
 
 cell_lines_data$hg38$cnv_to_bundle <- get_sample_cn_segments(
-    sample_list = cell_lines_data$meta$sample_id,
-    multiple_samples = TRUE,
+    these_sample_ids = cell_lines_data$meta$sample_id,
     projection = "hg38",
     with_chr_prefix = TRUE
 )
 
-cell_lines_data$grch37$sv_to_bundle <- get_manta_sv_by_samples(
+cell_lines_data$grch37$sv_to_bundle <- get_manta_sv(
     these_samples_metadata = cell_lines_data$meta,
 )
 
-cell_lines_data$hg38$sv_to_bundle <- get_manta_sv_by_samples(
+cell_lines_data$hg38$sv_to_bundle <- get_manta_sv(
     these_samples_metadata = cell_lines_data$meta,
     projection = "hg38"
 )
@@ -351,7 +349,7 @@ bundled_meta = dplyr::filter(
     sample_id %in% GAMBLR.data::sample_data$meta$sample_id
 )
 
-full_sv_to_bundle = get_manta_sv_by_samples(
+full_sv_to_bundle = get_manta_sv(
   these_samples_metadata = bundled_meta,projection="hg38")
 
 annotated_sv_to_bundle = annotate_sv(full_sv_to_bundle,genome_build = "hg38")
@@ -372,7 +370,7 @@ annotated_sv_keep = left_join(
     select(c(1:16))
 
 # Now same for the grch37 projection
-full_sv_to_bundle_grch37 <- get_manta_sv_by_samples(
+full_sv_to_bundle_grch37 <- get_manta_sv(
     these_samples_metadata = bundled_meta
 )
 
@@ -430,23 +428,18 @@ sample_data$meta = bind_rows(
 )
 
 sample_data$grch37$maf <- bind_rows(
-    fl_data$ssm_to_bundle,
-    cell_lines_data$grch37$ssm,
-    reddy_data$grch37$ssm_to_bundle,
-    schmitz_data$grch37$ssm_to_bundle,
-    chapuy_data$grch37$ssm_to_bundle
+    fl_data$ssm_to_bundle %>% mutate(Pipeline = "Publication"),
+    cell_lines_data$grch37$ssm %>% mutate(Pipeline = "SLMS-3"),
+    reddy_data$grch37$ssm_to_bundle %>% mutate(Pipeline = "SLMS-3"),
+    schmitz_data$grch37$ssm_to_bundle %>% mutate(Pipeline = "SLMS-3"),
+    chapuy_data$grch37$ssm_to_bundle %>% mutate(Pipeline = "SLMS-3")
 )
 
 sample_data$hg38$maf <- bind_rows(
-    bl_data$ssm_to_bundle,
-    dlbcl_data$ssm_to_bundle,
-    cell_lines_data$hg38$ssm
+    bl_data$ssm_to_bundle %>% mutate(Pipeline = "Publication"),
+    dlbcl_data$ssm_to_bundle %>% mutate(Pipeline = "SLMS-3"),
+    cell_lines_data$hg38$ssm %>% mutate(Pipeline = "SLMS-3")
 )
-
-# add column to indicate which pipeline the data were derived from
-sample_data$grch37$maf$Pipeline = "SLMS-3"
-sample_data$hg38$maf$Pipeline = "SLMS-3"
-
 
 sample_data$grch37$seg <- bind_rows(
     fl_data$cnv_to_bundle,
@@ -489,8 +482,8 @@ coding_maf <- read_tsv("/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf
     )
 
 coding_maf_dlbcl = get_coding_ssm(
-    limit_samples = these_samples_dlbcl,
-    seq_type = "genome",
+    these_sample_ids = these_samples_dlbcl,
+    this_seq_type = "genome",
     projection = "hg38",
     basic_columns = FALSE) %>%
     select(
@@ -524,7 +517,7 @@ these_samples_capture <- sample_data$meta %>%
 
 coding_maf_capture <- get_ssm_by_samples(
     these_sample_ids = these_samples_capture,
-    seq_type = "capture",
+    this_seq_type = "capture",
     basic_columns = FALSE) %>%
     select(
         all_of(selected_columns)
