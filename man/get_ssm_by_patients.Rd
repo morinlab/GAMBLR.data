@@ -9,6 +9,7 @@ get_ssm_by_patients(
   these_samples_metadata,
   projection = "grch37",
   this_seq_type = "genome",
+  tool_name = "slms-3",
   min_read_support = 3,
   basic_columns = TRUE,
   maf_cols = NULL,
@@ -26,6 +27,8 @@ If the vector of patient IDs is missing (\code{these_patient_ids}), this functio
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38). Default is grch37.}
 
 \item{this_seq_type}{The seq type you want results for. Default is "genome".}
+
+\item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
 \item{min_read_support}{Subset returned variants to a set minimum read support. Default is 3.}
 
@@ -60,10 +63,10 @@ library(dplyr)
 my_patient = get_ssm_by_patients(these_patient_ids = "DOHH-2")
 
 #using a subset metadata tablee to retreive patient SSMs
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\% 
+cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
  dplyr::filter(cohort == "DLBCL_cell_lines")
- 
-patient_maf = get_ssm_by_patients(these_samples_metadata = cell_line_meta, 
+
+patient_maf = get_ssm_by_patients(these_samples_metadata = cell_line_meta,
                                   this_seq_type = "genome")
 
 }

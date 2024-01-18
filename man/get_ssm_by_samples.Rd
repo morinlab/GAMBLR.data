@@ -10,6 +10,7 @@ get_ssm_by_samples(
   these_samples_metadata = NULL,
   this_seq_type = "genome",
   projection = "grch37",
+  tool_name = "slms-3",
   these_genes,
   min_read_support = 3,
   basic_columns = TRUE,
@@ -41,6 +42,8 @@ If not provided and these_sample_ids is also not provided, the function will ret
 
 \item{projection}{The projection genome build. Supports hg38 and grch37.}
 
+\item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
+
 \item{these_genes}{A vector of genes to subset ssm to.}
 
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
@@ -71,9 +74,9 @@ Or a metadata table subset to the sample IDs of interest with \code{these_sample
 library(dplyr)
 
 #return a MAF for DLBCL cell line
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\% 
+cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
   dplyr::filter(cohort == "DLBCL_cell_lines")
-  
+
 dlbcl_maf = get_ssm_by_samples(these_samples_metadata = cell_line_meta)
 
 #basic usage, using a single sample ID

@@ -9,6 +9,7 @@ get_ssm_by_regions(
   these_samples_metadata = NULL,
   maf_data,
   this_seq_type = "genome",
+  mode = "slms-3",
   regions_list,
   regions_bed,
   streamlined = TRUE,
@@ -30,6 +31,8 @@ i.e the following parameters are ignored; \code{these_samples_metadata}, \code{t
 If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
 
 \item{this_seq_type}{The this_seq_type you want back, default is genome.}
+
+\item{mode}{Accepts 2 options of "slms-3" and "publication" to indicate which variant calls to use. Default is "slms-3".}
 
 \item{regions_list}{A vector of regions in the chr:start-end format to restrict the returned SSM calls to.}
 
@@ -60,7 +63,7 @@ This function internally calls \link{get_ssm_by_region} to retrieve SSM calls fo
 }
 \examples{
 #basic usage, adding custom names from bundled ashm data frame
-regions_bed = dplyr::mutate(GAMBLR.data::grch37_ashm_regions, 
+regions_bed = dplyr::mutate(GAMBLR.data::grch37_ashm_regions,
   name = paste(gene, region, sep = "_"))
 
 ashm_basic_details = get_ssm_by_regions(regions_bed = regions_bed,
