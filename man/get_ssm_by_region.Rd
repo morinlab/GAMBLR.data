@@ -45,7 +45,7 @@ i.e the following parameters are ignored; \code{these_samples_metadata}, \code{t
 
 \item{this_seq_type}{The seq_type you want back, default is genome.}
 
-\item{mode}{Accepts 2 options of "slms-3" and "publication" to indicate which variant calls to use. Default is "slms-3".}
+\item{mode}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
 

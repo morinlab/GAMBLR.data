@@ -11,7 +11,7 @@
 #' i.e the following parameters are ignored; `these_samples_metadata`, `these_sample_ids`, and `this_seq_type`
 #' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
 #' @param this_seq_type The this_seq_type you want back, default is genome.
-#' @param mode Accepts 2 options of "slms-3" and "publication" to indicate which variant calls to use. Default is "slms-3".
+#' @param mode Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
 #' @param regions_list A vector of regions in the chr:start-end format to restrict the returned SSM calls to.
 #' @param regions_bed A data frame in BED format with the coordinates you want to retrieve (recommended).
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE`

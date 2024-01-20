@@ -19,7 +19,7 @@
 #' @param streamlined Return Start_Position and Tumor_Smaple_Barcode as the only two MAF columns. Default is FALSE.
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38).
 #' @param this_seq_type The seq_type you want back, default is genome.
-#' @param mode Accepts 2 options of "slms-3" and "publication" to indicate which variant calls to use. Default is "slms-3".
+#' @param mode Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
 #' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).
 #' @param verbose Set to FALSE to prevent ANY message to be printed.
 #' In most cases, this parameter should be left to TRUE.

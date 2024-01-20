@@ -32,7 +32,7 @@ If not provided (and if \code{these_sample_ids} is not provided), the function w
 
 \item{this_seq_type}{The this_seq_type you want back, default is genome.}
 
-\item{mode}{Accepts 2 options of "slms-3" and "publication" to indicate which variant calls to use. Default is "slms-3".}
+\item{mode}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
 \item{regions_list}{A vector of regions in the chr:start-end format to restrict the returned SSM calls to.}
 
