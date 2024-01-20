@@ -143,5 +143,9 @@ get_ssm_by_region = function(these_sample_ids = NULL,
       dplyr::select(Start_Position, Tumor_Sample_Barcode)
   }
 
+  # Handle possible duplicates
+  muts_region <- muts_region %>%
+    distinct
+
   return(muts_region)
 }

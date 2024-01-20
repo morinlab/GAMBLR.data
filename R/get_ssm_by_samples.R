@@ -99,6 +99,10 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
     sample_ssm = dplyr::select(sample_ssm, all_of(maf_cols))
   }
 
+  # Handle possible duplicates
+  sample_ssm <- sample_ssm %>%
+    distinct
+
   return(sample_ssm)
 }
 
