@@ -15,6 +15,7 @@ get_ssm_by_region(
   streamlined = FALSE,
   projection = "grch37",
   this_seq_type = "genome",
+  mode = "slms-3",
   min_read_support = 3,
   verbose = FALSE,
   ...
@@ -43,6 +44,8 @@ i.e the following parameters are ignored; \code{these_samples_metadata}, \code{t
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38).}
 
 \item{this_seq_type}{The seq_type you want back, default is genome.}
+
+\item{mode}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
 \item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
 
