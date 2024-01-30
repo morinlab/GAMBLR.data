@@ -13,6 +13,8 @@ get_coding_ssm_status(
   review_hotspots = TRUE,
   genes_of_interest = c("FOXO1", "MYD88", "CREBBP"),
   genome_build = "hg19",
+  include_silent = FALSE,
+  include_silent_genes,
   ...
 )
 }
@@ -45,6 +47,9 @@ FOXO1, MYD88, and CREBBP are supported.}
 
 \item{genome_build}{Reference genome build for the coordinates in the MAF
 file. The default is hg19 genome build.}
+
+\item{include_silent}{Logical parameter indicating whether to include silent
+mutations into coding mutations. Default is FALSE.}
 }
 \value{
 A data frame with tabulated mutation status.
