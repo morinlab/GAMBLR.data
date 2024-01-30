@@ -28,6 +28,8 @@
 #'      FOXO1, MYD88, and CREBBP are supported.
 #' @param genome_build Reference genome build for the coordinates in the MAF
 #'      file. The default is hg19 genome build.
+#' @param include_silent Logical parameter indicating whether to include silent
+#'      mutations into coding mutations. Default is FALSE.
 #'
 #' @return A data frame with tabulated mutation status.
 #'
@@ -52,6 +54,8 @@ get_coding_ssm_status = function(
         review_hotspots = TRUE,
         genes_of_interest = c("FOXO1", "MYD88", "CREBBP"),
         genome_build = "hg19",
+        include_silent = FALSE,
+        include_silent_genes,
         ...
     ){
 
@@ -72,19 +76,58 @@ get_coding_ssm_status = function(
         gene_symbols <- GAMBLR.data::lymphoma_genes$Gene
     }
 
+    if(!missing(include_silent_genes)){
+        message(
+            "Combining genes specified with gene_symbols and include_silent_genes"
+        )
+        gene_symbols <- c(
+            gene_symbols,
+            include_silent_genes
+        ) %>%
+        unique()
+    }
+
     if(missing(these_samples_metadata)){
         these_samples_metadata <- get_gambl_metadata()
     }
 
-    coding_ssm <- maf_data %>%
-        dplyr::filter(
-            Variant_Classification %in% c(
-                "Frame_Shift_Del", "Frame_Shift_Ins", "In_Frame_Del",
-                "In_Frame_Ins", "Missense_Mutation", "Nonsense_Mutation",
-                "Nonstop_Mutation", "Silent", "Splice_Region", "Splice_Site",
-                "Targeted_Region", "Translation_Start_Site"
+    coding_var <- c(
+        "Frame_Shift_Del", "Frame_Shift_Ins", "In_Frame_Del",
+        "In_Frame_Ins", "Missense_Mutation", "Nonsense_Mutation",
+        "Nonstop_Mutation", "Splice_Region", "Splice_Site",
+        "Targeted_Region", "Translation_Start_Site"
+    )
+
+    if(include_silent){
+        message("Including Silent variants")
+        coding_var <- c(coding_var, "Silent")
+    }
+
+    if(missing(include_silent_genes)){
+        coding_ssm <- maf_data %>%
+            dplyr::filter(
+                Variant_Classification %in% coding_var
+            )
+    } else {
+        message(
+            strwrap(
+                prefix = " ",
+                initial = "", 
+                "You have provided gene list with argument include_silent_genes.
+                The Silent variants will be included even if the include_silent
+                argument is set to FALSE.
+                "
             )
         )
+        coding_ssm <- maf_data %>%
+            dplyr::filter(
+                Variant_Classification %in% coding_var |
+                (
+                    Hugo_Symbol %in% include_silent_genes &
+                    Variant_Classification == "Silent"
+                )
+            )
+    }
 
     coding <- coding_ssm %>%
         dplyr::filter(
