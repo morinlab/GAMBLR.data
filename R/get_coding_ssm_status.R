@@ -2,10 +2,18 @@
 #'
 #' @description Tabulate mutation status (SSM) for a set of genes.
 #'
-#' @details This function takes a vector of gene symbols and subsets the
-#' incoming MAF to specified genes. If no genes are provided, the function will
-#' default to all lymphoma genes.  Currently only the grch37 genome build is
-#' supported for hotspot annotation and review for this version of the function.
+#' @details This function takes a data frame (in MAF-like format) and converts
+#' it to a binary one-hot encoded matrix of mutation status for either a set of
+#' user-specified genes (via gene_symbols) or, if no genes are provided, default
+#' to all lymphoma genes. The default behaviour is to assign each gene/sample_id
+#' combination as mutated only if there is a protein coding mutation for that
+#' sample in the MAF but this can be configured to use synonymous variants in
+#' some (via include_silent_genes) or all (via include_silent) genes.
+#' This function also has other filtering and convenience parameters giving
+#' the user full control of the return. For more information, refer to the
+#' parameter descriptions and examples.
+#' Currently only the grch37 genome build is supported for hotspot annotation
+#' and review for this version of the function.
 #'
 #' @param gene_symbols A vector of gene symbols for which the mutation status
 #'      will be tabulated. If not provided, lymphoma genes will be returned
@@ -28,6 +36,11 @@
 #'      FOXO1, MYD88, and CREBBP are supported.
 #' @param genome_build Reference genome build for the coordinates in the MAF
 #'      file. The default is hg19 genome build.
+#' @param include_silent Logical parameter indicating whether to include silent
+#'      mutations into coding mutations. Default is FALSE.
+#' @param include_silent_genes Optionally, provide a list of genes for which the
+#'      Silent variants to be considered. If provided, the Silent variants for
+#'      these genes will be included regardless of the include_silent argument.
 #'
 #' @return A data frame with tabulated mutation status.
 #'
@@ -52,6 +65,8 @@ get_coding_ssm_status = function(
         review_hotspots = TRUE,
         genes_of_interest = c("FOXO1", "MYD88", "CREBBP"),
         genome_build = "hg19",
+        include_silent = FALSE,
+        include_silent_genes,
         ...
     ){
 
@@ -72,19 +87,63 @@ get_coding_ssm_status = function(
         gene_symbols <- GAMBLR.data::lymphoma_genes$Gene
     }
 
+    if(!missing(include_silent_genes)){
+        message(
+            strwrap(
+                prefix = " ",
+                initial = "",
+                "Output will include all genes specified in gene_symbols
+                and include_silent_genes parameters."
+            )
+        )
+        gene_symbols <- c(
+            gene_symbols,
+            include_silent_genes
+        ) %>%
+        unique()
+    }
+
     if(missing(these_samples_metadata)){
         these_samples_metadata <- get_gambl_metadata()
     }
 
-    coding_ssm <- maf_data %>%
-        dplyr::filter(
-            Variant_Classification %in% c(
-                "Frame_Shift_Del", "Frame_Shift_Ins", "In_Frame_Del",
-                "In_Frame_Ins", "Missense_Mutation", "Nonsense_Mutation",
-                "Nonstop_Mutation", "Silent", "Splice_Region", "Splice_Site",
-                "Targeted_Region", "Translation_Start_Site"
+    coding_var <- c(
+        "Frame_Shift_Del", "Frame_Shift_Ins", "In_Frame_Del",
+        "In_Frame_Ins", "Missense_Mutation", "Nonsense_Mutation",
+        "Nonstop_Mutation", "Splice_Region", "Splice_Site",
+        "Targeted_Region", "Translation_Start_Site"
+    )
+
+    if(include_silent){
+        message("Including Synonymous variants for all genes...")
+        coding_var <- c(coding_var, "Silent")
+    }
+
+    if(missing(include_silent_genes)){
+        coding_ssm <- maf_data %>%
+            dplyr::filter(
+                Variant_Classification %in% coding_var
+            )
+    } else {
+        message(
+            strwrap(
+                prefix = " ",
+                initial = "", 
+                "You have provided gene list with argument include_silent_genes.
+                The Silent variants will be included even if the include_silent
+                argument is set to FALSE.
+                "
             )
         )
+        coding_ssm <- maf_data %>%
+            dplyr::filter(
+                Variant_Classification %in% coding_var |
+                (
+                    Hugo_Symbol %in% include_silent_genes &
+                    Variant_Classification == "Silent"
+                )
+            )
+    }
 
     coding <- coding_ssm %>%
         dplyr::filter(
