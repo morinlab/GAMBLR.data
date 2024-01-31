@@ -50,6 +50,10 @@ file. The default is hg19 genome build.}
 
 \item{include_silent}{Logical parameter indicating whether to include silent
 mutations into coding mutations. Default is FALSE.}
+
+\item{include_silent_genes}{Optionally, provide a list of genes for which the
+Silent variants to be considered. If provided, the Silent variants for
+these genes will be included regardless of the include_silent argument.}
 }
 \value{
 A data frame with tabulated mutation status.
@@ -58,10 +62,18 @@ A data frame with tabulated mutation status.
 Tabulate mutation status (SSM) for a set of genes.
 }
 \details{
-This function takes a vector of gene symbols and subsets the
-incoming MAF to specified genes. If no genes are provided, the function will
-default to all lymphoma genes.  Currently only the grch37 genome build is
-supported for hotspot annotation and review for this version of the function.
+This function takes a data frame (in MAF-like format) and converts
+it to a binary one-hot encoded matrix of mutation status for either a set of
+user-specified genes (via gene_symbols) or, if no genes are provided, default
+to all lymphoma genes. The default behaviour is to assign each gene/sample_id
+combination as mutated only if there is a protein coding mutation for that
+sample in the MAF but this can be configured to use synonymous variants in
+some (via include_silent_genes) or all (via include_silent) genes.
+This function also has other filtering and convenience parameters giving
+the user full control of the return. For more information, refer to the
+parameter descriptions and examples.
+Currently only the grch37 genome build is supported for hotspot annotation
+and review for this version of the function.
 }
 \examples{
 coding_tabulated_df = get_coding_ssm_status(

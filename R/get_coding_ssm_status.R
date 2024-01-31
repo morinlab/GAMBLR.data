@@ -2,10 +2,18 @@
 #'
 #' @description Tabulate mutation status (SSM) for a set of genes.
 #'
-#' @details This function takes a vector of gene symbols and subsets the
-#' incoming MAF to specified genes. If no genes are provided, the function will
-#' default to all lymphoma genes.  Currently only the grch37 genome build is
-#' supported for hotspot annotation and review for this version of the function.
+#' @details This function takes a data frame (in MAF-like format) and converts
+#' it to a binary one-hot encoded matrix of mutation status for either a set of
+#' user-specified genes (via gene_symbols) or, if no genes are provided, default
+#' to all lymphoma genes. The default behaviour is to assign each gene/sample_id
+#' combination as mutated only if there is a protein coding mutation for that
+#' sample in the MAF but this can be configured to use synonymous variants in
+#' some (via include_silent_genes) or all (via include_silent) genes.
+#' This function also has other filtering and convenience parameters giving
+#' the user full control of the return. For more information, refer to the
+#' parameter descriptions and examples.
+#' Currently only the grch37 genome build is supported for hotspot annotation
+#' and review for this version of the function.
 #'
 #' @param gene_symbols A vector of gene symbols for which the mutation status
 #'      will be tabulated. If not provided, lymphoma genes will be returned
@@ -81,7 +89,12 @@ get_coding_ssm_status = function(
 
     if(!missing(include_silent_genes)){
         message(
-            "Combining genes specified with gene_symbols and include_silent_genes"
+            strwrap(
+                prefix = " ",
+                initial = "",
+                "Output will include all genes specified in gene_symbols
+                and include_silent_genes parameters."
+            )
         )
         gene_symbols <- c(
             gene_symbols,
@@ -102,7 +115,7 @@ get_coding_ssm_status = function(
     )
 
     if(include_silent){
-        message("Including Silent variants")
+        message("Including Synonymous variants for all genes...")
         coding_var <- c(coding_var, "Silent")
     }
 
