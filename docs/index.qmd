@@ -12,17 +12,19 @@ about:
   image: logo.png
   links:
     - icon: info-circle
+      text: Why use GAMBLR.data?
       href: GAMBLR.data/why.html
     - icon: download
+      text: How to install?
       href: GAMBLR.data/install.html
     - icon: book
       href: tutorials/getting_started.qmd
     - icon: postcard
-      text: Blog
+      text: Release notes
       href: posts.qmd
     - icon: github
       text: GitHub
-      href: https://github.com/morinlab
+      href: https://github.com/morinlab/GAMBLR.data
 ---
 
 ::: {#about}
