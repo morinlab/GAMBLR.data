@@ -12,9 +12,9 @@ about:
   image: logo.png
   links:
     - icon: info-circle
-      href: why.html
+      href: GAMBLR.data/why.html
     - icon: download
-      href: install.html
+      href: GAMBLR.data/install.html
     - icon: book
       href: tutorials/getting_started.qmd
     - icon: postcard
