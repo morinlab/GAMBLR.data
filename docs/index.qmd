@@ -88,7 +88,7 @@ git clone git@github.com:morinlab/GAMBLR.data.git
 In your R editor of choice (which is __**hopefully**__ [VS Code](https://code.visualstudio.com/) now), set your working directory to the place you just cloned the repo.
 
 ```bash
-setwd("~/GAMBLR")
+setwd("~/GAMBLR.data")
 ```
 
 Install the package in R by running the following command (requires the `devtools` package)
