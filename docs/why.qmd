@@ -1,0 +1,61 @@
+---
+title: "Why GAMBLR.data?"
+---
+
+GAMBLR.data is an open-source portable R library.
+
+If you've had issues with importing genomic data from large-scale lymphoma
+studies, need to work with standardized data used for analysis of somatic
+variants, find yourself translating between different genome build systems,
+or just want a great great comprehensive resource of genomic data in B-cell
+lymphomas, GAMBLR.data is for you.
+
+GAMBLR stands for **G**enomic **A**nalysis of **M**ature **B**-cell **L**ymphomas
+in **R**, and is part of the family of R packages for lymphoma cancer research
+developed in the [Morin Lab](https://morinlab.github.io/) at the Simon Fraser
+University.
+
+
+## GAMBLR family
+
+GAMBLR.data is part of a larger family of R tools for the analysis of lymphoma
+genomic data.
+
+It is designed to mainly serve as a storeage of bundled data resources and works
+well with other tools in the GAMBLR family. We continue to bundle more data
+available through this package, as well as improve it's functionality.
+
+## Local experience
+
+The data bundled with the GAMBLR.data is immediately available upon package
+installation and does not require internet coonection or ssh access to GSC
+resources. It can run anywhere the R is available without restrictions and
+limitations.
+
+## Use cases
+
+You can use GAMBLR.data at any stage of your lymphoma data analysis workflow.
+
+GAMBLR.data helps with:
+
+* one-stop shop to obtain somatic variants from BL, DLBCL, and FL cases (studies
+by [Thomas et al](https://ashpublications.org/blood/article/141/8/904/486739/Genetic-subgroups-inform-on-pathobiology-in-adult), [Dreval et al](https://ashpublications.org/blood/article/142/6/561/495422/Genetic-subdivisions-of-follicular-lymphoma),
+[Schmitz et al](https://www.nejm.org/doi/10.1056/NEJMoa1801445?url_ver=Z39.88-2003&rfr_id=ori:rid:crossref.org&rfr_dat=cr_pub%20%200www.ncbi.nlm.nih.gov),
+[Chapuy et al](https://www.nature.com/articles/s41591-018-0016-8),
+[Reddy et al](https://www.cell.com/cell/fulltext/S0092-8674(17)31121-2?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0092867417311212%3Fshowall%3Dtrue).) and variant calls
+from some DLBCL cell lines.
+* QC metrics from major WGS and WEX studies of B-cell lymphomas (as reported in
+[Dreval et al.](https://ashpublications.org/blood/article/140/24/2549/486782/Minimal-information-for-reporting-a-genomics))
+* Curated lists of lymphoma genes for all major pathologies
+* Curated list of regions targeted by aSHM in B-cell lymphomas
+* Coordinates of chromosome arms in both genome projections
+* Gene coordinates in both genome projection
+* Coordinates of oncogenes and SV partners in both genome projections
+* Hotspot regions for selected genes in both projections
+* Other resources
+
+## Community
+
+Community discussions primarily happen through issue submission on [GitHub](https://github.com/morinlab/GAMBLR.data/issues).
+
+## Getting started

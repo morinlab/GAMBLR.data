@@ -1,0 +1,80 @@
+project:
+  type: website
+
+website:
+  title: "GAMBLR.data"
+  description: "Collection of genomic data for analysis of Mature B-cell neoplasms"
+  favicon: logo.png
+  open-graph:
+    image: logo.png
+
+  # search
+  search:
+    location: navbar
+    type: overlay
+
+  # options
+  reader-mode: false
+  back-to-top-navigation: true
+  repo-url: https://github.com/morinlab/GAMBLR.data
+  repo-actions: [edit, issue]
+  repo-branch: master
+  repo-subdir: docs
+  issue-url: https://github.com/morinlab/GAMBLR.data/issues/new
+
+  # footer
+  page-footer:
+    border: false
+    left: ""
+    right:
+      - icon: github
+        href: https://github.com/morinlab
+
+  navbar:
+    logo: logo.png
+    tools:
+      - icon: github
+        menu:
+          - text: Source code
+            url: https://github.com/morinlab/GAMBLR.data
+          - text: Report a bug
+            url: https://github.com/morinlab/GAMBLR.data/issues/new
+          - text: Report a documentation issue
+            url: https://github.com/morinlab/GAMBLR.data/issues/new
+          - text: Submit a feature request
+            url: https://github.com/morinlab/GAMBLR.data/issues/new
+    left:
+      - sidebar:getting-started
+      - sidebar:concepts
+
+  sidebar:
+    - id: ""
+    - id: getting-started
+      title: "Getting started"
+      style: "docked"
+      collapse-level: 2
+      contents:
+        - install.qmd
+        - auto: tutorials/*.qmd
+    - id: concepts
+      title: "Concepts"
+      style: "docked"
+      collapse-level: 2
+      contents:
+        - why.qmd
+        - auto: concepts/*.qmd
+
+format:
+  html:
+    theme:
+      light: [flatly, theme-light.scss]
+      dark: [darkly, theme-dark.scss]
+    toc: true
+    css: styles.css
+
+highlight-style: ayu
+code-annotations: hover
+
+execute:
+  warning: false
+  error: false

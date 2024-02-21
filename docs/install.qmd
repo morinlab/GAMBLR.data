@@ -1,0 +1,25 @@
+---
+hide:
+  - toc
+  - navigation
+  - footer
+---
+
+# Installation
+
+We recommend installing the package directly from GitHub (requires `devtools` dependency).
+
+```r
+if (!require("devtools")) install.packages("devtools")
+
+devtools::install_github(
+    "morinlab/GAMBLR.data",
+    repos = BiocManager::repositories()
+) # <1>
+```
+
+You can confirm successful installation by running some of the easy and most popular commands:
+```r
+get_gambl_metadata() # returns simple metadata data frame
+get_coding_ssm() # returns data frame in maf formatting with somatic variants
+```

@@ -1,0 +1,86 @@
+[
+  {
+    "objectID": "install.html",
+    "href": "install.html",
+    "title": "Installation",
+    "section": "",
+    "text": "Installation\nWe recommend installing the package directly from GitHub (requires devtools dependency).\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\nYou can confirm successful installation by running some of the easy and most popular commands:\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "why.html",
+    "href": "why.html",
+    "title": "Why GAMBLR.data?",
+    "section": "",
+    "text": "GAMBLR.data is an open-source portable R library.\nIf you’ve had issues with importing genomic data from large-scale lymphoma studies, need to work with standardized data used for analysis of somatic variants, find yourself translating between different genome build systems, or just want a great great comprehensive resource of genomic data in B-cell lymphomas, GAMBLR.data is for you.\nGAMBLR stands for Genomic Analysis of Mature B-cell Lymphomas in R, and is part of the family of R packages for lymphoma cancer research developed in the Morin Lab at the Simon Fraser University."
+  },
+  {
+    "objectID": "why.html#gamblr-family",
+    "href": "why.html#gamblr-family",
+    "title": "Why GAMBLR.data?",
+    "section": "GAMBLR family",
+    "text": "GAMBLR family\nGAMBLR.data is part of a larger family of R tools for the analysis of lymphoma genomic data.\nIt is designed to mainly serve as a storeage of bundled data resources and works well with other tools in the GAMBLR family. We continue to bundle more data available through this package, as well as improve it’s functionality."
+  },
+  {
+    "objectID": "why.html#local-experience",
+    "href": "why.html#local-experience",
+    "title": "Why GAMBLR.data?",
+    "section": "Local experience",
+    "text": "Local experience\nThe data bundled with the GAMBLR.data is immediately available upon package installation and does not require internet coonection or ssh access to GSC resources. It can run anywhere the R is available without restrictions and limitations."
+  },
+  {
+    "objectID": "why.html#use-cases",
+    "href": "why.html#use-cases",
+    "title": "Why GAMBLR.data?",
+    "section": "Use cases",
+    "text": "Use cases\nYou can use GAMBLR.data at any stage of your lymphoma data analysis workflow.\nGAMBLR.data helps with:\n\none-stop shop to obtain somatic variants from BL, DLBCL, and FL cases (studies by Thomas et al, Dreval et al, Schmitz et al, Chapuy et al, Reddy et al.) and variant calls from some DLBCL cell lines.\nQC metrics from major WGS and WEX studies of B-cell lymphomas (as reported in Dreval et al.)\nCurated lists of lymphoma genes for all major pathologies\nCurated list of regions targeted by aSHM in B-cell lymphomas\nCoordinates of chromosome arms in both genome projections\nGene coordinates in both genome projection\nCoordinates of oncogenes and SV partners in both genome projections\nHotspot regions for selected genes in both projections\nOther resources"
+  },
+  {
+    "objectID": "why.html#community",
+    "href": "why.html#community",
+    "title": "Why GAMBLR.data?",
+    "section": "Community",
+    "text": "Community\nCommunity discussions primarily happen through issue submission on GitHub."
+  },
+  {
+    "objectID": "why.html#getting-started",
+    "href": "why.html#getting-started",
+    "title": "Why GAMBLR.data?",
+    "section": "Getting started",
+    "text": "Getting started"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "GAMBLR.data",
+    "section": "",
+    "text": "Why GAMBLR.data?\n  \n  \n    \n     Installation\n  \n  \n    \n     \n  \n  \n    \n     Blog\n  \n  \n    \n     GitHub"
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "GAMBLR.data",
+    "section": "Install",
+    "text": "Install\nWe recommend installing the package directly from GitHub (requires devtools dependency).\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n1)\n\n1\n\nInstall GAMBLR.data directly from GitHub along with all bundled data.\n\n\n\n\n\nShow quickstart"
+  },
+  {
+    "objectID": "index.html#quickstart",
+    "href": "index.html#quickstart",
+    "title": "GAMBLR.data",
+    "section": "Quickstart",
+    "text": "Quickstart\nThe quick and easy way to get started is to make sure the devtools dependency is installed, then install the GAMBLR.data and run a simple function that returns metadata to confirm successful setup:\n# Verify devtools is installed\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\n# Install GAMBLR.data\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\n\n# Confirm successful setup\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants"
+  },
+  {
+    "objectID": "index.html#installation-for-developers",
+    "href": "index.html#installation-for-developers",
+    "title": "GAMBLR.data",
+    "section": "Installation for developers",
+    "text": "Installation for developers\nThe easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository\ncd\ngit clone git@github.com:morinlab/GAMBLR.data.git\nIn your R editor of choice (which is hopefully VS Code now), set your working directory to the place you just cloned the repo.\nsetwd(\"~/GAMBLR\")\nInstall the package in R by running the following command (requires the devtools package)\ndevtools::install()\nGAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub documentation for details on how to do pull request."
+  }
+]

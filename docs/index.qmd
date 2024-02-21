@@ -1,0 +1,103 @@
+---
+title: "GAMBLR.data"
+description: "Collection of genomic data for analysis of Mature B-cell neoplasms"
+repo-actions: false
+code-annotations: hover
+format:
+  html:
+    toc: false
+about:
+  id: about
+  template: jolla
+  image: logo.png
+  links:
+    - icon: info-circle
+      href: why.qmd
+    - icon: download
+      href: install.qmd
+    - icon: book
+      href: tutorials/getting_started.qmd
+    - icon: postcard
+      text: Blog
+      href: posts.qmd
+    - icon: github
+      text: GitHub
+      href: https://github.com/morinlab
+---
+
+::: {#about}
+:::
+
+## Install
+
+We recommend installing the package directly from GitHub (requires `devtools` dependency).
+
+```r
+devtools::install_github(
+    "morinlab/GAMBLR.data",
+    repos = BiocManager::repositories()
+) # <1>
+```
+
+1. Install GAMBLR.data directly from GitHub along with all bundled data.
+
+
+###
+
+<div class="d-grid gap-2"><a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseQuickstart" role="button" aria-expanded="false" aria-controls="collapseQuickstart">Show quickstart</a></div>
+
+###
+
+::: {#collapseQuickstart .collapse .multi-collapse}
+
+## Quickstart
+
+The quick and easy way to get started is to make sure the `devtools` dependency is installed, then install the GAMBLR.data and run a simple function that returns metadata to confirm successful setup:
+
+```r
+# Verify devtools is installed
+if (!require("devtools")) install.packages("devtools")
+
+# Install GAMBLR.data
+devtools::install_github(
+    "morinlab/GAMBLR.data",
+    repos = BiocManager::repositories()
+)
+
+# Confirm successful setup
+get_gambl_metadata() # returns simple metadata data frame
+get_coding_ssm() # returns data frame in maf formatting with somatic variants
+```
+
+:::
+
+###
+
+<div class="d-grid gap-2"><a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseDevelopers" role="button" aria-expanded="false" aria-controls="collapseDevelopers"  margin="100px">Show installation for developers</a></div>
+
+::: {#collapseDevelopers .collapse .multi-collapse}
+
+## Installation for developers
+
+The easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository
+
+```bash
+cd
+git clone git@github.com:morinlab/GAMBLR.data.git
+```
+In your R editor of choice (which is __**hopefully**__ [VS Code](https://code.visualstudio.com/) now), set your working directory to the place you just cloned the repo.
+
+```bash
+setwd("~/GAMBLR")
+```
+
+Install the package in R by running the following command (requires the `devtools` package)
+
+```r
+devtools::install()
+```
+
+GAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub [documentation](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for details on how to do pull request.
+
+:::
+
