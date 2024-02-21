@@ -12,9 +12,9 @@ about:
   image: logo.png
   links:
     - icon: info-circle
-      href: why.qmd
+      href: why.html
     - icon: download
-      href: install.qmd
+      href: install.html
     - icon: book
       href: tutorials/getting_started.qmd
     - icon: postcard
