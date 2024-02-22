@@ -27,7 +27,7 @@ This diagram illustrates a simplified way of dependency relationship for
 different packages in the GAMBLR.family:
 
 ```{mermaid}
-flowchart LR
+flowchart TD
   A("GAMBLR.data") --> B("GAMBLR.helpers")
   B --> C("GAMBLR.utils")
   C --> D("GAMBLR.viz")
