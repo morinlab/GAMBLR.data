@@ -142,19 +142,10 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     muts_region = muts_region %>%
       dplyr::select(Start_Position, Tumor_Sample_Barcode)
   }
-  
-  # some duplicates are masked because they may contain "" or NA. 
-  # change them to always contain NAs,
-  muts_region[muts_region == ""] = NA
-  
-  # GAMBLR.data::sample_data[[projection]]$ashm doesn't contain the RefSeq
-  # column, which may mask duplicates. handle this and remove all duplicates.
-  muts_region_refseq = dplyr::select(muts_region, Tumor_Sample_Barcode, RefSeq) %>% 
-    distinct %>% 
-    dplyr::filter(!is.na(RefSeq))
-  muts_region = dplyr::select(muts_region, -RefSeq) %>% 
-    distinct %>% 
-    left_join(muts_region_refseq, by = "Tumor_Sample_Barcode")
-  
+
+  # Handle possible duplicates
+  muts_region <- muts_region %>%
+    distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
+
   return(muts_region)
 }
