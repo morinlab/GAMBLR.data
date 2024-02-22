@@ -19,7 +19,7 @@ direct comparison and comprehensive data analysis. This is handled internally
 and is always availabe in one or the other projection regardless of initial
 genome build to which the sample was aligned to.
 
-* **metadata** This is a data frame with a set of minimal required columns such
+* **metadata:** This is a data frame with a set of minimal required columns such
 as `patient_id`, `Tumor_Sample_Barcode`, `sample_id`, `seq_type`, `sex`, `cohort`,
 and `pathology`. The columns like sex and cohort can contain NA calues but must
 be present in the metadata. The main purpose of this data frame is to provide

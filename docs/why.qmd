@@ -25,6 +25,9 @@ It is designed to mainly serve as a storeage of bundled data resources and works
 well with other tools in the GAMBLR family. We continue to bundle more data
 available through this package, as well as improve it's functionality.
 
+For more details, please refer to the [GAMBLR family](./concepts/GAMBLR_family.html)
+section.
+
 ## Local experience
 
 The data bundled with the GAMBLR.data is immediately available upon package
@@ -53,6 +56,9 @@ from some DLBCL cell lines.
 * Coordinates of oncogenes and SV partners in both genome projections
 * Hotspot regions for selected genes in both projections
 * Other resources
+
+For more details, please refer to the [bundled data](./resources/bundled_data.html)
+section.
 
 ## Community
 
