@@ -1,0 +1,40 @@
+---
+title: "GAMBLR family of packages"
+---
+
+GAMBLR.data is the first and most basic member of the GAMBLR family of packages.
+It is mostly serving a purpose of storing the bundled data helpful for genomic
+analysis of B-cell neoplasms in GAMBLR, and also contains small basic functions
+serving as API to retreive this data.
+
+Some of the bundled data is versioned and it keeps being updated. This insludes,
+but is not limited to, regions targeted by aSHM (new regions are being added as
+they are identified), curated list of lymphoma genes, somatic mutations hotsposts
+etc. Conveniently for the user, unless they request the specific version of the
+data, the most recent and up-to-date version is used by default.
+
+The GAMBLR family includes:
+
+* GAMBLR.data - this package
+* GAMBLR.helpers - a set of low-level functions for data operation
+* GAMBLR.utils - higher level set of functions to operate on genomic data
+* GAMBLR.viz - set of functions used mostly for visualizations
+* GAMBLR.results - used for access of the full data in GAMBL project. Only
+    available for the members of the Morin Lab and requires access to GSC, but
+    can also be run locally once properly configured and synced.
+
+This diagram illustrates a simplified way of dependency relationship for
+different packages in the GAMBLR.family:
+
+```{mermaid}
+flowchart LR
+  A("GAMBLR.data") --> B("GAMBLR.helpers")
+  B --> C("GAMBLR.utils")
+  C --> D("GAMBLR.viz")
+  D --> E{"Morin Lab member?"}
+  E -- YES --> F("GAMBLR.results")
+  E -- NO --> A
+```
+
+All dependencies should be installed for you just like for any other R package.
+If not, please report the issue in the appropriate GitHub repo.

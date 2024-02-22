@@ -18,6 +18,7 @@ about:
       text: How to install?
       href: GAMBLR.data/install.html
     - icon: book
+      text: How to use?
       href: tutorials/getting_started.qmd
     - icon: postcard
       text: Release notes
