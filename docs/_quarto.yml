@@ -48,6 +48,7 @@ website:
     left:
       - sidebar:getting-started
       - sidebar:concepts
+      - sidebar:bundled-data
 
   sidebar:
     - id: ""
@@ -65,6 +66,12 @@ website:
       contents:
         - why.qmd
         - auto: concepts/*.qmd
+    - id: bundled-data
+      title: "Resources"
+      style: "docked"
+      collapse-level: 2
+      contents:
+        - auto: resources/*.qmd
 
 format:
   html:
