@@ -25,5 +25,6 @@ and `pathology`. The columns like sex and cohort can contain NA calues but must
 be present in the metadata. The main purpose of this data frame is to provide
 a structure for the metadata that is always expected to be available and
 provides linkage between unique sample identifiers and associated basic metadata
-values.
-
+values. The columns `Tumor_Sample_Barcode` and `sample_id` are expected to
+contain duplicate values, but are required to be present for direct operation on
+the outputs of different upstream tools.
