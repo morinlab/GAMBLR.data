@@ -145,7 +145,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   # Handle possible duplicates
   muts_region <- muts_region %>%
-    distinct
+    distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
 
   return(muts_region)
 }

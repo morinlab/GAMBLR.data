@@ -101,7 +101,7 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
 
   # Handle possible duplicates
   sample_ssm <- sample_ssm %>%
-    distinct
+    distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
 
   return(sample_ssm)
 }
