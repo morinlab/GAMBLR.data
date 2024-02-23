@@ -1,0 +1,3 @@
+# Tutorial: getting started
+
+This is a quick tour of some basic commands and usage patterns, just to get your flippers wet.

@@ -65,3 +65,5 @@ section.
 Community discussions primarily happen through issue submission on [GitHub](https://github.com/morinlab/GAMBLR.data/issues).
 
 ## Getting started
+
+If you're interested in trying GAMBLR.data we recommend the [getting started tutorial](./tutorials/getting_started.html).

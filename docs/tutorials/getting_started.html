@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>GAMBLR.data - GAMBLR.data glossary</title>
+<title>GAMBLR.data – getting_started</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,10 +65,6 @@ ul.task-list li input[type="checkbox"] {
 
 
 <link rel="stylesheet" href="../styles.css">
-<meta property="og:title" content="GAMBLR.data - GAMBLR.data glossary">
-<meta property="og:description" content="">
-<meta property="og:image" content="logo.png">
-<meta property="og:site-name" content="GAMBLR.data">
 </head>
 
 <body class="nav-sidebar floating nav-fixed">
@@ -177,7 +173,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../concepts/glossary.html">GAMBLR.data glossary</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/getting_started.html">Tutorial: getting started</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -191,20 +187,14 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../why.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Why GAMBLR.data?</span></a>
+  <a href="../install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installation</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../concepts/GAMBLR_family.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">GAMBLR family of packages</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../concepts/glossary.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">GAMBLR.data glossary</span></a>
+  <a href="../tutorials/getting_started.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Tutorial: getting started</span></a>
   </div>
 </li>
     </ul>
@@ -213,35 +203,25 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#tutorial-getting-started" id="toc-tutorial-getting-started" class="nav-link active" data-scroll-target="#tutorial-getting-started">Tutorial: getting started</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/morinlab/GAMBLR.data/edit/master/docs/tutorials/getting_started.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/morinlab/GAMBLR.data/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">GAMBLR.data glossary</h1>
-</div>
 
 
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-</header>
-
-<p>There are several key concepts underlying the logic behind the GAMBLR.data package. The main terms are:</p>
-<ul>
-<li><p><strong>projection:</strong> This is a coordinate system defining the relationship with genome build and chromosome prefixing. The main projections supported throughout GAMBLR.data are <code>grch37</code> and <code>hg38</code>. The <code>grch37</code> projection is always not prefixed and is in relation to the coordinate system of the hg19 genome build. In contrast, the <code>hg38</code> is always chr-prefixed and is in relation to the coordinate system of the hg38 genome build. As GAMBL itself and the data bundled and available through this package represents a large collection of samples sequenced both locally and externally, there is always a difficulty associated with proper handling of prefixes, different custom contigs and their lengths in the fasta reference, coordinates, and other distinctions complicating the direct comparison and comprehensive data analysis. This is handled internally and is always availabe in one or the other projection regardless of initial genome build to which the sample was aligned to.</p></li>
-<li><p><strong>metadata:</strong> This is a data frame with a set of minimal required columns such as <code>patient_id</code>, <code>Tumor_Sample_Barcode</code>, <code>sample_id</code>, <code>seq_type</code>, <code>sex</code>, <code>cohort</code>, and <code>pathology</code>. The columns like sex and cohort can contain NA calues but must be present in the metadata. The main purpose of this data frame is to provide a structure for the metadata that is always expected to be available and provides linkage between unique sample identifiers and associated basic metadata values. The columns <code>Tumor_Sample_Barcode</code> and <code>sample_id</code> are expected to contain duplicate values, but are required to be present for direct operation on the outputs of different upstream tools.</p></li>
-</ul>
+<section id="tutorial-getting-started" class="level1">
+<h1>Tutorial: getting started</h1>
+<p>This is a quick tour of some basic commands and usage patterns, just to get your flippers wet.</p>
 
 
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -665,7 +645,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/morinlab/GAMBLR.data/edit/master/docs/concepts/glossary.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/morinlab/GAMBLR.data/issues/new" class="toc-action">Report an issue</a></p></div></div></div>
+    </div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">

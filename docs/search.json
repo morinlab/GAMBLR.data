@@ -1,7 +1,7 @@
 [
   {
-    "objectID": "resources/funtions.html",
-    "href": "resources/funtions.html",
+    "objectID": "resources/functions.html",
+    "href": "resources/functions.html",
     "title": "Functions overview",
     "section": "",
     "text": "The GAMBLR.data package not only stores data, but also provides some basic functionaliry to easily retreive it and operate on this data. Almost all of the functions listed below are the easier version of those in the associated package GAMBLR.results, but unlike that member of the GAMBLR family, the functions inculed here do not require you to be Morin Lab member or have access to GSC.\nThere is a limited number of basic functions available with this package as its main goal is data storage, so therefore the functions are not separated into categories. Nevertheless, these are the basic functions available:\n\nannotate_hotspots: Annotate maf data with hotsposts. Will return the same maf as input with additional logical column showing whether the particular SSM is in the hotspot region.\nassign_cn_to_ssm: Annotate maf data by assigning copy number state to SSM. Will return the same maf as input with additional column showing the absolute copy number state of the variant in that position.\ncalc_mutation_frequency_bin_region: Calculate mutation frequency by sliding window. Will return a numeric matrix with samples in rows showing number of mutations in the given window. Operates only on one given region. If you need to analyze many regions, use the plural version of this function.\ncalc_mutation_frequency_bin_regions: Calculate mutation frequency by sliding window. Will return a numeric matrix with samples in rows showing number of mutations in the given window. This function is really just a wrapper for the singular version but works on many given regions.\ncheck_excess_params: Helper function that ensures arguments given to the functions in this package are appropriate, and will drop any unsupported arguments.\ncollate_results: Collate results. This currently adds the QC metrics to the given set of samples in the metadata.\nget_ashm_count_matrix: Return matrix showing how many mutations are in the given aSHM region for each given sample.\nget_cn_segments: Return a copy mumber data in seg format in a given region.\nget_coding_ssm: Return maf data with only coding mutations.\nget_coding_ssm_status: Return a binary matrix showing whether or not each given sample is mutated in each given gene.\nget_gambl_metadata: Return metadata for the whole collection of samples present in GAMBL.\nget_manta_sv: Get SV calls returned by manta.\nget_sample_cn_segments: Return the CNV data for a given sample in a seg format.\nget_ssm_by_patients: Return maf data (both coding and non-coding mutations) for a given set of patients. This will return maf data for multiple samples if they exist for a given patient.\nget_ssm_by_region: Return maf data with variants in a single given region. Operates only on one given region. If you need to analyze many regions, use the plural version of this function.\nget_ssm_by_regions: Return maf data with variants in a single given region. Operates only on one given region. This function is really just a wrapper for the singular version but works on many given regions.\nget_ssm_by_samples: Return maf data (both coding and non-coding mutations) for a given set of samples. This will return maf data for only the specified sample even if multiple sample exist for a given patient.\nid_ease: Internal function that converts vector of sample ids into data frame with metadata and vice versa. Used internally and is not really meant for standalone use.\nprocess_regions: Helper function that will harmonize genomic regions specified as character vectors or data frame. Returns list with two objects, regions as a vector and in bed format.\nregion_to_chunks: Helper function that will separate a chromosome region specified in UCSC format into individual chunks of chromosome, start, and end.\n\n\n\n\n Back to top"
@@ -14,11 +14,46 @@
     "text": "GAMBLR.data is the first and most basic member of the GAMBLR family of packages. It is mostly serving a purpose of storing the bundled data helpful for genomic analysis of B-cell neoplasms in GAMBLR, and also contains small basic functions serving as API to retreive this data.\nSome of the bundled data is versioned and it keeps being updated. This insludes, but is not limited to, regions targeted by aSHM (new regions are being added as they are identified), curated list of lymphoma genes, somatic mutations hotsposts etc. Conveniently for the user, unless they request the specific version of the data, the most recent and up-to-date version is used by default.\nThe GAMBLR family includes:\n\nGAMBLR.data - this package\nGAMBLR.helpers - a set of low-level functions for data operation\nGAMBLR.utils - higher level set of functions to operate on genomic data\nGAMBLR.viz - set of functions used mostly for visualizations\nGAMBLR.results - used for access of the full data in GAMBL project. Only available for the members of the Morin Lab and requires access to GSC, but can also be run locally once properly configured and synced.\n\nThis diagram illustrates a simplified way of dependency relationship for different packages in the GAMBLR.family:\n\n\n\n\nflowchart LR\n  A(\"GAMBLR.data\") --&gt; B(\"GAMBLR.helpers\")\n  B --&gt; C(\"GAMBLR.utils\")\n  C --&gt; D(\"GAMBLR.viz\")\n  D --&gt; E{\"Morin Lab member?\"}\n  E -- YES --&gt; F(\"GAMBLR.results\")\n  E -- NO --&gt; A\n\n\n\n\n\nAll dependencies should be installed for you just like for any other R package. If not, please report the issue in the appropriate GitHub repo.\n\n\n\n Back to top"
   },
   {
-    "objectID": "install.html",
-    "href": "install.html",
-    "title": "Installation",
+    "objectID": "tutorials/getting_started.html",
+    "href": "tutorials/getting_started.html",
+    "title": "Tutorial: getting started",
     "section": "",
-    "text": "Installation\nWe recommend installing the package directly from GitHub (requires devtools dependency).\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\nYou can confirm successful installation by running some of the easy and most popular commands:\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants\n\n\n\n\n Back to top"
+    "text": "Tutorial: getting started\nThis is a quick tour of some basic commands and usage patterns, just to get your flippers wet.\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "GAMBLR.data",
+    "section": "",
+    "text": "Why use GAMBLR.data?\n  \n  \n    \n     How to install?\n  \n  \n    \n     How to use?\n  \n  \n    \n     Release notes\n  \n  \n    \n     GitHub"
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "GAMBLR.data",
+    "section": "Install",
+    "text": "Install\nWe recommend installing the package directly from GitHub (requires devtools dependency).\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n1)\n\n1\n\nInstall GAMBLR.data directly from GitHub along with all bundled data.\n\n\n\n\n\nShow quickstart"
+  },
+  {
+    "objectID": "index.html#quickstart",
+    "href": "index.html#quickstart",
+    "title": "GAMBLR.data",
+    "section": "Quickstart",
+    "text": "Quickstart\nThe quick and easy way to get started is to make sure the devtools dependency is installed, then install the GAMBLR.data and run a simple function that returns metadata to confirm successful setup:\n# Verify devtools is installed\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\n# Install GAMBLR.data\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\n\n# Confirm successful setup\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants"
+  },
+  {
+    "objectID": "index.html#installation-for-developers",
+    "href": "index.html#installation-for-developers",
+    "title": "GAMBLR.data",
+    "section": "Installation for developers",
+    "text": "Installation for developers\nThe easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository\ncd\ngit clone git@github.com:morinlab/GAMBLR.data.git\nIn your R editor of choice (which is hopefully VS Code now), set your working directory to the place you just cloned the repo.\nsetwd(\"~/GAMBLR.data\")\nInstall the package in R by running the following command (requires the devtools package)\ndevtools::install()\nGAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub documentation for details on how to do pull request."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n\n\n Back to top"
   },
   {
     "objectID": "why.html",
@@ -60,42 +95,14 @@
     "href": "why.html#getting-started",
     "title": "Why GAMBLR.data?",
     "section": "Getting started",
-    "text": "Getting started"
+    "text": "Getting started\nIf you’re interested in trying GAMBLR.data we recommend the getting started tutorial."
   },
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
+    "objectID": "install.html",
+    "href": "install.html",
+    "title": "Installation",
     "section": "",
-    "text": "About this site\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "GAMBLR.data",
-    "section": "",
-    "text": "Why use GAMBLR.data?\n  \n  \n    \n     How to install?\n  \n  \n    \n     How to use?\n  \n  \n    \n     Release notes\n  \n  \n    \n     GitHub"
-  },
-  {
-    "objectID": "index.html#install",
-    "href": "index.html#install",
-    "title": "GAMBLR.data",
-    "section": "Install",
-    "text": "Install\nWe recommend installing the package directly from GitHub (requires devtools dependency).\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n1)\n\n1\n\nInstall GAMBLR.data directly from GitHub along with all bundled data.\n\n\n\n\n\nShow quickstart"
-  },
-  {
-    "objectID": "index.html#quickstart",
-    "href": "index.html#quickstart",
-    "title": "GAMBLR.data",
-    "section": "Quickstart",
-    "text": "Quickstart\nThe quick and easy way to get started is to make sure the devtools dependency is installed, then install the GAMBLR.data and run a simple function that returns metadata to confirm successful setup:\n# Verify devtools is installed\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\n# Install GAMBLR.data\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\n\n# Confirm successful setup\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants"
-  },
-  {
-    "objectID": "index.html#installation-for-developers",
-    "href": "index.html#installation-for-developers",
-    "title": "GAMBLR.data",
-    "section": "Installation for developers",
-    "text": "Installation for developers\nThe easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository\ncd\ngit clone git@github.com:morinlab/GAMBLR.data.git\nIn your R editor of choice (which is hopefully VS Code now), set your working directory to the place you just cloned the repo.\nsetwd(\"~/GAMBLR.data\")\nInstall the package in R by running the following command (requires the devtools package)\ndevtools::install()\nGAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub documentation for details on how to do pull request."
+    "text": "Installation\nWe recommend installing the package directly from GitHub (requires devtools dependency).\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\nYou can confirm successful installation by running some of the easy and most popular commands:\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants\n\n\n\n\n Back to top"
   },
   {
     "objectID": "concepts/glossary.html",
