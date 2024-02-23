@@ -2,3 +2,59 @@
 title: "Functions overview"
 ---
 
+The GAMBLR.data package not only stores data, but also provides some basic
+functionaliry to easily retreive it and operate on this data. Almost all of the
+functions listed below are the easier version of those in the associated package
+GAMBLR.results, but unlike that member of the GAMBLR family, the functions
+inculed here do not require you to be Morin Lab member or have access to GSC.
+
+* `annotate_hotspots`: Annotate maf data with hotsposts. Will return the same
+maf as input with additional logical column showing whether the particular SSM
+is in the hotspot region.
+* `assign_cn_to_ssm`: Annotate maf data by assigning copy number state to SSM.
+Will return the same maf as input with additional column showing the absolute
+copy number state of the variant in that position.
+* `calc_mutation_frequency_bin_region`: Calculate mutation frequency by sliding
+window. Will return a numeric matrix with samples in rows showing number of
+mutations in the given window. Operates only on one given region. If you need to
+analyze many regions, use the plural version of this function.
+* `calc_mutation_frequency_bin_regions`: Calculate mutation frequency by sliding
+window. Will return a numeric matrix with samples in rows showing number of
+mutations in the given window. This function is really just a wrapper for the
+singular version but works on many given regions.
+* `check_excess_params`: Helper function that ensures arguments given to the
+functions in this package are appropriate, and will drop any unsupported
+arguments.
+* `collate_results`: Collate results. This currently adds the QC metrics to the
+given set of samples in the metadata.
+* `get_ashm_count_matrix`: Return matrix showing how many mutations are in the
+given aSHM region for each given sample.
+* `get_cn_segments`: Return a copy mumber data in seg format in a given region.
+* `get_coding_ssm`: Return maf data with only coding mutations.
+* `get_coding_ssm_status`: Return a binary matrix showing whether or not each
+given sample is mutated in each given gene.
+* `get_gambl_metadata`: Return metadata for the whole collection of samples
+present in GAMBL.
+* `get_manta_sv`: Get SV calls returned by manta.
+* `get_sample_cn_segments`: Return the CNV data for a given sample in a seg
+format.
+* `get_ssm_by_patients`: Return maf data (both coding and non-coding mutations)
+for a given set of patients. This will return maf data for multiple samples if
+they exist for a given patient.
+* `get_ssm_by_region`: Return maf data with variants in a single given region.
+Operates only on one given region. If you need to analyze many regions, use the
+plural version of this function.
+* `get_ssm_by_regions`: Return maf data with variants in a single given region.
+Operates only on one given region. This function is really just a wrapper for the
+singular version but works on many given regions.
+* `get_ssm_by_samples`: Return maf data (both coding and non-coding mutations)
+for a given set of samples. This will return maf data for only the specified
+sample even if multiple sample exist for a given patient.
+* `id_ease`: Internal function that converts vector of sample ids into data
+frame with metadata and vice versa. Used internally and is not really meant for
+standalone use.
+* `process_regions`: Helper function that will  harmonize genomic regions
+specified as character vectors or data frame. Returns list with two objects,
+regions as a vector and in bed format.
+* `region_to_chunks`: Helper function that will separate a chromosome region
+specified in UCSC format into individual chunks of chromosome, start, and end.
