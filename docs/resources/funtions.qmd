@@ -8,6 +8,10 @@ functions listed below are the easier version of those in the associated package
 GAMBLR.results, but unlike that member of the GAMBLR family, the functions
 inculed here do not require you to be Morin Lab member or have access to GSC.
 
+There is a limited number of basic functions available with this package as its
+main goal is data storage, so therefore the functions are not separated into
+categories. Nevertheless, these are the basic functions available:
+
 * `annotate_hotspots`: Annotate maf data with hotsposts. Will return the same
 maf as input with additional logical column showing whether the particular SSM
 is in the hotspot region.
