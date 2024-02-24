@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -207,7 +241,16 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#tutorial-getting-started" id="toc-tutorial-getting-started" class="nav-link active" data-scroll-target="#tutorial-getting-started">Tutorial: getting started</a></li>
+  <li><a href="#tutorial-getting-started" id="toc-tutorial-getting-started" class="nav-link active" data-scroll-target="#tutorial-getting-started">Tutorial: getting started</a>
+  <ul class="collapse">
+  <li><a href="#how-do-i-obtain-metadata" id="toc-how-do-i-obtain-metadata" class="nav-link" data-scroll-target="#how-do-i-obtain-metadata">How do I obtain metadata?</a></li>
+  <li><a href="#how-do-i-obtain-ssm" id="toc-how-do-i-obtain-ssm" class="nav-link" data-scroll-target="#how-do-i-obtain-ssm">How do I obtain SSM?</a>
+  <ul class="collapse">
+  <li><a href="#by-samples" id="toc-by-samples" class="nav-link" data-scroll-target="#by-samples">By Samples</a></li>
+  <li><a href="#by-region" id="toc-by-region" class="nav-link" data-scroll-target="#by-region">By Region</a></li>
+  <li><a href="#coding-ssm" id="toc-coding-ssm" class="nav-link" data-scroll-target="#coding-ssm">Coding SSM</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/morinlab/GAMBLR.data/edit/master/docs/tutorials/getting_started.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/morinlab/GAMBLR.data/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -218,9 +261,568 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="tutorial-getting-started" class="level1">
 <h1>Tutorial: getting started</h1>
-<p>This is a quick tour of some basic commands and usage patterns, just to get your flippers wet.</p>
+<p>This is a quick tour of some basic commands and usage patterns, just to get you started.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Load packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GAMBLR.data)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This tutorial explores how to retrieve different data types bundled withing GAMBLR.data. Commonly, such GAMBLR functions are prefixed with <code>get_</code>. These functions are readily available for returning data of different types: Simple Somatic Mutations (SSM), Copy Number (CN) segments and Structural Variants (SV). This resource explores commonly occurring arguments across different functions, best-practices and recommendations in the scope of retrieving data.</p>
+<section id="how-do-i-obtain-metadata" class="level2">
+<h2 class="anchored" data-anchor-id="how-do-i-obtain-metadata">How do I obtain metadata?</h2>
+<p>First, lets start with retrieving metadata for all GAMBL samples. We can control which samples to be included in the output with <code>seq_type_filter</code> argument, which returns <em>genome</em> samples by default. To return metadata for capture samples, set <code>seq_type_filter = "capture"</code>. It is also possible to return metadata for more than one seq type, e.g <code>seq_type_filter = c("genome", "capture")</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Get gambl metadata for genome samples</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>genomes <span class="ot">&lt;-</span> <span class="fu">get_gambl_metadata</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">seq_type_filter =</span> <span class="st">"genome"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>capture <span class="ot">&lt;-</span> <span class="fu">get_gambl_metadata</span>(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">seq_type_filter =</span> <span class="st">"capture"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>all <span class="ot">&lt;-</span> <span class="fu">get_gambl_metadata</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">seq_type_filter =</span> <span class="fu">c</span>(<span class="st">"genome"</span>, <span class="st">"capture"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now that we have the metadata, it can illustrate what are the expected column names and their format:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(metadata<span class="sc">$</span>all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [4,785 × 27] (S3: tbl_df/tbl/data.frame)
+ $ sample_id           : chr [1:4785] "00-14595_tumorA" "00-14595_tumorB" "00-14595_tumorC" "00-14595_tumorD" ...
+ $ patient_id          : chr [1:4785] "00-14595" "00-14595" "00-14595" "00-14595" ...
+ $ pathology           : chr [1:4785] "COMFL" "COMFL" "DLBCL" "FL" ...
+ $ seq_type            : chr [1:4785] "genome" "genome" "genome" "genome" ...
+ $ genome_build        : chr [1:4785] "grch37" "grch37" "grch37" "grch37" ...
+ $ pairing_status      : chr [1:4785] "matched" "matched" "matched" "matched" ...
+ $ Tumor_Sample_Barcode: chr [1:4785] "00-14595_tumorA" "00-14595_tumorB" "00-14595_tumorC" "00-14595_tumorD" ...
+ $ age_group           : chr [1:4785] "Other" "Other" "Other" "Other" ...
+ $ compression         : chr [1:4785] "bam" "cram" "cram" "cram" ...
+ $ bam_available       : logi [1:4785] TRUE TRUE TRUE TRUE TRUE TRUE ...
+ $ pathology_rank      : num [1:4785] 13 13 19 15 19 19 15 27 19 19 ...
+ $ cohort              : chr [1:4785] "DLBCL_LSARP_Trios" "DLBCL_LSARP_Trios" "DLBCL_LSARP_Trios" "DLBCL_LSARP_Trios" ...
+ $ COO_consensus       : chr [1:4785] "GCB" "GCB" "GCB" "GCB" ...
+ $ DHITsig_consensus   : chr [1:4785] "DHITsigNeg" "DHITsigPos" "DHITsig-IND" "DHITsig-IND" ...
+ $ EBV_status_inf      : chr [1:4785] NA NA NA NA ...
+ $ ffpe_or_frozen      : chr [1:4785] "FFPE" "FFPE" "FFPE" "FFPE" ...
+ $ fl_grade            : chr [1:4785] NA NA NA NA ...
+ $ hiv_status          : chr [1:4785] "UNKNOWN" "UNKNOWN" "UNKNOWN" "UNKNOWN" ...
+ $ lymphgen            : Factor w/ 12 levels "EZB","EZB-COMP",..: 1 1 1 1 12 7 1 12 NA 1 ...
+ $ lymphgen_cnv_noA53  : chr [1:4785] "EZB" "EZB" "EZB" "EZB" ...
+ $ lymphgen_no_cnv     : chr [1:4785] "EZB" "EZB" "EZB" "EZB" ...
+ $ lymphgen_with_cnv   : chr [1:4785] "EZB" "EZB" "EZB" "EZB" ...
+ $ lymphgen_wright     : chr [1:4785] NA NA NA NA ...
+ $ molecular_BL        : chr [1:4785] NA NA NA NA ...
+ $ normal_sample_id    : chr [1:4785] "00-14595_normal" "00-14595_normal" "00-14595_normal" "00-14595_normal" ...
+ $ sex                 : chr [1:4785] "F" "F" "F" "F" ...
+ $ time_point          : chr [1:4785] "A" "B" "C" "D" ...</code></pre>
+</div>
+</div>
+<p>We can now use the metadata as we wish, for example see what pathologies are available and do any sort of subsetting.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#We can see what is included in the metadata</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>all <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(pathology, seq_type) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> pathology,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> pathology</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>seq_type) <span class="sc">+</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label=</span>n), <span class="at">size=</span><span class="fl">3.5</span>)<span class="sc">+</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="fl">0.5</span>,</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">1</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="getting_started_files/figure-html/manipulate_metadata-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Subset metadata on a set of samples (samples classified as DLBCL for pathology)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>dlbcl <span class="ot">&lt;-</span> metadata<span class="sc">$</span>all <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(pathology <span class="sc">==</span> <span class="st">"DLBCL"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Quick sanity check</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>dlbcl <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(pathology, seq_type) <span class="sc">%&gt;%</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> pathology,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> pathology</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>seq_type) <span class="sc">+</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label=</span>n), <span class="at">size=</span><span class="fl">3.5</span>)<span class="sc">+</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="fl">0.5</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">1</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="getting_started_files/figure-html/manipulate_metadata-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="how-do-i-obtain-ssm" class="level2">
+<h2 class="anchored" data-anchor-id="how-do-i-obtain-ssm">How do I obtain SSM?</h2>
+<p>Based on the information available to the user, application, or downstream analysis, there are multiple ways to retrieve SSM data. For example, if the user knows the sample ID and is only interested in looking at SSM results for that particular sample, one can use <code>get_ssm_by_sample</code>. If multiple samples are to be analyzed, <code>get_ssm_by_samples</code> (plural version) is recommended. The user can also use patient IDs for retrieving this data, in this case <code>get_ssm_by_patients</code> is available. In addition, the user can also restrict SSM calls to specific genomic regions with <code>get_ssm_by_regions</code> or <code>get_ssm_by_region</code>.</p>
+<p>Another possibility is to focus on coding mutations only and call <code>get_coding_ssm</code>, this function returns all coding SSMs from the bundled data in MAF-like format. If the user have an already pre-filtered metadata, the <code>these_samples_metadata</code> argument can be used with all SSM functions to restrict the variants returned to the sample IDs in this data frame, handy!</p>
+<section id="by-samples" class="level3">
+<h3 class="anchored" data-anchor-id="by-samples">By Samples</h3>
+<p>Return SSMs for one or more samples with <code>get_ssm_by_samples</code>. In the example below, we are requesting SSM for the DOHH-2 cell line in two different ways:</p>
+<section id="using-these_sample_ids" class="level4">
+<h4 class="anchored" data-anchor-id="using-these_sample_ids">Using <code>these_sample_ids</code></h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>my_sample_id <span class="ot">&lt;-</span> <span class="st">"DOHH-2"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Using the these_samples_id argument</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>ssm_sample <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_samples</span>(<span class="at">these_sample_ids =</span> my_sample_id)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#How manny mutations do we get back?</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ssm_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 22137    45</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#What columns are available?</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ssm_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Hugo_Symbol"                   "Entrez_Gene_Id"               
+ [3] "Center"                        "NCBI_Build"                   
+ [5] "Chromosome"                    "Start_Position"               
+ [7] "End_Position"                  "Strand"                       
+ [9] "Variant_Classification"        "Variant_Type"                 
+[11] "Reference_Allele"              "Tumor_Seq_Allele1"            
+[13] "Tumor_Seq_Allele2"             "dbSNP_RS"                     
+[15] "dbSNP_Val_Status"              "Tumor_Sample_Barcode"         
+[17] "Matched_Norm_Sample_Barcode"   "Match_Norm_Seq_Allele1"       
+[19] "Match_Norm_Seq_Allele2"        "Tumor_Validation_Allele1"     
+[21] "Tumor_Validation_Allele2"      "Match_Norm_Validation_Allele1"
+[23] "Match_Norm_Validation_Allele2" "Verification_Status"          
+[25] "Validation_Status"             "Mutation_Status"              
+[27] "Sequencing_Phase"              "Sequence_Source"              
+[29] "Validation_Method"             "Score"                        
+[31] "BAM_File"                      "Sequencer"                    
+[33] "Tumor_Sample_UUID"             "Matched_Norm_Sample_UUID"     
+[35] "HGVSc"                         "HGVSp"                        
+[37] "HGVSp_Short"                   "Transcript_ID"                
+[39] "Exon_Number"                   "t_depth"                      
+[41] "t_ref_count"                   "t_alt_count"                  
+[43] "n_depth"                       "n_ref_count"                  
+[45] "n_alt_count"                  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#What variants are the available?</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ssm_sample <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Variant_Classification) <span class="sc">%&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> Variant_Classification,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> Variant_Classification</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label=</span>n), <span class="at">size=</span><span class="fl">3.5</span>)<span class="sc">+</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="fl">0.5</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">1</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="getting_started_files/figure-html/e1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="using-these_samples_metadata" class="level4">
+<h4 class="anchored" data-anchor-id="using-these_samples_metadata">Using <code>these_samples_metadata</code></h4>
+<p>We can supply instead a metadata table that has already been subset to the sample ID(s) of interest.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>dohh2 <span class="ot">&lt;-</span> metadata<span class="sc">$</span>genome <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(sample_id <span class="sc">==</span> <span class="st">"DOHH-2"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Using the these_samples_metadata argument</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>ssm_meta <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_samples</span>(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#How manny mutations do we get back?</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ssm_meta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 22137    45</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#What columns are available?</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ssm_meta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Hugo_Symbol"                   "Entrez_Gene_Id"               
+ [3] "Center"                        "NCBI_Build"                   
+ [5] "Chromosome"                    "Start_Position"               
+ [7] "End_Position"                  "Strand"                       
+ [9] "Variant_Classification"        "Variant_Type"                 
+[11] "Reference_Allele"              "Tumor_Seq_Allele1"            
+[13] "Tumor_Seq_Allele2"             "dbSNP_RS"                     
+[15] "dbSNP_Val_Status"              "Tumor_Sample_Barcode"         
+[17] "Matched_Norm_Sample_Barcode"   "Match_Norm_Seq_Allele1"       
+[19] "Match_Norm_Seq_Allele2"        "Tumor_Validation_Allele1"     
+[21] "Tumor_Validation_Allele2"      "Match_Norm_Validation_Allele1"
+[23] "Match_Norm_Validation_Allele2" "Verification_Status"          
+[25] "Validation_Status"             "Mutation_Status"              
+[27] "Sequencing_Phase"              "Sequence_Source"              
+[29] "Validation_Method"             "Score"                        
+[31] "BAM_File"                      "Sequencer"                    
+[33] "Tumor_Sample_UUID"             "Matched_Norm_Sample_UUID"     
+[35] "HGVSc"                         "HGVSp"                        
+[37] "HGVSp_Short"                   "Transcript_ID"                
+[39] "Exon_Number"                   "t_depth"                      
+[41] "t_ref_count"                   "t_alt_count"                  
+[43] "n_depth"                       "n_ref_count"                  
+[45] "n_alt_count"                  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#What variants are the available?</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>ssm_meta <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Variant_Classification) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> Variant_Classification,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> Variant_Classification</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label=</span>n), <span class="at">size=</span><span class="fl">3.5</span>) <span class="sc">+</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="fl">0.5</span>,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">1</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="getting_started_files/figure-html/e2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We can make sure that both approaches generate identical outputs:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    ssm_sample,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    ssm_meta</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>Thus, there is no “right” or “wrong” way, it is simply your personal preference!</p>
+</section>
+<section id="using-these_genes" class="level4">
+<h4 class="anchored" data-anchor-id="using-these_genes">Using <code>these_genes</code></h4>
+<p>Returnng maf data for thousands or hundreds of files can be potentially creating memory or space issues to store the Rsession if you are using old-day R editors like RStudio. To facilitate this, you can optionally request the SSM to be returned just for a small number of specific genes with the argument <code>these_genes</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Only look at specific gene(s)</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>my_genes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"MYC"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>ssm_myc <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_samples</span>(</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_genes =</span> my_genes</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>ssm_myc <span class="sc">%&gt;%</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Hugo_Symbol) <span class="sc">%&gt;%</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> Hugo_Symbol,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> Hugo_Symbol</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="getting_started_files/figure-html/e3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="using-maf_col" class="level4">
+<h4 class="anchored" data-anchor-id="using-maf_col">Using <code>maf_col</code></h4>
+<p>Similarly, do decrease the burden of handling large maf data, it is also possible to dictate what MAF columns we want back. To do this, call the function with the <code>maf_col</code> argument and provide vector of the columns of interest. Here, we are requesting SSM calls for only a small set of columns. It is also important to note that this will require setting of another argument <code>basic_columns</code> to <code>FALSE</code> as this argument takes precedence of all other arguments that control output columns and returns first 45 columns of standard maf.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the column names</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>my_columns <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hugo_Symbol"</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Chromosome"</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Start_Position"</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"End_Position"</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Tumor_Sample_Barcode"</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Variant_Classification"</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Since we don provide neither of arguments that restrict to specific</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co"># samples, we expect the return to contain data from all samples in the bundled</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co"># data</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>ssm_col <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_samples</span>(</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_genes =</span> my_genes,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">maf_col =</span> my_columns,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">basic_columns =</span> <span class="cn">FALSE</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the dimensions for the capture SSM calls?</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ssm_col)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3884    6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the columns in the output?</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ssm_col)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Hugo_Symbol"            "Chromosome"             "Start_Position"        
+[4] "End_Position"           "Tumor_Sample_Barcode"   "Variant_Classification"</code></pre>
+</div>
+</div>
+</section>
+<section id="in-a-different-projection" class="level4">
+<h4 class="anchored" data-anchor-id="in-a-different-projection">In a different projection</h4>
+<p>Often many downstream tools can only work on one or the other genome buid, and GAMBLR.data provides a simple and straightforward way to obtain variants in different projection. The default output is always wuth respect to <code>grch37</code>, and it can be easily modified with argument <code>projection</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ssm_hg38 <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_samples</span>(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Sanity check the projection</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>ssm_hg38 <span class="sc">%&gt;%</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(NCBI_Build) <span class="sc">%&gt;%</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> NCBI_Build,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> NCBI_Build</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label=</span>n), <span class="at">size=</span><span class="fl">3.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="getting_started_files/figure-html/e5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As we did not specify any sample id, metadata, or gene to the above call, it by default returned the data for all samples available in the GAMBR.data and we can see from the plot that all of the variants are with respect to hg38. Sweet! <span class="emoji" data-emoji="sunglasses">😎</span></p>
+</section>
+</section>
+<section id="by-region" class="level3">
+<h3 class="anchored" data-anchor-id="by-region">By Region</h3>
+<p>In this section we are exploring the different ways you can return the maf data for a specific region (or regions) of interest.</p>
+<section id="use-region" class="level4">
+<h4 class="anchored" data-anchor-id="use-region">Use <code>region</code></h4>
+<p>If you are only looking at one specific position, you can take advantage of the <code>get_ssm_by_region()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MYC region (grch37)</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>myc_region <span class="ot">&lt;-</span> <span class="st">"8:128747680-128753674"</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all SSMs that are residing in the defined MYC region</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>myc_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(<span class="at">region =</span> myc_region)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>myc_ssm <span class="sc">%&gt;%</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Hugo_Symbol) <span class="sc">%&gt;%</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> Hugo_Symbol,</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> Hugo_Symbol</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="getting_started_files/figure-html/e6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="specify-individual-chunks" class="level4">
+<h4 class="anchored" data-anchor-id="specify-individual-chunks">Specify individual chunks</h4>
+<p>We can also specify the coordinates we are interested in using the <code>chromosome</code>, <code>qstart</code>, and <code>qend</code> arguments:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all SSMs that are residing in the defined MYC region</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>myc_ssm_arg <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>myc_ssm_arg <span class="sc">%&gt;%</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Hugo_Symbol) <span class="sc">%&gt;%</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> Hugo_Symbol,</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> Hugo_Symbol</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="getting_started_files/figure-html/e7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Let us also confirm that the returned maf is the same we get back with the <code>region</code> argument:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    myc_ssm,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    myc_ssm_arg</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="use-pre-loaded-maf" class="level4">
+<h4 class="anchored" data-anchor-id="use-pre-loaded-maf">Use pre-loaded maf</h4>
+<p>If you are working with massive maf data containing many variants and have already imported it to R, or using the maf data not coming with this package, you can still take advantage of this function and use the pre-loaded maf. This function will still subset it to the desired regions. To do so, specify the MAF of interest with <code>maf_data</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>dohh2_myc_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">maf_data =</span> ssm_sample,</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>While we are on it, is it generating the same output as when we ask for SSM to be returned for a specific gene with <code>get_ssm_by_samples()</code>?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    ssm_myc,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_ssm</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>Yes, indeed - the both outputs are identical again.</p>
+</section>
+<section id="toggling-streamlined" class="level4">
+<h4 class="anchored" data-anchor-id="toggling-streamlined">Toggling <code>streamlined</code></h4>
+<p>This function also has a streamlined option available. If set to <code>TRUE</code>, only two columns are kept in the returned MAF (Start_Position and Tumour_Sample_Barcode). In this example, we are extending the coordinates to encapsulate the whole p-arm of chromosome 1. Note, since we are requesting hg38 calls, we have to add the chr prefix for the specified chromosome. Don’t remember the coordinates? Likely, the GAMBLR.data provides the coordinates for chromosome arms in both projections!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>coord <span class="ot">&lt;-</span> chromosome_arms_hg38 <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(arm <span class="sc">==</span> <span class="st">"p"</span>, chromosome <span class="sc">==</span> <span class="st">"chr1"</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>streamlined_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> coord<span class="sc">$</span>chromosome,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> coord<span class="sc">$</span>start,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> coord<span class="sc">$</span>end,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">streamlined =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="co">#What columns are kept with streamlined = TRUE?</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(streamlined_ssm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Start_Position"       "Tumor_Sample_Barcode"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#How many variants do we find within the specified region?</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(streamlined_ssm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7749</code></pre>
+</div>
+</div>
+</section>
+<section id="focus-on-specific-ids" class="level4">
+<h4 class="anchored" data-anchor-id="focus-on-specific-ids">Focus on specific IDs</h4>
+<p>Similarly to other get_ssm functions, we can also call <code>get_ssm_by_region</code> with either <code>these_sample_ids</code> or <code>these_samples_metadata</code> to restrict the return to specific sample IDs. In this example, we first call the function with <code>these_sample_ids = "DOHH-2"</code> and then with <code>these_samples_metadata</code> giving the function a metadata that has been subset to the same sample ID.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>dohh2_region_sample <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>dohh2_region_metadata <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2,</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can also see that both approaches generate identical output:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Are the two returned data frames identical?</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    dohh2_region_sample,</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    dohh2_region_metadata</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="look-at-multiple-regions" class="level4">
+<h4 class="anchored" data-anchor-id="look-at-multiple-regions">Look at multiple regions</h4>
+<p>For multiple regions, refer to the plural version, <code>get_ssm_by_regions</code>. In this example we will return SSM calls for all aSHM regions associated with <em>PAX5</em> across all available samples. With this multiple-region-version of this function we also get the region name added to the returned data frame and there are a couple of different ways this can be done. If you are providing regions as a bed file (<code>regions_bed</code>), you have the option of setting <code>use_name_column = TRUE</code>. If you do so your bed file should have a column simply named “name”. In this case, the function will keep this column for naming the returned regions in the maf. With <code>streamlined = TRUE</code> the function returns the minimal number of columns. Don’t know coordinates of aSHM at <em>PAX5</em>? GAMBLR.data got you covered!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get aSHM genes, select the columns of interest and rename for</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># get_ssm_by_regions compatibility</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>ashm_gene <span class="ot">&lt;-</span> <span class="st">"PAX5"</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>regions <span class="ot">&lt;-</span> grch37_ashm_regions <span class="sc">%&gt;%</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(gene <span class="sc">==</span> ashm_gene) <span class="sc">%&gt;%</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">chromosome =</span> chr_name,</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">start =</span> hg19_start,</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">end =</span> hg19_end</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="fu">paste0</span>(gene, <span class="st">"_"</span>, region)</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="co">#Get ssm for all ashm regions</span></span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>ashm_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_regions</span>(</span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">regions_bed =</span> regions,</span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">use_name_column =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">streamlined =</span> <span class="cn">TRUE</span></span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ashm_ssm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+     start sample_id region_name  
+     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;        
+1 37025887 01-20260T PAX5_intron-1
+2 37024351 04-24937T PAX5_intron-1
+3 37025246 04-24937T PAX5_intron-1
+4 37025268 04-24937T PAX5_intron-1
+5 37025300 04-24937T PAX5_intron-1
+6 37025820 04-24937T PAX5_intron-1</code></pre>
+</div>
+</div>
+</section>
+<section id="using-list-of-regions" class="level4">
+<h4 class="anchored" data-anchor-id="using-list-of-regions">Using list of regions</h4>
+<p>You can instead specify regions as a vector of characters (<code>regions_list</code>) instead of using a bed file. In this case, the function will not accept a fourth element for naming the returned regions. If so, the function defaults to using the specified regions instead.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>ssm_region_list <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_regions</span>(</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">regions_list =</span> <span class="fu">c</span>(</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"chr9:37023396-37027663"</span>,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"chr9:37029849-37037154"</span>,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"chr9:37369209-37372160"</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">streamlined =</span> <span class="cn">TRUE</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ssm_region_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+     start sample_id region_name           
+     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;                 
+1 37025887 01-20260T chr9:37023396-37027663
+2 37024351 04-24937T chr9:37023396-37027663
+3 37025246 04-24937T chr9:37023396-37027663
+4 37025268 04-24937T chr9:37023396-37027663
+5 37025300 04-24937T chr9:37023396-37027663
+6 37025820 04-24937T chr9:37023396-37027663</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="coding-ssm" class="level3">
+<h3 class="anchored" data-anchor-id="coding-ssm">Coding SSM</h3>
 
 
+</section>
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
