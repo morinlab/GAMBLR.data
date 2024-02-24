@@ -33,7 +33,8 @@ about:
 
 ## Install
 
-We recommend installing the package directly from GitHub (requires `devtools` dependency).
+We recommend installing the package directly from GitHub (requires `devtools`
+dependency).
 
 ```r
 devtools::install_github(
@@ -55,7 +56,9 @@ devtools::install_github(
 
 ## Quickstart
 
-The quick and easy way to get started is to make sure the `devtools` dependency is installed, then install the GAMBLR.data and run a simple function that returns metadata to confirm successful setup:
+The quick and easy way to get started is to make sure the `devtools` dependency
+is installed, then install the GAMBLR.data and run a simple function that
+returns metadata to confirm successful setup:
 
 ```r
 # Verify devtools is installed
@@ -82,7 +85,8 @@ get_coding_ssm() # returns data frame in maf formatting with somatic variants
 
 ## Installation for developers
 
-The easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository
+The easiest way to obtain and contribute to GAMBLR.data is to do this via
+cloning the repository
 
 ```bash
 cd
@@ -94,13 +98,25 @@ In your R editor of choice (which is __**hopefully**__ [VS Code](https://code.vi
 setwd("~/GAMBLR.data")
 ```
 
-Install the package in R by running the following command (requires the `devtools` package)
+Install the package in R by running the following command (requires the
+`devtools` package):
 
 ```r
 devtools::install()
 ```
 
-GAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub [documentation](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for details on how to do pull request.
+After applying your modifications to the code, use the following command to
+quickly test your changes without directly installing the packaage (requires the
+`devtools` dependency):
+
+```r
+devtools::load_all()
+```
+
+GAMBLR.data is a free open-source package, but the Master branch is protected.
+We welcome contributions (pull request, bug report, feature request, PR review)
+from all levels of users. All commits must be submitted via pull request on a
+branch. Please refer to the GitHub [documentation](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for details on how to do pull request.
 
 :::
 
