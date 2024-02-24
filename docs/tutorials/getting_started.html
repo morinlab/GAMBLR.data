@@ -819,6 +819,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="coding-ssm" class="level3">
 <h3 class="anchored" data-anchor-id="coding-ssm">Coding SSM</h3>
+<p>Lastly, another way to retrieve SSM is to call <code>get_coding_ssm</code>. This function returns coding SSM for any given sample. This function is a convenient option for anyone interested in focusing only on coding mutations. Convenient filtering arguments are included in this function for easy and straightforward subsetting. If these arguments are not called, coding SSM will be returned for all samples. Of course, similar to the examples above, you can provide a metadata subset that has already been filtered to the sample IDs of interest (using <code>these_samples_metadata</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit_cohort</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>dlbcl_cell_lines <span class="ot">&lt;-</span> <span class="fu">get_coding_ssm</span>(</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">limit_cohort =</span> <span class="st">"DLBCL_cell_lines"</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(dlbcl_cell_lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1616   47</code></pre>
+</div>
+</div>
+<p>Instead, we can just exclude a group of samples by using the <code>exclude_cohort</code> argument:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Exclude_cohort</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>no_dlbcl_cell_lines <span class="ot">&lt;-</span> <span class="fu">get_coding_ssm</span>(</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclude_cohort =</span>  <span class="st">"DLBCL_cell_lines"</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(no_dlbcl_cell_lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 63461    47</code></pre>
+</div>
+</div>
 
 
 </section>

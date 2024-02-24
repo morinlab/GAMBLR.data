@@ -480,7 +480,7 @@ You can instead specify regions as a vector of characters (`regions_list`)
 instead of using a bed file. In this case, the function will not accept a fourth
 element for naming the returned regions. If so, the function defaults to using
 the specified regions instead.
-```{r get_sm_by_regions_7}
+```{r e12}
 ssm_region_list <- get_ssm_by_regions(
     regions_list = c(
         "chr9:37023396-37027663",
@@ -494,31 +494,31 @@ head(ssm_region_list)
 ```
 
 ### Coding SSM
-Lastly, another way to retrieve SSM is to call `get_coding_ssm`. This function returns coding SSM for any given sample. This function is a convenient option for anyone interested in plotting coding mutations. Convenient filtering arguments are included in this function for easy and straight-forward subset to specific pathologist, cohorts, and sample IDs. If these arguments are not called, coding SSM will be returned for all samples. In the example bellow, we are calling this function with no samples or metadata provided, instead we're using the in-0house filtering options to subset the return to our desire. Of course, the user can provide a metadata subset that has already been filtered to the sample IDs of interest (using `these_samples_metadata`).
-```{r get_coding_ssm}
-#First, let us have a look at all the valid cohorts and pathology
-unique(get_gambl_metadata()[,"cohort"])
-unique(get_gambl_metadata()[,"pathology"])
+Lastly, another way to retrieve SSM is to call `get_coding_ssm`. This function
+returns coding SSM for any given sample. This function is a convenient option
+for anyone interested in focusing only on coding mutations. Convenient filtering
+arguments are included in this function for easy and straightforward subsetting.
+If these arguments are not called, coding SSM will be returned for all samples.
+Of course, similar to the examples above, you can provide a metadata subset that
+has already been filtered to the sample IDs of interest (using
+`these_samples_metadata`).
+```{r e13}
+# Limit_cohort
+dlbcl_cell_lines <- get_coding_ssm(
+    limit_cohort = "DLBCL_cell_lines"
+)
 
-#Limit_cohort
-dlbcl_cell_lines = get_coding_ssm(these_samples_metadata = get_gambl_metadata(),
-                                  limit_cohort = "DLBCL_cell_lines")
 dim(dlbcl_cell_lines)
+```
 
+Instead, we can just exclude a group of samples by using the `exclude_cohort`
+argument:
+```{r e14}
 #Exclude_cohort
-no_dlbcl_cell_lines = get_coding_ssm(exclude_cohort =  "DLBCL_cell_lines")
+no_dlbcl_cell_lines <- get_coding_ssm(
+    exclude_cohort =  "DLBCL_cell_lines"
+)
 dim(no_dlbcl_cell_lines)
-
-#limit_pathology
-fl_coding_ssm = get_coding_ssm(limit_pathology = "FL")
-dim(fl_coding_ssm)
-
-#exclude silent mutations
-no_silent = get_coding_ssm(these_sample_ids = "DOHH-2",
-                           include_silent = FALSE)
-
-#Do we have any variants classified as "silent"?
-table(no_silent$Variant_Classification)
 ```
 
 ## Get CN
