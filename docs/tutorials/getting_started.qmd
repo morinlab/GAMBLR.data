@@ -674,10 +674,7 @@ identical outputs.
 
 ## How do I obtain SV?
 In this last section we will explore how to get SV data using GAMBLR.data. For
-this purpose `get_manta_sv` was developed. This function also operates on the
-same set of familiar arguments as other family of `get_` functions in GAMBLR.
-For example, to obtain SV calls for multiple samples, give `these_sample_ids` a
-vector of sample IDs.
+this purpose `get_manta_sv` was developed.
 Similar to the previously described SSM and CNV functionality, this function can
 also restrict the returned calls to any genomic regions specified with
 `chromosome`, `qstart`, `qend`, or the complete region specified under `region`
@@ -689,7 +686,15 @@ unmatched samples. In addition, you can chose to return all variants, even the
 ones not passing the filter criteria. To do so, set `pass = FALSE` (default is
 TRUE).
 
-### Default behaviour
+### By Samples
+This function also operates on the same set of familiar arguments as other
+family of `get_` functions in GAMBLR. For example, to obtain SV calls for
+multiple samples, give `these_sample_ids` a vector of sample IDs. It will return
+the identical output as when the subsetting is done using
+`these_samples_metadata`. When none of this is specified, the returned output
+cotains SVs for all samples available.
+
+#### Default behaviour
 We will call `get_manta_sv` with default arguments to examine the output.
 ```{r e21}
 # Default arguments
@@ -705,7 +710,7 @@ length(unique(all_manta$tumour_sample_id))
 head(all_manta)
 ```
 
-### Using `these_sample_ids`
+#### Using `these_sample_ids`
 Here we are demonstrating the sample ID subset options
 ```{r e22}
 # Use these_sample_ids
@@ -716,7 +721,7 @@ sample_dohh2_manta <- get_manta_sv(
 head(sample_dohh2_manta)
 ```
 
-### Using `these_samples_metadata`sample
+#### Using `these_samples_metadata`sample
 Alternatively, you can also provide `these_samples_metadata` argument to make
 use of a pre-filtered metadata table. In this case, the returned SVs will be
 restricted to the sample_ids within the data frame.

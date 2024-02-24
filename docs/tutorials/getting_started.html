@@ -257,9 +257,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#how-do-i-obtain-sv" id="toc-how-do-i-obtain-sv" class="nav-link" data-scroll-target="#how-do-i-obtain-sv">How do I obtain SV?</a>
   <ul class="collapse">
-  <li><a href="#default-behaviour-1" id="toc-default-behaviour-1" class="nav-link" data-scroll-target="#default-behaviour-1">Default behaviour</a></li>
-  <li><a href="#using-these_sample_ids-2" id="toc-using-these_sample_ids-2" class="nav-link" data-scroll-target="#using-these_sample_ids-2">Using <code>these_sample_ids</code></a></li>
-  <li><a href="#using-these_samples_metadatasample" id="toc-using-these_samples_metadatasample" class="nav-link" data-scroll-target="#using-these_samples_metadatasample">Using <code>these_samples_metadata</code>sample</a></li>
+  <li><a href="#by-samples-2" id="toc-by-samples-2" class="nav-link" data-scroll-target="#by-samples-2">By Samples</a></li>
   <li><a href="#by-region-2" id="toc-by-region-2" class="nav-link" data-scroll-target="#by-region-2">By Region</a></li>
   <li><a href="#sv-filtering" id="toc-sv-filtering" class="nav-link" data-scroll-target="#sv-filtering">SV filtering</a></li>
   </ul></li>
@@ -1962,9 +1960,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="how-do-i-obtain-sv" class="level2">
 <h2 class="anchored" data-anchor-id="how-do-i-obtain-sv">How do I obtain SV?</h2>
-<p>In this last section we will explore how to get SV data using GAMBLR.data. For this purpose <code>get_manta_sv</code> was developed. This function also operates on the same set of familiar arguments as other family of <code>get_</code> functions in GAMBLR. For example, to obtain SV calls for multiple samples, give <code>these_sample_ids</code> a vector of sample IDs. Similar to the previously described SSM and CNV functionality, this function can also restrict the returned calls to any genomic regions specified with <code>chromosome</code>, <code>qstart</code>, <code>qend</code>, or the complete region specified under <code>region</code> argument (in chr:start-end format). In addition, useful filtering arguments are also available, use <code>min_vaf</code> to set the minimum tumour VAF for a SV to be returned and <code>min_score</code> to set the lowest Manta somatic score for a SV to be returned. <code>pair_status</code> can be used to return variants from either matched or unmatched samples. In addition, you can chose to return all variants, even the ones not passing the filter criteria. To do so, set <code>pass = FALSE</code> (default is TRUE).</p>
-<section id="default-behaviour-1" class="level3">
-<h3 class="anchored" data-anchor-id="default-behaviour-1">Default behaviour</h3>
+<p>In this last section we will explore how to get SV data using GAMBLR.data. For this purpose <code>get_manta_sv</code> was developed. Similar to the previously described SSM and CNV functionality, this function can also restrict the returned calls to any genomic regions specified with <code>chromosome</code>, <code>qstart</code>, <code>qend</code>, or the complete region specified under <code>region</code> argument (in chr:start-end format). In addition, useful filtering arguments are also available, use <code>min_vaf</code> to set the minimum tumour VAF for a SV to be returned and <code>min_score</code> to set the lowest Manta somatic score for a SV to be returned. <code>pair_status</code> can be used to return variants from either matched or unmatched samples. In addition, you can chose to return all variants, even the ones not passing the filter criteria. To do so, set <code>pass = FALSE</code> (default is TRUE).</p>
+<section id="by-samples-2" class="level3">
+<h3 class="anchored" data-anchor-id="by-samples-2">By Samples</h3>
+<p>This function also operates on the same set of familiar arguments as other family of <code>get_</code> functions in GAMBLR. For example, to obtain SV calls for multiple samples, give <code>these_sample_ids</code> a vector of sample IDs. It will return the identical output as when the subsetting is done using <code>these_samples_metadata</code>. When none of this is specified, the returned output cotains SVs for all samples available.</p>
+<section id="default-behaviour-1" class="level4">
+<h4 class="anchored" data-anchor-id="default-behaviour-1">Default behaviour</h4>
 <p>We will call <code>get_manta_sv</code> with default arguments to examine the output.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default arguments</span></span>
@@ -2007,8 +2008,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="using-these_sample_ids-2" class="level3">
-<h3 class="anchored" data-anchor-id="using-these_sample_ids-2">Using <code>these_sample_ids</code></h3>
+<section id="using-these_sample_ids-2" class="level4">
+<h4 class="anchored" data-anchor-id="using-these_sample_ids-2">Using <code>these_sample_ids</code></h4>
 <p>Here we are demonstrating the sample ID subset options</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_sample_ids</span></span>
@@ -2036,8 +2037,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="using-these_samples_metadatasample" class="level3">
-<h3 class="anchored" data-anchor-id="using-these_samples_metadatasample">Using <code>these_samples_metadata</code>sample</h3>
+<section id="using-these_samples_metadatasample" class="level4">
+<h4 class="anchored" data-anchor-id="using-these_samples_metadatasample">Using <code>these_samples_metadata</code>sample</h4>
 <p>Alternatively, you can also provide <code>these_samples_metadata</code> argument to make use of a pre-filtered metadata table. In this case, the returned SVs will be restricted to the sample_ids within the data frame.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>meta_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
@@ -2053,6 +2054,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>[1] TRUE</code></pre>
 </div>
 </div>
+</section>
 </section>
 <section id="by-region-2" class="level3">
 <h3 class="anchored" data-anchor-id="by-region-2">By Region</h3>
