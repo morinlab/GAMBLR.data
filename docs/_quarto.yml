@@ -62,7 +62,7 @@ website:
     - id: concepts
       title: "Concepts"
       style: "docked"
-      collapse-level: 3
+      collapse-level: 4
       contents:
         - why.qmd
         - auto: concepts/*.qmd
