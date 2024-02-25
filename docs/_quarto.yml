@@ -58,6 +58,7 @@ website:
       collapse-level: 2
       contents:
         - install.qmd
+        - faq.qmd
         - auto: tutorials/*.qmd
     - id: concepts
       title: "Concepts"

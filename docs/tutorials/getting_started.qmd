@@ -772,14 +772,13 @@ identical(
 ### SV filtering
 Here we are demonstrating the filtering options to return SVs. In this example
 we are calling `get_manta_sv` on the DLBCL metadata subset. For demonstration
-purposes, we are also requesting a non-default projection and setting
-`verbose = TRUE` for more verbose output.
+purposes, we are also requesting a non-default projection and adding some more
+filtering.
 ```{r e25}
 # Get manta SVs for the DLBCL cell line
 dlbcl_manta <- get_manta_sv(
     these_samples_metadata = metadata$dlbcl,
     projection = "hg38",
-    verbose = TRUE,
     min_vaf = 0.4,
     min_score = 100
 )

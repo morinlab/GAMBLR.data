@@ -1,0 +1,86 @@
+---
+title: "Frequently Asked Qestions"
+echo: false
+---
+
+This section will cover most of the questions you may have about GAMBLR.data. If
+there is something that is not covered, please feel free to reach out to us via
+GitHub by reporting an [issue](https://github.com/morinlab/GAMBLR.data/issues/new)
+and we will be happy to add it to this page.
+
+###
+
+
+<div class="d-grid gap-2"><a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#General" role="button" aria-expanded="false" aria-controls="General">General questions</a></div>
+
+::: {#General .collapse .multi-collapse}
+
+## Someone said "lymphoma genes". What is this?
+
+The term lymphoma genes is referred to the curated list of genes significantly
+mutated in mature B-cell lymphomas. If you were referred to this list, it is
+available with this package by simply calling `lymphoma_genes`.
+Several modifications of the curated list are available, including the lists
+split by pathology, and a more comprehensive list `lymphoma_genes_comprehensive`
+that provides more information such as which studies reported it as SMG,
+whether it is target of aSHM etc.
+
+## Someone said "aSHM regions". What is this?
+
+The GAMBLR.data comes with the list of aSHM regions. They are determined by
+variety of approaches but mostly by manually reviewing patters of thousands of
+variants across multiple lymphomas. They can be obtained by simply calling
+`{projection}_ashm_regions`.
+The aSHM regions are version-controlled to track the previous iterations of the
+list, but the `{projection}_ashm_regions` always refers to the latest and most
+complete version. If you want to access the previous iterations, they can be
+referred to as `somatic_hypermutation_locations_GRCh3{projection_version}_v{version}`.
+For more details please refer to the [bundled data resources](./resources/bundled_data.html).
+
+:::
+
+###
+
+<div class="d-grid gap-2"><a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#SomaticVariants" role="button" aria-expanded="false" aria-controls="SomaticVariants">Somatic variants</a></div>
+
+###
+
+::: {#SomaticVariants .collapse .multi-collapse}
+
+## What kind of somatic variants are bundled?
+
+The GAMBLR.data provides simple somatic, copy number, and structural variants.
+For data that comes directly from the Supplemental Tables of supported studies,
+it is provided in the projection as reported in the original publications. For
+the rest of the samples it is available with respect to both grch37 and hg38.
+
+## What are the studies bundled with the package?
+
+The data includes variants from the following studies:
+```{r}
+library(GAMBLR.data)
+table(sample_data$meta$cohort, sample_data$meta$pathology)
+```
+
+## Which variant caller is used to call the variants?
+
+The simple somatic mutations are called using the SLMS-3 variant caller. Briefly,
+this is a voting approach of strelka2, mutect2, LoFreq, and SAGE. For more
+details about SLMS-3, please refer to the [source code](https://github.com/LCR-BCCRC/lcr-modules/tree/master/modules/slms_3) and manuscript by [Thomas et al.](https://doi.org/10.1182/blood.2022016534).
+For copy number variants, the calls for WGS samples are obtained using
+battenberg or sequenza when the samples are matched, and contolfreec when the
+samples are unmatched. The samples subjected to whole exome sequencing, the
+copy number variants are called with battenberg for matched samples, and
+combination of cnvkit/pureCN for samples without matched normal sample.
+The structural variants are called using manta.
+
+## Are the variant calls reported for throughout the whole genome space?
+
+The data for BL samples from the manuscript by [Thomas et al.](https://doi.org/10.1182/blood.2022016534) and FL/DLBCL samples from the manuscript by [Dreval et al.](https://doi.org/10.1182/blood.2022018719) are directly pulled from the Supplemental Tables. They
+represent only coding variants.
+The rest of the simple somatic variants are restricted to only coding variants
+in lymphoma genes.
+
+:::
+
+###
