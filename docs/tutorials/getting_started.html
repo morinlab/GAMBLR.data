@@ -942,951 +942,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>dlbcl_samples_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> metadata<span class="sc">$</span>dlbcl<span class="sc">$</span>sample_id,</span>
 <span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   [1] "00-22011_tumorB"               "02-11616_tumorA"              
-   [3] "02-17305_tumorA"               "02-17305_tumorB"              
-   [5] "03-19969_tumorB"               "04-11038_tumorA"              
-   [7] "04-11038_tumorB"               "04-13783_tumorB"              
-   [9] "06-16041_tumorA"               "06-16041_tumorB"              
-  [11] "07-24757_tumorB"               "08-24058_tumorA"              
-  [13] "08-24058_tumorB"               "08-24058_tumorC"              
-  [15] "09-32452_tumorA"               "10-30256_tumorA"              
-  [17] "1001-2027_FFPE"                "1001-2028_plasma"             
-  [19] "1001-2030_FFPE"                "1001-2030_plasma"             
-  [21] "1001-2035_FFPE"                "1001-2035_plasma"             
-  [23] "1001-2036_FFPE"                "1001-2037_plasma"             
-  [25] "1001-2038_FFPE"                "1001-2039_FFPE"               
-  [27] "1001-2040_FFPE"                "1001-2040_plasma"             
-  [29] "1001-2046_FFPE"                "1003-2043_FFPE"               
-  [31] "1003-2043_plasma"              "1003-2046_FFPE"               
-  [33] "1004-2031_plasma"              "1004-2033_FFPE"               
-  [35] "1005-2018_FFPE"                "1006-2010_FFPE"               
-  [37] "1007-2013_FFPE"                "1010-2010_FFPE"               
-  [39] "1010-2010_plasma"              "1011-2017_FFPE"               
-  [41] "1011-2018_FFPE"                "1011-2018_plasma"             
-  [43] "1011-2019_FFPE"                "1011-2020_FFPE"               
-  [45] "1012-2006_FFPE"                "1012-2008_FFPE"               
-  [47] "1012-2008_plasma"              "1013-2006_FFPE"               
-  [49] "1013-2006_plasma"              "1013-2010_FFPE"               
-  [51] "1013-2010_plasma"              "11-31342_tumorA"              
-  [53] "11-31342_tumorB"               "11-31342_tumorC"              
-  [55] "14-19181_tumorA"               "14-19181_tumorB"              
-  [57] "14-27873_tumorA"               "14-27873_tumorB"              
-  [59] "14-27873_tumorC"               "16-22216_tumorA"              
-  [61] "16-22216_tumorB"               "16-43083_tumorB"              
-  [63] "17-16667_tumorA"               "18-12910_tumorA"              
-  [65] "2001-2024_FFPE"                "2001-2026_FFPE"               
-  [67] "2001-2026_plasma"              "2004-2026_plasma"             
-  [69] "2004-2027_FFPE"                "2004-2030_FFPE"               
-  [71] "2004-2030_plasma"              "2004-2033_FFPE"               
-  [73] "2004-2033_plasma"              "4002-2003_FFPE"               
-  [75] "4002-2003_plasma"              "7004-2002_FFPE"               
-  [77] "75-10141_tumorA"               "75-10141_tumorB"              
-  [79] "8002-2019_FFPE"                "8003-2001_FFPE"               
-  [81] "8005-2002_FFPE"                "8005-2003_FFPE"               
-  [83] "8005-2003_plasma"              "8006-2002_FFPE"               
-  [85] "8006-2002_plasma"              "86-30788_tumorA"              
-  [87] "86-30788_tumorB"               "CABN0001_2015-08-11"          
-  [89] "CABN0002_2015-08-19"           "CABN0003_2013-11-28"          
-  [91] "CABN0003_2016-07-05"           "CAGJ0001_Biopsy"              
-  [93] "CAHN0001_2011-05-25"           "CAHN0001_2016-07-13"          
-  [95] "CALM0002_Biopsy"               "CAMP0003_2016-05-06"          
-  [97] "CAMP0005_2015-12-15"           "CAMP0005_2016-06-20"          
-  [99] "CAMP0006_2015-08-18"           "CAMP0007_2016-05-20"          
- [101] "CAMP0009_2016-07-04"           "CAMP0010-Biopsy"              
- [103] "CAMP0010_2017-07-18"           "CARM0001_2016-03-24"          
- [105] "CASA0002_2015-03-10"           "CASA0002_2016-03-07"          
- [107] "CASA0002_2016-08-24"           "CATC0001_2016-01-11"          
- [109] "CATC0002_2016-09-21"           "CATC0003_Biopsy"              
- [111] "CAVA0006-Diagnostic"           "CAVA0006_2016-08-23"          
- [113] "DFCIDL008-Tumor"               "DFCIDL009-Tumor"              
- [115] "DFCI_DLBCL_Goe17-Tumor"        "DLBCL-BWH_DLBCL64-Tumor"      
- [117] "DLBCL-DFCI_DLBCL_Goe05-Tumor"  "DLBCL-DFCI_DLBCL_Goe07-Tumor" 
- [119] "DLBCL-DFCI_DLBCL_Goe08-Tumor"  "DLBCL-DFCI_DLBCL_Goe16-Tumor" 
- [121] "DLBCL-MC_F064AB-Tumor"         "DLBCL-MC_F089_HCZ-Tumor"      
- [123] "DLBCL-MC_F089_MLB-Tumor"       "DLBCL-MC_F132_MLM-Tumor"      
- [125] "DLBCL-MC_F139_AD-Tumor"        "DLBCL-MC_F139_LJF-Tumor"      
- [127] "DLBCL-MC_F210_GWC-Tumor"       "DLBCL-MC_F218_RAP-Tumor"      
- [129] "DLBCL-MC_F231_CAO-Tumor"       "DLBCL-MC_F262_WLC-Tumor"      
- [131] "DLBCL-MC_F300_TBF-Tumor"       "DLBCL-MC_F307_JPS-Tumor"      
- [133] "DLBCL-MC_F339_JPS2-Tumor"      "DLBCL-MC_F344_CJS-Tumor"      
- [135] "DLBCL-MC_F349_BJJ-Tumor"       "DLBCL-MC_F358_WDS-Tumor"      
- [137] "DLBCL-MC_F362_MJB1-Tumor"      "DLBCL-MC_F496DMP-Tumor"       
- [139] "DLBCL-MC_F500_ECU-Tumor"       "DLBCL-MC_F502_RFK-Tumor"      
- [141] "DLBCL-MC_F519_ALT-Tumor"       "DLBCL-MC_F606_DMJ-Tumor"      
- [143] "DLBCL-MC_F648_JKW-Tumor"       "DLBCL-MC_F729_MAN-Tumor"      
- [145] "DLBCL-MC_F739_AMA3-Tumor"      "DLBCL-MC_F815_BAT-Tumor"      
- [147] "DLBCL-MC_F886_EJH-Tumor"       "DLBCL-MC_F925_DLR-Tumor"      
- [149] "DLBCL-MC_F927_JHS-Tumor"       "DLBCL-MC_F959_ERM-Tumor"      
- [151] "DLBCL-MC_F990_MNA-Tumor"       "DLBCL-RICOVER_1013-Tumor"     
- [153] "DLBCL-RICOVER_1018-Tumor"      "DLBCL-RICOVER_102-Tumor"      
- [155] "DLBCL-RICOVER_1032-Tumor"      "DLBCL-RICOVER_1045-Tumor"     
- [157] "DLBCL-RICOVER_1046-Tumor"      "DLBCL-RICOVER_105-Tumor"      
- [159] "DLBCL-RICOVER_1060-Tumor"      "DLBCL-RICOVER_1061-Tumor"     
- [161] "DLBCL-RICOVER_107-Tumor"       "DLBCL-RICOVER_1072-Tumor"     
- [163] "DLBCL-RICOVER_1081-Tumor"      "DLBCL-RICOVER_1106-Tumor"     
- [165] "DLBCL-RICOVER_111-Tumor"       "DLBCL-RICOVER_1138-Tumor"     
- [167] "DLBCL-RICOVER_1144-Tumor"      "DLBCL-RICOVER_1150-Tumor"     
- [169] "DLBCL-RICOVER_1165-Tumor"      "DLBCL-RICOVER_1169-Tumor"     
- [171] "DLBCL-RICOVER_1190-Tumor"      "DLBCL-RICOVER_1192-Tumor"     
- [173] "DLBCL-RICOVER_1199-Tumor"      "DLBCL-RICOVER_120-Tumor"      
- [175] "DLBCL-RICOVER_1204-Tumor"      "DLBCL-RICOVER_1210-Tumor"     
- [177] "DLBCL-RICOVER_1219-Tumor"      "DLBCL-RICOVER_1235-Tumor"     
- [179] "DLBCL-RICOVER_1237-Tumor"      "DLBCL-RICOVER_1247-Tumor"     
- [181] "DLBCL-RICOVER_1248-Tumor"      "DLBCL-RICOVER_1257-Tumor"     
- [183] "DLBCL-RICOVER_126-Tumor"       "DLBCL-RICOVER_1263-Tumor"     
- [185] "DLBCL-RICOVER_1269-Tumor"      "DLBCL-RICOVER_1278-Tumor"     
- [187] "DLBCL-RICOVER_1283-Tumor"      "DLBCL-RICOVER_1287-Tumor"     
- [189] "DLBCL-RICOVER_1289-Tumor"      "DLBCL-RICOVER_1293-Tumor"     
- [191] "DLBCL-RICOVER_1299-Tumor"      "DLBCL-RICOVER_1329-Tumor"     
- [193] "DLBCL-RICOVER_134-Tumor"       "DLBCL-RICOVER_147-Tumor"      
- [195] "DLBCL-RICOVER_148-Tumor"       "DLBCL-RICOVER_150-Tumor"      
- [197] "DLBCL-RICOVER_151-Tumor"       "DLBCL-RICOVER_173-Tumor"      
- [199] "DLBCL-RICOVER_174-Tumor"       "DLBCL-RICOVER_181-Tumor"      
- [201] "DLBCL-RICOVER_197-Tumor"       "DLBCL-RICOVER_208-Tumor"      
- [203] "DLBCL-RICOVER_215-Tumor"       "DLBCL-RICOVER_216-Tumor"      
- [205] "DLBCL-RICOVER_221-Tumor"       "DLBCL-RICOVER_224-Tumor"      
- [207] "DLBCL-RICOVER_253-Tumor"       "DLBCL-RICOVER_258-Tumor"      
- [209] "DLBCL-RICOVER_266-Tumor"       "DLBCL-RICOVER_267-Tumor"      
- [211] "DLBCL-RICOVER_269-Tumor"       "DLBCL-RICOVER_274-Tumor"      
- [213] "DLBCL-RICOVER_288-Tumor"       "DLBCL-RICOVER_290-Tumor"      
- [215] "DLBCL-RICOVER_299-Tumor"       "DLBCL-RICOVER_314-Tumor"      
- [217] "DLBCL-RICOVER_320-Tumor"       "DLBCL-RICOVER_325-Tumor"      
- [219] "DLBCL-RICOVER_335-Tumor"       "DLBCL-RICOVER_336-Tumor"      
- [221] "DLBCL-RICOVER_338-Tumor"       "DLBCL-RICOVER_342-Tumor"      
- [223] "DLBCL-RICOVER_361-Tumor"       "DLBCL-RICOVER_384-Tumor"      
- [225] "DLBCL-RICOVER_401-Tumor"       "DLBCL-RICOVER_408-Tumor"      
- [227] "DLBCL-RICOVER_417-Tumor"       "DLBCL-RICOVER_431-Tumor"      
- [229] "DLBCL-RICOVER_440-Tumor"       "DLBCL-RICOVER_449-Tumor"      
- [231] "DLBCL-RICOVER_451-Tumor"       "DLBCL-RICOVER_463-Tumor"      
- [233] "DLBCL-RICOVER_467-Tumor"       "DLBCL-RICOVER_469-Tumor"      
- [235] "DLBCL-RICOVER_473-Tumor"       "DLBCL-RICOVER_478-Tumor"      
- [237] "DLBCL-RICOVER_496-Tumor"       "DLBCL-RICOVER_506-Tumor"      
- [239] "DLBCL-RICOVER_522-Tumor"       "DLBCL-RICOVER_533-Tumor"      
- [241] "DLBCL-RICOVER_543-Tumor"       "DLBCL-RICOVER_554-Tumor"      
- [243] "DLBCL-RICOVER_575-Tumor"       "DLBCL-RICOVER_577-Tumor"      
- [245] "DLBCL-RICOVER_583-Tumor"       "DLBCL-RICOVER_585-Tumor"      
- [247] "DLBCL-RICOVER_597-Tumor"       "DLBCL-RICOVER_617-Tumor"      
- [249] "DLBCL-RICOVER_623-Tumor"       "DLBCL-RICOVER_632-Tumor"      
- [251] "DLBCL-RICOVER_678-Tumor"       "DLBCL-RICOVER_685-Tumor"      
- [253] "DLBCL-RICOVER_692-Tumor"       "DLBCL-RICOVER_694-Tumor"      
- [255] "DLBCL-RICOVER_701-Tumor"       "DLBCL-RICOVER_704-Tumor"      
- [257] "DLBCL-RICOVER_711-Tumor"       "DLBCL-RICOVER_712-Tumor"      
- [259] "DLBCL-RICOVER_720-Tumor"       "DLBCL-RICOVER_744-Tumor"      
- [261] "DLBCL-RICOVER_763-Tumor"       "DLBCL-RICOVER_773-Tumor"      
- [263] "DLBCL-RICOVER_780-Tumor"       "DLBCL-RICOVER_787-Tumor"      
- [265] "DLBCL-RICOVER_822-Tumor"       "DLBCL-RICOVER_826-Tumor"      
- [267] "DLBCL-RICOVER_829-Tumor"       "DLBCL-RICOVER_850-Tumor"      
- [269] "DLBCL-RICOVER_865-Tumor"       "DLBCL-RICOVER_866-Tumor"      
- [271] "DLBCL-RICOVER_910-Tumor"       "DLBCL-RICOVER_945-Tumor"      
- [273] "DLBCL-RICOVER_948-Tumor"       "DLBCL-RICOVER_950-Tumor"      
- [275] "DLBCL-RICOVER_956-Tumor"       "DLBCL-RICOVER_977-Tumor"      
- [277] "DLBCL-RICOVER_978-Tumor"       "DLBCL-RICOVER_985-Tumor"      
- [279] "DLBCL-RICOVER_99-Tumor"        "DLBCL-c_D_1103-Tumor"         
- [281] "DLBCL-c_D_1104-Tumor"          "DLBCL-c_D_1105-Tumor"         
- [283] "DLBCL-c_D_1106-Tumor"          "DLBCL-c_D_1107-Tumor"         
- [285] "DLBCL-c_D_1108-Tumor"          "DLBCL-c_D_1109-Tumor"         
- [287] "DLBCL-c_D_1110-Tumor"          "DLBCL-c_D_1111-Tumor"         
- [289] "DLBCL-c_D_1112-Tumor"          "DLBCL-c_D_1113-Tumor"         
- [291] "DLBCL-c_D_1114-Tumor"          "DLBCL-c_D_1115-Tumor"         
- [293] "DLBCL-c_D_1117-Tumor"          "DLBCL-c_D_1118-Tumor"         
- [295] "DLBCL-c_D_1120-Tumor"          "DLBCL-c_D_1121-Tumor"         
- [297] "DLBCL-c_D_1123-Tumor"          "DLBCL-c_D_1124-Tumor"         
- [299] "DLBCL-c_D_1125-Tumor"          "DLBCL-c_D_1126-Tumor"         
- [301] "DLBCL-c_D_1127-Tumor"          "DLBCL-c_D_1128-Tumor"         
- [303] "DLBCL-c_D_1129-Tumor"          "DLBCL-c_D_1130-Tumor"         
- [305] "DLBCL-c_D_1131-Tumor"          "DLBCL-c_D_1132-Tumor"         
- [307] "DLBCL-c_D_1133-Tumor"          "DLBCL-c_D_1134-Tumor"         
- [309] "DLBCL-c_D_1135-Tumor"          "DLBCL-c_D_1136-Tumor"         
- [311] "DLBCL-c_D_1138-Tumor"          "DLBCL-c_D_1139-Tumor"         
- [313] "DLBCL-c_D_1140-Tumor"          "DLBCL-c_D_1141-Tumor"         
- [315] "DLBCL-c_D_1142-Tumor"          "DLBCL-c_D_1144-Tumor"         
- [317] "DLBCL-c_D_1145-Tumor"          "DLBCL-c_D_1146-Tumor"         
- [319] "DLBCL-c_D_1147-Tumor"          "DLBCL-c_D_1148-Tumor"         
- [321] "DLBCL-c_D_1149-Tumor"          "DLBCL-c_D_1150-Tumor"         
- [323] "DLBCL-c_D_1151-Tumor"          "DLBCL-c_D_1152-Tumor"         
- [325] "DLBCL-c_D_1153-Tumor"          "DLBCL-c_D_1154-Tumor"         
- [327] "DLBCL-c_D_1155-Tumor"          "DLBCL-c_D_1156-Tumor"         
- [329] "DLBCL-c_D_1157-Tumor"          "DLBCL-c_D_1158-Tumor"         
- [331] "DLBCL-c_D_1159-Tumor"          "DLBCL-c_D_1162-Tumor"         
- [333] "DLBCL-c_D_1163-Tumor"          "DLBCL-c_D_1166-Tumor"         
- [335] "DLBCL-c_D_pair13-Tumor"        "DLBCL-c_D_pair2-Tumor"        
- [337] "DLBCL-c_D_pair20-Tumor"        "DLBCL-c_D_pair22-Tumor"       
- [339] "DLBCL-c_D_pair23-Tumor"        "DLBCL-c_D_pair5-Tumor"        
- [341] "DLBCL-c_D_pair9-Tumor"         "DLBCL10450T"                  
- [343] "DLBCL10451T"                   "DLBCL10452T"                  
- [345] "DLBCL10453T"                   "DLBCL10454T"                  
- [347] "DLBCL10455T"                   "DLBCL10456T"                  
- [349] "DLBCL10457T"                   "DLBCL10458T"                  
- [351] "DLBCL10459T"                   "DLBCL10460T"                  
- [353] "DLBCL10461T"                   "DLBCL10462T"                  
- [355] "DLBCL10463T"                   "DLBCL10464T"                  
- [357] "DLBCL10465T"                   "DLBCL10466T"                  
- [359] "DLBCL10467T"                   "DLBCL10469T"                  
- [361] "DLBCL10470T"                   "DLBCL10471T"                  
- [363] "DLBCL10472T"                   "DLBCL10473T"                  
- [365] "DLBCL10474T"                   "DLBCL10475T"                  
- [367] "DLBCL10476T"                   "DLBCL10477T"                  
- [369] "DLBCL10478T"                   "DLBCL10479T"                  
- [371] "DLBCL10480T"                   "DLBCL10481T"                  
- [373] "DLBCL10482T"                   "DLBCL10483T"                  
- [375] "DLBCL10484T"                   "DLBCL10485T"                  
- [377] "DLBCL10486T"                   "DLBCL10487T"                  
- [379] "DLBCL10488T"                   "DLBCL10489T"                  
- [381] "DLBCL10490T"                   "DLBCL10491T"                  
- [383] "DLBCL10492T"                   "DLBCL10493T"                  
- [385] "DLBCL10494T"                   "DLBCL10495T"                  
- [387] "DLBCL10497T"                   "DLBCL10498T"                  
- [389] "DLBCL10499T"                   "DLBCL10500T"                  
- [391] "DLBCL10501T"                   "DLBCL10502T"                  
- [393] "DLBCL10503T"                   "DLBCL10504T"                  
- [395] "DLBCL10505T"                   "DLBCL10506T"                  
- [397] "DLBCL10507T"                   "DLBCL10508T"                  
- [399] "DLBCL10509T"                   "DLBCL10510T"                  
- [401] "DLBCL10512T"                   "DLBCL10513T"                  
- [403] "DLBCL10514T"                   "DLBCL10515T"                  
- [405] "DLBCL10516T"                   "DLBCL10517T"                  
- [407] "DLBCL10518T"                   "DLBCL10519T"                  
- [409] "DLBCL10520T"                   "DLBCL10521T"                  
- [411] "DLBCL10522T"                   "DLBCL10523T"                  
- [413] "DLBCL10524T"                   "DLBCL10527T"                  
- [415] "DLBCL10528T"                   "DLBCL10529T"                  
- [417] "DLBCL10530T"                   "DLBCL10531T"                  
- [419] "DLBCL10532T"                   "DLBCL10533T"                  
- [421] "DLBCL10534T"                   "DLBCL10535T"                  
- [423] "DLBCL10536T"                   "DLBCL10537T"                  
- [425] "DLBCL10538T"                   "DLBCL10539T"                  
- [427] "DLBCL10540T"                   "DLBCL10541T"                  
- [429] "DLBCL10542T"                   "DLBCL10543T"                  
- [431] "DLBCL10544T"                   "DLBCL10545T"                  
- [433] "DLBCL10546T"                   "DLBCL10547T"                  
- [435] "DLBCL10548T"                   "DLBCL10549T"                  
- [437] "DLBCL10550T"                   "DLBCL10552T"                  
- [439] "DLBCL10553T"                   "DLBCL10554T"                  
- [441] "DLBCL10555T"                   "DLBCL10564T"                  
- [443] "DLBCL10565T"                   "DLBCL10566T"                  
- [445] "DLBCL10780T"                   "DLBCL10781T"                  
- [447] "DLBCL10782T"                   "DLBCL10833T"                  
- [449] "DLBCL10834T"                   "DLBCL10835T"                  
- [451] "DLBCL10836T"                   "DLBCL10837T"                  
- [453] "DLBCL10838T"                   "DLBCL10839T"                  
- [455] "DLBCL10842T"                   "DLBCL10843T"                  
- [457] "DLBCL10844T"                   "DLBCL10845T"                  
- [459] "DLBCL10846T"                   "DLBCL10847T"                  
- [461] "DLBCL10848T"                   "DLBCL10849T"                  
- [463] "DLBCL10850T"                   "DLBCL10851T"                  
- [465] "DLBCL10852T"                   "DLBCL10853T"                  
- [467] "DLBCL10854T"                   "DLBCL10855T"                  
- [469] "DLBCL10856T"                   "DLBCL10857T"                  
- [471] "DLBCL10858T"                   "DLBCL10859T"                  
- [473] "DLBCL10860T"                   "DLBCL10861T"                  
- [475] "DLBCL10862T"                   "DLBCL10863T"                  
- [477] "DLBCL10864T"                   "DLBCL10865T"                  
- [479] "DLBCL10866T"                   "DLBCL10867T"                  
- [481] "DLBCL10868T"                   "DLBCL10869T"                  
- [483] "DLBCL10870T"                   "DLBCL10871T"                  
- [485] "DLBCL10872T"                   "DLBCL10873T"                  
- [487] "DLBCL10874T"                   "DLBCL10875T"                  
- [489] "DLBCL10876T"                   "DLBCL10877T"                  
- [491] "DLBCL10878T"                   "DLBCL10879T"                  
- [493] "DLBCL10880T"                   "DLBCL10881T"                  
- [495] "DLBCL10883T"                   "DLBCL10884T"                  
- [497] "DLBCL10885T"                   "DLBCL10887T"                  
- [499] "DLBCL10888T"                   "DLBCL10889T"                  
- [501] "DLBCL10890T"                   "DLBCL10891T"                  
- [503] "DLBCL10892T"                   "DLBCL10893T"                  
- [505] "DLBCL10894T"                   "DLBCL10895T"                  
- [507] "DLBCL10896T"                   "DLBCL10897T"                  
- [509] "DLBCL10898T"                   "DLBCL10899T"                  
- [511] "DLBCL10900T"                   "DLBCL10901T"                  
- [513] "DLBCL10902T"                   "DLBCL10903T"                  
- [515] "DLBCL10904T"                   "DLBCL10905T"                  
- [517] "DLBCL10906T"                   "DLBCL10907T"                  
- [519] "DLBCL10908T"                   "DLBCL10909T"                  
- [521] "DLBCL10910T"                   "DLBCL10911T"                  
- [523] "DLBCL10912T"                   "DLBCL10913T"                  
- [525] "DLBCL10914T"                   "DLBCL10915T"                  
- [527] "DLBCL10916T"                   "DLBCL10917T"                  
- [529] "DLBCL10918T"                   "DLBCL10919T"                  
- [531] "DLBCL10920T"                   "DLBCL10921T"                  
- [533] "DLBCL10922T"                   "DLBCL10923T"                  
- [535] "DLBCL10924T"                   "DLBCL10925T"                  
- [537] "DLBCL10926T"                   "DLBCL10927T"                  
- [539] "DLBCL10928T"                   "DLBCL10929T"                  
- [541] "DLBCL10930T"                   "DLBCL10931T"                  
- [543] "DLBCL10932T"                   "DLBCL10933T"                  
- [545] "DLBCL10934T"                   "DLBCL10935T"                  
- [547] "DLBCL10936T"                   "DLBCL10937T"                  
- [549] "DLBCL10938T"                   "DLBCL10939T"                  
- [551] "DLBCL10940T"                   "DLBCL10941T"                  
- [553] "DLBCL10942T"                   "DLBCL10943T"                  
- [555] "DLBCL10945T"                   "DLBCL10946T"                  
- [557] "DLBCL10947T"                   "DLBCL10948T"                  
- [559] "DLBCL10949T"                   "DLBCL10950T"                  
- [561] "DLBCL10951T"                   "DLBCL10952T"                  
- [563] "DLBCL10953T"                   "DLBCL10954T"                  
- [565] "DLBCL10955T"                   "DLBCL10956T"                  
- [567] "DLBCL10957T"                   "DLBCL10958T"                  
- [569] "DLBCL10959T"                   "DLBCL10960T"                  
- [571] "DLBCL10961T"                   "DLBCL10962T"                  
- [573] "DLBCL10963T"                   "DLBCL10964T"                  
- [575] "DLBCL10965T"                   "DLBCL10966T"                  
- [577] "DLBCL10967T"                   "DLBCL10968T"                  
- [579] "DLBCL10969T"                   "DLBCL10970T"                  
- [581] "DLBCL10971T"                   "DLBCL10972T"                  
- [583] "DLBCL10973T"                   "DLBCL10974T"                  
- [585] "DLBCL10975T"                   "DLBCL10977T"                  
- [587] "DLBCL10978T"                   "DLBCL10979T"                  
- [589] "DLBCL10980T"                   "DLBCL10981T"                  
- [591] "DLBCL10982T"                   "DLBCL10983T"                  
- [593] "DLBCL10984T"                   "DLBCL10985T"                  
- [595] "DLBCL10986T"                   "DLBCL10987T"                  
- [597] "DLBCL10988T"                   "DLBCL10989T"                  
- [599] "DLBCL10990T"                   "DLBCL10991T"                  
- [601] "DLBCL10992T"                   "DLBCL10993T"                  
- [603] "DLBCL10994T"                   "DLBCL10995T"                  
- [605] "DLBCL10996T"                   "DLBCL10997T"                  
- [607] "DLBCL10998T"                   "DLBCL10999T"                  
- [609] "DLBCL11000T"                   "DLBCL11001T"                  
- [611] "DLBCL11002T"                   "DLBCL11003T"                  
- [613] "DLBCL11004T"                   "DLBCL11005T"                  
- [615] "DLBCL11180T"                   "DLBCL11181T"                  
- [617] "DLBCL11182T"                   "DLBCL11187T"                  
- [619] "DLBCL11188T"                   "DLBCL11191T"                  
- [621] "DLBCL11193T"                   "DLBCL11194T"                  
- [623] "DLBCL11195T"                   "DLBCL11196T"                  
- [625] "DLBCL11202T"                   "DLBCL11203T"                  
- [627] "DLBCL11204T"                   "DLBCL11205T"                  
- [629] "DLBCL11206T"                   "DLBCL11208T"                  
- [631] "DLBCL11242T"                   "DLBCL11255T"                  
- [633] "DLBCL11256T"                   "DLBCL11257T"                  
- [635] "DLBCL11258T"                   "DLBCL11259T"                  
- [637] "DLBCL11260T"                   "DLBCL11261T"                  
- [639] "DLBCL11262T"                   "DLBCL11271T"                  
- [641] "DLBCL11346T"                   "DLBCL11353T"                  
- [643] "DLBCL11428T"                   "DLBCL11429T"                  
- [645] "DLBCL11430T"                   "DLBCL11431T"                  
- [647] "DLBCL11432T"                   "DLBCL11433T"                  
- [649] "DLBCL11434T"                   "DLBCL11435T"                  
- [651] "DLBCL11436T"                   "DLBCL11437T"                  
- [653] "DLBCL11438T"                   "DLBCL11439T"                  
- [655] "DLBCL11440T"                   "DLBCL11441T"                  
- [657] "DLBCL11443T"                   "DLBCL11444T"                  
- [659] "DLBCL11445T"                   "DLBCL11446T"                  
- [661] "DLBCL11447T"                   "DLBCL11448T"                  
- [663] "DLBCL11449T"                   "DLBCL11450T"                  
- [665] "DLBCL11451T"                   "DLBCL11452T"                  
- [667] "DLBCL11453T"                   "DLBCL11454T"                  
- [669] "DLBCL11455T"                   "DLBCL11456T"                  
- [671] "DLBCL11457T"                   "DLBCL11458T"                  
- [673] "DLBCL11459T"                   "DLBCL11460T"                  
- [675] "DLBCL11461T"                   "DLBCL11462T"                  
- [677] "DLBCL11463T"                   "DLBCL11464T"                  
- [679] "DLBCL11466T"                   "DLBCL11467T"                  
- [681] "DLBCL11468T"                   "DLBCL11469T"                  
- [683] "DLBCL11470T"                   "DLBCL11471T"                  
- [685] "DLBCL11472T"                   "DLBCL11473T"                  
- [687] "DLBCL11474T"                   "DLBCL11475T"                  
- [689] "DLBCL11476T"                   "DLBCL11477T"                  
- [691] "DLBCL11478T"                   "DLBCL11479T"                  
- [693] "DLBCL11480T"                   "DLBCL11481T"                  
- [695] "DLBCL11482T"                   "DLBCL11483T"                  
- [697] "DLBCL11484T"                   "DLBCL11485T"                  
- [699] "DLBCL11486T"                   "DLBCL11488T"                  
- [701] "DLBCL11489T"                   "DLBCL11490T"                  
- [703] "DLBCL11491T"                   "DLBCL11492T"                  
- [705] "DLBCL11493T"                   "DLBCL11494T"                  
- [707] "DLBCL11495T"                   "DLBCL11496T"                  
- [709] "DLBCL11497T"                   "DLBCL11498T"                  
- [711] "DLBCL11499T"                   "DLBCL11500T"                  
- [713] "DLBCL11501T"                   "DLBCL11503T"                  
- [715] "DLBCL11504T"                   "DLBCL11506T"                  
- [717] "DLBCL11507T"                   "DLBCL11508T"                  
- [719] "DLBCL11509T"                   "DLBCL11510T"                  
- [721] "DLBCL11511T"                   "DLBCL11512T"                  
- [723] "DLBCL11513T"                   "DLBCL11514T"                  
- [725] "DLBCL11515T"                   "DLBCL11516T"                  
- [727] "DLBCL11518T"                   "DLBCL11519T"                  
- [729] "DLBCL11520T"                   "DLBCL11523T"                  
- [731] "DLBCL11525T"                   "DLBCL11526T"                  
- [733] "DLBCL11527T"                   "DLBCL11528T"                  
- [735] "DLBCL11530T"                   "DLBCL11531T"                  
- [737] "DLBCL11532T"                   "DLBCL11533T"                  
- [739] "DLBCL11534T"                   "DLBCL11535T"                  
- [741] "DLBCL11536T"                   "DLBCL11537T"                  
- [743] "DLBCL11538T"                   "DLBCL11539T"                  
- [745] "DLBCL11540T"                   "DLBCL11541T"                  
- [747] "DLBCL11542T"                   "DLBCL11558T"                  
- [749] "DLBCL11559T"                   "DLBCL11560T"                  
- [751] "DLBCL11562T"                   "DLBCL11563T"                  
- [753] "DLBCL11564T"                   "DLBCL11565T"                  
- [755] "DLBCL11566T"                   "DLBCL11567T"                  
- [757] "DLBCL11568T"                   "DLBCL11569T"                  
- [759] "DLBCL11570T"                   "DLBCL11571T"                  
- [761] "DLBCL11572T"                   "DLBCL11573T"                  
- [763] "DLBCL11574T"                   "DLBCL11575T"                  
- [765] "DLBCL11576T"                   "DLBCL11577T"                  
- [767] "DLBCL11578T"                   "DLBCL11579T"                  
- [769] "DLBCL11581T"                   "DLBCL11584T"                  
- [771] "DLBCL11585T"                   "DLBCL11586T"                  
- [773] "DLBCL11587T"                   "DLBCL11589T"                  
- [775] "DLBCL11590T"                   "DLBCL11591T"                  
- [777] "DLBCL11595T"                   "DLBCL11596T"                  
- [779] "DLBCL11646T"                   "DLBCL11648T"                  
- [781] "DLBCL11649T"                   "DLBCL11651T"                  
- [783] "DLBCL11652T"                   "DLBCL11655T"                  
- [785] "DLBCL11656T"                   "DLBCL11657T"                  
- [787] "DLBCL11658T"                   "DLBCL11659T"                  
- [789] "DLBCL11660T"                   "DLBCL11661T"                  
- [791] "DLBCL11662T"                   "DLBCL11663T"                  
- [793] "DLBCL11664T"                   "DLBCL11665T"                  
- [795] "DLBCL11666T"                   "DLBCL11667T"                  
- [797] "DLBCL11669T"                   "DLBCL11670T"                  
- [799] "DLBCL11671T"                   "DLBCL11672T"                  
- [801] "DLBCL11673T"                   "DLBCL11675T"                  
- [803] "DLBCL11676T"                   "DLBCL11677T"                  
- [805] "DLBCL11678T"                   "DLBCL11679T"                  
- [807] "DLBCL11680T"                   "DLBCL11681T"                  
- [809] "DLBCL11683T"                   "DLBCL11684T"                  
- [811] "DLBCL11685T"                   "DLBCL_P01-Tumor"              
- [813] "DLBCL_P02-Tumor"               "DLBCL_P04-Tumor"              
- [815] "DLBCL_P07-Tumor"               "DLBCL_P10-Tumor"              
- [817] "OZM073-003_LowGradeDiagnosis"  "OZM073-003_Transformation"    
- [819] "OZM073-006_LowGradeDiagnosis"  "OZM073-006_PlasmaEx-REL"      
- [821] "OZM073-006_Relapse"            "OZM073-006_Transformation"    
- [823] "OZM073-007_Relapse"            "OZM073-008_Diagnosis"         
- [825] "OZM073-008_Relapse"            "OZM073-009_Diagnosis"         
- [827] "OZM073-011_LowGradeDiagnosis"  "OZM073-012_LowGradeDiagnosis" 
- [829] "OZM073-012_Relapse"            "OZM073-013_Diagnosis"         
- [831] "OZM073-013_PlasmaEx-T2"        "OZM073-013_Relapse"           
- [833] "OZM073-014_LowGradeDiagnosis"  "OZM073-014_LowGradeDiagnosis2"
- [835] "OZM073-015_Diagnosis"          "OZM073-015_PlasmaEx-T3"       
- [837] "OZM073-015_Relapse"            "OZM073-016_Diagnosis"         
- [839] "OZM073-016_Relapse"            "OZM073-017_Diagnosis"         
- [841] "OZM073-018_Diagnosis"          "OZM073-021_Diagnosis"         
- [843] "OZM073-021_Relapse"            "OZM073-022_Diagnosis"         
- [845] "OZM073-023_Relapse"            "OZM073-025_Diagnosis"         
- [847] "OZM073-025_Progression"        "OZM073-026_Transformation"    
- [849] "OZM073-027_LowGradeDiagnosis"  "OZM073-028_Transformation"    
- [851] "OZM073-029_Transformation"     "OZM073-030_Transformation"    
- [853] "OZM073-032_Diagnosis"          "OZM073-033_Diagnosis"         
- [855] "OZM073-036_Transformation"     "QC2-11T"                      
- [857] "QC2-12T"                       "QC2-13T"                      
- [859] "QC2-15T"                       "QC2-17T"                      
- [861] "QC2-18T"                       "QC2-19T"                      
- [863] "QC2-20T"                       "QC2-21T"                      
- [865] "QC2-22T"                       "QC2-23T"                      
- [867] "QC2-25T"                       "QC2-26T"                      
- [869] "QC2-30T"                       "QC2-32T"                      
- [871] "QC2-33T"                       "QC2-34T"                      
- [873] "QC2-35T"                       "QC2-36T"                      
- [875] "QC2-39T"                       "QC2-3T"                       
- [877] "QC2-40T"                       "QC2-42T"                      
- [879] "QC2-4T"                        "QC2-5T"                       
- [881] "QC2-7T"                        "QC2-9T"                       
- [883] "Reddy_1008T"                   "Reddy_1016T"                  
- [885] "Reddy_2043T"                   "Reddy_2044T"                  
- [887] "Reddy_2045T"                   "Reddy_2046T"                  
- [889] "Reddy_2047T"                   "Reddy_2048T"                  
- [891] "Reddy_2057T"                   "Reddy_2060T"                  
- [893] "Reddy_2072T"                   "Reddy_2073T"                  
- [895] "Reddy_2074T"                   "Reddy_2075T"                  
- [897] "Reddy_2076T"                   "Reddy_2077T"                  
- [899] "Reddy_2078T"                   "Reddy_2079T"                  
- [901] "Reddy_2080T"                   "Reddy_2081T"                  
- [903] "Reddy_2083T"                   "Reddy_2084T"                  
- [905] "Reddy_2085T"                   "Reddy_2087T"                  
- [907] "Reddy_2088T"                   "Reddy_2089T"                  
- [909] "Reddy_2091T"                   "Reddy_2092T"                  
- [911] "Reddy_2093T"                   "Reddy_2095T"                  
- [913] "Reddy_2097T"                   "Reddy_2100T"                  
- [915] "Reddy_2101T"                   "Reddy_2102T"                  
- [917] "Reddy_2103T"                   "Reddy_2106T"                  
- [919] "Reddy_2107T"                   "Reddy_2109T"                  
- [921] "Reddy_2110T"                   "Reddy_2111T"                  
- [923] "Reddy_2112T"                   "Reddy_2113T"                  
- [925] "Reddy_2114T"                   "Reddy_2115T"                  
- [927] "Reddy_2120T"                   "Reddy_2121T"                  
- [929] "Reddy_2122T"                   "Reddy_2123T"                  
- [931] "Reddy_2124T"                   "Reddy_2125T"                  
- [933] "Reddy_2126T"                   "Reddy_2127T"                  
- [935] "Reddy_2128T"                   "Reddy_2130T"                  
- [937] "Reddy_2133T"                   "Reddy_2134T"                  
- [939] "Reddy_2135T"                   "Reddy_2136T"                  
- [941] "Reddy_2137T"                   "Reddy_2138T"                  
- [943] "Reddy_2140T"                   "Reddy_2141T"                  
- [945] "Reddy_2142T"                   "Reddy_2143T"                  
- [947] "Reddy_2144T"                   "Reddy_2145T"                  
- [949] "Reddy_2146T"                   "Reddy_2147T"                  
- [951] "Reddy_2148T"                   "Reddy_2149T"                  
- [953] "Reddy_2150T"                   "Reddy_2151T"                  
- [955] "Reddy_2152T"                   "Reddy_2153T"                  
- [957] "Reddy_2154T"                   "Reddy_2155T"                  
- [959] "Reddy_2156T"                   "Reddy_2157T"                  
- [961] "Reddy_2158T"                   "Reddy_2159T"                  
- [963] "Reddy_2160T"                   "Reddy_2161T"                  
- [965] "Reddy_2162T"                   "Reddy_2163T"                  
- [967] "Reddy_2164T"                   "Reddy_2165T"                  
- [969] "Reddy_2166T"                   "Reddy_2190T"                  
- [971] "Reddy_2191T"                   "Reddy_2192T"                  
- [973] "Reddy_2193T"                   "Reddy_2194T"                  
- [975] "Reddy_2195T"                   "Reddy_2196T"                  
- [977] "Reddy_2198T"                   "Reddy_2199T"                  
- [979] "Reddy_2200T"                   "Reddy_2201T"                  
- [981] "Reddy_2203T"                   "Reddy_2204T"                  
- [983] "Reddy_2205T"                   "Reddy_2206T"                  
- [985] "Reddy_2207T"                   "Reddy_2208T"                  
- [987] "Reddy_2209T"                   "Reddy_2210T"                  
- [989] "Reddy_2211T"                   "Reddy_2212T"                  
- [991] "Reddy_2213T"                   "Reddy_2214T"                  
- [993] "Reddy_2215T"                   "Reddy_2216T"                  
- [995] "Reddy_2217T"                   "Reddy_2219T"                  
- [997] "Reddy_2220T"                   "Reddy_2221T"                  
- [999] "Reddy_2222T"                   "Reddy_2223T"                  
-[1001] "Reddy_2224T"                   "Reddy_2225T"                  
-[1003] "Reddy_2226T"                   "Reddy_2227T"                  
-[1005] "Reddy_2228T"                   "Reddy_2229T"                  
-[1007] "Reddy_2230T"                   "Reddy_2231T"                  
-[1009] "Reddy_2232T"                   "Reddy_2233T"                  
-[1011] "Reddy_2234T"                   "Reddy_2235T"                  
-[1013] "Reddy_2236T"                   "Reddy_2237T"                  
-[1015] "Reddy_2238T"                   "Reddy_2239T"                  
-[1017] "Reddy_2240T"                   "Reddy_2241T"                  
-[1019] "Reddy_2242T"                   "Reddy_2243T"                  
-[1021] "Reddy_2244T"                   "Reddy_2246T"                  
-[1023] "Reddy_2247T"                   "Reddy_2248T"                  
-[1025] "Reddy_2249T"                   "Reddy_2250T"                  
-[1027] "Reddy_2251T"                   "Reddy_2252T"                  
-[1029] "Reddy_2253T"                   "Reddy_2254T"                  
-[1031] "Reddy_2255T"                   "Reddy_2256T"                  
-[1033] "Reddy_2257T"                   "Reddy_2259T"                  
-[1035] "Reddy_2260T"                   "Reddy_2261T"                  
-[1037] "Reddy_2262T"                   "Reddy_2263T"                  
-[1039] "Reddy_2269T"                   "Reddy_2270T"                  
-[1041] "Reddy_2271T"                   "Reddy_2272T"                  
-[1043] "Reddy_2273T"                   "Reddy_2274T"                  
-[1045] "Reddy_2278T"                   "Reddy_2279T"                  
-[1047] "Reddy_2281T"                   "Reddy_2286T"                  
-[1049] "Reddy_2290T"                   "Reddy_2291T"                  
-[1051] "Reddy_2293T"                   "Reddy_2297T"                  
-[1053] "Reddy_2298T"                   "Reddy_2300T"                  
-[1055] "Reddy_2302T"                   "Reddy_2303T"                  
-[1057] "Reddy_2306T"                   "Reddy_2307T"                  
-[1059] "Reddy_2448T"                   "Reddy_2449T"                  
-[1061] "Reddy_2450T"                   "Reddy_2451T"                  
-[1063] "Reddy_2453T"                   "Reddy_2455T"                  
-[1065] "Reddy_2459T"                   "Reddy_2461T"                  
-[1067] "Reddy_2462T"                   "Reddy_2463T"                  
-[1069] "Reddy_2464T"                   "Reddy_2466T"                  
-[1071] "Reddy_2467T"                   "Reddy_2468T"                  
-[1073] "Reddy_2469T"                   "Reddy_2470T"                  
-[1075] "Reddy_2471T"                   "Reddy_2472T"                  
-[1077] "Reddy_2473T"                   "Reddy_2474T"                  
-[1079] "Reddy_2475T"                   "Reddy_2476T"                  
-[1081] "Reddy_2477T"                   "Reddy_2478T"                  
-[1083] "Reddy_2479T"                   "Reddy_2480T"                  
-[1085] "Reddy_2481T"                   "Reddy_2482T"                  
-[1087] "Reddy_2483T"                   "Reddy_2485T"                  
-[1089] "Reddy_2487T"                   "Reddy_2488T"                  
-[1091] "Reddy_2522T"                   "Reddy_2523T"                  
-[1093] "Reddy_2524T"                   "Reddy_2525T"                  
-[1095] "Reddy_2527T"                   "Reddy_2528T"                  
-[1097] "Reddy_2529T"                   "Reddy_2530T"                  
-[1099] "Reddy_2532T"                   "Reddy_2533T"                  
-[1101] "Reddy_2534T"                   "Reddy_2538T"                  
-[1103] "Reddy_2539T"                   "Reddy_2540T"                  
-[1105] "Reddy_2541T"                   "Reddy_2542T"                  
-[1107] "Reddy_2543T"                   "Reddy_2544T"                  
-[1109] "Reddy_2545T"                   "Reddy_2547T"                  
-[1111] "Reddy_2548T"                   "Reddy_2549T"                  
-[1113] "Reddy_2550T"                   "Reddy_2551T"                  
-[1115] "Reddy_2552T"                   "Reddy_2553T"                  
-[1117] "Reddy_2554T"                   "Reddy_2555T"                  
-[1119] "Reddy_2556T"                   "Reddy_2559T"                  
-[1121] "Reddy_2560T"                   "Reddy_2561T"                  
-[1123] "Reddy_2562T"                   "Reddy_2565T"                  
-[1125] "Reddy_2566T"                   "Reddy_2567T"                  
-[1127] "Reddy_2570T"                   "Reddy_2571T"                  
-[1129] "Reddy_2573T"                   "Reddy_2575T"                  
-[1131] "Reddy_2576T"                   "Reddy_2577T"                  
-[1133] "Reddy_2578T"                   "Reddy_2580T"                  
-[1135] "Reddy_2581T"                   "Reddy_2582T"                  
-[1137] "Reddy_2585T"                   "Reddy_2588T"                  
-[1139] "Reddy_2591T"                   "Reddy_2593T"                  
-[1141] "Reddy_2594T"                   "Reddy_2596T"                  
-[1143] "Reddy_2597T"                   "Reddy_2599T"                  
-[1145] "Reddy_2600T"                   "Reddy_2602T"                  
-[1147] "Reddy_2603T"                   "Reddy_2604T"                  
-[1149] "Reddy_2605T"                   "Reddy_2606T"                  
-[1151] "Reddy_2608T"                   "Reddy_2609T"                  
-[1153] "Reddy_2611T"                   "Reddy_2612T"                  
-[1155] "Reddy_2613T"                   "Reddy_2614T"                  
-[1157] "Reddy_2616T"                   "Reddy_2617T"                  
-[1159] "Reddy_2619T"                   "Reddy_2620T"                  
-[1161] "Reddy_2621T"                   "Reddy_2622T"                  
-[1163] "Reddy_2624T"                   "Reddy_2626T"                  
-[1165] "Reddy_2628T"                   "Reddy_2629T"                  
-[1167] "Reddy_2630T"                   "Reddy_2632T"                  
-[1169] "Reddy_2634T"                   "Reddy_2635T"                  
-[1171] "Reddy_2636T"                   "Reddy_2637T"                  
-[1173] "Reddy_2639T"                   "Reddy_2640T"                  
-[1175] "Reddy_2642T"                   "Reddy_2643T"                  
-[1177] "Reddy_2644T"                   "Reddy_2646T"                  
-[1179] "Reddy_2647T"                   "Reddy_2649T"                  
-[1181] "Reddy_2650T"                   "Reddy_2651T"                  
-[1183] "Reddy_2652T"                   "Reddy_2654T"                  
-[1185] "Reddy_2655T"                   "Reddy_2656T"                  
-[1187] "Reddy_2657T"                   "Reddy_2658T"                  
-[1189] "Reddy_2659T"                   "Reddy_2660T"                  
-[1191] "Reddy_2662T"                   "Reddy_2663T"                  
-[1193] "Reddy_2664T"                   "Reddy_2666T"                  
-[1195] "Reddy_2667T"                   "Reddy_2669T"                  
-[1197] "Reddy_2671T"                   "Reddy_2673T"                  
-[1199] "Reddy_2675T"                   "Reddy_2676T"                  
-[1201] "Reddy_2677T"                   "Reddy_2678T"                  
-[1203] "Reddy_2680T"                   "Reddy_2681T"                  
-[1205] "Reddy_2684T"                   "Reddy_2685T"                  
-[1207] "Reddy_2687T"                   "Reddy_2688T"                  
-[1209] "Reddy_2689T"                   "Reddy_2690T"                  
-[1211] "Reddy_2691T"                   "Reddy_2692T"                  
-[1213] "Reddy_2696T"                   "Reddy_2697T"                  
-[1215] "Reddy_2698T"                   "Reddy_2699T"                  
-[1217] "Reddy_2700T"                   "Reddy_2704T"                  
-[1219] "Reddy_2705T"                   "Reddy_2706T"                  
-[1221] "Reddy_2707T"                   "Reddy_2709T"                  
-[1223] "Reddy_2713T"                   "Reddy_2714T"                  
-[1225] "Reddy_2715T"                   "Reddy_2716T"                  
-[1227] "Reddy_2718T"                   "Reddy_2719T"                  
-[1229] "Reddy_2720T"                   "Reddy_2725T"                  
-[1231] "Reddy_2727T"                   "Reddy_2728T"                  
-[1233] "Reddy_2758T"                   "Reddy_2761T"                  
-[1235] "Reddy_2762T"                   "Reddy_2763T"                  
-[1237] "Reddy_2764T"                   "Reddy_2765T"                  
-[1239] "Reddy_2766T"                   "Reddy_2767T"                  
-[1241] "Reddy_2768T"                   "Reddy_2769T"                  
-[1243] "Reddy_2770T"                   "Reddy_2771T"                  
-[1245] "Reddy_2772T"                   "Reddy_2773T"                  
-[1247] "Reddy_2775T"                   "Reddy_2776T"                  
-[1249] "Reddy_2777T"                   "Reddy_2778T"                  
-[1251] "Reddy_2779T"                   "Reddy_2781T"                  
-[1253] "Reddy_2783T"                   "Reddy_2784T"                  
-[1255] "Reddy_2785T"                   "Reddy_2786T"                  
-[1257] "Reddy_2788T"                   "Reddy_2789T"                  
-[1259] "Reddy_2790T"                   "Reddy_2791T"                  
-[1261] "Reddy_2792T"                   "Reddy_2793T"                  
-[1263] "Reddy_2794T"                   "Reddy_2805T"                  
-[1265] "Reddy_2806T"                   "Reddy_2808T"                  
-[1267] "Reddy_2809T"                   "Reddy_2810T"                  
-[1269] "Reddy_2812T"                   "Reddy_2813T"                  
-[1271] "Reddy_2814T"                   "Reddy_2815T"                  
-[1273] "Reddy_2816T"                   "Reddy_2818T"                  
-[1275] "Reddy_2819T"                   "Reddy_2820T"                  
-[1277] "Reddy_2821T"                   "Reddy_2823T"                  
-[1279] "Reddy_2824T"                   "Reddy_2826T"                  
-[1281] "Reddy_2827T"                   "Reddy_2828T"                  
-[1283] "Reddy_2829T"                   "Reddy_2830T"                  
-[1285] "Reddy_2831T"                   "Reddy_2832T"                  
-[1287] "Reddy_2833T"                   "Reddy_2834T"                  
-[1289] "Reddy_2836T"                   "Reddy_2837T"                  
-[1291] "Reddy_2838T"                   "Reddy_2839T"                  
-[1293] "Reddy_2840T"                   "Reddy_2841T"                  
-[1295] "Reddy_2843T"                   "Reddy_2844T"                  
-[1297] "Reddy_2865T"                   "Reddy_2867T"                  
-[1299] "Reddy_2871T"                   "Reddy_2872T"                  
-[1301] "Reddy_2873T"                   "Reddy_2874T"                  
-[1303] "Reddy_2877T"                   "Reddy_2878T"                  
-[1305] "Reddy_2879T"                   "Reddy_2881T"                  
-[1307] "Reddy_2882T"                   "Reddy_2884T"                  
-[1309] "Reddy_2886T"                   "Reddy_2887T"                  
-[1311] "Reddy_2888T"                   "Reddy_2889T"                  
-[1313] "Reddy_2891T"                   "Reddy_2892T"                  
-[1315] "Reddy_2893T"                   "Reddy_2894T"                  
-[1317] "Reddy_2895T"                   "Reddy_2897T"                  
-[1319] "Reddy_2898T"                   "Reddy_2899T"                  
-[1321] "Reddy_2900T"                   "Reddy_2901T"                  
-[1323] "Reddy_2902T"                   "Reddy_2903T"                  
-[1325] "Reddy_2904T"                   "Reddy_2905T"                  
-[1327] "Reddy_2908T"                   "Reddy_2909T"                  
-[1329] "Reddy_2910T"                   "Reddy_2912T"                  
-[1331] "Reddy_2915T"                   "Reddy_2917T"                  
-[1333] "Reddy_2918T"                   "Reddy_2919T"                  
-[1335] "Reddy_2921T"                   "Reddy_2922T"                  
-[1337] "Reddy_2923T"                   "Reddy_2925T"                  
-[1339] "Reddy_2928T"                   "Reddy_2931T"                  
-[1341] "Reddy_2933T"                   "Reddy_2934T"                  
-[1343] "Reddy_2935T"                   "Reddy_2936T"                  
-[1345] "Reddy_2939T"                   "Reddy_2940T"                  
-[1347] "Reddy_2941T"                   "Reddy_2944T"                  
-[1349] "Reddy_2945T"                   "Reddy_2946T"                  
-[1351] "Reddy_2947T"                   "Reddy_2948T"                  
-[1353] "Reddy_2949T"                   "Reddy_2950T"                  
-[1355] "Reddy_2951T"                   "Reddy_2952T"                  
-[1357] "Reddy_2953T"                   "Reddy_2954T"                  
-[1359] "Reddy_2955T"                   "Reddy_2956T"                  
-[1361] "Reddy_2957T"                   "Reddy_2958T"                  
-[1363] "Reddy_2995T"                   "Reddy_2996T"                  
-[1365] "Reddy_2998T"                   "Reddy_2999T"                  
-[1367] "Reddy_3382T"                   "Reddy_3384T"                  
-[1369] "Reddy_3385T"                   "Reddy_3386T"                  
-[1371] "Reddy_3387T"                   "Reddy_3388T"                  
-[1373] "Reddy_3389T"                   "Reddy_3390T"                  
-[1375] "Reddy_3394T"                   "Reddy_3396T"                  
-[1377] "Reddy_3397T"                   "Reddy_3398T"                  
-[1379] "Reddy_3399T"                   "Reddy_3400T"                  
-[1381] "Reddy_3401T"                   "Reddy_3403T"                  
-[1383] "Reddy_3404T"                   "Reddy_3405T"                  
-[1385] "Reddy_3406T"                   "Reddy_3407T"                  
-[1387] "Reddy_3408T"                   "Reddy_3409T"                  
-[1389] "Reddy_3411T"                   "Reddy_3412T"                  
-[1391] "Reddy_3413T"                   "Reddy_3417T"                  
-[1393] "Reddy_3418T"                   "Reddy_3419T"                  
-[1395] "Reddy_3422T"                   "Reddy_3423T"                  
-[1397] "Reddy_3424T"                   "Reddy_3428T"                  
-[1399] "Reddy_3429T"                   "Reddy_3430T"                  
-[1401] "Reddy_3431T"                   "Reddy_3432T"                  
-[1403] "Reddy_3433T"                   "Reddy_3434T"                  
-[1405] "Reddy_3435T"                   "Reddy_3438T"                  
-[1407] "Reddy_3439T"                   "Reddy_3440T"                  
-[1409] "Reddy_3441T"                   "Reddy_3444T"                  
-[1411] "Reddy_3446T"                   "Reddy_3447T"                  
-[1413] "Reddy_3448T"                   "Reddy_3449T"                  
-[1415] "Reddy_3450T"                   "Reddy_3451T"                  
-[1417] "Reddy_3452T"                   "Reddy_3453T"                  
-[1419] "Reddy_3454T"                   "Reddy_3455T"                  
-[1421] "Reddy_3456T"                   "Reddy_3457T"                  
-[1423] "Reddy_3458T"                   "Reddy_3459T"                  
-[1425] "Reddy_3460T"                   "Reddy_3461T"                  
-[1427] "Reddy_3462T"                   "Reddy_3463T"                  
-[1429] "Reddy_3464T"                   "Reddy_3465T"                  
-[1431] "Reddy_3467T"                   "Reddy_3468T"                  
-[1433] "Reddy_3470T"                   "Reddy_3471T"                  
-[1435] "Reddy_3472T"                   "Reddy_3473T"                  
-[1437] "Reddy_3474T"                   "Reddy_3475T"                  
-[1439] "Reddy_3476T"                   "Reddy_3477T"                  
-[1441] "Reddy_3478T"                   "Reddy_3479T"                  
-[1443] "Reddy_3480T"                   "Reddy_3481T"                  
-[1445] "Reddy_3482T"                   "Reddy_3483T"                  
-[1447] "Reddy_3484T"                   "Reddy_3485T"                  
-[1449] "Reddy_3486T"                   "Reddy_3487T"                  
-[1451] "Reddy_3488T"                   "Reddy_3489T"                  
-[1453] "Reddy_3490T"                   "Reddy_3493T"                  
-[1455] "Reddy_3495T"                   "Reddy_3496T"                  
-[1457] "Reddy_3497T"                   "Reddy_3498T"                  
-[1459] "Reddy_3500T"                   "Reddy_3502T"                  
-[1461] "Reddy_3503T"                   "Reddy_3504T"                  
-[1463] "Reddy_3505T"                   "Reddy_3506T"                  
-[1465] "Reddy_3507T"                   "Reddy_3508T"                  
-[1467] "Reddy_3510T"                   "Reddy_3511T"                  
-[1469] "Reddy_3512T"                   "Reddy_3513T"                  
-[1471] "Reddy_3514T"                   "Reddy_3515T"                  
-[1473] "Reddy_3517T"                   "Reddy_3519T"                  
-[1475] "Reddy_3520T"                   "Reddy_3521T"                  
-[1477] "Reddy_3522T"                   "Reddy_3523T"                  
-[1479] "Reddy_3525T"                   "Reddy_3527T"                  
-[1481] "Reddy_3528T"                   "Reddy_3529T"                  
-[1483] "Reddy_3531T"                   "Reddy_3532T"                  
-[1485] "Reddy_3535T"                   "Reddy_3536T"                  
-[1487] "Reddy_3537T"                   "Reddy_3538T"                  
-[1489] "Reddy_3539T"                   "Reddy_3540T"                  
-[1491] "Reddy_3542T"                   "Reddy_3545T"                  
-[1493] "Reddy_3546T"                   "Reddy_3547T"                  
-[1495] "Reddy_3548T"                   "Reddy_3549T"                  
-[1497] "Reddy_3551T"                   "Reddy_3552T"                  
-[1499] "Reddy_3553T"                   "Reddy_3555T"                  
-[1501] "Reddy_3556T"                   "Reddy_3557T"                  
-[1503] "Reddy_3558T"                   "Reddy_3559T"                  
-[1505] "Reddy_3560T"                   "Reddy_3561T"                  
-[1507] "Reddy_3562T"                   "Reddy_3563T"                  
-[1509] "Reddy_3565T"                   "Reddy_3566T"                  
-[1511] "Reddy_3579T"                   "Reddy_3580T"                  
-[1513] "Reddy_3582T"                   "Reddy_3584T"                  
-[1515] "Reddy_3585T"                   "Reddy_3586T"                  
-[1517] "Reddy_3587T"                   "Reddy_3589T"                  
-[1519] "Reddy_3590T"                   "Reddy_3591T"                  
-[1521] "Reddy_3592T"                   "Reddy_3593T"                  
-[1523] "Reddy_3594T"                   "Reddy_3595T"                  
-[1525] "Reddy_3596T"                   "Reddy_3597T"                  
-[1527] "Reddy_3598T"                   "Reddy_3600T"                  
-[1529] "Reddy_3601T"                   "Reddy_3602T"                  
-[1531] "Reddy_3603T"                   "Reddy_3604T"                  
-[1533] "Reddy_3605T"                   "Reddy_3606T"                  
-[1535] "Reddy_3607T"                   "Reddy_3608T"                  
-[1537] "Reddy_3609T"                   "Reddy_3610T"                  
-[1539] "Reddy_3611T"                   "Reddy_3612T"                  
-[1541] "Reddy_3613T"                   "Reddy_3614T"                  
-[1543] "Reddy_3615T"                   "Reddy_3616T"                  
-[1545] "Reddy_3617T"                   "Reddy_3618T"                  
-[1547] "Reddy_3620T"                   "Reddy_3622T"                  
-[1549] "Reddy_3623T"                   "Reddy_3624T"                  
-[1551] "Reddy_3625T"                   "Reddy_3627T"                  
-[1553] "Reddy_3628T"                   "Reddy_3629T"                  
-[1555] "Reddy_3630T"                   "Reddy_3631T"                  
-[1557] "Reddy_3632T"                   "Reddy_3634T"                  
-[1559] "Reddy_3635T"                   "Reddy_3636T"                  
-[1561] "Reddy_3637T"                   "Reddy_3638T"                  
-[1563] "Reddy_3639T"                   "Reddy_3640T"                  
-[1565] "Reddy_3642T"                   "Reddy_3643T"                  
-[1567] "Reddy_3644T"                   "Reddy_3645T"                  
-[1569] "Reddy_3646T"                   "Reddy_3647T"                  
-[1571] "Reddy_3648T"                   "Reddy_3649T"                  
-[1573] "Reddy_3651T"                   "Reddy_3652T"                  
-[1575] "Reddy_3653T"                   "Reddy_3654T"                  
-[1577] "Reddy_3655T"                   "Reddy_3656T"                  
-[1579] "Reddy_3657T"                   "Reddy_3659T"                  
-[1581] "Reddy_3660T"                   "Reddy_3661T"                  
-[1583] "Reddy_3662T"                   "Reddy_3663T"                  
-[1585] "Reddy_3664T"                   "Reddy_3665T"                  
-[1587] "Reddy_3666T"                   "Reddy_3667T"                  
-[1589] "Reddy_3668T"                   "Reddy_3669T"                  
-[1591] "Reddy_3671T"                   "Reddy_3672T"                  
-[1593] "Reddy_3673T"                   "Reddy_3674T"                  
-[1595] "Reddy_3675T"                   "Reddy_3677T"                  
-[1597] "Reddy_3679T"                   "Reddy_3680T"                  
-[1599] "Reddy_3681T"                   "Reddy_3682T"                  
-[1601] "Reddy_3683T"                   "Reddy_3684T"                  
-[1603] "Reddy_3685T"                   "Reddy_3686T"                  
-[1605] "Reddy_3687T"                   "Reddy_3688T"                  
-[1607] "Reddy_3689T"                   "Reddy_3691T"                  
-[1609] "Reddy_3692T"                   "Reddy_3693T"                  
-[1611] "Reddy_3694T"                   "Reddy_3696T"                  
-[1613] "Reddy_3697T"                   "Reddy_3698T"                  
-[1615] "Reddy_3699T"                   "Reddy_3700T"                  
-[1617] "Reddy_3701T"                   "Reddy_3703T"                  
-[1619] "Reddy_3704T"                   "Reddy_3705T"                  
-[1621] "Reddy_3706T"                   "Reddy_3707T"                  
-[1623] "Reddy_3708T"                   "Reddy_3709T"                  
-[1625] "Reddy_3711T"                   "Reddy_3712T"                  
-[1627] "Reddy_3713T"                   "Reddy_3715T"                  
-[1629] "Reddy_3716T"                   "Reddy_3717T"                  
-[1631] "Reddy_3718T"                   "Reddy_3719T"                  
-[1633] "Reddy_3721T"                   "Reddy_3722T"                  
-[1635] "Reddy_3724T"                   "Reddy_3725T"                  
-[1637] "Reddy_3726T"                   "Reddy_3727T"                  
-[1639] "Reddy_3728T"                   "Reddy_3729T"                  
-[1641] "Reddy_3730T"                   "Reddy_3731T"                  
-[1643] "Reddy_3732T"                   "Reddy_3733T"                  
-[1645] "Reddy_3734T"                   "Reddy_3735T"                  
-[1647] "Reddy_3736T"                   "Reddy_3737T"                  
-[1649] "Reddy_3739T"                   "Reddy_3740T"                  
-[1651] "Reddy_3741T"                   "Reddy_3742T"                  
-[1653] "Reddy_3743T"                   "Reddy_3744T"                  
-[1655] "Reddy_3745T"                   "Reddy_3746T"                  
-[1657] "Reddy_3747T"                   "Reddy_3748T"                  
-[1659] "Reddy_3749T"                   "Reddy_3750T"                  
-[1661] "Reddy_3751T"                   "Reddy_3753T"                  
-[1663] "Reddy_3754T"                   "Reddy_3755T"                  
-[1665] "Reddy_3756T"                   "Reddy_3757T"                  
-[1667] "Reddy_3758T"                   "Reddy_3759T"                  
-[1669] "Reddy_3760T"                   "Reddy_3761T"                  
-[1671] "Reddy_3762T"                   "Reddy_3763T"                  
-[1673] "Reddy_3764T"                   "Reddy_3765T"                  
-[1675] "Reddy_3766T"                   "Reddy_3767T"                  
-[1677] "Reddy_3770T"                   "Reddy_3771T"                  
-[1679] "Reddy_3775T"                   "Reddy_3776T"                  
-[1681] "Reddy_3777T"                   "Reddy_3778T"                  
-[1683] "Reddy_3779T"                   "Reddy_3780T"                  
-[1685] "Reddy_3781T"                   "Reddy_3782T"                  
-[1687] "Reddy_3783T"                   "Reddy_3784T"                  
-[1689] "Reddy_3785T"                   "Reddy_3786T"                  
-[1691] "Reddy_3787T"                   "Reddy_3810T"                  
-[1693] "Reddy_3811T"                   "Reddy_3812T"                  
-[1695] "Reddy_3814T"                   "Reddy_3815T"                  
-[1697] "Reddy_3816T"                   "Reddy_3817T"                  
-[1699] "Reddy_3819T"                   "Reddy_3820T"                  
-[1701] "Reddy_3821T"                   "Reddy_3822T"                  
-[1703] "Reddy_3823T"                   "Reddy_3824T"                  
-[1705] "Reddy_3825T"                   "Reddy_3826T"                  
-[1707] "Reddy_3827T"                   "Reddy_3828T"                  
-[1709] "Reddy_3829T"                   "Reddy_3830T"                  
-[1711] "Reddy_3831T"                   "Reddy_3832T"                  
-[1713] "Reddy_3833T"                   "Reddy_3834T"                  
-[1715] "Reddy_3835T"                   "Reddy_3836T"                  
-[1717] "Reddy_3837T"                   "Reddy_3838T"                  
-[1719] "Reddy_3839T"                   "Reddy_3840T"                  
-[1721] "Reddy_3842T"                   "Reddy_3843T"                  
-[1723] "Reddy_3845T"                   "Reddy_3846T"                  
-[1725] "Reddy_3847T"                   "Reddy_3848T"                  
-[1727] "Reddy_3849T"                   "Reddy_3851T"                  
-[1729] "Reddy_3852T"                   "Reddy_3854T"                  
-[1731] "Reddy_3856T"                   "Reddy_3857T"                  
-[1733] "Reddy_3859T"                   "Reddy_3861T"                  
-[1735] "Reddy_3865T"                   "Reddy_3867T"                  
-[1737] "Reddy_3871T"                   "Reddy_3872T"                  
-[1739] "Reddy_3873T"                   "Reddy_3875T"                  
-[1741] "Reddy_3876T"                   "Reddy_3879T"                  
-[1743] "Reddy_3880T"                   "Reddy_3881T"                  
-[1745] "Reddy_3882T"                   "Reddy_3883T"                  
-[1747] "Reddy_3885T"                   "Reddy_3886T"                  
-[1749] "Reddy_3887T"                   "Reddy_3888T"                  
-[1751] "Reddy_3889T"                   "Reddy_3891T"                  
-[1753] "Reddy_3892T"                   "Reddy_3893T"                  
-[1755] "Reddy_3894T"                   "Reddy_3895T"                  
-[1757] "Reddy_3896T"                   "Reddy_3898T"                  
-[1759] "Reddy_3899T"                   "Reddy_3900T"                  
-[1761] "Reddy_3901T"                   "Reddy_3902T"                  
-[1763] "Reddy_3903T"                   "Reddy_3904T"                  
-[1765] "Reddy_3905T"                   "Reddy_3906T"                  
-[1767] "Reddy_3907T"                   "Reddy_3908T"                  
-[1769] "Reddy_3909T"                   "Reddy_3910T"                  
-[1771] "Reddy_3911T"                   "Reddy_3912T"                  
-[1773] "Reddy_3913T"                   "Reddy_3914T"                  
-[1775] "Reddy_3915T"                   "Reddy_3916T"                  
-[1777] "Reddy_3917T"                   "Reddy_3918T"                  
-[1779] "Reddy_3919T"                   "Reddy_3920T"                  
-[1781] "Reddy_3921T"                   "Reddy_3922T"                  
-[1783] "Reddy_3923T"                   "Reddy_3924T"                  
-[1785] "Reddy_3925T"                   "Reddy_3926T"                  
-[1787] "Reddy_3927T"                   "Reddy_3928T"                  
-[1789] "Reddy_3929T"                   "Reddy_3930T"                  
-[1791] "Reddy_3931T"                   "Reddy_3932T"                  
-[1793] "Reddy_3933T"                   "Reddy_3934T"                  
-[1795] "Reddy_3935T"                   "Reddy_3936T"                  
-[1797] "Reddy_3937T"                   "Reddy_3938T"                  
-[1799] "Reddy_3939T"                   "Reddy_3940T"                  
-[1801] "Reddy_3941T"                   "Reddy_3942T"                  
-[1803] "Reddy_3943T"                   "Reddy_3944T"                  
-[1805] "Reddy_3945T"                   "Reddy_3946T"                  
-[1807] "Reddy_3948T"                   "Reddy_3949T"                  
-[1809] "Reddy_3950T"                   "Reddy_3951T"                  
-[1811] "Reddy_3952T"                   "Reddy_3953T"                  
-[1813] "Reddy_3954T"                   "Reddy_3955T"                  
-[1815] "Reddy_3956T"                   "Reddy_3957T"                  
-[1817] "Reddy_3958T"                   "Reddy_3959T"                  
-[1819] "Reddy_3960T"                   "Reddy_3961T"                  
-[1821] "Reddy_3962T"                   "Reddy_3963T"                  
-[1823] "Reddy_3964T"                   "Reddy_3965T"                  
-[1825] "Reddy_3966T"                   "Reddy_3967T"                  
-[1827] "Reddy_3968T"                   "Reddy_3969T"                  
-[1829] "Reddy_3971T"                   "Reddy_3972T"                  
-[1831] "Reddy_3973T"                   "Reddy_3974T"                  
-[1833] "Reddy_3975T"                   "Reddy_3976T"                  
-[1835] "Reddy_3977T"                   "Reddy_3978T"                  
-[1837] "Reddy_3979T"                   "Reddy_3980T"                  
-[1839] "Reddy_3981T"                   "Reddy_3982T"                  
-[1841] "Reddy_3983T"                   "Reddy_3984T"                  
-[1843] "Reddy_3985T"                   "Reddy_3986T"                  
-[1845] "Reddy_3987T"                   "Reddy_3988T"                  
-[1847] "Reddy_3989T"                   "Reddy_3990T"                  
-[1849] "Reddy_3991T"                   "Reddy_3992T"                  
-[1851] "Reddy_3993T"                   "Reddy_3994T"                  
-[1853] "Reddy_3995T"                   "Reddy_3996T"                  
-[1855] "Reddy_3997T"                   "Reddy_3998T"                  
-[1857] "Reddy_3999T"                   "Reddy_4000T"                  
-[1859] "Reddy_648T"                    "Reddy_658T"                   
-[1861] "Reddy_683T"                    "Reddy_684T"                   
-[1863] "Reddy_689T"                    "Reddy_690T"                   
-[1865] "Reddy_695T"                    "Reddy_702T"                   
-[1867] "Reddy_704T"                    "Reddy_705T"                   
-[1869] "Reddy_707T"                    "Reddy_759T"                   
-[1871] "Reddy_787T"                    "Reddy_790T"                   
-[1873] "Reddy_793T"                    "Reddy_799T"                   
-[1875] "Reddy_800T"                    "Reddy_813T"                   
-[1877] "Reddy_816T"                    "Reddy_823T"                   
-[1879] "Reddy_829T"                    "Reddy_830T"                   
-[1881] "Reddy_831T"                   </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dlbcl_samples_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dlbcl_samples_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 7
   ID                        chrom     start       end LOH_flag log.ratio    CN
@@ -1898,13 +956,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 5 HTMCP-01-01-00012-01A-01D 2      88829484  88832840       NA         0     2
 6 HTMCP-01-01-00012-01A-01D 2      88832841  88856611       NA         1     4</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>dlbcl_meta_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
-<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dlbcl,</span>
-<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
-<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Are they the same?</span></span>
-<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(dlbcl_samples_seg, dlbcl_meta_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>dlbcl_meta_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dlbcl,</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Are they the same?</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(dlbcl_samples_seg, dlbcl_meta_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -1918,27 +976,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="use-region-1">Use <code>region</code></h4>
 <p>Here we are showing how to give the function a complete region with the <code>region</code> argument. Similarly to <code>get_sample_cn_segmetns</code> if <code>these_sample_ids</code> and/or <code>these_samples_metadata</code> are not specified, the function will query all available samples.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What is our region again?</span></span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>myc_region</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What is our region again?</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>myc_region</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "8:128747680-128753674"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get cn segments in this region for all samples</span></span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>myc_seg <span class="ot">&lt;-</span> <span class="fu">get_cn_segments</span>(</span>
-<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
-<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the CN states in this region for the selected samples?</span></span>
-<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>myc_seg <span class="sc">%&gt;%</span></span>
-<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(CN) <span class="sc">%&gt;%</span></span>
-<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
-<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
-<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> CN,</span>
-<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
-<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> CN</span>
-<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get cn segments in this region for all samples</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>myc_seg <span class="ot">&lt;-</span> <span class="fu">get_cn_segments</span>(</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the CN states in this region for the selected samples?</span></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>myc_seg <span class="sc">%&gt;%</span></span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(CN) <span class="sc">%&gt;%</span></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> CN,</span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> CN</span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="getting_started_files/figure-html/e19-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1948,18 +1006,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="specify-individual-chunks-1">Specify individual chunks</h4>
 <p>Here we specify the region of interest with the <code>chromosome</code>, <code>qstart</code>, and <code>qend</code> arguments. As a quick check we are also comparing the returned data frame with what we get when specifying the same region with the <code>region</code> argument to ensure they are identical.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>myc_chunks_seg <span class="ot">&lt;-</span> <span class="fu">get_cn_segments</span>(</span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span></span>
-<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Does this return match what we get when specifying the same genomic range</span></span>
-<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a><span class="co"># with `range` in the previous example?</span></span>
-<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>    myc_seg,</span>
-<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>    myc_chunks_seg</span>
-<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>myc_chunks_seg <span class="ot">&lt;-</span> <span class="fu">get_cn_segments</span>(</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span></span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Does this return match what we get when specifying the same genomic range</span></span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a><span class="co"># with `range` in the previous example?</span></span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>    myc_seg,</span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>    myc_chunks_seg</span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -1978,21 +1036,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="default-behaviour-1">Default behaviour</h4>
 <p>We will call <code>get_manta_sv</code> with default arguments to examine the output.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default arguments</span></span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>all_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>()</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a><span class="co"># How many SVs do we get back?</span></span>
-<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(all_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default arguments</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>all_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>()</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a><span class="co"># How many SVs do we get back?</span></span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(all_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1035</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># How many samples do we have SV calls for?</span></span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(all_manta<span class="sc">$</span>tumour_sample_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># How many samples do we have SV calls for?</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(all_manta<span class="sc">$</span>tumour_sample_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 520</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What does the returned data frame looks like?</span></span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What does the returned data frame looks like?</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  CHROM_A   START_A     END_A CHROM_B   START_B     END_B
 1       1 161658631 161658631       3  16509907  16509907
@@ -2022,12 +1080,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="using-these_sample_ids-2">Using <code>these_sample_ids</code></h4>
 <p>Here we are demonstrating the sample ID subset options</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_sample_ids</span></span>
-<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>sample_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id</span>
-<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sample_dohh2_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_sample_ids</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>sample_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sample_dohh2_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  CHROM_A   START_A     END_A CHROM_B   START_B     END_B
 1      14 106329465 106329465      18  60793497  60793497
@@ -2051,15 +1109,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="using-these_samples_metadatasample">Using <code>these_samples_metadata</code>sample</h4>
 <p>Alternatively, you can also provide <code>these_samples_metadata</code> argument to make use of a pre-filtered metadata table. In this case, the returned SVs will be restricted to the sample_ids within the data frame.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>meta_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2</span>
-<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Are they the same?</span></span>
-<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>    sample_dohh2_manta,</span>
-<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>    meta_dohh2_manta</span>
-<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>meta_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Are they the same?</span></span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>    sample_dohh2_manta,</span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>    meta_dohh2_manta</span>
+<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -2070,31 +1128,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="by-region-2">By Region</h3>
 <p>We can call <code>get_manta_sv</code> specifying the region of interest first in the region format and then with specifying the chromosome, start and end individually.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Specifying MYC in region format</span></span>
-<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_region <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id,</span>
-<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region,</span>
-<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="dv">0</span>,</span>
-<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">0</span>,</span>
-<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
-<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb74-10"><a href="#cb74-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Specifying MYC with chromosome, qstart and qend arguments</span></span>
-<span id="cb74-11"><a href="#cb74-11" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_chunks <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb74-12"><a href="#cb74-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2,</span>
-<span id="cb74-13"><a href="#cb74-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
-<span id="cb74-14"><a href="#cb74-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
-<span id="cb74-15"><a href="#cb74-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span>,</span>
-<span id="cb74-16"><a href="#cb74-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="dv">0</span>,</span>
-<span id="cb74-17"><a href="#cb74-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">0</span>,</span>
-<span id="cb74-18"><a href="#cb74-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
-<span id="cb74-19"><a href="#cb74-19" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb74-20"><a href="#cb74-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb74-21"><a href="#cb74-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Are the returns data frames the same?</span></span>
-<span id="cb74-22"><a href="#cb74-22" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb74-23"><a href="#cb74-23" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_region,</span>
-<span id="cb74-24"><a href="#cb74-24" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_chunks</span>
-<span id="cb74-25"><a href="#cb74-25" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Specifying MYC in region format</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_region <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id,</span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region,</span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="dv">0</span>,</span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">0</span>,</span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
+<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Specifying MYC with chromosome, qstart and qend arguments</span></span>
+<span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_chunks <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb72-12"><a href="#cb72-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2,</span>
+<span id="cb72-13"><a href="#cb72-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
+<span id="cb72-14"><a href="#cb72-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
+<span id="cb72-15"><a href="#cb72-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span>,</span>
+<span id="cb72-16"><a href="#cb72-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="dv">0</span>,</span>
+<span id="cb72-17"><a href="#cb72-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">0</span>,</span>
+<span id="cb72-18"><a href="#cb72-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
+<span id="cb72-19"><a href="#cb72-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb72-20"><a href="#cb72-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-21"><a href="#cb72-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Are the returns data frames the same?</span></span>
+<span id="cb72-22"><a href="#cb72-22" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb72-23"><a href="#cb72-23" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_region,</span>
+<span id="cb72-24"><a href="#cb72-24" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_chunks</span>
+<span id="cb72-25"><a href="#cb72-25" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -2104,26 +1162,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="sv-filtering">SV filtering</h3>
 <p>Here we are demonstrating the filtering options to return SVs. In this example we are calling <code>get_manta_sv</code> on the DLBCL metadata subset. For demonstration purposes, we are also requesting a non-default projection and adding some more filtering.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get manta SVs for the DLBCL cell line</span></span>
-<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>dlbcl_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dlbcl,</span>
-<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span>,</span>
-<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="fl">0.4</span>,</span>
-<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">100</span></span>
-<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a><span class="co"># How many variants do we get back with these filters?</span></span>
-<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(dlbcl_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get manta SVs for the DLBCL cell line</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>dlbcl_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dlbcl,</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span>,</span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="fl">0.4</span>,</span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">100</span></span>
+<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a><span class="co"># How many variants do we get back with these filters?</span></span>
+<span id="cb74-10"><a href="#cb74-10" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(dlbcl_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 48</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Does the advertised VAF filters work?</span></span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(dlbcl_manta<span class="sc">$</span>VAF_tumour <span class="sc">&gt;=</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Does the advertised VAF filters work?</span></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(dlbcl_manta<span class="sc">$</span>VAF_tumour <span class="sc">&gt;=</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Do the advertised SCORE filter work?</span></span>
-<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(dlbcl_manta<span class="sc">$</span>SCORE <span class="sc">&gt;=</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Do the advertised SCORE filter work?</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(dlbcl_manta<span class="sc">$</span>SCORE <span class="sc">&gt;=</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
