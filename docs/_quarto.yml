@@ -20,7 +20,7 @@ website:
   back-to-top-navigation: true
   repo-url: https://github.com/morinlab/GAMBLR.data
   repo-actions: [edit, issue]
-  repo-branch: master
+  repo-branch: website
   repo-subdir: docs
   issue-url: https://github.com/morinlab/GAMBLR.data/issues/new
 
