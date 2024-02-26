@@ -56,11 +56,11 @@
     "text": "This section will cover most of the questions you may have about GAMBLR.data. If there is something that is not covered, please feel free to reach out to us via GitHub by reporting an issue and we will be happy to add it to this page."
   },
   {
-    "objectID": "faq.html#someone-said-lymphoma-genes.-what-is-this",
-    "href": "faq.html#someone-said-lymphoma-genes.-what-is-this",
+    "objectID": "faq.html#what-exactly-is-meant-by-lymphoma-genes",
+    "href": "faq.html#what-exactly-is-meant-by-lymphoma-genes",
     "title": "Frequently Asked Qestions",
-    "section": "Someone said “lymphoma genes”. What is this?",
-    "text": "Someone said “lymphoma genes”. What is this?\nThe term lymphoma genes is referred to the curated list of genes significantly mutated in mature B-cell lymphomas. If you were referred to this list, it is available with this package by simply calling lymphoma_genes. Several modifications of the curated list are available, including the lists split by pathology, and a more comprehensive list lymphoma_genes_comprehensive that provides more information such as which studies reported it as SMG, whether it is target of aSHM etc."
+    "section": "What exactly is meant by “lymphoma genes”?",
+    "text": "What exactly is meant by “lymphoma genes”?\nThe term lymphoma genes is referred to the curated list of genes significantly mutated in mature B-cell lymphomas. If you were referred to this list, it is available with this package by simply calling lymphoma_genes. Several modifications of the curated list are available, including the lists split by pathology, and a more comprehensive list lymphoma_genes_comprehensive that provides more information such as which studies reported it as SMG, whether it is target of aSHM etc."
   },
   {
     "objectID": "faq.html#someone-said-ashm-regions.-what-is-this",

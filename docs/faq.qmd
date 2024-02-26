@@ -15,7 +15,7 @@ and we will be happy to add it to this page.
 
 ::: {#General .collapse .multi-collapse}
 
-## Someone said "lymphoma genes". What is this?
+## What exactly is meant by "lymphoma genes"?
 
 The term lymphoma genes is referred to the curated list of genes significantly
 mutated in mature B-cell lymphomas. If you were referred to this list, it is
