@@ -284,17 +284,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Tutorial: getting started</h1>
 <p>This is a quick tour of some basic commands and usage patterns, just to get you started.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Load packages</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GAMBLR.data)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>This tutorial explores how to retrieve different data types bundled withing GAMBLR.data. Commonly, such GAMBLR functions are prefixed with <code>get_</code>. These functions are readily available for returning data of different types: Simple Somatic Mutations (SSM), Copy Number (CN) segments and Structural Variants (SV). This resource explores commonly occurring arguments across different functions, best-practices and recommendations in the scope of retrieving data.</p>
+<p>This tutorial explores how to retrieve different data types bundled within GAMBLR.data. Commonly, GAMBLR functions are prefixed with <code>get_</code>. These functions are readily available for returning data of different types: Simple Somatic Mutations (SSM), Copy Number (CN) segments and Structural Variants (SV). This resource explores commonly occurring arguments across different functions, best-practices and recommendations in the scope of retrieving data.</p>
 <section id="how-do-i-obtain-metadata" class="level2">
 <h2 class="anchored" data-anchor-id="how-do-i-obtain-metadata">How do I obtain metadata?</h2>
-<p>First, lets start with retrieving metadata for all GAMBL samples. We can control which samples to be included in the output with <code>seq_type_filter</code> argument, which returns <em>genome</em> samples by default. To return metadata for capture samples, set <code>seq_type_filter = "capture"</code>. It is also possible to return metadata for more than one seq type, e.g <code>seq_type_filter = c("genome", "capture")</code>.</p>
+<p>First, let’s start with retrieving metadata for all GAMBL samples. We can control which samples to be included in the output with <code>seq_type_filter</code> argument, which returns <em>genome</em> samples by default. To return metadata for capture samples, set <code>seq_type_filter = "capture"</code>. It is also possible to return metadata for more than one seq type, e.g <code>seq_type_filter = c("genome", "capture")</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Get gambl metadata for genome samples</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Get gambl metadata for genome samples</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>genomes <span class="ot">&lt;-</span> <span class="fu">get_gambl_metadata</span>(</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">seq_type_filter =</span> <span class="st">"genome"</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -305,7 +305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">seq_type_filter =</span> <span class="fu">c</span>(<span class="st">"genome"</span>, <span class="st">"capture"</span>)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Now that we have the metadata, it can illustrate what are the expected column names and their format:</p>
+<p>Now that we have the metadata, we can look at the expected column names and their format:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(metadata<span class="sc">$</span>all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -339,9 +339,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  $ time_point          : chr [1:4785] "A" "B" "C" "D" ...</code></pre>
 </div>
 </div>
-<p>We can now use the metadata as we wish, for example see what pathologies are available and do any sort of subsetting.</p>
+<p>We can now use the metadata as we wish. For example, we can visualize the counts of samples per pathology and sequencing type:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#We can see what is included in the metadata</span></span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can see what is included in the metadata</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>all <span class="sc">%&gt;%</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(pathology, seq_type) <span class="sc">%&gt;%</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
@@ -364,11 +364,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <p><img src="getting_started_files/figure-html/manipulate_metadata-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Subset metadata on a set of samples (samples classified as DLBCL for pathology)</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>dlbcl <span class="ot">&lt;-</span> metadata<span class="sc">$</span>all <span class="sc">%&gt;%</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(pathology <span class="sc">==</span> <span class="st">"DLBCL"</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Quick sanity check</span></span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can also visualize these counts when subset to only DLBCL:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset metadata on a set of samples (samples classified as DLBCL for pathology)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>dlbcl <span class="ot">&lt;-</span> metadata<span class="sc">$</span>all <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(pathology <span class="sc">==</span> <span class="st">"DLBCL"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>dlbcl <span class="sc">%&gt;%</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(pathology, seq_type) <span class="sc">%&gt;%</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
@@ -395,8 +395,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="how-do-i-obtain-ssm" class="level2">
 <h2 class="anchored" data-anchor-id="how-do-i-obtain-ssm">How do I obtain SSM?</h2>
-<p>Based on the information available to you, application, or downstream analysis, there are multiple ways to retrieve SSM data. For example, if you knows the sample ID and is only interested in looking at SSM results for that particular sample, one can use <code>get_ssm_by_sample</code>. If multiple samples are to be analyzed, <code>get_ssm_by_samples</code> (plural version) is recommended. You can also use patient IDs for retrieving this data, in this case <code>get_ssm_by_patients</code> is available. In addition, you can also restrict SSM calls to specific genomic regions with <code>get_ssm_by_regions</code> or <code>get_ssm_by_region</code>.</p>
-<p>Another possibility is to focus on coding mutations only and call <code>get_coding_ssm</code>, this function returns all coding SSMs from the bundled data in MAF-like format. If you have an already pre-filtered metadata, the <code>these_samples_metadata</code> argument can be used with all SSM functions to restrict the variants returned to the sample IDs in this data frame, handy!</p>
+<p>Based on the information available to you, your application, or your downstream analysis, there are multiple ways to retrieve SSM data. For example, if you know the sample ID and are only interested in looking at SSM results for that particular sample, you can use <code>get_ssm_by_sample</code>. If multiple samples are to be analyzed, <code>get_ssm_by_samples</code> (plural version) is recommended. You can also use patient IDs for retrieving this data, in this case <code>get_ssm_by_patients</code> is available. In addition, you can also restrict SSM calls to specific genomic regions with <code>get_ssm_by_regions</code> or <code>get_ssm_by_region</code>.</p>
+<p>Another possibility is to focus on coding mutations only and call <code>get_coding_ssm</code>, this function returns all coding SSMs from the bundled data in maf-like format. If you have an already pre-filtered metadata, the <code>these_samples_metadata</code> argument can be used with all SSM functions to restrict the variants returned to the sample IDs in this data frame, handy!</p>
 <section id="by-samples" class="level3">
 <h3 class="anchored" data-anchor-id="by-samples">By Samples</h3>
 <p>Return SSMs for one or more samples with <code>get_ssm_by_samples</code>. In the example below, we are requesting SSM for the DOHH-2 cell line in two different ways:</p>
@@ -408,12 +408,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Using the these_samples_id argument</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>ssm_sample <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_samples</span>(<span class="at">these_sample_ids =</span> my_sample_id)</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#How manny mutations do we get back?</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># How many mutations do we get back?</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ssm_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 22137    45</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#What columns are available?</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What columns are available?</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ssm_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "Hugo_Symbol"                   "Entrez_Gene_Id"               
@@ -440,7 +440,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 [43] "n_depth"                       "n_ref_count"                  
 [45] "n_alt_count"                  </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#What variants are the available?</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What variants are available?</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ssm_sample <span class="sc">%&gt;%</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Variant_Classification) <span class="sc">%&gt;%</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
@@ -476,12 +476,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2</span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#How manny mutations do we get back?</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># How many mutations do we get back?</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ssm_meta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 22137    45</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#What columns are available?</span></span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What columns are available?</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ssm_meta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "Hugo_Symbol"                   "Entrez_Gene_Id"               
@@ -508,7 +508,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 [43] "n_depth"                       "n_ref_count"                  
 [45] "n_alt_count"                  </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#What variants are the available?</span></span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What variants are available?</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>ssm_meta <span class="sc">%&gt;%</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Variant_Classification) <span class="sc">%&gt;%</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
@@ -545,7 +545,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="using-these_genes" class="level4">
 <h4 class="anchored" data-anchor-id="using-these_genes">Using <code>these_genes</code></h4>
-<p>Returnng maf data for thousands or hundreds of files can be potentially creating memory or space issues to store the Rsession if you are using old-day R editors like RStudio. To facilitate this, you can optionally request the SSM to be returned just for a small number of specific genes with the argument <code>these_genes</code>:</p>
+<p>Returning maf data for thousands or hundreds of files can potentially create memory or space issues when storing the Rsession if you are using old-day R editors like RStudio. To facilitate this, you can optionally request the SSM to be returned just for a small number of specific genes with the argument <code>these_genes</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Only look at specific gene(s)</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>my_genes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"MYC"</span>)</span>
@@ -572,7 +572,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="using-maf_col" class="level4">
 <h4 class="anchored" data-anchor-id="using-maf_col">Using <code>maf_col</code></h4>
-<p>Similarly, do decrease the burden of handling large maf data, it is also possible to dictate what MAF columns we want back. To do this, call the function with the <code>maf_col</code> argument and provide vector of the columns of interest. Here, we are requesting SSM calls for only a small set of columns. It is also important to note that this will require setting of another argument <code>basic_columns</code> to <code>FALSE</code> as this argument takes precedence of all other arguments that control output columns and returns first 45 columns of standard maf.</p>
+<p>Similarly, to decrease the burden of handling large maf data, it is also possible to dictate what maf columns we want back. To do this, call the function with the <code>maf_col</code> argument and provide a vector of the columns of interest. Here, we are requesting SSM calls for only a small set of columns. It is also important to note that this will require setting the argument <code>basic_columns</code> to <code>FALSE</code>, as this argument takes precedence over all other arguments that control output columns and returns first 45 columns of standard maf.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the column names</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>my_columns <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
@@ -584,7 +584,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Variant_Classification"</span></span>
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Since we don provide neither of arguments that restrict to specific</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Since we don't provide any arguments that restrict to specific</span></span>
 <span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co"># samples, we expect the return to contain data from all samples in the bundled</span></span>
 <span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co"># data</span></span>
 <span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>ssm_col <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_samples</span>(</span>
@@ -608,7 +608,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="in-a-different-projection" class="level4">
 <h4 class="anchored" data-anchor-id="in-a-different-projection">In a different projection</h4>
-<p>Often many downstream tools can only work on one or the other genome buid, and GAMBLR.data provides a simple and straightforward way to obtain variants in different projection. The default output is always wuth respect to <code>grch37</code>, and it can be easily modified with argument <code>projection</code>:</p>
+<p>Often many downstream tools can only work on one specific genome build, and GAMBLR.data provides a simple and straightforward way to obtain variants in different projections. The default output is always with respect to <code>grch37</code>, and it can be easily modified with argument <code>projection</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ssm_hg38 <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_samples</span>(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
@@ -630,12 +630,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="getting_started_files/figure-html/e5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>As we did not specify any sample id, metadata, or gene to the above call, it by default returned the data for all samples available in the GAMBR.data and we can see from the plot that all of the variants are with respect to hg38. Sweet! <span class="emoji" data-emoji="sunglasses">😎</span></p>
+<p>As we did not specify any sample ID, metadata, or gene to the above call, it by default returned the data for all samples available in GAMBLR.data, and we can see from the plot that all of the variants are with respect to hg38. Sweet! <span class="emoji" data-emoji="sunglasses">😎</span></p>
 </section>
 </section>
 <section id="by-region" class="level3">
 <h3 class="anchored" data-anchor-id="by-region">By Region</h3>
-<p>In this section we are exploring the different ways you can return the maf data for a specific region (or regions) of interest.</p>
+<p>In this section, we are exploring the different ways you can obtain the maf data for a specific region (or regions) of interest.</p>
 <section id="use-region" class="level4">
 <h4 class="anchored" data-anchor-id="use-region">Use <code>region</code></h4>
 <p>If you are only looking at one specific position, you can take advantage of the <code>get_ssm_by_region()</code> function:</p>
@@ -686,7 +686,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="getting_started_files/figure-html/e7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Let us also confirm that the returned maf is the same we get back with the <code>region</code> argument:</p>
+<p>Let’s also confirm that this returned maf is the same as what we get back when using the <code>region</code> argument:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    myc_ssm,</span>
@@ -699,7 +699,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="use-pre-loaded-maf" class="level4">
 <h4 class="anchored" data-anchor-id="use-pre-loaded-maf">Use pre-loaded maf</h4>
-<p>If you are working with massive maf data containing many variants and have already imported it to R, or using the maf data not coming with this package, you can still take advantage of this function and use the pre-loaded maf. This function will still subset it to the desired regions. To do so, specify the MAF of interest with <code>maf_data</code>:</p>
+<p>If you are working with massive maf data containing many variants and have already imported it to R, or using the maf data from outside of this package, you can still take advantage of this function and use the pre-loaded maf. This function will still subset it to the desired regions. To do so, specify the maf of interest with <code>maf_data</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>dohh2_myc_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">maf_data =</span> ssm_sample,</span>
@@ -720,7 +720,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="toggling-streamlined" class="level4">
 <h4 class="anchored" data-anchor-id="toggling-streamlined">Toggling <code>streamlined</code></h4>
-<p>This function also has a streamlined option available. If set to <code>TRUE</code>, only two columns are kept in the returned MAF (Start_Position and Tumour_Sample_Barcode). In this example, we are extending the coordinates to encapsulate the whole p-arm of chromosome 1. Note, since we are requesting hg38 calls, we have to add the chr prefix for the specified chromosome. Don’t remember the coordinates? Likely, the GAMBLR.data provides the coordinates for chromosome arms in both projections!</p>
+<p>This function also has a streamlined option available. If set to <code>TRUE</code>, only two columns are kept in the returned maf (Start_Position and Tumour_Sample_Barcode). In this example, we are extending the coordinates to encapsulate the whole p-arm of chromosome 1. Note, since we are requesting hg38 calls, we have to add the chr prefix for the specified chromosome. Don’t remember the coordinates? Luckily, GAMBLR.data provides the coordinates for chromosome arms in both projections!</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>coord <span class="ot">&lt;-</span> chromosome_arms_hg38 <span class="sc">%&gt;%</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(arm <span class="sc">==</span> <span class="st">"p"</span>, chromosome <span class="sc">==</span> <span class="st">"chr1"</span>)</span>
@@ -733,12 +733,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
 <span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="co">#What columns are kept with streamlined = TRUE?</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="co"># What columns are kept with streamlined = TRUE?</span></span>
 <span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(streamlined_ssm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Start_Position"       "Tumor_Sample_Barcode"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#How many variants do we find within the specified region?</span></span>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># How many variants do we find within the specified region?</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(streamlined_ssm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 7749</code></pre>
@@ -747,7 +747,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="focus-on-specific-ids" class="level4">
 <h4 class="anchored" data-anchor-id="focus-on-specific-ids">Focus on specific IDs</h4>
-<p>Similarly to other get_ssm functions, we can also call <code>get_ssm_by_region</code> with either <code>these_sample_ids</code> or <code>these_samples_metadata</code> to restrict the return to specific sample IDs. In this example, we first call the function with <code>these_sample_ids = "DOHH-2"</code> and then with <code>these_samples_metadata</code> giving the function a metadata that has been subset to the same sample ID.</p>
+<p>Similarly to other get_ssm functions, we can also call <code>get_ssm_by_region</code> with either <code>these_sample_ids</code> or <code>these_samples_metadata</code> to restrict the return to specific sample IDs. In this example, we first call the function with <code>these_sample_ids = "DOHH-2"</code> and then with <code>these_samples_metadata</code> giving the function a metadata table that has been subset to the same sample ID.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>dohh2_region_sample <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id,</span>
@@ -761,11 +761,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>We can also see that both approaches generate identical output:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Are the two returned data frames identical?</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    dohh2_region_sample,</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    dohh2_region_metadata</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    dohh2_region_sample,</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    dohh2_region_metadata</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -773,7 +772,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="look-at-multiple-regions" class="level4">
 <h4 class="anchored" data-anchor-id="look-at-multiple-regions">Look at multiple regions</h4>
-<p>For multiple regions, refer to the plural version, <code>get_ssm_by_regions</code>. In this example we will return SSM calls for all aSHM regions associated with <em>PAX5</em> across all available samples. With this multiple-region-version of this function we also get the region name added to the returned data frame and there are a couple of different ways this can be done. If you are providing regions as a bed file (<code>regions_bed</code>), you have the option of setting <code>use_name_column = TRUE</code>. If you do so your bed file should have a column simply named “name”. In this case, the function will keep this column for naming the returned regions in the maf. With <code>streamlined = TRUE</code> the function returns the minimal number of columns. Don’t know coordinates of aSHM at <em>PAX5</em>? GAMBLR.data got you covered!</p>
+<p>For multiple regions, refer to the plural version, <code>get_ssm_by_regions</code>. In this example, we will obtain SSM calls for all aSHM regions associated with <em>PAX5</em> across all available samples. With this multiple-region-version of this function we also get the region name added to the returned data frame and there are a couple of different ways this can be done. If you are providing regions as a bed file (<code>regions_bed</code>), you have the option of setting <code>use_name_column = TRUE</code>. If you do so, your bed file should have a column simply named “name”. In this case, the function will keep this column for naming the returned regions in the maf. With <code>streamlined = TRUE</code> the function returns the minimal number of columns. Don’t know coordinates of aSHM at <em>PAX5</em>? GAMBLR.data has you covered!</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get aSHM genes, select the columns of interest and rename for</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># get_ssm_by_regions compatibility</span></span>
@@ -789,7 +788,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="fu">paste0</span>(gene, <span class="st">"_"</span>, region)</span>
 <span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="co">#Get ssm for all ashm regions</span></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Get ssm for all ashm regions</span></span>
 <span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>ashm_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_regions</span>(</span>
 <span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">regions_bed =</span> regions,</span>
 <span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">use_name_column =</span> <span class="cn">TRUE</span>,</span>
@@ -812,7 +811,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="using-list-of-regions" class="level4">
 <h4 class="anchored" data-anchor-id="using-list-of-regions">Using list of regions</h4>
-<p>You can instead specify regions as a vector of characters (<code>regions_list</code>) instead of using a bed file. In this case, the function will not accept a fourth element for naming the returned regions. If so, the function defaults to using the specified regions instead.</p>
+<p>You can instead specify regions as a vector of characters (<code>regions_list</code>) instead of using a bed file. In this case, the function will not accept a fourth element for naming the returned regions. If so, the function defaults to using the specified region as the name of the column in the output.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>ssm_region_list <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_regions</span>(</span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">regions_list =</span> <span class="fu">c</span>(</span>
@@ -840,7 +839,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="coding-ssm" class="level3">
 <h3 class="anchored" data-anchor-id="coding-ssm">Coding SSM</h3>
-<p>Lastly, another way to retrieve SSM is to call <code>get_coding_ssm</code>. This function returns coding SSM for any given sample. This function is a convenient option for anyone interested in focusing only on coding mutations. Convenient filtering arguments are included in this function for easy and straightforward subsetting. If these arguments are not called, coding SSM will be returned for all samples. Of course, similar to the examples above, you can provide a metadata subset that has already been filtered to the sample IDs of interest (using <code>these_samples_metadata</code>).</p>
+<p>Lastly, another way to retrieve SSM is to call <code>get_coding_ssm</code>. This function returns coding SSM for any given sample. This function is a convenient option for anyone interested in focusing only on coding mutations. Convenient filtering arguments are included in this function for easy and straightforward subsetting. If these arguments are not used, coding SSM will be returned for all samples. Of course, similar to the examples above, you can provide a metadata subset that has already been filtered to the sample IDs of interest (using <code>these_samples_metadata</code>).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit_cohort</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>dlbcl_cell_lines <span class="ot">&lt;-</span> <span class="fu">get_coding_ssm</span>(</span>
@@ -854,7 +853,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Instead, we can just exclude a group of samples by using the <code>exclude_cohort</code> argument:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Exclude_cohort</span></span>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Exclude_cohort</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>no_dlbcl_cell_lines <span class="ot">&lt;-</span> <span class="fu">get_coding_ssm</span>(</span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclude_cohort =</span>  <span class="st">"DLBCL_cell_lines"</span></span>
 <span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -870,10 +869,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>For the purpose of retrieving CN data, we have two functions available: <code>get_sample_cn_segments</code> and <code>get_sn_segments</code>, each with its own specialized application and recommended usage. Briefly, <code>get_sample_cn_segments</code> is best called if you want to query CN segments for a specific subset of samples. This function works for singular as well as multiple samples. In addition, many arguments and their behavior might be already familiar to you from the previous section (such as <code>this_seq_type</code>, <code>projection</code>, <code>these_sample_ids</code>, and <code>these_samples_metadata</code>). If you instead want to query CN calls for a specific region or genomic loci, <code>get_cn_segments</code> is best used. In this section we will explore the two different functions and demonstrate how they can be used.</p>
 <section id="by-samples-1" class="level3">
 <h3 class="anchored" data-anchor-id="by-samples-1">By Samples</h3>
-<p><code>get_sample_cn_segments</code> returns CN segments in seg format for single sample or multiple samples. Specify the sample IDs you are interested in with <code>these_sample_ids</code> (as a vector of characters), or call this function with <code>these_samples_metadata</code> if you already have a metadata table subset to the sample IDs of interest. If none of the above arguments are specified, the function will return CN segments for available samples (from <code>get_gambl_metadata</code>) - a behaviour consistent with other functions of the <code>get_</code> GAMBLR family. As some downstream tools do now allow for missing segments in the CN data for proper functioning, this is already handled for you when returning SN. The “bald spots” where CN callers did not report any variants are filled in with empty segments of diploid state, and extend through the whole chromosome arm, omitting centromeres.</p>
+<p><code>get_sample_cn_segments</code> returns CN segments in seg format for single sample or multiple samples. Specify the sample IDs you are interested in with <code>these_sample_ids</code> (as a vector of characters), or call this function with <code>these_samples_metadata</code> if you already have a metadata table subset to the sample IDs of interest. If none of the above arguments are specified, the function will return CN segments for available samples (from <code>get_gambl_metadata</code>) - a behaviour consistent with other functions of the <code>get_</code> GAMBLR family. As some downstream tools do not allow for missing segments in the CN data for proper functioning, this is already handled for you when obtaining CN data. The “bald spots” where CN callers did not report any variants are filled in with empty segments of diploid state, and extend through the whole chromosome arm, omitting centromeres.</p>
 <section id="default-behaviour" class="level4">
 <h4 class="anchored" data-anchor-id="default-behaviour">Default behaviour</h4>
-<p>To begin wit it, lets call <code>get_sample_cn_segments</code> with default arguments. This returns all available CN information from the bundled data. Consistent with other functions of the <code>get_</code> GAMBLR family, the default <code>seq_type</code> is always set to genome and <code>grch37</code> projection.</p>
+<p>To begin, let’s call <code>get_sample_cn_segments</code> with default arguments. This returns all available CN information from the bundled data. Consistent with other functions of the <code>get_</code> GAMBLR family, the default <code>seq_type</code> is always set to genome and default projection set to <code>grch37</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>()</span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -894,7 +893,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="using-these_sample_ids-1" class="level4">
 <h4 class="anchored" data-anchor-id="using-these_sample_ids-1">Using <code>these_sample_ids</code></h4>
-<p>Now, let us explore some of the other arguments we have available. In this example we are calling the function specifying <code>these_sample_ids</code> to return CN data for a sample of interest.</p>
+<p>Now, let’s explore some of the other arguments we have available. In this example, we are calling the function specifying <code>these_sample_ids</code> to obtain CN data for a sample of interest.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_sample_ids</span></span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>sample_dohh2_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
@@ -936,9 +935,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="in-a-different-projection-1" class="level4">
 <h4 class="anchored" data-anchor-id="in-a-different-projection-1">In a different projection</h4>
-<p>We can retrieve CN segments while also request a different projection. Similar to the SSM functionality shown earlier, this can be done by toggling the <code>projection</code> argument and switching it to the <code>hg38</code> value from the default.</p>
+<p>We can retrieve CN segments while also requesting a different projection. Similar to the SSM functionality shown earlier, this can be done by toggling the <code>projection</code> argument and switching it to the <code>hg38</code> value.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Call get_sample_cn_segments</span></span>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call get_sample_cn_segments</span></span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>dlbcl_samples_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> metadata<span class="sc">$</span>dlbcl<span class="sc">$</span>sample_id,</span>
 <span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
@@ -961,7 +960,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
 <span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Are they the same?</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Are they the same?</span></span>
 <span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(dlbcl_samples_seg, dlbcl_meta_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
@@ -971,10 +970,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="by-region-1" class="level3">
 <h3 class="anchored" data-anchor-id="by-region-1">By Region</h3>
-<p><code>get_cn_segments</code> behaves very similar to <code>get_sample_cn_segments</code> with the difference that you can specify one or more genomic loci to restrict the returned CN segments to. In order to achieve this, the function has the following additional arguments available; <code>region</code>, <code>chromosome</code>, <code>qstart</code>, and <code>qend</code>. You can provide the full region in a “region” format (chr:start-end) to the <code>region</code> argument. Alternatively, you can provide chromosome, start and end coordinates individually with <code>chr</code>, <code>qstart</code>, and <code>qend</code> arguments.</p>
+<p><code>get_cn_segments</code> behaves very similar to <code>get_sample_cn_segments</code> with the difference that you can specify one or more genomic loci to restrict the returned CN segments to. In order to achieve this, the function has the following additional arguments available; <code>region</code>, <code>chromosome</code>, <code>qstart</code>, and <code>qend</code>. You can provide the full region in a “region” format (chr:start-end) to the <code>region</code> argument. Alternatively, you can provide chromosome, start, and end coordinates individually with <code>chr</code>, <code>qstart</code>, and <code>qend</code> arguments.</p>
 <section id="use-region-1" class="level4">
 <h4 class="anchored" data-anchor-id="use-region-1">Use <code>region</code></h4>
-<p>Here we are showing how to give the function a complete region with the <code>region</code> argument. Similarly to <code>get_sample_cn_segmetns</code> if <code>these_sample_ids</code> and/or <code>these_samples_metadata</code> are not specified, the function will query all available samples.</p>
+<p>Here we are showing how to give the function a complete region with the <code>region</code> argument. Similar to <code>get_sample_cn_segments</code>, if <code>these_sample_ids</code> and/or <code>these_samples_metadata</code> are not specified, the function will query all available samples.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What is our region again?</span></span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>myc_region</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1004,7 +1003,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="specify-individual-chunks-1" class="level4">
 <h4 class="anchored" data-anchor-id="specify-individual-chunks-1">Specify individual chunks</h4>
-<p>Here we specify the region of interest with the <code>chromosome</code>, <code>qstart</code>, and <code>qend</code> arguments. As a quick check we are also comparing the returned data frame with what we get when specifying the same region with the <code>region</code> argument to ensure they are identical.</p>
+<p>Here we specify the region of interest with the <code>chromosome</code>, <code>qstart</code>, and <code>qend</code> arguments. As a quick check, we are also comparing the returned data frame with what we get when specifying the same region with the <code>region</code> argument to ensure they are identical.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>myc_chunks_seg <span class="ot">&lt;-</span> <span class="fu">get_cn_segments</span>(</span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
@@ -1028,10 +1027,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="how-do-i-obtain-sv" class="level2">
 <h2 class="anchored" data-anchor-id="how-do-i-obtain-sv">How do I obtain SV?</h2>
-<p>In this last section we will explore how to get SV data using GAMBLR.data. For this purpose <code>get_manta_sv</code> was developed. Similar to the previously described SSM and CNV functionality, this function can also restrict the returned calls to any genomic regions specified with <code>chromosome</code>, <code>qstart</code>, <code>qend</code>, or the complete region specified under <code>region</code> argument (in chr:start-end format). In addition, useful filtering arguments are also available, use <code>min_vaf</code> to set the minimum tumour VAF for a SV to be returned and <code>min_score</code> to set the lowest Manta somatic score for a SV to be returned. <code>pair_status</code> can be used to return variants from either matched or unmatched samples. In addition, you can chose to return all variants, even the ones not passing the filter criteria. To do so, set <code>pass = FALSE</code> (default is TRUE).</p>
+<p>In this last section, we will explore how to get SV data using GAMBLR.data. For this purpose <code>get_manta_sv</code> was developed. Similar to the previously described SSM and CNV functionalities, this function can also restrict the returned calls to any genomic regions specified with <code>chromosome</code>, <code>qstart</code>, <code>qend</code>, or the complete region specified with the <code>region</code> argument (in chr:start-end format). In addition, useful filtering arguments are also available, use <code>min_vaf</code> to set the minimum tumour VAF in order for a SV to be returned and <code>min_score</code> to set the lowest Manta somatic score in order for a SV to be returned. <code>pair_status</code> can be used to obtain variants from either matched or unmatched samples. In addition, you can chose to obtain all variants, even the ones not passing the filter criteria. To do so, set <code>pass = FALSE</code> (default is TRUE).</p>
 <section id="by-samples-2" class="level3">
 <h3 class="anchored" data-anchor-id="by-samples-2">By Samples</h3>
-<p>This function also operates on the same set of familiar arguments as other family of <code>get_</code> functions in GAMBLR. For example, to obtain SV calls for multiple samples, give <code>these_sample_ids</code> a vector of sample IDs. It will return the identical output as when the subsetting is done using <code>these_samples_metadata</code>. When none of this is specified, the returned output cotains SVs for all samples available.</p>
+<p>This function also operates on the same set of familiar arguments as the family of <code>get_</code> functions in GAMBLR. For example, to obtain SV calls for multiple samples, give <code>these_sample_ids</code> a vector of sample IDs. It will return the identical output as when the subsetting is done using <code>these_samples_metadata</code>. When none of this is specified, the returned output contains SVs for all samples available.</p>
 <section id="default-behaviour-1" class="level4">
 <h4 class="anchored" data-anchor-id="default-behaviour-1">Default behaviour</h4>
 <p>We will call <code>get_manta_sv</code> with default arguments to examine the output.</p>
@@ -1049,7 +1048,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 520</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What does the returned data frame looks like?</span></span>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What does the returned data frame look like?</span></span>
 <span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  CHROM_A   START_A     END_A CHROM_B   START_B     END_B
@@ -1078,7 +1077,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="using-these_sample_ids-2" class="level4">
 <h4 class="anchored" data-anchor-id="using-these_sample_ids-2">Using <code>these_sample_ids</code></h4>
-<p>Here we are demonstrating the sample ID subset options</p>
+<p>Here we are demonstrating the sample ID subset option.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_sample_ids</span></span>
 <span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>sample_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
@@ -1128,7 +1127,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="by-region-2">By Region</h3>
 <p>We can call <code>get_manta_sv</code> specifying the region of interest first in the region format and then with specifying the chromosome, start and end individually.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Specifying MYC in region format</span></span>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying MYC in region format</span></span>
 <span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_region <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
 <span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id,</span>
 <span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region,</span>
@@ -1137,7 +1136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
 <span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Specifying MYC with chromosome, qstart and qend arguments</span></span>
+<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying MYC with chromosome, qstart and qend arguments</span></span>
 <span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_chunks <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
 <span id="cb72-12"><a href="#cb72-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2,</span>
 <span id="cb72-13"><a href="#cb72-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
@@ -1148,7 +1147,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb72-18"><a href="#cb72-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
 <span id="cb72-19"><a href="#cb72-19" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb72-20"><a href="#cb72-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb72-21"><a href="#cb72-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Are the returns data frames the same?</span></span>
+<span id="cb72-21"><a href="#cb72-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Are the returned data frames the same?</span></span>
 <span id="cb72-22"><a href="#cb72-22" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
 <span id="cb72-23"><a href="#cb72-23" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_region,</span>
 <span id="cb72-24"><a href="#cb72-24" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_chunks</span>
@@ -1160,9 +1159,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="sv-filtering" class="level3">
 <h3 class="anchored" data-anchor-id="sv-filtering">SV filtering</h3>
-<p>Here we are demonstrating the filtering options to return SVs. In this example we are calling <code>get_manta_sv</code> on the DLBCL metadata subset. For demonstration purposes, we are also requesting a non-default projection and adding some more filtering.</p>
+<p>Here we are demonstrating the filtering options to obtain SVs. In this example, we are calling <code>get_manta_sv</code> on the DLBCL metadata subset. For demonstration purposes, we are also requesting a non-default projection and adding some more filtering.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get manta SVs for the DLBCL cell line</span></span>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get manta SVs for the samples with DLBCL pathology</span></span>
 <span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>dlbcl_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
 <span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dlbcl,</span>
 <span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span>,</span>

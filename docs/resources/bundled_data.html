@@ -253,53 +253,53 @@ ul.task-list li input[type="checkbox"] {
 <section id="curated-gene-lists" class="level2">
 <h2 class="anchored" data-anchor-id="curated-gene-lists">Curated gene lists</h2>
 <ul>
-<li><code>gene_blacklist</code> A tibble with gene symbols (Hugo) that falls within blacklisted regions of the genome. The genes in this data object represent common sequencing artefacts and are discarded during the data analysis.</li>
-<li><code>lymphoma_genes</code> A data frame with manually curated set of genes commonly mutated in lymphomas with associated TRUE/FALSE columns annotating lymphoma type(s) where the particular mutations are present. This object by default always represents the most recent version of the curated list.</li>
-<li><code>lymphoma_genes_bl_v0.1</code> A data frame with manually curated set of genes commonly mutated in BL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>lymphoma_genes_bl_v_latest</code> A data frame with manually curated set of genes commonly mutated in BL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.</li>
-<li><code>lymphoma_genes_comprehensive</code> A data frame with the curated list of genes reported as significantly mutated in the large lymphoma studies. Both Ensembl ID and Hugo Symbol are serving as gene identifiers. This data contains annotation for the studies by Chapuy, Reddy, Wright (LymphGen), Lacy, as well as annotation of being curated, reported as SMG in other_studies, or being aSHM target.</li>
-<li><code>lymphoma_genes_dlbcl_v0.1</code> A data frame with manually curated set of genes commonly mutated in DLBCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>lymphoma_genes_dlbcl_v_latest</code> A data frame with manually curated set of genes commonly mutated in DLBCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.</li>
-<li><code>lymphoma_genes_lymphoma_genes_v0.0</code> Legacy version of the curated list of genes significantly mutated in lymphomas. Bundled here for backwards compatibility and can be referred directly by it’s version number.</li>
-<li><code>lymphoma_genes_mcl_v0.1</code> A data frame with manually curated set of genes commonly mutated in MCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>lymphoma_genes_mcl_v_latest</code> A data frame with manually curated set of genes commonly mutated in MCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.</li>
+<li><code>gene_blacklist</code> A tibble with gene symbols (Hugo) that fall within blacklisted regions of the genome. The genes in this data object represent common sequencing artifacts and are discarded during the data analysis.</li>
+<li><code>lymphoma_genes</code> A data frame with a manually curated set of genes commonly mutated in lymphomas with associated TRUE/FALSE columns annotating lymphoma type(s) where the particular mutations are present. This object by default always represents the most recent version of the curated list.</li>
+<li><code>lymphoma_genes_bl_v0.1</code> A data frame with a manually curated set of genes commonly mutated in BL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>lymphoma_genes_bl_v_latest</code> A data frame with a manually curated set of genes commonly mutated in BL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.</li>
+<li><code>lymphoma_genes_comprehensive</code> A data frame with the curated list of genes reported as significantly mutated in the large lymphoma studies. Both Ensembl ID and Hugo Symbol are available as gene identifiers. This data contains annotations for the studies by Chapuy, Reddy, Wright (LymphGen), Lacy, as well as annotations for whether the gene is curated, reported as SMG in other_studies, or a target of aSHM.</li>
+<li><code>lymphoma_genes_dlbcl_v0.1</code> A data frame with a manually curated set of genes commonly mutated in DLBCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>lymphoma_genes_dlbcl_v_latest</code> A data frame with a manually curated set of genes commonly mutated in DLBCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.</li>
+<li><code>lymphoma_genes_lymphoma_genes_v0.0</code> Legacy version of the curated list of genes significantly mutated in lymphomas. Bundled here for backwards compatibility and can be referred to directly by it’s version number.</li>
+<li><code>lymphoma_genes_mcl_v0.1</code> A data frame with a manually curated set of genes commonly mutated in MCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred directly by it’s version number.</li>
+<li><code>lymphoma_genes_mcl_v_latest</code> A data frame with a manually curated set of genes commonly mutated in MCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.</li>
 </ul>
 </section>
 <section id="coordinate-based-resources" class="level2">
 <h2 class="anchored" data-anchor-id="coordinate-based-resources">Coordinate-based resources</h2>
 <ul>
-<li><code>chromosome_arms_grch37</code>: A data frame with the chromosome arm coordinates in respect to grch37 projection.</li>
-<li><code>chromosome_arms_hg38</code> A data frame with the chromosome arm coordinates in respect to hg38.</li>
-<li><code>grch37_gene_coordinates</code> All gene coordinates in respect to grch37. Contains both Ensembl ID and Hugo Symbol as identifier.</li>
-<li><code>grch37_lymphoma_genes_bed</code> Coordinates in respect to grch37 for the genes commonly associated with B-cell lymphomas.</li>
-<li><code>grch37_oncogene</code> A data frame with the coordinates of lymphoma oncogenes relative to the grch37. Used in mapping of the breakpoint coordinates.</li>
-<li><code>grch37_partners</code> Translocation partners for oncogenes with coordinates in respect to grch37.</li>
-<li><code>hg38_gene_coordinates</code> All gene coordinates in respect to hg38. Contains both Ensembl ID and Hugo Symbol as identifier.</li>
-<li><code>hg38_lymphoma_genes_bed</code> Coordinates in respect to hg38 for the genes commonly associated with B-cell lymphomas.</li>
+<li><code>chromosome_arms_grch37</code>: A data frame with the chromosome arm coordinates with respect to the grch37 projection.</li>
+<li><code>chromosome_arms_hg38</code> A data frame with the chromosome arm coordinates with respect to the hg38 projection.</li>
+<li><code>grch37_gene_coordinates</code> A data frame of all gene coordinates with respect to grch37. Contains both Ensembl ID and Hugo Symbol as identifiers.</li>
+<li><code>grch37_lymphoma_genes_bed</code> A data frame in the bed format for genes commonly associated with B-cell lymphomas. Coordinates are with respect to grch37.</li>
+<li><code>grch37_oncogene</code> A data frame with the coordinates of lymphoma oncogenes relative to grch37. Used in mapping of the breakpoint coordinates.</li>
+<li><code>grch37_partners</code> A data frame of translocation partners for oncogenes with coordinates relative to grch37.</li>
+<li><code>hg38_gene_coordinates</code> A data frame of all gene coordinates with respect to hg38. Contains both Ensembl ID and Hugo Symbol as identifiers.</li>
+<li><code>hg38_lymphoma_genes_bed</code> A data frame in the bed format for genes commonly associated with B-cell lymphomas. Coordinates are with respect to hg38.</li>
 <li><code>hg38_oncogene</code> A data frame with the coordinates of lymphoma oncogenes relative to the hg38. Used in mapping of the breakpoint coordinates.</li>
-<li><code>hg38_partners</code> Translocation partners for oncogenes with coordinates in respect to hg38.</li>
-<li><code>grch37_all_gene_coordinates</code> Protein-coding gene coordinates in respect to grch37. Contains both Ensembl ID and Hugo Symbol as identifier. Mainly here for backwards compatibility with earlier GAMBLR versions.</li>
-<li><code>hotspot_regions_grch37</code> Mutation hotspot regions in respect to grch37.</li>
-<li><code>hotspot_regions_hg38</code> Mutation hotspot regions in respect to hg38.</li>
-<li><code>target_regions_grch37</code> A data frame with coordinates of the target regions of the genome representing the whole exome sequencing panel. This is Agilent V5 (no UTR) with respect to grch37.</li>
-<li><code>target_regions_hg38</code> A data frame with coordinates of the target regions of the genome representing the whole exome sequencing panel. This is Agilent V5 (no UTR) with respect to hg38.</li>
+<li><code>hg38_partners</code> A data frame of translocation partners for oncogenes with relative coordinates to hg38.</li>
+<li><code>grch37_all_gene_coordinates</code> A data frame of protein-coding gene coordinates relative to grch37. Contains both Ensembl ID and Hugo Symbol as identifiers. Mainly here for backwards compatibility with earlier GAMBLR versions.</li>
+<li><code>hotspot_regions_grch37</code> A data frame of mutation hotspot regions relative to grch37.</li>
+<li><code>hotspot_regions_hg38</code> A data frame of mutation hotspot regions relative to hg38.</li>
+<li><code>target_regions_grch37</code> A data frame with coordinates of the regions of the genome targeted by the whole exome sequencing panel Agilent V5 (no UTR) relative to grch37.</li>
+<li><code>target_regions_hg38</code> A data frame with coordinates of the regions of the genome targeted by the whole exome sequencing panel Agilent V5 (no UTR) relative to hg38.</li>
 </ul>
 </section>
 <section id="ashm-regions" class="level2">
 <h2 class="anchored" data-anchor-id="ashm-regions">aSHM regions</h2>
 <ul>
-<li><code>grch37_ashm_regions</code> Aberrant somatic hypermutation (aSHM) regions in respect to grch37. This object always by default refers to the most recent version of the aSHM regions.</li>
-<li><code>hg38_ashm_regions</code> Aberrant somatic hypermutation (aSHM) regions in respect to hg38. This object always by default refers to the most recent version of the aSHM regions.</li>
-<li><code>somatic_hypermutation_locations_GRCh37_v0.0</code> Aberrant somatic hypermutation (aSHM) regions in respect to grch37. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>somatic_hypermutation_locations_GRCh37_v0.1</code> Aberrant somatic hypermutation (aSHM) regions in respect to grch37. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>somatic_hypermutation_locations_GRCh37_v0.2</code> Aberrant somatic hypermutation (aSHM) regions in respect to grch37. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>somatic_hypermutation_locations_GRCh37_v0.3</code> Aberrant somatic hypermutation (aSHM) regions in respect to grch37. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>somatic_hypermutation_locations_GRCh37_v_latest</code> Aberrant somatic hypermutation (aSHM) regions in respect to grch37. This is an alias for the latest version of this data.</li>
-<li><code>somatic_hypermutation_locations_GRCh38_v0.0</code> Aberrant somatic hypermutation (aSHM) regions in respect to hg38. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>somatic_hypermutation_locations_GRCh38_v0.1</code> Aberrant somatic hypermutation (aSHM) regions in respect to hg38. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>somatic_hypermutation_locations_GRCh38_v0.2</code> Aberrant somatic hypermutation (aSHM) regions in respect to hg38. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>somatic_hypermutation_locations_GRCh38_v0.3</code> Aberrant somatic hypermutation (aSHM) regions in respect to hg38. This is the versioned data and can be referred directly by it’s version number.</li>
-<li><code>somatic_hypermutation_locations_GRCh38_v_latest</code> Aberrant somatic hypermutation (aSHM) regions in respect to hg38. This is an alias for the latest version of this data.</li>
+<li><code>grch37_ashm_regions</code> Aberrant somatic hypermutation (aSHM) regions relative to grch37. This object always by default refers to the most recent version of the aSHM regions.</li>
+<li><code>hg38_ashm_regions</code> Aberrant somatic hypermutation (aSHM) regions relative to hg38. This object always by default refers to the most recent version of the aSHM regions.</li>
+<li><code>somatic_hypermutation_locations_GRCh37_v0.0</code> Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>somatic_hypermutation_locations_GRCh37_v0.1</code> Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>somatic_hypermutation_locations_GRCh37_v0.2</code> Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>somatic_hypermutation_locations_GRCh37_v0.3</code> Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>somatic_hypermutation_locations_GRCh37_v_latest</code> Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is an alias for the latest version of this data.</li>
+<li><code>somatic_hypermutation_locations_GRCh38_v0.0</code> Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>somatic_hypermutation_locations_GRCh38_v0.1</code> Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>somatic_hypermutation_locations_GRCh38_v0.2</code> Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>somatic_hypermutation_locations_GRCh38_v0.3</code> Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.</li>
+<li><code>somatic_hypermutation_locations_GRCh38_v_latest</code> Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is an alias for the latest version of this data.</li>
 </ul>
 </section>
 <section id="other-resources" class="level2">
@@ -311,8 +311,9 @@ ul.task-list li input[type="checkbox"] {
 <li><code>hgnc2pfam.df</code> A dataset containing the mapping table between Hugo symbol, UniProt ID, and Pfam ACC. This dataset comes from the g3viz package and was obtained via this URL: https://github.com/morinlab/g3viz/tree/master/data</li>
 <li><code>hotspots_annotations</code> Hotspot coordinates used in the feature annotation during matrix assembly of data for cFL classifier.</li>
 <li><code>mirage_metrics</code> A data frame providing the data reported in the Supplemental Table of the MIRAGE study by <a href="https://doi.org/10.1182/blood.2022016095">Dreval et al, 2022</a></li>
-<li><code>mutation.table.df</code> A data frame providing the linkage between Variant Classification, Mutation_Class, and Short_Name for the simple somatic mutations. reddy_genes A data frame of the genes reported as significantly mutated by the study of <a href="https://doi.org/10.1016/j.cell.2017.09.027">Reddy et al, 2017</a></li>
-<li><code>wright_genes_with_weights</code> Wright genes with weight values.</li>
+<li><code>mutation.table.df</code> A data frame providing the linkage between Variant Classification, Mutation_Class, and Short_Name for the simple somatic mutations.</li>
+<li>reddy_genes A data frame of the genes reported as significantly mutated by the study of <a href="https://doi.org/10.1016/j.cell.2017.09.027">Reddy et al, 2017</a></li>
+<li><code>wright_genes_with_weights</code> Wright genes with weight values from the study by <a href="https://10.1182/blood-2013-11-536433">Scott et al, 2014</a>.</li>
 </ul>
 
 

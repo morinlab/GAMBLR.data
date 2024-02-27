@@ -4,9 +4,10 @@ title: "Functions overview"
 
 The GAMBLR.data package not only stores data, but also provides some basic
 functionality to easily retrieve and operate on this data. Almost all of the
-functions listed below are the easier version of those in the associated package
-GAMBLR.results, but unlike that member of the GAMBLR family, the functions
-included here do not require you to be Morin Lab member or have access to GSC.
+functions listed below are the "lighter" version of those in the associated package
+[GAMBLR.results](https://github.com/morinlab/GAMBLR.results), which means that
+the functions included here do not require you to be Morin Lab member or have
+access to GSC.
 
 There is a limited number of basic functions available, therefore the functions
 are not separated into categories below. Nevertheless, these are the basic functions available:
@@ -59,4 +60,5 @@ standalone use.
 specified as character vectors or a data frame. Returns a list with two objects:
 regions as a vector and regions in bed format.
 * `region_to_chunks`: Helper function that will separate a chromosome region
-specified in UCSC format into individual chunks of chromosome, start, and end.
+specified in UCSC format (chr:start-end) into individual chunks of chromosome,
+start, and end.

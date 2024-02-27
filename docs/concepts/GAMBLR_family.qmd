@@ -2,9 +2,9 @@
 title: "GAMBLR family of packages"
 ---
 
-GAMBLR.data is the first and most basic member of the GAMBLR family of packages.
+GAMBLR.data is the first and most basic member of the [GAMBLR]((https://github.com/morinlab/GAMBLR)) family of packages.
 It mostly serves the purpose of storing the bundled data helpful for genomic
-analysis of B-cell neoplasms in GAMBLR, but also contains small basic functions
+analysis of B-cell neoplasms in R, but also contains small basic functions
 serving as API to retrieve this data.
 
 Some of the bundled data is versioned as it is continuously being updated. This includes,
@@ -16,10 +16,10 @@ data, the most recent and up-to-date version is used by default.
 The GAMBLR family includes:
 
 * GAMBLR.data - this package
-* GAMBLR.helpers - a set of low-level functions for data operation
-* GAMBLR.utils - higher level set of functions to operate on genomic data
-* GAMBLR.viz - set of functions used mostly for visualizations
-* GAMBLR.results - used to access the full data in GAMBL project. Only
+* [GAMBLR.helpers](https://github.com/morinlab/GAMBLR.helpers) - a set of low-level functions for data operation
+* [GAMBLR.utils](https://github.com/morinlab/GAMBLR.utils) - higher level set of functions to operate on genomic data
+* [GAMBLR.viz](https://github.com/morinlab/GAMBLR.viz) - set of functions used mostly for visualizations
+* [GAMBLR.results](https://github.com/morinlab/GAMBLR.results) - used to access the full data in GAMBL project. Only
     available for members of the Morin Lab and requires access to GSC, but
     can also be run locally once properly configured and synced.
 

@@ -147,4 +147,5 @@ Table of the MIRAGE study by [Dreval et al, 2022](https://doi.org/10.1182/blood.
 Classification, Mutation_Class, and Short_Name for the simple somatic mutations.
 * reddy_genes A data frame of the genes reported as significantly mutated by the
 study of [Reddy et al, 2017](https://doi.org/10.1016/j.cell.2017.09.027)
-* `wright_genes_with_weights` Wright genes with weight values.
+* `wright_genes_with_weights` Wright genes with weight values from the study
+by [Scott et al, 2014](https://10.1182/blood-2013-11-536433).

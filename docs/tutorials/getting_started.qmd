@@ -78,8 +78,7 @@ metadata$all %>%
         )
     )
 
-We can also visualize these counts when subset to only DLBCL:
-
+# We can also visualize these counts when subset to only DLBCL:
 # Subset metadata on a set of samples (samples classified as DLBCL for pathology)
 metadata$dlbcl <- metadata$all %>%
     filter(pathology == "DLBCL")
@@ -116,7 +115,7 @@ is available. In addition, you can also restrict SSM calls to specific
 genomic regions with `get_ssm_by_regions` or `get_ssm_by_region`.
 
 Another possibility is to focus on coding mutations only and call `get_coding_ssm`,
-this function returns all coding SSMs from the bundled data in MAF-like format.
+this function returns all coding SSMs from the bundled data in maf-like format.
 If you have an already pre-filtered metadata, the `these_samples_metadata`
 argument can be used with all SSM functions to restrict the variants returned
 to the sample IDs in this data frame, handy!
@@ -239,7 +238,7 @@ ssm_myc %>%
 
 #### Using `maf_col`
 Similarly, to decrease the burden of handling large maf data, it is also
-possible to dictate what MAF columns we want back. To do this, call the function
+possible to dictate what maf columns we want back. To do this, call the function
 with the `maf_col` argument and provide a vector of the columns of interest. Here,
 we are requesting SSM calls for only a small set of columns. It is also
 important to note that this will require setting the argument
@@ -365,7 +364,7 @@ identical(
 If you are working with massive maf data containing many variants and have
 already imported it to R, or using the maf data from outside of this package,
 you can still take advantage of this function and use the pre-loaded maf. This
-function will still subset it to the desired regions. To do so, specify the MAF
+function will still subset it to the desired regions. To do so, specify the maf
 of interest with `maf_data`:
 ```{r e8}
 dohh2_myc_ssm <- get_ssm_by_region(
@@ -386,7 +385,7 @@ Yes, indeed - the both outputs are identical again.
 
 #### Toggling `streamlined`
 This function also has a streamlined option available. If set to `TRUE`, only
-two columns are kept in the returned MAF (Start_Position and
+two columns are kept in the returned maf (Start_Position and
 Tumour_Sample_Barcode). In this example, we are extending the coordinates to
 encapsulate the whole p-arm of chromosome 1. Note, since we are requesting hg38
 calls, we have to add the chr prefix for the specified chromosome. Don't
@@ -477,7 +476,7 @@ head(ashm_ssm)
 You can instead specify regions as a vector of characters (`regions_list`)
 instead of using a bed file. In this case, the function will not accept a fourth
 element for naming the returned regions. If so, the function defaults to using
-the specified regions instead.
+the specified region as the name of the column in the output.
 ```{r e12}
 ssm_region_list <- get_ssm_by_regions(
     regions_list = c(

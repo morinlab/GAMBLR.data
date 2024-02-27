@@ -21,9 +21,9 @@ The term lymphoma genes refers to the curated list of genes significantly
 mutated in mature B-cell lymphomas. This list is available within this package
 by simply calling `lymphoma_genes`.
 Several modifications of the curated list are available, including the lists
-split by pathology and a more comprehensive list `lymphoma_genes_comprehensive`
-that provides more information such as which studies reported it as SMG,
-whether it is target of aSHM, etc.
+split by pathology, and a more comprehensive list `lymphoma_genes_comprehensive`
+that provides more information such as which studies reported it as significantly
+mutated, whether it is target of aSHM etc.
 
 ## Someone said "aSHM regions". What is this?
 
@@ -61,6 +61,9 @@ The data includes variants from the following studies:
 library(GAMBLR.data)
 table(sample_data$meta$cohort, sample_data$meta$pathology)
 ```
+
+Please see the [use cases](./why.html#use-cases) for the more information on
+each of these studies.
 
 ## Which variant caller is used to call the variants?
 
