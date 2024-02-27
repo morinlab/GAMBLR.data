@@ -85,5 +85,3 @@ The rest of the simple somatic variants are restricted to only coding variants
 in lymphoma genes.
 
 :::
-
-###
