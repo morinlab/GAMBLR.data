@@ -21,7 +21,7 @@ University.
 GAMBLR.data is part of a larger family of R tools for the analysis of lymphoma
 genomic data.
 
-It is designed to mainly serve as a storeage of bundled data resources and works
+It is designed to mainly serve as a storage of bundled data resources and works
 well with other tools in the GAMBLR family. We continue to bundle more data
 available through this package, as well as improve it's functionality.
 
@@ -31,8 +31,8 @@ section.
 ## Local experience
 
 The data bundled with the GAMBLR.data is immediately available upon package
-installation and does not require internet coonection or ssh access to GSC
-resources. It can run anywhere the R is available without restrictions and
+installation and does not require internet connection or ssh access to GSC
+resources. It can run anywhere that R is available without restrictions and
 limitations.
 
 ## Use cases
@@ -52,7 +52,7 @@ from some DLBCL cell lines.
 * Curated lists of lymphoma genes for all major pathologies
 * Curated list of regions targeted by aSHM in B-cell lymphomas
 * Coordinates of chromosome arms in both genome projections
-* Gene coordinates in both genome projection
+* Gene coordinates in both genome projections
 * Coordinates of oncogenes and SV partners in both genome projections
 * Hotspot regions for selected genes in both projections
 * Other resources

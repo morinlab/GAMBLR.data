@@ -17,13 +17,13 @@ and we will be happy to add it to this page.
 
 ## What exactly is meant by "lymphoma genes"?
 
-The term lymphoma genes is referred to the curated list of genes significantly
-mutated in mature B-cell lymphomas. If you were referred to this list, it is
-available with this package by simply calling `lymphoma_genes`.
+The term lymphoma genes refers to the curated list of genes significantly
+mutated in mature B-cell lymphomas. This list is available within this package
+by simply calling `lymphoma_genes`.
 Several modifications of the curated list are available, including the lists
-split by pathology, and a more comprehensive list `lymphoma_genes_comprehensive`
+split by pathology and a more comprehensive list `lymphoma_genes_comprehensive`
 that provides more information such as which studies reported it as SMG,
-whether it is target of aSHM etc.
+whether it is target of aSHM, etc.
 
 ## Someone said "aSHM regions". What is this?
 
