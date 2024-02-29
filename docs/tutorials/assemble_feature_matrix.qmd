@@ -90,13 +90,13 @@ feature matrix.
 ### Return the simple somatic mutations
 
 First, lets return the data frame with simple somatic mutations in maf format
-and store it in the data. Technically this step is not strictly necessary, as
+and store it in a variable. Technically this step is not strictly necessary, as
 each function used below will be able to retreive it for you when the maf data
 is not provided, but we will advocate for good practice here and have the maf
 data stored in a designated variable.
 As we will be utilizing both coding and non-coding mutations, we will take
-advantage of returning the variants per sample (without necessarily restricting)
-to coding-only variants.
+advantage of returning the variants per sample (without necessarily restricting
+to coding-only variants).
 ```{r obtain_maf}
 # Obtain simple somatic mutations
 maf <- get_ssm_by_samples(
