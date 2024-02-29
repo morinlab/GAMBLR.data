@@ -200,7 +200,7 @@ format and are ready to proceed to the next step.
 The FL study also annotated the non-coding mutations at selected aSHM targets
 as features of binary matrix. Again, all the necessarily means to do it in a
 simple step are provided by GAMBLR.data.
-The regions targeted by aSHM [are available](../resources/buncled_data.html) in
+The regions targeted by aSHM [are available](../resources/bundled_data.html) in
 the GAMBLR.data. Since they are always complemented with new regions once they
 are identified, the latest and most comprehensive version is always available
 by referring to `{projection}_ashm_regions`. However, this use case is a perfect
