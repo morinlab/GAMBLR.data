@@ -1,0 +1,286 @@
+---
+from: markdown+emoji
+warning: false
+fig.width: 7
+fig.height: 5
+fig.align: "center"
+---
+
+# Tutorial: assemble feature matrix
+
+In 2023, the Morin Lab developed a classifier of Follicular Lymphoma (FL)
+predictive of histological transformation to more aggressive DLBCL. This study
+was published in [Blood (2023).](https://doi.org/10.1182/blood.2022018719) How
+was the binary feature matrix assembled for that machine learning model?
+
+In this quick tour we will show how GAMBLR.data resources can help you to
+generate such matrix.
+
+```{r load_packages}
+#| message: false
+
+# Load packages
+library(GAMBLR.data)
+library(tidyverse)
+```
+
+This tutorial explores how to obtain metadata for the samples, simple somatic
+mutations in maf format, and auto-magically transform it into a binary matrix of
+features.
+To simplify this tutorial, we will only include a small subset of features (not
+the whole set as was used in the original paper), but this example will be able
+to illustrate the functionality and highlight the main steps of the process.
+
+## Obtain metadata
+In the [previous tutorial](./tutorials/getting_started.html), we have already
+explored the function `get_gambl_metadata()`. In contrast, here we will use
+different approach as the metadata from the Supplemental Table 1 is direcly
+available in the object `sample_data`. Let's retreive it:
+
+```{r metadata}
+
+metadata <- sample_data$meta
+
+```
+
+Now that we have the metadata, we can look at the available columns and find
+samples from the FL study:
+
+```{r metadata_structure}
+# What are columns available?
+colnames(metadata)
+
+# How can I find samples from the FL study?
+table(metadata$cohort)
+```
+
+We can now see that the samples from the FL study are in the cohort `FL_Dreval`.
+Let's explore these samples more:
+
+```{r subset_metadata}
+# Only filter for the samples from FL study
+metadata <- metadata %>%
+    filter(cohort == "FL_Dreval")
+
+table(metadata$pathology)
+```
+
+Now, let's take 10 samples from the FL study: 5 FL and 5 DLBCL:
+
+```{r finalize_metadata}
+# Only filter for the samples from FL study
+metadata <- metadata %>%
+    filter(pathology %in% c("FL", "DLBCL")) %>%
+    group_by(pathology) %>%
+    arrange(sample_id) %>%
+    slice_tail(n = 5) %>%
+    ungroup
+
+# How does our metadata looks like now?
+str(metadata)
+```
+
+Our subsetting worked and we can now proceed with matrix assembly.
+
+## Generate feature matrix
+
+We will now use the metadata from the previous step to assemble the binary
+feature matrix.
+
+### Return the simple somatic mutations
+
+First, lets return the data frame with simple somatic mutations in maf format
+and store it in the data. Technically this step is not strictly necessary, as
+each function used below will be able to retreive it for you when the maf data
+is not provided, but we will advocate for good practice here and have the maf
+data stored in a designated variable.
+As we will be utilizing both coding and non-coding mutations, we will take
+advantage of returning the variants per sample (without necessarily restricting)
+to coding-only variants.
+```{r obtain_maf}
+# Obtain simple somatic mutations
+maf <- get_ssm_by_samples(
+    these_samples_metadata = metadata
+)
+```
+
+Wow, that was super easy and blazing fast! Did it even work?? Let's confirm:
+
+```{r check_maf}
+# How many samples are present in maf?
+length(unique(maf$Tumor_Sample_Barcode))
+
+# Are all these samples the ones we are interested in and requested with metadata?
+sort(unique(maf$Tumor_Sample_Barcode)) == sort(metadata$Tumor_Sample_Barcode)
+
+# What are the mutations in the maf? Are they just coding?
+table(maf$Variant_Classification)
+```
+
+We can see from the above outputs that we got somatic mutations for all requested
+samples and the maf contains both coding and non-coding variants. We can now
+proceed to the next steps.
+
+### Coding mutations as features
+
+The feature matrix in the FL study contained coding mutation status at selected
+genes denoted as 1 when the mutation was present and 0 when there was no
+mutation. In addition to that, mutation hotspots at some genes were also taken
+into account. To complicate things more, annotation of hotspots was performed
+differently depending on the specific gene and mutational effect. Specifically,
+the *CREBBP* missemse mutations were considered hotspots when they occured in
+the KAT domain, but not outside of it. The mutations in *FOXO1* were considered
+hotspots when the AA change was at M1.
+GAMBLR.data provides a one-stop shop to achieve this level of details
+out-of-the-box in a simple and convenient way with `get_coding_ssm_status`
+functions. It has a logical arguments `include_hotspots` to separate regular
+mutations from the ones occurring at hotspots, and `review_hotspots`, which will
+handle the specific cases we described above in an automated way. Both of these
+arguments are `TRUE` by default, so you do not need to toggle them separately,
+but in this exaple we will specify them explicitly just to illustrate that
+this will happen during the function call.
+To keep the example clean and concise, we will also annotate the mutation status
+only for a few of selected genes.
+
+```{r coding_matrix}
+# Specify genes to annotate
+our_genes <- c(
+    "CREBBP", "MYD88", "RRAGC",
+    "PIM1", "BCL2", "BCL6"
+)
+
+# Generate binary matrix
+coding_matrix <- get_coding_ssm_status(
+    gene_symbols = our_genes,
+    these_samples_metadata = metadata,
+    maf_data = maf,
+    include_hotspots = TRUE,
+    review_hotspots = TRUE
+)
+
+coding_matrix
+```
+
+We can see that in this example there is only one sample with hotspot mutation
+in *CREBBP*, SP59424 (annotated as `1` in the column `CREBBPHOTSPOT`). Let's
+sanity check this annotation for illustration purposes:
+
+```{r sanity_check_crebbp}
+crebbp_hotspot_mutation <- maf %>%
+    filter(
+        Tumor_Sample_Barcode == "SP59424",
+        Hugo_Symbol == "CREBBP"
+    ) %>%
+    select(Chromosome, Start_Position, Variant_Classification)
+
+crebbp_hotspot_mutation
+```
+
+This mutation falls within KAT domain and is a missense variant, so it is
+indeed correct to be annotated as hotspot. How can we check it does fall within
+KAT domain? It is easy with GAMBLR.data:
+
+```{r check_kat_domain}
+# GAMBLR.data has the regions to be considered as hotspots
+hotspot_regions_grch37
+
+# Now check that CREBBP mutations
+between(
+    crebbp_hotspot_mutation$Start_Position,
+    hotspot_regions_grch37["CREBBP", "start"],
+    hotspot_regions_grch37["CREBBP", "end"]
+)
+```
+
+We have now generated matrix of coding mutations and SSM hotspots in a binary
+format and are ready to proceed to the next step.
+
+### aSHM mutations as features
+
+The FL study also annotated the non-coding mutations at selected aSHM targets
+as features of binary matrix. Again, all the necessarily means to do it in a
+simple step are provided by GAMBLR.data.
+The regions targeted by aSHM [are available](./resources/buncled_data.html) in
+the GAMBLR.data. Since they are always complemented with new regions once they
+are identified, the latest and most comprehensive version is always available
+by referring to `{projection}_ashm_regions`. However, this use case is a perfect
+exmple to demonstarate how to operate on versioned iterations of the aSHM
+target list, as the list has been updated since the time the study was published
+and at the time of publication version 0.2 was used. We can refer to it directly
+by the version number:
+
+```{r ashm_regions}
+regions_bed <- somatic_hypermutation_locations_GRCh37_v0.2
+
+head(regions_bed)
+```
+
+We will perform some simple modifications to it to make our experience better
+and only select few regions for illustrative purposes:
+
+```{r subset_regions}
+our_regions <- c(
+    "BCL6-TSS",
+    "BCL7A-TSS",
+    "RHOH-TSS",
+    "ZFP36L1-TSS"
+)
+
+regions_bed <- regions_bed %>%
+    mutate(
+        name = paste(gene, region, sep = "-")
+    ) %>%
+    filter(
+        name %in% our_regions
+    )
+
+regions_bed
+```
+
+Now we can see whether or not there are any mutations within these regions:
+
+```{r ashm_matrix}
+ashm_matrix <- get_ashm_count_matrix(
+    regions_bed = regions_bed,
+    maf_data = maf,
+    these_samples_metadata = metadata
+)
+
+ashm_matrix
+```
+
+We how calculated the number of mutations in each region for each sample. The
+original study used pathology-specific values per region to convert these counts
+to binary, but here we will use a cutoff of 5 to binarize these counts. We will
+also convert rownames to column so it will be easier for us to unite all
+matrices into single one at the later steps:
+
+```{r binarize_ashm}
+ashm_matrix[ashm_matrix <= 5] = 0
+ashm_matrix[ashm_matrix > 5] = 1
+ashm_matrix <- ashm_matrix %>%
+    rownames_to_column("sample_id")
+
+ashm_matrix
+
+```
+
+We have now generated matrix of non-coding mutations in a binary format and are
+ready to unite all matrices together.
+
+### Unite into full feature matrix
+
+We can now combine both coding and non-coding mutations into single matrix:
+
+```{r full_matrix}
+feature_matrix <- left_join(
+    coding_matrix,
+    ashm_matrix
+)
+
+feature_matrix
+```
+
+That's it!
+
+Happy GAMBLing!
