@@ -34,7 +34,7 @@ and metadata (these_samples_metadata).
 \details{
 This function can take sample IDs as a vector of characters, or a metadata table in data frame format.
 If no sample IDs are provided to the function, the function will operate on all gambl sample IDs available for the given seq type.
-It is highly recommended to run this function with \code{verbose = TRUE} (default).
+It is highly recommended to run this function with \code{verbose = TRUE}.
 Since this will not only improve the overall logic on how the function operates.
 But also might help with debugging functions that are internally calling this function.
 The function also performs sanity checks and notifies the user if any of the requested sample IDs are not found in the metadata.
