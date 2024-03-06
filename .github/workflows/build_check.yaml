@@ -2,7 +2,7 @@ name: GAMBLR.data build check
 
 on:
   pull_request:
-    branches: [kdreval-dev]
+    branches: [master]
 
 
 jobs:
