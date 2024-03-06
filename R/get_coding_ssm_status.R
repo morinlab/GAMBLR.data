@@ -184,7 +184,7 @@ get_coding_ssm_status = function(
 
         # review for the supported genes
         if(review_hotspots){
-            annotated = GAMBLR.helpers::review_hotspots(
+            annotated = review_hotspots(
                 annotated,
                 genes_of_interest = genes_of_interest,
                 genome_build = genome_build
