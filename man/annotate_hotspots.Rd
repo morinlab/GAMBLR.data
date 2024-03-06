@@ -8,6 +8,8 @@ annotate_hotspots(mutation_maf, ...)
 }
 \arguments{
 \item{mutation_maf}{A data frame in MAF format.}
+
+\item{...}{Any other parameter. These parameters will be ignored.}
 }
 \value{
 The same data frame with one additional column "hot_spot".
