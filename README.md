@@ -1,3 +1,5 @@
+![](https://github.com/morinlab/GAMBLR.data/actions/workflows/build_check.yml/badge.svg)
+
 # GABMLR.data - an R package with community resources generated based on GAMBL results.
 
 This package provides the standalone functionality with different sets of
