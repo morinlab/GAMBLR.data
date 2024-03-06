@@ -38,7 +38,10 @@ INTERNAL FUNCTION to harmonize genomic regions specified as character vectors or
 \examples{
 library(dplyr)
 
-regions <- setNames(c("chr1:10000-15000", "chr1:100000000-100005000"), c("one_region", "another_region"))
+regions <- setNames(
+     c("chr1:10000-15000", "chr1:100000000-100005000"),
+     c("one_region", "another_region")
+)
 process_regions(regions_list = regions)
 
 reg_bed = GAMBLR.data::grch37_ashm_regions \%>\%

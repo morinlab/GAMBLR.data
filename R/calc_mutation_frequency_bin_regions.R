@@ -51,7 +51,8 @@
 #' reg_vec <- these_regions$regions_list
 #' reg_bed <- these_regions$regions_bed
 #'
-#' #use a set of user defined regions (from genes) and calculate mut frequency across all available samples
+#' # use a set of user defined regions (from genes) and
+#' # calculate mut frequency across all available samples
 #' mult_freq_all = calc_mutation_frequency_bin_regions(regions_list = reg_vec)
 #' mult_freq_all = calc_mutation_frequency_bin_regions(regions_bed = reg_bed)
 #'
