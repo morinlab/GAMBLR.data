@@ -27,7 +27,8 @@ pmids <- list(
     "Thomas_BL" = 36201743,
     "Reddy_DLBCL" = 28985567,
     "Schmitz_DLBCL" = 29641966,
-    "Chapuy_DLBCL" = 29713087
+    "Chapuy_DLBCL" = 29713087,
+    "Arthur_DLBCL" = 30275490
 )
 
 
@@ -657,7 +658,45 @@ sample_data$hg38$maf <- hg38 %>%
         sample_data$hg38$maf
     )
 
+
 setwd("~/my_dir/repos/GAMBLR.data/")
+
+# Add data from Arthur paper
+arthur_maf <- read_tsv(
+    "inst/extdata/studies/DLBCL_Arthur.maf.gz"
+)
+sample_data$grch37$maf <- bind_rows(
+    sample_data$grch37$maf,
+    arthur_maf %>%
+        mutate(
+            Pipeline = "strelka",
+            Study = "Arthur"
+        )
+)
+
+arthur_meta <- read_xlsx(
+    "inst/extdata/studies/DLBCL_Arthur.xlsx",
+    sheet = 1
+) %>% filter(`WGS data` == 1)
+
+
+arthur_meta <- gambl_metadata %>%
+    filter(
+        patient_id %in% arthur_meta$`Case ID`,
+        seq_type == "genome",
+        ! grepl("tumor", sample_id)
+    ) %>%
+    mutate(
+        sample_id = patient_id,
+        Tumor_Sample_Barcode = patient_id,
+        cohort = "DLBCL_Arthur",
+        reference_PMID = pmids$Arthur_DLBCL
+    )
+
+sample_data$meta <- bind_rows(
+    sample_data$meta,
+    arthur_meta
+)
 
 usethis::use_data(
     sample_data,
