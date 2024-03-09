@@ -1,4 +1,4 @@
-![](https://github.com/morinlab/GAMBLR.data/actions/workflows/build_check.yml/badge.svg)
+![](https://github.com/morinlab/GAMBLR.data/actions/workflows/build_check.yaml/badge.svg)
 
 # GABMLR.data - an R package with community resources generated based on GAMBL results.
 
