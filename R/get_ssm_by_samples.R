@@ -113,8 +113,6 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
 #' #basic usage, using a single sample ID
 #' dohh2_maf = get_ssm_by_sample(this_sample_id = "DOHH-2")
 #'
-#' @export
-#'
 get_ssm_by_sample = function(this_sample_id = NULL,
                              these_samples_metadata = NULL,
                              this_seq_type = "genome",
