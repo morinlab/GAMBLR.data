@@ -2,7 +2,7 @@
 #'
 #' @description Efficiently retrieve all mutations across a range of genomic regions.
 #'
-#' @details This function internally calls [GAMBLR.data::get_ssm_by_region] to retrieve SSM calls for the specified regions.
+#' @details This function internally calls get_ssm_by_region to retrieve SSM calls for the specified regions.
 #'
 #' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
 #' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to.
@@ -83,23 +83,23 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                        verbose = verbose,
                        this_seq_type = this_seq_type)
 
-    region_mafs = lapply(regions, function(x){GAMBLR.data::get_ssm_by_region(region = x,
-                                                                             these_samples_metadata = metadata,
-                                                                             this_seq_type = this_seq_type,
-                                                                             streamlined = streamlined,
-                                                                             projection = projection,
-                                                                             min_read_support = min_read_support,
-                                                                             mode = mode,
-                                                                             verbose = FALSE, #force to FALSE, suppressing noisy output
-                                                                             ...)})
+    region_mafs = lapply(regions, function(x){get_ssm_by_region(region = x,
+                                                                these_samples_metadata = metadata,
+                                                                this_seq_type = this_seq_type,
+                                                                streamlined = streamlined,
+                                                                projection = projection,
+                                                                min_read_support = min_read_support,
+                                                                mode = mode,
+                                                                verbose = FALSE, #force to FALSE, suppressing noisy output
+                                                                ...)})
   }else{
-    region_mafs = lapply(regions, function(x){GAMBLR.data::get_ssm_by_region(region = x,
-                                                                             maf_data = maf_data,
-                                                                             streamlined = streamlined,
-                                                                             projection = projection,
-                                                                             min_read_support = min_read_support,
-                                                                             verbose = FALSE, #force to FALSE, suppressing noisy output
-                                                                             ...)})
+    region_mafs = lapply(regions, function(x){get_ssm_by_region(region = x,
+                                                                maf_data = maf_data,
+                                                                streamlined = streamlined,
+                                                                projection = projection,
+                                                                min_read_support = min_read_support,
+                                                                verbose = FALSE, #force to FALSE, suppressing noisy output
+                                                                ...)})
 
   }
 
