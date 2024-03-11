@@ -28,7 +28,8 @@ pmids <- list(
     "Reddy_DLBCL" = 28985567,
     "Schmitz_DLBCL" = 29641966,
     "Chapuy_DLBCL" = 29713087,
-    "Arthur_DLBCL" = 30275490
+    "Arthur_DLBCL" = 30275490,
+    "Hilton_DLBCL" = 37319384
 )
 
 
@@ -697,6 +698,138 @@ sample_data$meta <- bind_rows(
     sample_data$meta,
     arthur_meta
 )
+
+# Add data from Hilton trios paper
+trios_samples <- read_xlsx(
+    "inst/extdata/studies/DLBCL_Hilton.xlsx"
+) %>%
+drop_na(DNAseq_sample_id)
+
+setwd("~/GAMBLR/")
+
+trios_meta <- GAMBLR.results::get_gambl_metadata(seq_type_filter = c("genome", "capture")) %>%
+    filter(sample_id %in% trios_samples$DNAseq_sample_id) %>%
+    select(any_of(colnames(sample_data$meta))) %>%
+    mutate(
+        cohort == "DLBCL_Hilton",
+        reference_PMID = pmids$Hilton_DLBCL
+    )
+
+sample_data$meta <- bind_rows(
+    sample_data$meta,
+    trios_meta
+)
+
+
+# trios grch37 ssm
+trios_ssm_grch37_genome <- get_ssm_by_samples(
+    these_sample_ids = trios_meta$sample_id,
+    basic_columns = FALSE,
+    these_genes = all_lymphoma_genes
+)
+
+trios_ssm_grch37_capture <- get_ssm_by_samples(
+    these_sample_ids = trios_meta %>%
+        filter(seq_type == "capture") %>%
+        pull(sample_id),
+    basic_columns = FALSE,
+    these_genes = all_lymphoma_genes,
+    this_seq_type = "capture"
+)
+
+
+trios_ssm_grch37 <- bind_rows(
+    trios_ssm_grch37_genome,
+    trios_ssm_grch37_capture
+) %>%
+    mutate(
+        Pipeline = "SLMS-3",
+        Study = "Hilton"
+    ) %>%
+    select(all_of(colnames(sample_data$grch37$maf)))
+
+# trios hg38 ssm
+trios_ssm_hg38_genome <- get_ssm_by_samples(
+    these_sample_ids = trios_meta$sample_id,
+    basic_columns = FALSE,
+    these_genes = all_lymphoma_genes,
+    projection = "hg38"
+)
+
+trios_ssm_hg38_capture <- get_ssm_by_samples(
+    these_sample_ids = trios_meta %>%
+        filter(seq_type == "capture") %>%
+        pull(sample_id),
+    basic_columns = FALSE,
+    these_genes = all_lymphoma_genes,
+    this_seq_type = "capture",
+    projection = "hg38"
+)
+
+
+trios_ssm_hg38 <- bind_rows(
+    trios_ssm_hg38_genome,
+    trios_ssm_hg38_capture
+) %>%
+    mutate(
+        Pipeline = "SLMS-3",
+        Study = "Hilton"
+    ) %>%
+    select(all_of(colnames(sample_data$hg38$maf)))
+
+sample_data$grch37$maf <- bind_rows(
+    sample_data$grch37$maf,
+    trios_ssm_grch37
+)
+
+sample_data$hg38$maf <- bind_rows(
+    sample_data$hg38$maf,
+    trios_ssm_hg38
+)
+
+
+trios_ashm_grch37 <- get_ssm_by_regions(
+    regions_bed = grch37_ashm_regions,
+    streamlined = FALSE,
+    basic_columns = TRUE
+)
+trios_ashm_grch37 <- trios_ashm_grch37 %>%
+    filter(Tumor_Sample_Barcode %in% trios_meta$Tumor_Sample_Barcode)
+
+trios_ashm_grch37 <- trios_ashm_grch37 %>%
+    mutate(
+        Pipeline = "SLMS-3",
+        Study = "Hilton"
+    )
+
+
+sample_data$grch37$ashm <- bind_rows(
+    sample_data$grch37$ashm,
+    trios_ashm_grch37
+)
+
+
+trios_ashm_hg38 <- get_ssm_by_regions(
+    regions_bed = hg38_ashm_regions,
+    projection = "hg38",
+    streamlined = FALSE,
+    basic_columns = TRUE
+)
+trios_ashm_hg38 <- trios_ashm_hg38 %>%
+    filter(Tumor_Sample_Barcode %in% trios_meta$Tumor_Sample_Barcode)
+
+trios_ashm_hg38 <- trios_ashm_hg38 %>%
+    mutate(
+        Pipeline = "SLMS-3",
+        Study = "Hilton"
+    )
+
+sample_data$hg38$ashm <- bind_rows(
+    sample_data$hg38$ashm,
+    trios_ashm_hg38
+)
+
+setwd("~/my_dir/repos/GAMBLR.data/")
 
 usethis::use_data(
     sample_data,
