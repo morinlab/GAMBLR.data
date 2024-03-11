@@ -59,7 +59,7 @@ Returns a data frame of variants in MAF-like format.
 Efficiently retrieve all mutations across a range of genomic regions.
 }
 \details{
-This function internally calls \link{get_ssm_by_region} to retrieve SSM calls for the specified regions.
+This function internally calls get_ssm_by_region to retrieve SSM calls for the specified regions.
 }
 \examples{
 #basic usage, adding custom names from bundled ashm data frame
