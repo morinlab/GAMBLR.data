@@ -32,8 +32,6 @@
 #'
 #' @import dplyr stringr
 #'
-#' @export
-#'
 #' @examples
 #' my_mutations = get_ssm_by_region(region = "chr8:128,723,128-128,774,067")
 #'
