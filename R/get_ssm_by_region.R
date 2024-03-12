@@ -33,8 +33,6 @@
 #'
 #' @import dplyr stringr
 #'
-#' @export
-#'
 #' @examples
 #' my_mutations = get_ssm_by_region(region = "chr8:128,723,128-128,774,067")
 #'
@@ -141,15 +139,15 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   #subset the maf to the specified region
   muts_region = dplyr::filter(this_maf, Chromosome == chromosome & Start_Position > qstart & Start_Position < qend)
-
+  
+  # Handle possible duplicates
+  muts_region <- muts_region %>%
+    distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
+  
   if(streamlined){
     muts_region = muts_region %>%
       dplyr::select(Start_Position, Tumor_Sample_Barcode)
   }
-
-  # Handle possible duplicates
-  muts_region <- muts_region %>%
-    distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
-
+  
   return(muts_region)
 }

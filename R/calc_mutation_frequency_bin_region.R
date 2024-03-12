@@ -146,7 +146,7 @@ calc_mutation_frequency_bin_region <- function(region,
   if (is.null(maf_data)) {
     try(
       if (!"seq_type" %in% colnames(metadata)) {
-        stop("seq_type must be present in metdata for compatibility with get_ssm_by_sample")
+        stop("seq_type must be present in metadata for compatibility with get_ssm_by_samples")
       }
     )
     message("Using GAMBLR.data::get_ssm_by_region...")
