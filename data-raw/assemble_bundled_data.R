@@ -711,7 +711,7 @@ trios_meta <- GAMBLR.results::get_gambl_metadata(seq_type_filter = c("genome", "
     filter(sample_id %in% trios_samples$DNAseq_sample_id) %>%
     select(any_of(colnames(sample_data$meta))) %>%
     mutate(
-        cohort == "DLBCL_Hilton",
+        cohort = "DLBCL_Hilton",
         reference_PMID = pmids$Hilton_DLBCL
     )
 
