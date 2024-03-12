@@ -1,10 +1,20 @@
 #' @title Get GAMBL Metadata.
 #'
-#' @description Convenience function for loading the bundled metadata, [GAMBLR.data::gambl_metadata].
+#' @description Convenience function for loading the sample metadata.
 #'
-#' @details This bare bones function was developed to retrieve metadata for non-GSC-users.
-#' Specify the seq type (`seq_type_filter`) for the samples you want returned as the only argument.
+#' @details This bare bones function was developed to retrieve metadata for
+#' non-GSC-users. Specify the seq type (`seq_type_filter`) for the samples you
+#' want returned as the only argument.
 #' It relies on the bundled metadata in this package.
+#' Specify `case_set` argument to retreive samples from particular study.
+#' Currently supported case_sets are: FL_Dreval (FL samples from Dreval et al),
+#' DLBCL_Dreval (DLBCL samples from Dreval et al), FL-DLBCL-study (all samples
+#' from Dreval et al), DLBCL_Arthur (all samples from Arthur et al study),
+#' DLBCL_Hilton (all samples from Hilton et al DLBCL Trios study),
+#' DLBCL_cell_lines (5 DLBCL cell lines), DLBCL_Chapuy (all samples from Chapuy
+#' et al study), DLBCL_Schmitz (all samples from Schmitz et al study),
+#' DLBCL_Reddy (all samples from Reddy et al study), DLBCL_Thomas (HTMCP DLBCLs
+#' from Thomas et al study), BL_Thomas (BL samples from Thomas et al study)
 #'
 #' @param seq_type_filter Specify the seq type you want to return metadata for.
 #' Default is "genome".
@@ -56,13 +66,61 @@
 #' #return metadata for genome and capture samples
 #' all_meta = get_gambl_metadata(seq_type_filter = c("genome", "capture"))
 #'
-get_gambl_metadata = function(seq_type_filter = "genome",
-                              ...){
+get_gambl_metadata = function(
+    seq_type_filter = "genome",
+    case_set,
+    ...
+){
 
-  #check if any invalid parameters are provided
-  check_excess_params(...)
+    #check if any invalid parameters are provided
+    check_excess_params(...)
 
-  message("Using the bundled metadata in GAMBLR.data...")
-  return(GAMBLR.data::sample_data$meta %>%
-           dplyr::filter(seq_type %in% seq_type_filter))
+    message("Using the bundled metadata in GAMBLR.data...")
+    metadata <- GAMBLR.data::sample_data$meta %>%
+            dplyr::filter(seq_type %in% seq_type_filter)
+
+
+    if(!missing(case_set)){
+
+        # pre-defined case sets
+        if(case_set == "FL_Dreval"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "FL_Dreval", pathology == "FL")
+        }else if(case_set == "DLBCL_Dreval"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "FL_Dreval", pathology == "DLBCL")
+        }else if(case_set == "FL-DLBCL-study"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "FL_Dreval")
+        }else if(case_set == "DLBCL_Arthur"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "DLBCL_Arthur")
+        }else if(case_set == "DLBCL_Hilton"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "DLBCL_Hilton")
+        }else if(case_set == "DLBCL_cell_lines"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "DLBCL_cell_lines")
+        }else if(case_set == "DLBCL_Chapuy"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "dlbcl_chapuy")
+        }else if(case_set == "DLBCL_Schmitz"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "dlbcl_schmitz")
+        }else if(case_set == "DLBCL_Reddy"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "dlbcl_reddy")
+        }else if(case_set == "BL_Thomas"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "BL_Thomas")
+        }else if(case_set == "DLBCL_Thomas"){
+            metadata <- metadata %>%
+                dplyr::filter(cohort == "DLBCL_Thomas")
+        }else{
+            message(paste("case set", case_set, "not available"))
+            return()
+        }
+    }
+
+    return(metadata)
 }
