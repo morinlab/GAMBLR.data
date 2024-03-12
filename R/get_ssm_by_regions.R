@@ -86,7 +86,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
     if(missing(this_study)){
         region_mafs = lapply(
             regions, function(x){
-                GAMBLR.data::get_ssm_by_region(
+                get_ssm_by_region(
                     region = x,
                     these_samples_metadata = metadata,
                     this_seq_type = this_seq_type,
@@ -101,7 +101,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
     }else{
         region_mafs = lapply(
             regions, function(x){
-                GAMBLR.data::get_ssm_by_region(
+                get_ssm_by_region(
                     region = x,
                     these_samples_metadata = metadata,
                     this_seq_type = this_seq_type,
@@ -116,7 +116,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
         )
     }
   }else{
-    region_mafs = lapply(regions, function(x){GAMBLR.data::get_ssm_by_region(region = x,
+    region_mafs = lapply(regions, function(x){get_ssm_by_region(region = x,
                                                                              maf_data = maf_data,
                                                                              streamlined = streamlined,
                                                                              projection = projection,
