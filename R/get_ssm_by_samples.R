@@ -13,6 +13,8 @@
 #' @param this_seq_type Default is genome.
 #' @param projection The projection genome build. Supports hg38 and grch37.
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
+#' @param this_study Optionally specify first name of the author for the paper
+#'      from which the variants should be returned for.
 #' @param these_genes A vector of genes to subset ssm to.
 #' @param basic_columns Return first 43 columns of MAF rather than full details. Default is TRUE.
 #' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters.

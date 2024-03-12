@@ -20,6 +20,8 @@
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38).
 #' @param this_seq_type The seq_type you want back, default is genome.
 #' @param mode Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
+#' @param this_study Optionally specify first name of the author for the paper
+#'      from which the variants should be returned for.
 #' @param verbose Set to FALSE to prevent ANY message to be printed.
 #' In most cases, this parameter should be left to TRUE.
 #' The parameter was added to accommodate for noisy output
