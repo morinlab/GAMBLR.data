@@ -18,7 +18,6 @@
 #' @param streamlined If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).
 #' @param use_name_column If your bed-format data frame has a name column (must be named "name") these can be used to name your regions in the returned data frame.
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.
-#' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).
 #' @param verbose Set to TRUE to maximize the output to console. Default is TRUE.
 #' This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.
@@ -43,12 +42,12 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                               maf_data,
                               this_seq_type = "genome",
                               mode = "slms-3",
+                              this_study,
                               regions_list,
                               regions_bed,
                               streamlined = TRUE,
                               use_name_column = FALSE,
                               projection = "grch37",
-                              min_read_support = 3,
                               verbose = FALSE,
                               ...){
 
@@ -88,8 +87,8 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                                                                              this_seq_type = this_seq_type,
                                                                              streamlined = streamlined,
                                                                              projection = projection,
-                                                                             min_read_support = min_read_support,
                                                                              mode = mode,
+                                                                             this_study = this_study,
                                                                              verbose = FALSE, #force to FALSE, suppressing noisy output
                                                                              ...)})
   }else{
@@ -97,7 +96,6 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                                                                              maf_data = maf_data,
                                                                              streamlined = streamlined,
                                                                              projection = projection,
-                                                                             min_read_support = min_read_support,
                                                                              verbose = FALSE, #force to FALSE, suppressing noisy output
                                                                              ...)})
 
