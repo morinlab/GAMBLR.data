@@ -99,8 +99,8 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   # Optionally return variants from a particular study
   if(!missing(this_study)){
-    sample_ssm <- sample_ssm %>%
-      dplyr::filter((tolower(!!sym("Study")) == this_study))
+    this_maf <- this_maf %>%
+      dplyr::filter((!!sym("Study")) == this_study)
   }  
 
   #split region into chunks (chr, start, end) and deal with chr prefixes based on the selected projection

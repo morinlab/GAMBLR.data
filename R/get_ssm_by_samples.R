@@ -88,7 +88,7 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
   # Optionally return variants from a particular study
   if(!missing(this_study)){
     sample_ssm <- sample_ssm %>%
-      dplyr::filter((tolower(!!sym("Study")) == this_study))
+      dplyr::filter((!!sym("Study")) == this_study)
   }  
 
   #subset maf to only include first 43 columns (default)
