@@ -10,6 +10,9 @@ get_gambl_metadata(seq_type_filter = "genome", case_set, ...)
 \item{seq_type_filter}{Specify the seq type you want to return metadata for.
 Default is "genome".}
 
+\item{case_set}{Optionally specify study details to return samples from a
+particular case set. See function description for supported case sets.}
+
 \item{...}{Any additional parameters.}
 }
 \value{

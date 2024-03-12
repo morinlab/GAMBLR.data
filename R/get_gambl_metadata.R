@@ -18,6 +18,8 @@
 #'
 #' @param seq_type_filter Specify the seq type you want to return metadata for.
 #' Default is "genome".
+#' @param case_set Optionally specify study details to return samples from a
+#' particular case set. See function description for supported case sets.
 #' @param ... Any additional parameters.
 #'
 #' @return A data frame with metadata, tailored for user without GSC access.
