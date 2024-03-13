@@ -10,7 +10,7 @@ get_ssm_by_patients(
   projection = "grch37",
   this_seq_type = "genome",
   tool_name = "slms-3",
-  min_read_support = 3,
+  this_study,
   basic_columns = TRUE,
   maf_cols = NULL,
   verbose = FALSE,
@@ -30,7 +30,8 @@ If the vector of patient IDs is missing (\code{these_patient_ids}), this functio
 
 \item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
-\item{min_read_support}{Subset returned variants to a set minimum read support. Default is 3.}
+\item{this_study}{Optionally specify first name of the author for the paper
+from which the variants should be returned for.}
 
 \item{basic_columns}{Return first 45 columns of MAF rather than full details. Default is TRUE.}
 

@@ -10,12 +10,12 @@ get_ssm_by_regions(
   maf_data,
   this_seq_type = "genome",
   mode = "slms-3",
+  this_study,
   regions_list,
   regions_bed,
   streamlined = TRUE,
   use_name_column = FALSE,
   projection = "grch37",
-  min_read_support = 3,
   verbose = FALSE,
   ...
 )
@@ -34,6 +34,9 @@ If not provided (and if \code{these_sample_ids} is not provided), the function w
 
 \item{mode}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
+\item{this_study}{Optionally specify first name of the author for the paper
+from which the variants should be returned for.}
+
 \item{regions_list}{A vector of regions in the chr:start-end format to restrict the returned SSM calls to.}
 
 \item{regions_bed}{A data frame in BED format with the coordinates you want to retrieve (recommended).
@@ -44,8 +47,6 @@ This parameter can also accept an additional column with region names that will 
 \item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions in the returned data frame.}
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.}
-
-\item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
 
 \item{verbose}{Set to TRUE to maximize the output to console. Default is TRUE.
 This parameter also dictates the verbosity of any helper function internally called inside the main function.}

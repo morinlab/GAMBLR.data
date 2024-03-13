@@ -13,8 +13,9 @@
 #' @param this_seq_type Default is genome.
 #' @param projection The projection genome build. Supports hg38 and grch37.
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
+#' @param this_study Optionally specify first name of the author for the paper
+#'      from which the variants should be returned for.
 #' @param these_genes A vector of genes to subset ssm to.
-#' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).
 #' @param basic_columns Return first 43 columns of MAF rather than full details. Default is TRUE.
 #' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters.
 #' @param verbose Enable for debugging/noisier output.
@@ -41,8 +42,8 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
                                this_seq_type = "genome",
                                projection = "grch37",
                                tool_name = "slms-3",
+                               this_study,
                                these_genes,
-                               min_read_support = 3,
                                basic_columns = TRUE,
                                maf_cols = NULL,
                                verbose = FALSE,
@@ -81,13 +82,16 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
                paste(valid_projections,collapse=", ")))
   }
 
-  #drop poorly supported reads
-  sample_ssm = dplyr::filter(sample_ssm, t_alt_count >= min_read_support)
-
   if(!missing(these_genes)){
     sample_ssm = sample_ssm %>%
       dplyr::filter(Hugo_Symbol %in% these_genes)
   }
+
+  # Optionally return variants from a particular study
+  if(!missing(this_study)){
+    sample_ssm <- sample_ssm %>%
+      dplyr::filter((!!sym("Study")) == this_study)
+  }  
 
   #subset maf to only include first 43 columns (default)
   if(basic_columns){
@@ -118,7 +122,6 @@ get_ssm_by_sample = function(this_sample_id = NULL,
                              this_seq_type = "genome",
                              projection = "grch37",
                              these_genes,
-                             min_read_support = 3,
                              basic_columns = TRUE,
                              maf_cols = NULL,
                              verbose = FALSE,
@@ -129,7 +132,6 @@ get_ssm_by_sample = function(this_sample_id = NULL,
                      this_seq_type = this_seq_type,
                      projection = projection,
                      these_genes = these_genes,
-                     min_read_support = min_read_support,
                      basic_columns = basic_columns,
                      maf_cols = maf_cols,
                      verbose = verbose,

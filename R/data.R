@@ -460,7 +460,7 @@
 
 #' Lymphoma Genes DLBCL Latest
 #'
-#' Genes frequently associated with Diffuse large B cell lymphoma (DLBCL). 
+#' Genes frequently associated with Diffuse large B cell lymphoma (DLBCL).
 #' This is the most up-to-date version of this dataset.
 #'
 #' @format ## `lymphoma_genes_dlbcl_v_latest`
@@ -486,7 +486,7 @@
 #' Lymphoma Genes v0.0
 #'
 #' A comprehenssive resource of genes associated with different types of lymphomas.
-#' 
+#'
 #' @aliases lymphoma_genes
 #'
 #' @format ## `lymphoma_genes_lymphoma_genes_v0.0`
@@ -513,7 +513,7 @@
 #' Genes frequently associated with Mantle cell lymphoma (MCL). This is version 0.1.
 #'
 #' @format ## `lymphoma_genes_mcl_v0.1`
-#' A data frame with 53 rows and 13 columns. 
+#' A data frame with 53 rows and 13 columns.
 #' \describe{
 #'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
 #'   \item{Gene}{Gene symbol in Hugo format.v}
@@ -538,7 +538,7 @@
 #' #' This is the most up-to-date version of this dataset.
 #'
 #' @format ## `lymphoma_genes_mcl_v_latest`
-#' A data frame with 53 rows and 13 columns. 
+#' A data frame with 53 rows and 13 columns.
 #' \describe{
 #'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
 #'   \item{Gene}{Gene symbol in Hugo format.v}
@@ -563,7 +563,7 @@
 #' Each projection is organized as a list of 3 elements; maf, seg, and bedpe (all data frames).
 #'
 #' @format ## `sample_data`
-#' A list of three elements. 
+#' A list of three elements.
 #' Two elements are lists with three data frames in each list and the last element (metadata) is a data frame.
 #' \describe{
 #'   \item{meta}{A data frame with metadata.}
@@ -640,6 +640,37 @@
 #' }
 "somatic_hypermutation_locations_GRCh37_v0.3"
 
+#' Somatic Hypermutation Locations GRCh37 v0.4
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh37, version 0.4.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh37_v0.4`
+#' A data frame with 129 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg19_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh37_v0.4"
+
+#' Somatic Hypermutation Locations GRCh37 v0.5
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh37, version 0.5.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh37_v0.5`
+#' A data frame with 130 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg19_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh37_v0.5"
 
 #' Somatic Hypermutation Locations GRCh37 Latest
 #'
@@ -727,6 +758,38 @@
 #' }
 "somatic_hypermutation_locations_GRCh38_v0.3"
 
+
+#' Somatic Hypermutation Locations GRCh38 v0.4
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh38, version 0.4.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh38_v0.4`
+#' A data frame with 129 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg38_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg38_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh38_v0.4"
+
+#' Somatic Hypermutation Locations GRCh38 v0.5
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh38, version 0.5.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh38_v0.5`
+#' A data frame with 130 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg38_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg38_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+"somatic_hypermutation_locations_GRCh38_v0.5"
 
 #' Somatic Hypermutation Locations GRCh38 Latest
 #'

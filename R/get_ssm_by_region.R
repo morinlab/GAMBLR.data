@@ -20,7 +20,8 @@
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38).
 #' @param this_seq_type The seq_type you want back, default is genome.
 #' @param mode Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
-#' @param min_read_support Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).
+#' @param this_study Optionally specify first name of the author for the paper
+#'      from which the variants should be returned for.
 #' @param verbose Set to FALSE to prevent ANY message to be printed.
 #' In most cases, this parameter should be left to TRUE.
 #' The parameter was added to accommodate for noisy output
@@ -51,7 +52,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
                              projection = "grch37",
                              this_seq_type = "genome",
                              mode = "slms-3",
-                             min_read_support = 3,
+                             this_study,
                              verbose = FALSE,
                              ...){
 
@@ -96,8 +97,11 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     this_maf = maf_data
   }
 
-  #drop poorly supported reads
-  this_maf = dplyr::filter(this_maf, t_alt_count >= min_read_support)
+  # Optionally return variants from a particular study
+  if(!missing(this_study)){
+    this_maf <- this_maf %>%
+      dplyr::filter((!!sym("Study")) == this_study)
+  }  
 
   #split region into chunks (chr, start, end) and deal with chr prefixes based on the selected projection
   if(length(region) > 1){
