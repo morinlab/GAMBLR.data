@@ -304,16 +304,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> [1] "patient_id"           "sample_id"            "Tumor_Sample_Barcode"
  [4] "seq_type"             "sex"                  "COO_consensus"       
  [7] "lymphgen"             "genetic_subgroup"     "EBV_status_inf"      
-[10] "cohort"               "pathology"            "reference_PMID"      </code></pre>
+[10] "cohort"               "pathology"            "reference_PMID"      
+[13] "genome_build"         "pairing_status"       "age_group"           
+[16] "compression"          "bam_available"        "pathology_rank"      
+[19] "DHITsig_consensus"    "ffpe_or_frozen"       "fl_grade"            
+[22] "hiv_status"           "lymphgen_cnv_noA53"   "lymphgen_no_cnv"     
+[25] "lymphgen_with_cnv"    "lymphgen_wright"      "molecular_BL"        
+[28] "normal_sample_id"     "time_point"          </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># How can I find samples from the FL study?</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(metadata<span class="sc">$</span>cohort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-       BL_Thomas DLBCL_cell_lines     dlbcl_chapuy      dlbcl_reddy 
-             234                5              233              999 
-   dlbcl_schmitz     DLBCL_Thomas        FL_Dreval 
-             470               43              443 </code></pre>
+       BL_Thomas     DLBCL_Arthur DLBCL_cell_lines     dlbcl_chapuy 
+             234              153                5              233 
+    DLBCL_Hilton      dlbcl_reddy    dlbcl_schmitz     DLBCL_Thomas 
+             160              999              470               43 
+       FL_Dreval 
+             443 </code></pre>
 </div>
 </div>
 <p>We can now see that the samples from the FL study are in the cohort <code>FL_Dreval</code>. Let’s explore these samples more:</p>
@@ -342,7 +350,7 @@ COMFL DLBCL    FL
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># How does our metadata looks like now?</span></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(metadata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>tibble [10 × 12] (S3: tbl_df/tbl/data.frame)
+<pre><code>tibble [10 × 29] (S3: tbl_df/tbl/data.frame)
  $ patient_id          : chr [1:10] "DO27833" "DO27851" "DO27853" "DO27855" ...
  $ sample_id           : chr [1:10] "SP59412" "SP59448" "SP59452" "SP59456" ...
  $ Tumor_Sample_Barcode: chr [1:10] "SP59412" "SP59448" "SP59452" "SP59456" ...
@@ -354,7 +362,24 @@ COMFL DLBCL    FL
  $ EBV_status_inf      : chr [1:10] NA NA NA NA ...
  $ cohort              : chr [1:10] "FL_Dreval" "FL_Dreval" "FL_Dreval" "FL_Dreval" ...
  $ pathology           : chr [1:10] "DLBCL" "DLBCL" "DLBCL" "DLBCL" ...
- $ reference_PMID      : num [1:10] 37084389 37084389 37084389 37084389 37084389 ...</code></pre>
+ $ reference_PMID      : num [1:10] 37084389 37084389 37084389 37084389 37084389 ...
+ $ genome_build        : chr [1:10] NA NA NA NA ...
+ $ pairing_status      : chr [1:10] NA NA NA NA ...
+ $ age_group           : chr [1:10] NA NA NA NA ...
+ $ compression         : chr [1:10] NA NA NA NA ...
+ $ bam_available       : logi [1:10] NA NA NA NA NA NA ...
+ $ pathology_rank      : num [1:10] NA NA NA NA NA NA NA NA NA NA
+ $ DHITsig_consensus   : chr [1:10] NA NA NA NA ...
+ $ ffpe_or_frozen      : chr [1:10] NA NA NA NA ...
+ $ fl_grade            : chr [1:10] NA NA NA NA ...
+ $ hiv_status          : chr [1:10] NA NA NA NA ...
+ $ lymphgen_cnv_noA53  : chr [1:10] NA NA NA NA ...
+ $ lymphgen_no_cnv     : chr [1:10] NA NA NA NA ...
+ $ lymphgen_with_cnv   : chr [1:10] NA NA NA NA ...
+ $ lymphgen_wright     : chr [1:10] NA NA NA NA ...
+ $ molecular_BL        : chr [1:10] NA NA NA NA ...
+ $ normal_sample_id    : chr [1:10] NA NA NA NA ...
+ $ time_point          : chr [1:10] NA NA NA NA ...</code></pre>
 </div>
 </div>
 <p>Our subsetting worked and we can now proceed with matrix assembly.</p>
@@ -388,15 +413,15 @@ COMFL DLBCL    FL
 <div class="cell-output cell-output-stdout">
 <pre><code>
                3'Flank                  3'UTR                5'Flank 
-                    29                     20                    153 
+                    29                     20                    127 
                  5'UTR        Frame_Shift_Del        Frame_Shift_Ins 
-                   118                      7                      1 
+                    61                      7                      1 
                    IGR           In_Frame_Del                 Intron 
-                    46                      2                   1828 
+                    46                      2                   1502 
      Missense_Mutation      Nonsense_Mutation                    RNA 
-                    89                      9                     15 
+                    78                      9                     15 
                 Silent          Splice_Region            Splice_Site 
-                    38                      8                      9 
+                    29                      6                      8 
 Translation_Start_Site 
                      1 </code></pre>
 </div>

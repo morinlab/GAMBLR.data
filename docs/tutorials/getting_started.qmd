@@ -303,147 +303,13 @@ As we did not specify any sample ID, metadata, or gene to the above call, it by 
 In this section, we are exploring the different ways you can obtain the maf data
 for a specific region (or regions) of interest.
 
-#### Use `region`
-If you are only looking at one specific position, you can take advantage of the
-`get_ssm_by_region()` function:
-
-```{r e6}
-# MYC region (grch37)
-myc_region <- "8:128747680-128753674"
-
-# Get all SSMs that are residing in the defined MYC region
-myc_ssm <- get_ssm_by_region(region = myc_region)
-
-myc_ssm %>%
-    count(Hugo_Symbol) %>%
-    ggplot(
-        aes(
-            x = Hugo_Symbol,
-            y = n,
-            fill = Hugo_Symbol
-        )
-    ) +
-    geom_bar(stat = "identity")
-```
-
-#### Specify individual chunks
-We can also specify the coordinates we are interested in using the `chromosome`,
-`qstart`, and `qend` arguments:
-
-```{r e7}
-# Get all SSMs that are residing in the defined MYC region
-myc_ssm_arg <- get_ssm_by_region(
-    chromosome = 8,
-    qstart = 128747680,
-    qend = 128753674
-)
-
-myc_ssm_arg %>%
-    count(Hugo_Symbol) %>%
-    ggplot(
-        aes(
-            x = Hugo_Symbol,
-            y = n,
-            fill = Hugo_Symbol
-        )
-    ) +
-    geom_bar(stat = "identity")
-```
-
-Let's also confirm that this returned maf is the same as what we get back when
-using the `region` argument:
-
-```{r c2}
-identical(
-    myc_ssm,
-    myc_ssm_arg
-)
-```
-
-#### Use pre-loaded maf
-If you are working with massive maf data containing many variants and have
-already imported it to R, or using the maf data from outside of this package,
-you can still take advantage of this function and use the pre-loaded maf. This
-function will still subset it to the desired regions. To do so, specify the maf
-of interest with `maf_data`:
-```{r e8}
-dohh2_myc_ssm <- get_ssm_by_region(
-    maf_data = ssm_sample,
-    region = myc_region
-)
-```
-
-While we are on it, is it generating the same output as when we ask for SSM
-to be returned for a specific gene with `get_ssm_by_samples()`?
-```{r c3}
-identical(
-    ssm_myc,
-    dohh2_myc_ssm
-)
-```
-Yes, indeed - the both outputs are identical again.
-
-#### Toggling `streamlined`
-This function also has a streamlined option available. If set to `TRUE`, only
-two columns are kept in the returned maf (Start_Position and
-Tumour_Sample_Barcode). In this example, we are extending the coordinates to
-encapsulate the whole p-arm of chromosome 1. Note, since we are requesting hg38
-calls, we have to add the chr prefix for the specified chromosome. Don't
-remember the coordinates? Luckily, GAMBLR.data provides the coordinates for
-chromosome arms in both projections!
-```{r e9}
-coord <- chromosome_arms_hg38 %>%
-    filter(arm == "p", chromosome == "chr1")
-
-streamlined_ssm <- get_ssm_by_region(
-    chromosome = coord$chromosome,
-    qstart = coord$start,
-    qend = coord$end,
-    streamlined = TRUE,
-    projection = "hg38"
-)
-
-# What columns are kept with streamlined = TRUE?
-colnames(streamlined_ssm)
-
-# How many variants do we find within the specified region?
-nrow(streamlined_ssm)
-```
-
-#### Focus on specific IDs
-Similarly to other get_ssm functions, we can also call `get_ssm_by_region` with
-either `these_sample_ids` or `these_samples_metadata` to restrict the return to
-specific sample IDs. In this example, we first call the function with
-`these_sample_ids = "DOHH-2"` and then with `these_samples_metadata` giving the
-function a metadata table that has been subset to the same sample ID.
-```{r e10}
-dohh2_region_sample <- get_ssm_by_region(
-    these_sample_ids = my_sample_id,
-    region = myc_region
-)
-
-dohh2_region_metadata <- get_ssm_by_region(
-    these_samples_metadata = metadata$dohh2,
-    region = myc_region
-)
-```
-
-We can also see that both approaches generate identical output:
-```{r c4}
-identical(
-    dohh2_region_sample,
-    dohh2_region_metadata
-)
-```
-
-#### Look at multiple regions
-For multiple regions, refer to the plural version, `get_ssm_by_regions`. In this
-example, we will obtain SSM calls for all aSHM regions associated with *PAX5* across
-all available samples. With this multiple-region-version of this function we
-also get the region name added to the returned data frame and there are a couple
-of different ways this can be done. If you are providing regions as a bed file
-(`regions_bed`), you have the option of setting `use_name_column = TRUE`. If you
-do so, your bed file should have a column simply named "name". In this
+For multiple regions, refer to the `get_ssm_by_regions`. In this
+example, we will obtain SSM calls for all aSHM regions associated with *PAX5*
+across all available samples. With this multiple-region-version of this function
+we also get the region name added to the returned data frame and there are a
+couple of different ways this can be done. If you are providing regions as a bed
+file (`regions_bed`), you have the option of setting `use_name_column = TRUE`.
+If you do so, your bed file should have a column simply named "name". In this
 case, the function will keep this column for naming the returned regions in the
 maf. With `streamlined = TRUE` the function returns the minimal number of
 columns. Don't know coordinates of aSHM at *PAX5*? GAMBLR.data has you covered!
@@ -625,8 +491,8 @@ Here we are showing how to give the function a complete region with the `region`
 argument. Similar to `get_sample_cn_segments`, if `these_sample_ids` and/or
 `these_samples_metadata` are not specified, the function will query all available samples.
 ```{r e19}
-# What is our region again?
-myc_region
+# MYC region (grch37)
+myc_region <- "8:128747680-128753674"
 
 # Get cn segments in this region for all samples
 myc_seg <- get_cn_segments(

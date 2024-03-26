@@ -106,6 +106,12 @@ can be referred to directly by it's version number.
 * `somatic_hypermutation_locations_GRCh37_v0.3` Aberrant somatic hypermutation
 (aSHM) regions relative to grch37. This is the versioned data and
 can be referred to directly by it's version number.
+* `somatic_hypermutation_locations_GRCh37_v0.4` Aberrant somatic hypermutation
+(aSHM) regions relative to grch37. This is the versioned data and
+can be referred to directly by it's version number.
+* `somatic_hypermutation_locations_GRCh37_v0.5` Aberrant somatic hypermutation
+(aSHM) regions relative to grch37. This is the versioned data and
+can be referred to directly by it's version number.
 * `somatic_hypermutation_locations_GRCh37_v_latest` Aberrant somatic hypermutation
 (aSHM) regions relative to grch37. This is an alias for the latest version of
 this data.
@@ -119,6 +125,12 @@ can be referred to directly by it's version number.
 (aSHM) regions relative to hg38. This is the versioned data and
 can be referred to directly by it's version number.
 * `somatic_hypermutation_locations_GRCh38_v0.3` Aberrant somatic hypermutation
+(aSHM) regions relative to hg38. This is the versioned data and
+can be referred to directly by it's version number.
+* `somatic_hypermutation_locations_GRCh38_v0.4` Aberrant somatic hypermutation
+(aSHM) regions relative to hg38. This is the versioned data and
+can be referred to directly by it's version number.
+* `somatic_hypermutation_locations_GRCh38_v0.5` Aberrant somatic hypermutation
 (aSHM) regions relative to hg38. This is the versioned data and
 can be referred to directly by it's version number.
 * `somatic_hypermutation_locations_GRCh38_v_latest` Aberrant somatic

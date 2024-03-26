@@ -319,34 +319,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(metadata<span class="sc">$</span>all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>tibble [4,785 × 27] (S3: tbl_df/tbl/data.frame)
- $ sample_id           : chr [1:4785] "00-14595_tumorA" "00-14595_tumorB" "00-14595_tumorC" "00-14595_tumorD" ...
- $ patient_id          : chr [1:4785] "00-14595" "00-14595" "00-14595" "00-14595" ...
- $ pathology           : chr [1:4785] "COMFL" "COMFL" "DLBCL" "FL" ...
- $ seq_type            : chr [1:4785] "genome" "genome" "genome" "genome" ...
- $ genome_build        : chr [1:4785] "grch37" "grch37" "grch37" "grch37" ...
- $ pairing_status      : chr [1:4785] "matched" "matched" "matched" "matched" ...
- $ Tumor_Sample_Barcode: chr [1:4785] "00-14595_tumorA" "00-14595_tumorB" "00-14595_tumorC" "00-14595_tumorD" ...
- $ age_group           : chr [1:4785] "Other" "Other" "Other" "Other" ...
- $ compression         : chr [1:4785] "bam" "cram" "cram" "cram" ...
- $ bam_available       : logi [1:4785] TRUE TRUE TRUE TRUE TRUE TRUE ...
- $ pathology_rank      : num [1:4785] 13 13 19 15 19 19 15 27 19 19 ...
- $ cohort              : chr [1:4785] "DLBCL_LSARP_Trios" "DLBCL_LSARP_Trios" "DLBCL_LSARP_Trios" "DLBCL_LSARP_Trios" ...
- $ COO_consensus       : chr [1:4785] "GCB" "GCB" "GCB" "GCB" ...
- $ DHITsig_consensus   : chr [1:4785] "DHITsigNeg" "DHITsigPos" "DHITsig-IND" "DHITsig-IND" ...
- $ EBV_status_inf      : chr [1:4785] NA NA NA NA ...
- $ ffpe_or_frozen      : chr [1:4785] "FFPE" "FFPE" "FFPE" "FFPE" ...
- $ fl_grade            : chr [1:4785] NA NA NA NA ...
- $ hiv_status          : chr [1:4785] "UNKNOWN" "UNKNOWN" "UNKNOWN" "UNKNOWN" ...
- $ lymphgen            : Factor w/ 12 levels "EZB","EZB-COMP",..: 1 1 1 1 12 7 1 12 NA 1 ...
- $ lymphgen_cnv_noA53  : chr [1:4785] "EZB" "EZB" "EZB" "EZB" ...
- $ lymphgen_no_cnv     : chr [1:4785] "EZB" "EZB" "EZB" "EZB" ...
- $ lymphgen_with_cnv   : chr [1:4785] "EZB" "EZB" "EZB" "EZB" ...
- $ lymphgen_wright     : chr [1:4785] NA NA NA NA ...
- $ molecular_BL        : chr [1:4785] NA NA NA NA ...
- $ normal_sample_id    : chr [1:4785] "00-14595_normal" "00-14595_normal" "00-14595_normal" "00-14595_normal" ...
- $ sex                 : chr [1:4785] "F" "F" "F" "F" ...
- $ time_point          : chr [1:4785] "A" "B" "C" "D" ...</code></pre>
+<pre><code>'data.frame':   2740 obs. of  29 variables:
+ $ patient_id          : chr  "BLGSP-71-29-00539" "BLGSP-71-29-00525" "BLGSP-71-29-00528" "BLGSP-71-29-00526" ...
+ $ sample_id           : chr  "Akata" "BL2" "BL30" "BL41" ...
+ $ Tumor_Sample_Barcode: chr  "Akata" "BL2" "BL30" "BL41" ...
+ $ seq_type            : chr  "genome" "genome" "genome" "genome" ...
+ $ sex                 : chr  "NA" "NA" "NA" "NA" ...
+ $ COO_consensus       : chr  NA NA NA NA ...
+ $ lymphgen            : chr  "ST2" "Other" "Other" "Other" ...
+ $ genetic_subgroup    : chr  "DGG-BL" "DGG-BL" "IC-BL" "IC-BL" ...
+ $ EBV_status_inf      : chr  "EBV-positive" "EBV-negative" "EBV-negative" "EBV-negative" ...
+ $ cohort              : chr  "BL_Thomas" "BL_Thomas" "BL_Thomas" "BL_Thomas" ...
+ $ pathology           : chr  "BL" "BL" "BL" "BL" ...
+ $ reference_PMID      : num  36201743 36201743 36201743 36201743 36201743 ...
+ $ genome_build        : chr  NA NA NA NA ...
+ $ pairing_status      : chr  NA NA NA NA ...
+ $ age_group           : chr  NA NA NA NA ...
+ $ compression         : chr  NA NA NA NA ...
+ $ bam_available       : logi  NA NA NA NA NA NA ...
+ $ pathology_rank      : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ DHITsig_consensus   : chr  NA NA NA NA ...
+ $ ffpe_or_frozen      : chr  NA NA NA NA ...
+ $ fl_grade            : chr  NA NA NA NA ...
+ $ hiv_status          : chr  NA NA NA NA ...
+ $ lymphgen_cnv_noA53  : chr  NA NA NA NA ...
+ $ lymphgen_no_cnv     : chr  NA NA NA NA ...
+ $ lymphgen_with_cnv   : chr  NA NA NA NA ...
+ $ lymphgen_wright     : chr  NA NA NA NA ...
+ $ molecular_BL        : chr  NA NA NA NA ...
+ $ normal_sample_id    : chr  NA NA NA NA ...
+ $ time_point          : chr  NA NA NA NA ...</code></pre>
 </div>
 </div>
 <p>We can now use the metadata as we wish. For example, we can visualize the counts of samples per pathology and sequencing type:</p>
@@ -421,7 +423,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># How many mutations do we get back?</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ssm_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 22137    45</code></pre>
+<pre><code>[1] 22089    45</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What columns are available?</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ssm_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -489,7 +491,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># How many mutations do we get back?</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ssm_meta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 22137    45</code></pre>
+<pre><code>[1] 22089    45</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What columns are available?</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ssm_meta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -606,7 +608,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the dimensions for the capture SSM calls?</span></span>
 <span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ssm_col)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3884    6</code></pre>
+<pre><code>[1] 4000    6</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the columns in the output?</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ssm_col)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -646,166 +648,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="by-region" class="level3">
 <h3 class="anchored" data-anchor-id="by-region">By Region</h3>
 <p>In this section, we are exploring the different ways you can obtain the maf data for a specific region (or regions) of interest.</p>
-<section id="use-region" class="level4">
-<h4 class="anchored" data-anchor-id="use-region">Use <code>region</code></h4>
-<p>If you are only looking at one specific position, you can take advantage of the <code>get_ssm_by_region()</code> function:</p>
+<p>For multiple regions, refer to the <code>get_ssm_by_regions</code>. In this example, we will obtain SSM calls for all aSHM regions associated with <em>PAX5</em> across all available samples. With this multiple-region-version of this function we also get the region name added to the returned data frame and there are a couple of different ways this can be done. If you are providing regions as a bed file (<code>regions_bed</code>), you have the option of setting <code>use_name_column = TRUE</code>. If you do so, your bed file should have a column simply named “name”. In this case, the function will keep this column for naming the returned regions in the maf. With <code>streamlined = TRUE</code> the function returns the minimal number of columns. Don’t know coordinates of aSHM at <em>PAX5</em>? GAMBLR.data has you covered!</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MYC region (grch37)</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>myc_region <span class="ot">&lt;-</span> <span class="st">"8:128747680-128753674"</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all SSMs that are residing in the defined MYC region</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>myc_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(<span class="at">region =</span> myc_region)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>myc_ssm <span class="sc">%&gt;%</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Hugo_Symbol) <span class="sc">%&gt;%</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> Hugo_Symbol,</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> Hugo_Symbol</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="getting_started_files/figure-html/e6-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="specify-individual-chunks" class="level4">
-<h4 class="anchored" data-anchor-id="specify-individual-chunks">Specify individual chunks</h4>
-<p>We can also specify the coordinates we are interested in using the <code>chromosome</code>, <code>qstart</code>, and <code>qend</code> arguments:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all SSMs that are residing in the defined MYC region</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>myc_ssm_arg <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>myc_ssm_arg <span class="sc">%&gt;%</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Hugo_Symbol) <span class="sc">%&gt;%</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> Hugo_Symbol,</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> Hugo_Symbol</span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="getting_started_files/figure-html/e7-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p>Let’s also confirm that this returned maf is the same as what we get back when using the <code>region</code> argument:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    myc_ssm,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    myc_ssm_arg</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] TRUE</code></pre>
-</div>
-</div>
-</section>
-<section id="use-pre-loaded-maf" class="level4">
-<h4 class="anchored" data-anchor-id="use-pre-loaded-maf">Use pre-loaded maf</h4>
-<p>If you are working with massive maf data containing many variants and have already imported it to R, or using the maf data from outside of this package, you can still take advantage of this function and use the pre-loaded maf. This function will still subset it to the desired regions. To do so, specify the maf of interest with <code>maf_data</code>:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>dohh2_myc_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">maf_data =</span> ssm_sample,</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>While we are on it, is it generating the same output as when we ask for SSM to be returned for a specific gene with <code>get_ssm_by_samples()</code>?</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    ssm_myc,</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_ssm</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] TRUE</code></pre>
-</div>
-</div>
-<p>Yes, indeed - the both outputs are identical again.</p>
-</section>
-<section id="toggling-streamlined" class="level4">
-<h4 class="anchored" data-anchor-id="toggling-streamlined">Toggling <code>streamlined</code></h4>
-<p>This function also has a streamlined option available. If set to <code>TRUE</code>, only two columns are kept in the returned maf (Start_Position and Tumour_Sample_Barcode). In this example, we are extending the coordinates to encapsulate the whole p-arm of chromosome 1. Note, since we are requesting hg38 calls, we have to add the chr prefix for the specified chromosome. Don’t remember the coordinates? Luckily, GAMBLR.data provides the coordinates for chromosome arms in both projections!</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>coord <span class="ot">&lt;-</span> chromosome_arms_hg38 <span class="sc">%&gt;%</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(arm <span class="sc">==</span> <span class="st">"p"</span>, chromosome <span class="sc">==</span> <span class="st">"chr1"</span>)</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>streamlined_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> coord<span class="sc">$</span>chromosome,</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> coord<span class="sc">$</span>start,</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> coord<span class="sc">$</span>end,</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">streamlined =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="co"># What columns are kept with streamlined = TRUE?</span></span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(streamlined_ssm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "Start_Position"       "Tumor_Sample_Barcode"</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># How many variants do we find within the specified region?</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(streamlined_ssm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 7749</code></pre>
-</div>
-</div>
-</section>
-<section id="focus-on-specific-ids" class="level4">
-<h4 class="anchored" data-anchor-id="focus-on-specific-ids">Focus on specific IDs</h4>
-<p>Similarly to other get_ssm functions, we can also call <code>get_ssm_by_region</code> with either <code>these_sample_ids</code> or <code>these_samples_metadata</code> to restrict the return to specific sample IDs. In this example, we first call the function with <code>these_sample_ids = "DOHH-2"</code> and then with <code>these_samples_metadata</code> giving the function a metadata table that has been subset to the same sample ID.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>dohh2_region_sample <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id,</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>dohh2_region_metadata <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_region</span>(</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2,</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>We can also see that both approaches generate identical output:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    dohh2_region_sample,</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    dohh2_region_metadata</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] TRUE</code></pre>
-</div>
-</div>
-</section>
-<section id="look-at-multiple-regions" class="level4">
-<h4 class="anchored" data-anchor-id="look-at-multiple-regions">Look at multiple regions</h4>
-<p>For multiple regions, refer to the plural version, <code>get_ssm_by_regions</code>. In this example, we will obtain SSM calls for all aSHM regions associated with <em>PAX5</em> across all available samples. With this multiple-region-version of this function we also get the region name added to the returned data frame and there are a couple of different ways this can be done. If you are providing regions as a bed file (<code>regions_bed</code>), you have the option of setting <code>use_name_column = TRUE</code>. If you do so, your bed file should have a column simply named “name”. In this case, the function will keep this column for naming the returned regions in the maf. With <code>streamlined = TRUE</code> the function returns the minimal number of columns. Don’t know coordinates of aSHM at <em>PAX5</em>? GAMBLR.data has you covered!</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get aSHM genes, select the columns of interest and rename for</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># get_ssm_by_regions compatibility</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>ashm_gene <span class="ot">&lt;-</span> <span class="st">"PAX5"</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>regions <span class="ot">&lt;-</span> grch37_ashm_regions <span class="sc">%&gt;%</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(gene <span class="sc">==</span> ashm_gene) <span class="sc">%&gt;%</span></span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">chromosome =</span> chr_name,</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">start =</span> hg19_start,</span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">end =</span> hg19_end</span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="fu">paste0</span>(gene, <span class="st">"_"</span>, region)</span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Get ssm for all ashm regions</span></span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>ashm_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_regions</span>(</span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">regions_bed =</span> regions,</span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">use_name_column =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">streamlined =</span> <span class="cn">TRUE</span></span>
-<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ashm_ssm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get aSHM genes, select the columns of interest and rename for</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># get_ssm_by_regions compatibility</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ashm_gene <span class="ot">&lt;-</span> <span class="st">"PAX5"</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>regions <span class="ot">&lt;-</span> grch37_ashm_regions <span class="sc">%&gt;%</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(gene <span class="sc">==</span> ashm_gene) <span class="sc">%&gt;%</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">chromosome =</span> chr_name,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">start =</span> hg19_start,</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">end =</span> hg19_end</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="fu">paste0</span>(gene, <span class="st">"_"</span>, region)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Get ssm for all ashm regions</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>ashm_ssm <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_regions</span>(</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">regions_bed =</span> regions,</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">use_name_column =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">streamlined =</span> <span class="cn">TRUE</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ashm_ssm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 3
      start sample_id region_name  
@@ -818,21 +684,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 6 37025820 04-24937T PAX5_intron-1</code></pre>
 </div>
 </div>
-</section>
 <section id="using-list-of-regions" class="level4">
 <h4 class="anchored" data-anchor-id="using-list-of-regions">Using list of regions</h4>
 <p>You can instead specify regions as a vector of characters (<code>regions_list</code>) instead of using a bed file. In this case, the function will not accept a fourth element for naming the returned regions. If so, the function defaults to using the specified region as the name of the column in the output.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>ssm_region_list <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_regions</span>(</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">regions_list =</span> <span class="fu">c</span>(</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"chr9:37023396-37027663"</span>,</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"chr9:37029849-37037154"</span>,</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"chr9:37369209-37372160"</span></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">streamlined =</span> <span class="cn">TRUE</span></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ssm_region_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ssm_region_list <span class="ot">&lt;-</span> <span class="fu">get_ssm_by_regions</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">regions_list =</span> <span class="fu">c</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"chr9:37023396-37027663"</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"chr9:37029849-37037154"</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"chr9:37369209-37372160"</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">streamlined =</span> <span class="cn">TRUE</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ssm_region_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 3
      start sample_id region_name           
@@ -851,25 +716,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="coding-ssm">Coding SSM</h3>
 <p>Lastly, another way to retrieve SSM is to call <code>get_coding_ssm</code>. This function returns coding SSM for any given sample. This function is a convenient option for anyone interested in focusing only on coding mutations. Convenient filtering arguments are included in this function for easy and straightforward subsetting. If these arguments are not used, coding SSM will be returned for all samples. Of course, similar to the examples above, you can provide a metadata subset that has already been filtered to the sample IDs of interest (using <code>these_samples_metadata</code>).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit_cohort</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>dlbcl_cell_lines <span class="ot">&lt;-</span> <span class="fu">get_coding_ssm</span>(</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">limit_cohort =</span> <span class="st">"DLBCL_cell_lines"</span></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(dlbcl_cell_lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit_cohort</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>dlbcl_cell_lines <span class="ot">&lt;-</span> <span class="fu">get_coding_ssm</span>(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">limit_cohort =</span> <span class="st">"DLBCL_cell_lines"</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(dlbcl_cell_lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1616   47</code></pre>
+<pre><code>[1] 1616   48</code></pre>
 </div>
 </div>
 <p>Instead, we can just exclude a group of samples by using the <code>exclude_cohort</code> argument:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Exclude_cohort</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>no_dlbcl_cell_lines <span class="ot">&lt;-</span> <span class="fu">get_coding_ssm</span>(</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclude_cohort =</span>  <span class="st">"DLBCL_cell_lines"</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(no_dlbcl_cell_lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Exclude_cohort</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>no_dlbcl_cell_lines <span class="ot">&lt;-</span> <span class="fu">get_coding_ssm</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclude_cohort =</span>  <span class="st">"DLBCL_cell_lines"</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(no_dlbcl_cell_lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 63461    47</code></pre>
+<pre><code>[1] 57230    48</code></pre>
 </div>
 </div>
 </section>
@@ -884,10 +749,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="default-behaviour">Default behaviour</h4>
 <p>To begin, let’s call <code>get_sample_cn_segments</code> with default arguments. This returns all available CN information from the bundled data. Consistent with other functions of the <code>get_</code> GAMBLR family, the default <code>seq_type</code> is always set to genome and default projection set to <code>grch37</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>()</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the columns we have available?</span></span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>()</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the columns we have available?</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 7
   ID        chrom     start       end LOH_flag log.ratio    CN
@@ -905,12 +770,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="using-these_sample_ids-1">Using <code>these_sample_ids</code></h4>
 <p>Now, let’s explore some of the other arguments we have available. In this example, we are calling the function specifying <code>these_sample_ids</code> to obtain CN data for a sample of interest.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_sample_ids</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>sample_dohh2_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id</span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sample_dohh2_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_sample_ids</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>sample_dohh2_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sample_dohh2_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 7
   ID     chrom     start       end LOH_flag log.ratio    CN
@@ -928,16 +793,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="using-these_samples_metadata-1">Using <code>these_samples_metadata</code></h4>
 <p>We can also use metadata restricted to the sample ID of interest to demonstrate that either of these arguments will return the same data, as long as they have the same sample ID.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_samples_metadata</span></span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>meta_dohh2_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2</span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Are they the same?</span></span>
-<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>    sample_dohh2_seg,</span>
-<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>    meta_dohh2_seg</span>
-<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_samples_metadata</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>meta_dohh2_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Are they the same?</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    sample_dohh2_seg,</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    meta_dohh2_seg</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -947,31 +812,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="in-a-different-projection-1">In a different projection</h4>
 <p>We can retrieve CN segments while also requesting a different projection. Similar to the SSM functionality shown earlier, this can be done by toggling the <code>projection</code> argument and switching it to the <code>hg38</code> value.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call get_sample_cn_segments</span></span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>dlbcl_samples_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> metadata<span class="sc">$</span>dlbcl<span class="sc">$</span>sample_id,</span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dlbcl_samples_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call get_sample_cn_segments</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>dlbcl_samples_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> metadata<span class="sc">$</span>dlbcl<span class="sc">$</span>sample_id,</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dlbcl_samples_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 7
-  ID                        chrom     start       end LOH_flag log.ratio    CN
-  &lt;chr&gt;                     &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
-1 HTMCP-01-01-00012-01A-01D 1         10001 121699999       NA         0     2
-2 HTMCP-01-01-00012-01A-01D 1     143200001 248956421       NA         0     2
-3 HTMCP-01-01-00012-01A-01D 2             1     11319       NA         0     2
-4 HTMCP-01-01-00012-01A-01D 2         11320  88829483       NA         0     2
-5 HTMCP-01-01-00012-01A-01D 2      88829484  88832840       NA         0     2
-6 HTMCP-01-01-00012-01A-01D 2      88832841  88856611       NA         1     4</code></pre>
+  ID                        chrom    start       end LOH_flag log.ratio    CN
+  &lt;chr&gt;                     &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+1 HTMCP-01-01-00003-01D-03D 1        10001    832872       NA     0         2
+2 HTMCP-01-01-00003-01D-03D 1       832873  23215653       NA     0         2
+3 HTMCP-01-01-00003-01D-03D 1     23215654  23216813       NA     0         2
+4 HTMCP-01-01-00003-01D-03D 1     23216814  23789186       NA    -0.731     1
+5 HTMCP-01-01-00003-01D-03D 1     23789187  23795110       NA     0         2
+6 HTMCP-01-01-00003-01D-03D 1     23795111 121608415       NA     0         2</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>dlbcl_meta_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dlbcl,</span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Are they the same?</span></span>
-<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(dlbcl_samples_seg, dlbcl_meta_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>dlbcl_meta_seg <span class="ot">&lt;-</span> <span class="fu">get_sample_cn_segments</span>(</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dlbcl,</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Are they the same?</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(dlbcl_samples_seg, dlbcl_meta_seg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -981,52 +846,50 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="by-region-1" class="level3">
 <h3 class="anchored" data-anchor-id="by-region-1">By Region</h3>
 <p><code>get_cn_segments</code> behaves very similar to <code>get_sample_cn_segments</code> with the difference that you can specify one or more genomic loci to restrict the returned CN segments to. In order to achieve this, the function has the following additional arguments available; <code>region</code>, <code>chromosome</code>, <code>qstart</code>, and <code>qend</code>. You can provide the full region in a “region” format (chr:start-end) to the <code>region</code> argument. Alternatively, you can provide chromosome, start, and end coordinates individually with <code>chr</code>, <code>qstart</code>, and <code>qend</code> arguments.</p>
-<section id="use-region-1" class="level4">
-<h4 class="anchored" data-anchor-id="use-region-1">Use <code>region</code></h4>
+<section id="use-region" class="level4">
+<h4 class="anchored" data-anchor-id="use-region">Use <code>region</code></h4>
 <p>Here we are showing how to give the function a complete region with the <code>region</code> argument. Similar to <code>get_sample_cn_segments</code>, if <code>these_sample_ids</code> and/or <code>these_samples_metadata</code> are not specified, the function will query all available samples.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What is our region again?</span></span>
-<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>myc_region</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "8:128747680-128753674"</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get cn segments in this region for all samples</span></span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>myc_seg <span class="ot">&lt;-</span> <span class="fu">get_cn_segments</span>(</span>
-<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
-<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the CN states in this region for the selected samples?</span></span>
-<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>myc_seg <span class="sc">%&gt;%</span></span>
-<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(CN) <span class="sc">%&gt;%</span></span>
-<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
-<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
-<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> CN,</span>
-<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
-<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> CN</span>
-<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MYC region (grch37)</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>myc_region <span class="ot">&lt;-</span> <span class="st">"8:128747680-128753674"</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get cn segments in this region for all samples</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>myc_seg <span class="ot">&lt;-</span> <span class="fu">get_cn_segments</span>(</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="co"># What are the CN states in this region for the selected samples?</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>myc_seg <span class="sc">%&gt;%</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(CN) <span class="sc">%&gt;%</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> CN,</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">y =</span> n,</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">fill =</span> CN</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="getting_started_files/figure-html/e19-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="specify-individual-chunks-1" class="level4">
-<h4 class="anchored" data-anchor-id="specify-individual-chunks-1">Specify individual chunks</h4>
+<section id="specify-individual-chunks" class="level4">
+<h4 class="anchored" data-anchor-id="specify-individual-chunks">Specify individual chunks</h4>
 <p>Here we specify the region of interest with the <code>chromosome</code>, <code>qstart</code>, and <code>qend</code> arguments. As a quick check, we are also comparing the returned data frame with what we get when specifying the same region with the <code>region</code> argument to ensure they are identical.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>myc_chunks_seg <span class="ot">&lt;-</span> <span class="fu">get_cn_segments</span>(</span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
-<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span></span>
-<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Does this return match what we get when specifying the same genomic range</span></span>
-<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a><span class="co"># with `range` in the previous example?</span></span>
-<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>    myc_seg,</span>
-<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>    myc_chunks_seg</span>
-<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>myc_chunks_seg <span class="ot">&lt;-</span> <span class="fu">get_cn_segments</span>(</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Does this return match what we get when specifying the same genomic range</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="co"># with `range` in the previous example?</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    myc_seg,</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>    myc_chunks_seg</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -1045,43 +908,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="default-behaviour-1">Default behaviour</h4>
 <p>We will call <code>get_manta_sv</code> with default arguments to examine the output.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default arguments</span></span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>all_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>()</span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a><span class="co"># How many SVs do we get back?</span></span>
-<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(all_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default arguments</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>all_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>()</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="co"># How many SVs do we get back?</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(all_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1035</code></pre>
+<pre><code>[1] 1154</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># How many samples do we have SV calls for?</span></span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(all_manta<span class="sc">$</span>tumour_sample_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># How many samples do we have SV calls for?</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(all_manta<span class="sc">$</span>tumour_sample_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 520</code></pre>
+<pre><code>[1] 580</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What does the returned data frame look like?</span></span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What does the returned data frame look like?</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  CHROM_A   START_A     END_A CHROM_B   START_B     END_B
 1       1 161658631 161658631       3  16509907  16509907
-2      11  65267283  65267283      14 106110907 106110907
-3      11  65267422  65267422      14 106110905 106110905
-4      13  91976545  91976545      14 106211857 106211857
-5      13  91975699  91975699      16  10980639  10980639
-6      13  91993632  91993633      16  10980585  10980586
+2       1 161663959 161663959       9  37363320  37363320
+3       1 161663959 161663959       9  37363320  37363320
+4      11  65267283  65267283      14 106110907 106110907
+5      11  65267422  65267422      14 106110905 106110905
+6      13  91976545  91976545      14 106211857 106211857
                      manta_name SCORE STRAND_A STRAND_B tumour_sample_id
 1      MantaBND:21171:0:1:0:0:0   133        +        +         FL2002T1
-2   MantaBND:152220:0:1:0:0:0:0    88        +        -        15-38154T
-3   MantaBND:152220:0:1:0:0:0:0   135        -        +        15-38154T
-4 MantaBND:18:59794:59817:0:1:0    90        -        +        15-31924T
-5     MantaBND:349176:1:2:0:0:0    73        +        +         SP124973
-6     MantaBND:349176:0:1:0:0:0    86        -        -         SP124973
+2     MantaBND:206628:0:1:0:0:0   122        +        +  09-15842_tumorA
+3     MantaBND:195941:0:1:0:0:0   151        +        +  09-15842_tumorB
+4   MantaBND:152220:0:1:0:0:0:0    88        +        -        15-38154T
+5   MantaBND:152220:0:1:0:0:0:0   135        -        +        15-38154T
+6 MantaBND:18:59794:59817:0:1:0    90        -        +        15-31924T
   normal_sample_id VAF_tumour  DP pair_status FILTER
 1          FL2002N      0.331 127     matched   PASS
-2        15-38154N      0.150 167     matched   PASS
-3        15-38154N      0.290 169     matched   PASS
-4        15-31924N      0.365  85     matched   PASS
-5         SP124972      0.198  86     matched   PASS
-6         SP124972      0.214  98     matched   PASS</code></pre>
+2  09-15842_normal      0.281 196     matched   PASS
+3  09-15842_normal      0.364 187     matched   PASS
+4        15-38154N      0.150 167     matched   PASS
+5        15-38154N      0.290 169     matched   PASS
+6        15-31924N      0.365  85     matched   PASS</code></pre>
 </div>
 </div>
 </section>
@@ -1089,12 +952,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="using-these_sample_ids-2">Using <code>these_sample_ids</code></h4>
 <p>Here we are demonstrating the sample ID subset option.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_sample_ids</span></span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>sample_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id</span>
-<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sample_dohh2_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use these_sample_ids</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>sample_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sample_dohh2_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  CHROM_A   START_A     END_A CHROM_B   START_B     END_B
 1      14 106329465 106329465      18  60793497  60793497
@@ -1118,15 +981,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="using-these_samples_metadatasample">Using <code>these_samples_metadata</code>sample</h4>
 <p>Alternatively, you can also provide <code>these_samples_metadata</code> argument to make use of a pre-filtered metadata table. In this case, the returned SVs will be restricted to the sample_ids within the data frame.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>meta_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2</span>
-<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Are they the same?</span></span>
-<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>    sample_dohh2_manta,</span>
-<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>    meta_dohh2_manta</span>
-<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>meta_dohh2_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Are they the same?</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>    sample_dohh2_manta,</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>    meta_dohh2_manta</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -1137,31 +1000,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="by-region-2">By Region</h3>
 <p>We can call <code>get_manta_sv</code> specifying the region of interest first in the region format and then with specifying the chromosome, start and end individually.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying MYC in region format</span></span>
-<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_region <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id,</span>
-<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region,</span>
-<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="dv">0</span>,</span>
-<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">0</span>,</span>
-<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
-<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying MYC with chromosome, qstart and qend arguments</span></span>
-<span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_chunks <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb72-12"><a href="#cb72-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2,</span>
-<span id="cb72-13"><a href="#cb72-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
-<span id="cb72-14"><a href="#cb72-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
-<span id="cb72-15"><a href="#cb72-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span>,</span>
-<span id="cb72-16"><a href="#cb72-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="dv">0</span>,</span>
-<span id="cb72-17"><a href="#cb72-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">0</span>,</span>
-<span id="cb72-18"><a href="#cb72-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
-<span id="cb72-19"><a href="#cb72-19" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb72-20"><a href="#cb72-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb72-21"><a href="#cb72-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Are the returned data frames the same?</span></span>
-<span id="cb72-22"><a href="#cb72-22" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
-<span id="cb72-23"><a href="#cb72-23" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_region,</span>
-<span id="cb72-24"><a href="#cb72-24" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_chunks</span>
-<span id="cb72-25"><a href="#cb72-25" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying MYC in region format</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_region <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_sample_ids =</span> my_sample_id,</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> myc_region,</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="dv">0</span>,</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">0</span>,</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying MYC with chromosome, qstart and qend arguments</span></span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>dohh2_myc_manta_chunks <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dohh2,</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">chromosome =</span> <span class="dv">8</span>,</span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">qstart =</span> <span class="dv">128747680</span>,</span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">qend =</span> <span class="dv">128753674</span>,</span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="dv">0</span>,</span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">0</span>,</span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">pass =</span> <span class="cn">FALSE</span></span>
+<span id="cb56-19"><a href="#cb56-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb56-20"><a href="#cb56-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-21"><a href="#cb56-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Are the returned data frames the same?</span></span>
+<span id="cb56-22"><a href="#cb56-22" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
+<span id="cb56-23"><a href="#cb56-23" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_region,</span>
+<span id="cb56-24"><a href="#cb56-24" aria-hidden="true" tabindex="-1"></a>    dohh2_myc_manta_chunks</span>
+<span id="cb56-25"><a href="#cb56-25" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -1171,26 +1034,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="sv-filtering">SV filtering</h3>
 <p>Here we are demonstrating the filtering options to obtain SVs. In this example, we are calling <code>get_manta_sv</code> on the DLBCL metadata subset. For demonstration purposes, we are also requesting a non-default projection and adding some more filtering.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get manta SVs for the samples with DLBCL pathology</span></span>
-<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>dlbcl_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
-<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dlbcl,</span>
-<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span>,</span>
-<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="fl">0.4</span>,</span>
-<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">100</span></span>
-<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a><span class="co"># How many variants do we get back with these filters?</span></span>
-<span id="cb74-10"><a href="#cb74-10" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(dlbcl_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get manta SVs for the samples with DLBCL pathology</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>dlbcl_manta <span class="ot">&lt;-</span> <span class="fu">get_manta_sv</span>(</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">these_samples_metadata =</span> metadata<span class="sc">$</span>dlbcl,</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">projection =</span> <span class="st">"hg38"</span>,</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_vaf =</span> <span class="fl">0.4</span>,</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_score =</span> <span class="dv">100</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a><span class="co"># How many variants do we get back with these filters?</span></span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(dlbcl_manta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 48</code></pre>
+<pre><code>[1] 65</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Does the advertised VAF filters work?</span></span>
-<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(dlbcl_manta<span class="sc">$</span>VAF_tumour <span class="sc">&gt;=</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Does the advertised VAF filters work?</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(dlbcl_manta<span class="sc">$</span>VAF_tumour <span class="sc">&gt;=</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Do the advertised SCORE filter work?</span></span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(dlbcl_manta<span class="sc">$</span>SCORE <span class="sc">&gt;=</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Do the advertised SCORE filter work?</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(dlbcl_manta<span class="sc">$</span>SCORE <span class="sc">&gt;=</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>

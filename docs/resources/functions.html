@@ -254,12 +254,12 @@ ul.task-list li input[type="checkbox"] {
 <li><code>get_manta_sv</code>: Returns SV calls from manta.</li>
 <li><code>get_sample_cn_segments</code>: Returns the CNV data for a given sample in seg format.</li>
 <li><code>get_ssm_by_patients</code>: Returns maf data (both coding and non-coding mutations) for a given set of patients. This will return maf data for multiple samples if they exist for a given patient.</li>
-<li><code>get_ssm_by_region</code>: Returns maf data of the variants in the single given region. Operates only on one given region. If you need to analyze many regions, use the plural version of this function.</li>
-<li><code>get_ssm_by_regions</code>: Returns maf data of the variants in the given regions. This function is really just a wrapper for the singular version but works on many given regions.</li>
+<li><code>get_ssm_by_regions</code>: Returns maf data of the variants in the given regions.</li>
 <li><code>get_ssm_by_samples</code>: Returns maf data (both coding and non-coding mutations) for a given set of samples. This will return maf data for only the specified samples even if multiple samples exist for a given patient.</li>
 <li><code>id_ease</code>: Internal function that converts a vector of sample ids into a data frame with metadata and vice versa. Used internally and is not really meant for standalone use.</li>
 <li><code>process_regions</code>: Helper function that will harmonize genomic regions specified as character vectors or a data frame. Returns a list with two objects: regions as a vector and regions in bed format.</li>
 <li><code>region_to_chunks</code>: Helper function that will separate a chromosome region specified in UCSC format (chr:start-end) into individual chunks of chromosome, start, and end.</li>
+<li><code>review_hotspots</code> Review hotspot mutations at certain genes to ensure they are correctly annotated. For example, will mark any missence mutation within KAT domain of <em>CREBBP</em> as hotspot. Only selected genes are supported.</li>
 </ul>
 
 
