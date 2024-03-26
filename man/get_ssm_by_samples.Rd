@@ -11,8 +11,8 @@ get_ssm_by_samples(
   this_seq_type = "genome",
   projection = "grch37",
   tool_name = "slms-3",
+  this_study,
   these_genes,
-  min_read_support = 3,
   basic_columns = TRUE,
   maf_cols = NULL,
   verbose = FALSE,
@@ -25,7 +25,6 @@ get_ssm_by_sample(
   this_seq_type = "genome",
   projection = "grch37",
   these_genes,
-  min_read_support = 3,
   basic_columns = TRUE,
   maf_cols = NULL,
   verbose = FALSE,
@@ -44,9 +43,10 @@ If not provided and these_sample_ids is also not provided, the function will ret
 
 \item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
-\item{these_genes}{A vector of genes to subset ssm to.}
+\item{this_study}{Optionally specify first name of the author for the paper
+from which the variants should be returned for.}
 
-\item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
+\item{these_genes}{A vector of genes to subset ssm to.}
 
 \item{basic_columns}{Return first 43 columns of MAF rather than full details. Default is TRUE.}
 

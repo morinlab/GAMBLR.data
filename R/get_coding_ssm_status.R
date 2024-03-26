@@ -41,6 +41,7 @@
 #' @param include_silent_genes Optionally, provide a list of genes for which the
 #'      Silent variants to be considered. If provided, the Silent variants for
 #'      these genes will be included regardless of the include_silent argument.
+#' @param ... Any other parameter. These parameters will be ignored.
 #'
 #' @return A data frame with tabulated mutation status.
 #'
@@ -183,7 +184,7 @@ get_coding_ssm_status = function(
 
         # review for the supported genes
         if(review_hotspots){
-            annotated = GAMBLR.helpers::review_hotspots(
+            annotated = review_hotspots(
                 annotated,
                 genes_of_interest = genes_of_interest,
                 genome_build = genome_build

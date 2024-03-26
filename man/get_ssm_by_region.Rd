@@ -16,7 +16,7 @@ get_ssm_by_region(
   projection = "grch37",
   this_seq_type = "genome",
   mode = "slms-3",
-  min_read_support = 3,
+  this_study,
   verbose = FALSE,
   ...
 )
@@ -47,7 +47,8 @@ i.e the following parameters are ignored; \code{these_samples_metadata}, \code{t
 
 \item{mode}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
-\item{min_read_support}{Only returns variants with at least this many reads in t_alt_count (for cleaning up augmented MAFs).}
+\item{this_study}{Optionally specify first name of the author for the paper
+from which the variants should be returned for.}
 
 \item{verbose}{Set to FALSE to prevent ANY message to be printed.
 In most cases, this parameter should be left to TRUE.

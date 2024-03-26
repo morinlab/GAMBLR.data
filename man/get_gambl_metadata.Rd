@@ -4,11 +4,14 @@
 \alias{get_gambl_metadata}
 \title{Get GAMBL Metadata.}
 \usage{
-get_gambl_metadata(seq_type_filter = c("genome", "capture"), ...)
+get_gambl_metadata(seq_type_filter = "genome", case_set, ...)
 }
 \arguments{
 \item{seq_type_filter}{Specify the seq type you want to return metadata for.
-Default is both genome and capture (all samples).}
+Default is "genome".}
+
+\item{case_set}{Optionally specify study details to return samples from a
+particular case set. See function description for supported case sets.}
 
 \item{...}{Any additional parameters.}
 }
@@ -46,12 +49,22 @@ A data frame with metadata, tailored for user without GSC access.
 }
 }
 \description{
-Convenience function for loading the bundled metadata, \link{gambl_metadata}.
+Convenience function for loading the sample metadata.
 }
 \details{
-This bare bones function was developed to retrieve metadata for non-GSC-users.
-Specify the seq type (\code{seq_type_filter}) for the samples you want returned as the only argument.
+This bare bones function was developed to retrieve metadata for
+non-GSC-users. Specify the seq type (\code{seq_type_filter}) for the samples you
+want returned as the only argument.
 It relies on the bundled metadata in this package.
+Specify \code{case_set} argument to retreive samples from particular study.
+Currently supported case_sets are: FL_Dreval (FL samples from Dreval et al),
+DLBCL_Dreval (DLBCL samples from Dreval et al), FL-DLBCL-study (all samples
+from Dreval et al), DLBCL_Arthur (all samples from Arthur et al study),
+DLBCL_Hilton (all samples from Hilton et al DLBCL Trios study),
+DLBCL_cell_lines (5 DLBCL cell lines), DLBCL_Chapuy (all samples from Chapuy
+et al study), DLBCL_Schmitz (all samples from Schmitz et al study),
+DLBCL_Reddy (all samples from Reddy et al study), DLBCL_Thomas (HTMCP DLBCLs
+from Thomas et al study), BL_Thomas (BL samples from Thomas et al study)
 }
 \examples{
 #return metadata for genome samples

@@ -3,7 +3,6 @@
 #' @description Convenience function for loading coding Simple Somatic Mutations (SSM) from the bundled data [GAMBLR.data::sample_data].
 #'
 #' @details This "bare bones" function was developed to retrieve coding SSM calls for non-GSC-users.
-#' For users with GSC access it is highly recommended to instead call [GAMBLR.results::get_coding_ssm].
 #' Effectively retrieve coding SSM calls. Multiple filtering parameters are available for this function.
 #' For more information on how to implement the filtering parameters, refer to the parameter descriptions as well as examples in the vignettes.
 #' This function depends on the bundled sample data in this package. 

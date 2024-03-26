@@ -1,4 +1,3 @@
-
 #' @title ID Ease
 #'
 #' @aliases id_ease, id ease
@@ -8,7 +7,7 @@
 #'
 #' @details This function can take sample IDs as a vector of characters, or a metadata table in data frame format.
 #' If no sample IDs are provided to the function, the function will operate on all gambl sample IDs available for the given seq type.
-#' It is highly recommended to run this function with `verbose = TRUE` (default).
+#' It is highly recommended to run this function with `verbose = TRUE`.
 #' Since this will not only improve the overall logic on how the function operates.
 #' But also might help with debugging functions that are internally calling this function.
 #' The function also performs sanity checks and notifies the user if any of the requested sample IDs are not found in the metadata.
@@ -55,9 +54,29 @@ id_ease = function(these_samples_metadata = NULL,
     metadata = GAMBLR.data::get_gambl_metadata(seq_type_filter = this_seq_type)
   }else{
     if(verbose){
-      message("id_ease: Metadata is provided...")
+      message("id_ease: Metadata is provided and samples of the selected seq type are kept...")
     }
-    metadata = these_samples_metadata
+    metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+    not_seq_type = setdiff(these_samples_metadata$sample_id, metadata$sample_id)
+    if(length(not_seq_type) > 0){
+      not_seq_type_msg = gettextf("id_ease: WARNING! %i samples in the provided metadata were removed because their seq types are not the same as in the `set_type` argument.",
+                                  length(not_seq_type))
+      if(verbose){
+        max_to_show <- 100
+        if( length(not_seq_type) > max_to_show ){
+          not_seq_type_msg = gettextf("%s Their first %i IDs are:", not_seq_type_msg,
+                                      max_to_show)
+          not_seq_type = head(not_seq_type, max_to_show)
+        }else{
+          not_seq_type_msg = gettextf("%s Their IDs are:", not_seq_type_msg)
+        }
+        message(not_seq_type_msg)
+        print(not_seq_type)
+      }else{
+        not_seq_type_msg = gettextf("%s Use `verbose = TRUE` to see their IDs.", not_seq_type_msg)
+        message(not_seq_type_msg)
+      }
+    }
   }
 
   #ensure metadata is subset to specified sample IDs

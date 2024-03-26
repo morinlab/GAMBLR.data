@@ -16,7 +16,8 @@
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38). Default is grch37.
 #' @param this_seq_type The seq type you want results for. Default is "genome".
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
-#' @param min_read_support Subset returned variants to a set minimum read support. Default is 3.
+#' @param this_study Optionally specify first name of the author for the paper
+#'      from which the variants should be returned for.
 #' @param basic_columns Return first 45 columns of MAF rather than full details. Default is TRUE.
 #' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF.
 #' This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).
@@ -48,7 +49,7 @@ get_ssm_by_patients = function(these_patient_ids,
                                projection = "grch37",
                                this_seq_type = "genome",
                                tool_name = "slms-3",
-                               min_read_support = 3,
+                               this_study,
                                basic_columns = TRUE,
                                maf_cols = NULL,
                                verbose = FALSE,
@@ -78,7 +79,7 @@ get_ssm_by_patients = function(these_patient_ids,
                                          projection = projection,
                                          this_seq_type = this_seq_type,
                                          tool_name = tool_name,
-                                         min_read_support = min_read_support,
+                                         this_study = this_study,
                                          basic_columns = basic_columns,
                                          maf_cols = maf_cols,
                                          verbose = verbose,
