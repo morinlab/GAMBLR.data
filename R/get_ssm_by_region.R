@@ -76,23 +76,13 @@ get_ssm_by_region = function(these_sample_ids = NULL,
   
   #return SSMs based on the selected projection
   if(missing(maf_data)){
-    #get valid projections
-    valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
-
-    if(projection %in% valid_projections){
-      this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
-        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-        dplyr::filter((tolower(!!sym("Pipeline")) == mode))
-      this_maf <- bind_rows(
-        this_maf,
-        GAMBLR.data::sample_data[[projection]]$ashm %>%
-            dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-            dplyr::filter((tolower(!!sym("Pipeline")) == mode))
-        )
-    }else{
-      stop(paste("please provide a valid projection. The following are available:",
-                 paste(valid_projections,collapse=", ")))
-    }
+    this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
+      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+      dplyr::filter((tolower(!!sym("Pipeline")) == mode))
+    this_maf <- GAMBLR.data::sample_data[[projection]]$ashm %>%
+      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+      dplyr::filter((tolower(!!sym("Pipeline")) == mode)) %>% 
+      bind_rows(this_maf, .)
   }else{
     this_maf = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids)
   }

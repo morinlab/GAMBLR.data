@@ -52,7 +52,16 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                               projection = "grch37",
                               verbose = FALSE,
                               ...){
-
+  
+  # check provided projection
+  # first, get valid projections
+  valid_projections = grep("meta", names(GAMBLR.data::sample_data), 
+                           value = TRUE, invert = TRUE)
+  if(! projection %in% valid_projections){
+    stop("Please provide a valid projection. The following are available: ",
+         paste(valid_projections, collapse=", "), ".")
+  }
+  
   #check if any invalid parameters are provided
   check_excess_params(...)
 
