@@ -112,10 +112,6 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     region = gsub(",", "", region)
     split_chunks = unlist(strsplit(region, ":"))
 
-    if(projection == "grch37"){
-      region = stringr::str_replace(region, "chr", "")
-    }
-
     chromosome = split_chunks[1]
     startend = unlist(strsplit(split_chunks[2], "-"))
     qstart = as.numeric(startend[1])
@@ -127,7 +123,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     region = paste0(chromosome, ":", qstart, "-", qend)
   }
 
-  if(projection =="grch37"){
+  if(projection == "grch37"){
     chromosome = gsub("chr", "", chromosome)
   }
 
