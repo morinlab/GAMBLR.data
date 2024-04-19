@@ -65,36 +65,26 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   #check if any invalid parameters are provided
   check_excess_params(...)
-
+  
+  #get samples with the dedicated helper function
+  metadata = id_ease(these_samples_metadata = these_samples_metadata,
+                     these_sample_ids = these_sample_ids,
+                     verbose = verbose,
+                     this_seq_type = this_seq_type)
+  
+  sample_ids = metadata$sample_id
+  
   #return SSMs based on the selected projection
   if(missing(maf_data)){
-    #get samples with the dedicated helper function
-    metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                       these_sample_ids = these_sample_ids,
-                       verbose = verbose,
-                       this_seq_type = this_seq_type)
-
-    sample_ids = metadata$sample_id
-
-    #get valid projections
-    valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
-
-    if(projection %in% valid_projections){
-      this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
-        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-        dplyr::filter((tolower(!!sym("Pipeline")) == mode))
-      this_maf <- bind_rows(
-        this_maf,
-        GAMBLR.data::sample_data[[projection]]$ashm %>%
-            dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-            dplyr::filter((tolower(!!sym("Pipeline")) == mode))
-        )
-    }else{
-      stop(paste("please provide a valid projection. The following are available:",
-                 paste(valid_projections,collapse=", ")))
-    }
+    this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
+      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+      dplyr::filter((tolower(!!sym("Pipeline")) == mode))
+    this_maf <- GAMBLR.data::sample_data[[projection]]$ashm %>%
+      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+      dplyr::filter((tolower(!!sym("Pipeline")) == mode)) %>% 
+      bind_rows(this_maf, .)
   }else{
-    this_maf = maf_data
+    this_maf = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids)
   }
 
   # Optionally return variants from a particular study
@@ -112,10 +102,6 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     region = gsub(",", "", region)
     split_chunks = unlist(strsplit(region, ":"))
 
-    if(projection == "grch37"){
-      region = stringr::str_replace(region, "chr", "")
-    }
-
     chromosome = split_chunks[1]
     startend = unlist(strsplit(split_chunks[2], "-"))
     qstart = as.numeric(startend[1])
@@ -127,7 +113,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     region = paste0(chromosome, ":", qstart, "-", qend)
   }
 
-  if(projection =="grch37"){
+  if(projection == "grch37"){
     chromosome = gsub("chr", "", chromosome)
   }
 
