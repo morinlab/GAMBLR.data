@@ -51,6 +51,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                               use_name_column = FALSE,
                               projection = "grch37",
                               verbose = FALSE,
+                              engine="default",
                               ...){
   
   # check provided projection
@@ -108,6 +109,22 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                 )
             }
         )
+    }else if(engine == "foverlaps"){
+      sample_maf = get_ssm_by_samples(these_samples_metadata=these_samples_metadata)
+      setkey(sample_maf, Chromosome, Start_Position,End_Position)
+      regions_dt = data.frame(all_lymphome_gene_regions) %>% rownames_to_column("Hugo_Symbol") %>% 
+        separate(all_lymphome_gene_regions,c("Chromosome","region"),sep = ":") %>%
+        separate(region,c("Start_Position","End_Position"),"-") %>%
+        mutate(Start_Position=as.numeric(Start_Position),End_Position=as.numeric(End_Position)) %>%
+        as.data.table()
+      setkey(regions_dt,Chromosome,Start_Position,End_Position)
+      maf_regions = foverlaps(sample_maf, regions_dt, type="within", which=TRUE,
+                              by.x=c("Chromosome","Start_Position","End_Position"),
+                              by.y=c("Chromosome","Start_Position","End_Position"))
+      
+      match_rows=filter(maf_regions,!is.na(yid)) %>% pull(xid)
+      match_maf = sample_maf[match_rows,]
+      return(match_maf)
     }else{
         region_mafs = lapply(
             regions, function(x){
