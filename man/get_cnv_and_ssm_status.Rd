@@ -86,30 +86,26 @@ these_sample_ids = c(
   "BLGSP-71-21-00188-01A-04E"
 )
 
-# Get sample meta data
-this_meta = get_gambl_metadata()
-this_meta = dplyr::filter(this_meta, sample_id \%in\% these_sample_ids)
-
 # For MYC and SYNCRIP, return CNV and SSM combined status; for MIR17HG, 
 # return only CNV status; for CCND3 return only SSM status
 genes_and_cn_threshs = data.frame(
-  gene_id=c("MYC", "MIR17HG", "CCND3", "SYNCRIP"),
-  cn_thresh=c(3, 3, 2, 1)
+  gene_id = c("MYC", "MIR17HG", "CCND3", "SYNCRIP"),
+  cn_thresh = c(3, 3, 2, 1)
 )
 get_cnv_and_ssm_status(
-  genes_and_cn_threshs,
-  this_meta,
+  genes_and_cn_threshs = genes_and_cn_threshs,
+  these_sample_ids = these_sample_ids,
   only_cnv = "MIR17HG",
 )
 
-# For all genes, return only CNV status
+# For all genes of interest, return only CNV status
 genes_and_cn_threshs = data.frame(
-  gene_id=c("MYC", "MIR17HG", "SYNCRIP"),
-  cn_thresh=c(3, 3, 1)
+  gene_id = c("MYC", "MIR17HG", "SYNCRIP"),
+  cn_thresh = c(3, 3, 1)
 )
 get_cnv_and_ssm_status(
-  genes_and_cn_threshs,
-  this_meta,
+  genes_and_cn_threshs = genes_and_cn_threshs,
+  these_sample_ids = these_sample_ids,
   only_cnv = "all",
 )
 
