@@ -6,7 +6,8 @@
 \usage{
 get_cnv_and_ssm_status(
   genes_and_cn_threshs,
-  these_samples_metadata,
+  these_sample_ids = NULL,
+  these_samples_metadata = NULL,
   this_seq_type = "genome",
   only_cnv = "none",
   genome_build = "grch37",
@@ -26,8 +27,10 @@ its respective gene. If this integer is below 2 (neutral CN state for diploids),
 (gene consider as tumor suppressor); if above 2, it is the minimum (oncogene); if equal to 2, do not consider
 CNV to return status.}
 
-\item{these_samples_metadata}{The metadata for samples of interest to be included in the returned matrix.
-Can be created with \code{get_gambl_metadata} function.}
+\item{these_sample_ids}{A vector of sample IDs that you want results for.}
+
+\item{these_samples_metadata}{A metadata table with sample IDs that you want results for. Can be created with
+the \code{get_gambl_metadata} function.}
 
 \item{this_seq_type}{The seq type to get results for. Possible values are "genome" (default) or "capture".}
 

@@ -20,8 +20,9 @@
 #'   its respective gene. If this integer is below 2 (neutral CN state for diploids), it is taken as the maximum 
 #'   (gene consider as tumor suppressor); if above 2, it is the minimum (oncogene); if equal to 2, do not consider
 #'   CNV to return status.
-#' @param these_samples_metadata The metadata for samples of interest to be included in the returned matrix.
-#'   Can be created with `get_gambl_metadata` function.
+#' @param these_sample_ids A vector of sample IDs that you want results for.
+#' @param these_samples_metadata A metadata table with sample IDs that you want results for. Can be created with 
+#'   the `get_gambl_metadata` function.
 #' @param this_seq_type The seq type to get results for. Possible values are "genome" (default) or "capture".
 #' @param only_cnv A vector of gene names indicating the genes for which only CNV status should be considered, 
 #'   ignoring SSM status. Set this argument to "all" or "none" (default) to apply this behavior to all or none 
@@ -81,7 +82,8 @@
 #' )
 #' 
 get_cnv_and_ssm_status = function(genes_and_cn_threshs,
-                                  these_samples_metadata,
+                                  these_sample_ids = NULL,
+                                  these_samples_metadata = NULL,
                                   this_seq_type = "genome",
                                   only_cnv = "none",
                                   genome_build = "grch37",
@@ -115,12 +117,13 @@ get_cnv_and_ssm_status = function(genes_and_cn_threshs,
       all(only_cnv %in% genes_and_cn_threshs$gene_id)
   })
   
-  # define variables
-  if(missing(these_samples_metadata)){
-    these_samples_metadata = get_gambl_metadata(seq_type_filter=this_seq_type)
-  }else{
-    these_samples_metadata = dplyr::filter(these_samples_metadata, seq_type==this_seq_type)
-  }
+  # get metadata with the dedicated helper function
+  these_samples_metadata = id_ease(
+    these_samples_metadata = these_samples_metadata,
+    these_sample_ids = these_sample_ids,
+    this_seq_type = this_seq_type,
+    verbose = FALSE
+  )
   
   # get gene regions
   my_regions = GAMBLR.utils::gene_to_region(gene_symbol = genes_and_cn_threshs$gene_id,
