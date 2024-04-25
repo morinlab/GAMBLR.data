@@ -10,7 +10,7 @@ get_cnv_and_ssm_status(
   these_samples_metadata = NULL,
   this_seq_type = "genome",
   only_cnv = "none",
-  genome_build = "grch37",
+  projection = "grch37",
   from_flatfile = TRUE,
   include_hotspots = TRUE,
   review_hotspots = TRUE,
@@ -38,7 +38,7 @@ the \code{get_gambl_metadata} function.}
 ignoring SSM status. Set this argument to "all" or "none" (default) to apply this behavior to all or none
 of the genes, respectively.}
 
-\item{genome_build}{Reference genome build. Possible values are "grch37" (default) or "hg38".}
+\item{projection}{Reference genome build. Possible values are "grch37" (default) or "hg38".}
 
 \item{from_flatfile}{Logical parameter indicating whether to use flat file to retrieve mutations. Set to FALSE
 to use database instead. Default is TRUE.}

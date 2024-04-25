@@ -27,7 +27,7 @@
 #' @param only_cnv A vector of gene names indicating the genes for which only CNV status should be considered, 
 #'   ignoring SSM status. Set this argument to "all" or "none" (default) to apply this behavior to all or none 
 #'   of the genes, respectively.
-#' @param genome_build Reference genome build. Possible values are "grch37" (default) or "hg38".
+#' @param projection Reference genome build. Possible values are "grch37" (default) or "hg38".
 #' @param from_flatfile Logical parameter indicating whether to use flat file to retrieve mutations. Set to FALSE 
 #' to use database instead. Default is TRUE.
 #' @param include_hotspots Logical parameter indicating whether hotspots object should also be tabulated. Default is TRUE.
@@ -86,7 +86,7 @@ get_cnv_and_ssm_status = function(genes_and_cn_threshs,
                                   these_samples_metadata = NULL,
                                   this_seq_type = "genome",
                                   only_cnv = "none",
-                                  genome_build = "grch37",
+                                  projection = "grch37",
                                   from_flatfile = TRUE,
                                   include_hotspots = TRUE,
                                   review_hotspots = TRUE,
@@ -107,7 +107,7 @@ get_cnv_and_ssm_status = function(genes_and_cn_threshs,
     }
   })
   
-  stopifnot('`genome_build` argument must be "grch37" or "hg38."' = genome_build %in% c("grch37", "hg38"))
+  stopifnot('`projection` argument must be "grch37" or "hg38."' = projection %in% c("grch37", "hg38"))
   
   stopifnot('`this_seq_type` argument must be "genome" or "capture."' = this_seq_type %in% c("genome", "capture"))
   
@@ -127,7 +127,7 @@ get_cnv_and_ssm_status = function(genes_and_cn_threshs,
   
   # get gene regions
   my_regions = GAMBLR.utils::gene_to_region(gene_symbol = genes_and_cn_threshs$gene_id,
-                                            projection = genome_build,
+                                            projection = projection,
                                             sort_regions = FALSE)
   
   if(length(my_regions) < nrow(genes_and_cn_threshs)){
@@ -188,7 +188,7 @@ get_cnv_and_ssm_status = function(genes_and_cn_threshs,
   # get maf data
   my_maf = get_ssm_by_samples(
     these_samples_metadata = these_samples_metadata,
-    projection = genome_build,
+    projection = projection,
     this_seq_type = this_seq_type,
     min_read_support = min_read_support_ssm,
     these_genes = genes_to_check_ssm,
@@ -197,11 +197,14 @@ get_cnv_and_ssm_status = function(genes_and_cn_threshs,
   )
   
   # get ssm status
+  if(projection == "grch37"){
+    genome_build = "hg19"
+  }
   ssm_status = get_coding_ssm_status(
     gene_symbols = genes_to_check_ssm,
     these_samples_metadata = these_samples_metadata,
     maf_data = my_maf,
-    projection = genome_build,
+    projection = projection,
     genome_build = genome_build,
     min_read_support = min_read_support_ssm,
     from_flatfile = from_flatfile,
