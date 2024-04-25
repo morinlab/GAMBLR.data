@@ -92,7 +92,13 @@ get_cn_states = function(regions_list,
   tibbled_data = tibble(region_segs, region_name = region_names)
   unnested_df = tibbled_data %>%
     unnest_longer(region_segs)
-
+  
+  # check whether copy number segments were found
+  if(nrow(unnested_df) == 0){
+    warning("No copy number segments could be found using the specified parameters.")
+    return(NULL)
+  }
+  
   seg_df = data.frame(ID = unnested_df$region_segs$ID, CN = unnested_df$region_segs$CN,region_name = unnested_df$region_name)
   #arbitrarily take the first segment for each region/ID combination
   seg_df = seg_df %>%
