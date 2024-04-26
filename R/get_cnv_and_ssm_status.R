@@ -125,10 +125,18 @@ get_cnv_and_ssm_status = function(genes_and_cn_threshs,
     verbose = FALSE
   )
   
-  # get gene regions
-  my_regions = GAMBLR.utils::gene_to_region(gene_symbol = genes_and_cn_threshs$gene_id,
-                                            projection = projection,
-                                            sort_regions = FALSE)
+  # get gene regions (don't use GAMBLR.utils::gene_to_region due to dependency issues)
+  if(projection == "grch37"){
+    gene_coordinates = GAMBLR.data::grch37_gene_coordinates
+    # chr_select = paste0(c(c(1:22),"X","Y"))
+  }else{
+    gene_coordinates = GAMBLR.data::hg38_gene_coordinates
+    # chr_select = paste0("chr", c(c(1:22),"X","Y"))
+  }
+  gene_coordinates = filter(gene_coordinates, gene_name %in% genes_and_cn_threshs$gene_id)
+  my_regions = with(gene_coordinates, paste0(chromosome, ":", start, "-", end)) %>% 
+    setNames(gene_coordinates$gene_name) %>% 
+    .[genes_and_cn_threshs$gene_id]
   
   if(length(my_regions) < nrow(genes_and_cn_threshs)){
     genes_and_cn_threshs = dplyr::filter(genes_and_cn_threshs, gene_id %in% names(my_regions))
