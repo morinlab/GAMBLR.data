@@ -44,6 +44,7 @@ For how to specify regions, refer to the parameter descriptions and function exa
 Is this function not what you are looking for? Try one of the following, similar, functions; \link[GAMBLR.results:assign_cn_to_ssm]{GAMBLR.results::assign_cn_to_ssm}, \link[GAMBLR.results:get_cn_segments]{GAMBLR.results::get_cn_segments}, \link[GAMBLR.results:get_sample_cn_segments]{GAMBLR.results::get_sample_cn_segments}
 }
 \examples{
+\dontrun{
 #basic usage, generic lymphoma gene list
 cn_matrix = get_cn_states(regions_bed=GAMBLR.data::grch37_lymphoma_genes_bed)
 
@@ -64,5 +65,6 @@ single_gene_cn <- get_cn_states(
  region_names = "MYC",
  this_seq_type = "capture"
 )
+}
 
 }

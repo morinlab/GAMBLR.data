@@ -21,6 +21,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' #basic usage, generic lymphoma gene list
 #' cn_matrix = get_cn_states(regions_bed=GAMBLR.data::grch37_lymphoma_genes_bed)
 #'
@@ -41,6 +42,7 @@
 #'  region_names = "MYC",
 #'  this_seq_type = "capture"
 #' )
+#' }
 #'
 get_cn_states = function(regions_list,
                          regions_bed,
