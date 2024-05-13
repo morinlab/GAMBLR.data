@@ -17,6 +17,7 @@ get_ssm_by_regions(
   use_name_column = FALSE,
   projection = "grch37",
   verbose = FALSE,
+  engine = "default",
   ...
 )
 }
