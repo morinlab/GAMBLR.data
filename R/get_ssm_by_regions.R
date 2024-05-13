@@ -22,6 +22,9 @@
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.
 #' @param verbose Set to TRUE to maximize the output to console. Default is TRUE.
 #' This parameter also dictates the verbosity of any helper function internally called inside the main function.
+#' @param engine String indicating which approach to use. Accepted values are
+#'      "default" (legacy behaviour with for loop for each region) and
+#'      "overlaps" (more efficient approach using overlaps).
 #' @param ... Any additional parameters.
 #'
 #' @return Returns a data frame of variants in MAF-like format.
@@ -51,18 +54,18 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                               use_name_column = FALSE,
                               projection = "grch37",
                               verbose = FALSE,
-                              engine="default",
+                              engine = "default",
                               ...){
-  
+
   # check provided projection
   # first, get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data), 
+  valid_projections = grep("meta", names(GAMBLR.data::sample_data),
                            value = TRUE, invert = TRUE)
   if(! projection %in% valid_projections){
     stop("Please provide a valid projection. The following are available: ",
          paste(valid_projections, collapse=", "), ".")
   }
-  
+
   #check if any invalid parameters are provided
   check_excess_params(...)
 
@@ -79,77 +82,168 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
   }else{
     regions = regions_list
   }
+  
+  # handle the correct chr prefixing
+  regions <- gsub("chr", "", regions)
+  if(projection == "hg38"){
+    regions <- paste0("chr", regions)
+  }
 
   if(verbose){
     print(regions)
   }
-  
+
   #get samples with the dedicated helper function
   metadata = id_ease(these_samples_metadata = these_samples_metadata,
                      these_sample_ids = these_sample_ids,
                      verbose = verbose,
                      this_seq_type = this_seq_type)
+
+  # The following has these steps to return the maf:
+  # 1. First check if the maf data is present
+  # 1a. If maf data is not provided, check whether this_study is specified
+  # 1b. For both this_study present and absent, check which engine is specified
+  # 2. If maf data is present, trust that the maf file is pre-defined accordingly
+  #    and no need to handle the this_study parameter explicitly.
+  # 2a. Check which engine is specified and handle maf_data accordingly
   
   if(missing(maf_data)){
     #warn/notify the user what version of this function they are using
     message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
 
     if(missing(this_study)){
-        region_mafs = lapply(
-            regions, function(x){
-                get_ssm_by_region(
-                    region = x,
-                    these_samples_metadata = metadata,
-                    this_seq_type = this_seq_type,
-                    streamlined = streamlined,
-                    projection = projection,
-                    mode = mode,
-                    verbose = FALSE, #force to FALSE, suppressing noisy output
-                    ...
-                )
+        if(engine == "overlaps"){
+            if(verbose){
+                print("Using the non-default engine for efficiency...")
             }
-        )
-    }else if(engine == "foverlaps"){
-      sample_maf = get_ssm_by_samples(these_samples_metadata=these_samples_metadata)
-      setkey(sample_maf, Chromosome, Start_Position,End_Position)
-      regions_dt = data.frame(all_lymphome_gene_regions) %>% rownames_to_column("Hugo_Symbol") %>% 
-        separate(all_lymphome_gene_regions,c("Chromosome","region"),sep = ":") %>%
-        separate(region,c("Start_Position","End_Position"),"-") %>%
-        mutate(Start_Position=as.numeric(Start_Position),End_Position=as.numeric(End_Position)) %>%
-        as.data.table()
-      setkey(regions_dt,Chromosome,Start_Position,End_Position)
-      maf_regions = foverlaps(sample_maf, regions_dt, type="within", which=TRUE,
-                              by.x=c("Chromosome","Start_Position","End_Position"),
-                              by.y=c("Chromosome","Start_Position","End_Position"))
-      
-      match_rows=filter(maf_regions,!is.na(yid)) %>% pull(xid)
-      match_maf = sample_maf[match_rows,]
-      return(match_maf)
+
+            sample_maf <- get_ssm_by_samples(
+                these_samples_metadata = these_samples_metadata,
+                this_seq_type = this_seq_type,
+                projection = projection,
+                tool_name = mode
+            )
+            regions_df <- as.data.frame(regions) %>%
+                `names<-`("regions") %>%
+                separate(
+                        regions,
+                        c("Chromosome", "Start_Position","End_Position"),
+                        ":|-"
+                    ) %>%
+                mutate(
+                    Start_Position = as.numeric(Start_Position),
+                    End_Position = as.numeric(End_Position)
+                ) %>%
+                mutate(region = row_number())
+            region_mafs <- cool_overlaps(
+                sample_maf,
+                regions_df
+            )  %>%
+            dplyr::rename_with(~ gsub(".x", "", .x, fixed = TRUE)) %>%
+            dplyr::select(all_of(c(names(sample_maf), "region"))) %>%
+            dplyr::group_split(region)
+        } else {
+            region_mafs = lapply(
+                regions, function(x){
+                    get_ssm_by_region(
+                        region = x,
+                        these_samples_metadata = metadata,
+                        this_seq_type = this_seq_type,
+                        streamlined = streamlined,
+                        projection = projection,
+                        mode = mode,
+                        verbose = FALSE, #force to FALSE, suppressing noisy output
+                        ...
+                    )
+                }
+            )
+        }
     }else{
-        region_mafs = lapply(
-            regions, function(x){
-                get_ssm_by_region(
-                    region = x,
-                    these_samples_metadata = metadata,
-                    this_seq_type = this_seq_type,
-                    streamlined = streamlined,
-                    projection = projection,
-                    mode = mode,
-                    this_study = this_study,
-                    verbose = FALSE, #force to FALSE, suppressing noisy output
-                    ...
-                )
+        if(engine == "overlaps"){
+            if(verbose){
+                print("Using the non-default engine for efficiency...")
             }
-        )
+
+            sample_maf <- get_ssm_by_samples(
+                these_samples_metadata = these_samples_metadata,
+                this_seq_type = this_seq_type,
+                projection = projection,
+                tool_name = mode,
+                this_study = this_study
+            )
+            regions_df <- as.data.frame(regions) %>%
+                `names<-`("regions") %>%
+                separate(
+                        regions,
+                        c("Chromosome", "Start_Position","End_Position"),
+                        ":|-"
+                    ) %>%
+                mutate(
+                    Start_Position = as.numeric(Start_Position),
+                    End_Position = as.numeric(End_Position)
+                ) %>%
+                mutate(region = row_number())
+
+            region_mafs <- cool_overlaps(
+                sample_maf,
+                regions_df
+            ) %>%
+            dplyr::rename_with(~ gsub(".x", "", .x, fixed = TRUE)) %>%
+            dplyr::select(all_of(c(names(sample_maf), "region"))) %>%
+            dplyr::group_split(region)
+
+        } else {
+            region_mafs = lapply(
+                regions, function(x){
+                    get_ssm_by_region(
+                        region = x,
+                        these_samples_metadata = metadata,
+                        this_seq_type = this_seq_type,
+                        streamlined = streamlined,
+                        projection = projection,
+                        mode = mode,
+                        this_study = this_study,
+                        verbose = FALSE, #force to FALSE, suppressing noisy output
+                        ...
+                    )
+                }
+            )
+        }
     }
   }else{
-    region_mafs = lapply(regions, function(x){get_ssm_by_region(region = x,
-                                                                maf_data = maf_data,
-                                                                these_samples_metadata = metadata,
-                                                                this_seq_type = this_seq_type,
-                                                                streamlined = streamlined,
-                                                                projection = projection,
-                                                                verbose = FALSE)})
+    if(engine == "overlaps"){
+      if(verbose){
+        print("Using the non-default engine for efficiency...")
+      }
+      regions_df <- as.data.frame(regions) %>%
+        `names<-`("regions") %>%
+        separate(
+                regions,
+                c("Chromosome", "Start_Position","End_Position"),
+                ":|-"
+            ) %>%
+        mutate(
+            Start_Position = as.numeric(Start_Position),
+            End_Position = as.numeric(End_Position)
+        ) %>%
+            mutate(region = row_number())
+
+      region_mafs <- cool_overlaps(
+        sample_maf,
+        regions_df
+      ) %>%
+        dplyr::rename_with(~ gsub(".x", "", .x, fixed = TRUE)) %>%
+            dplyr::select(all_of(c(names(sample_maf), "region"))) %>%
+            dplyr::group_split(region)
+    }else{
+      region_mafs = lapply(regions, function(x){get_ssm_by_region(region = x,
+                                                                    maf_data = maf_data,
+                                                                    these_samples_metadata = metadata,
+                                                                    this_seq_type = this_seq_type,
+                                                                    streamlined = streamlined,
+                                                                    projection = projection,
+                                                                    verbose = FALSE)})
+    }
   }
 
   #deal with region names
