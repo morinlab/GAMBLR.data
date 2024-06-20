@@ -423,3 +423,37 @@ hotspots_annotations <- system.file(
         Chromosome = as.character(Chromosome)
     )
 usethis::use_data(hotspots_annotations, overwrite = TRUE)
+
+
+mirna_targetscan <- system.file(
+        "extdata",
+        "Predicted_Target_Locations.default_predictions.hg19.bed.gz",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv(
+      col_names = c(
+        "Chromosome", 
+        "Start_Position", 
+        "End_Position", 
+        "Gene:miRNA", 
+        "context++_score_percentile", 
+        "Strand", 
+        "SP", 
+        "EP", 
+        "color", 
+        "block_count", 
+        "sites", 
+        "block"
+      )
+    ) %>%
+    select(
+      "Chromosome", 
+      "Start_Position", 
+      "End_Position", 
+      "Gene:miRNA", 
+      "sites"
+    ) %>%
+    separate(
+      "Gene:miRNA", into = c("Hugo_Symbol", "miRNA"), sep = ":"
+    )
+usethis::use_data(mirna_targetscan, overwrite = TRUE)
