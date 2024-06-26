@@ -454,6 +454,8 @@ mirna_targetscan <- system.file(
       "sites"
     ) %>%
     separate(
-      "Gene:miRNA", into = c("Hugo_Symbol", "miRNA"), sep = ":"
+      "Gene:miRNA",
+      into = c("Hugo_Symbol", "miRNA"),
+      sep = ":"
     )
 usethis::use_data(mirna_targetscan, overwrite = TRUE)
