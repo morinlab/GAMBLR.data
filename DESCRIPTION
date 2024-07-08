@@ -35,7 +35,6 @@ Imports:
     ggplot2,
     parallel,
     purrr,
-    stringr,
     tibble,
     tidyr
 LazyDataCompression: xz

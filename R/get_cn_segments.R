@@ -9,7 +9,7 @@
 #' For more usage examples, refer to the parameter descriptions and examples in the vignettes.
 #'
 #' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
-#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to. 
+#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to.
 #' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
 #' @param region Region formatted like chrX:1234-5678 or X:1234-56789.
 #' @param chromosome The chromosome you are restricting to. Required parameter if region is not specified.
@@ -23,8 +23,8 @@
 #'
 #' @return A data frame with CN segments for the specified region.
 #'
-#' @import dplyr stringr
-#' 
+#' @import dplyr
+#'
 #' @export
 #'
 #' @examples
@@ -49,32 +49,32 @@ get_cn_segments = function(these_sample_ids = NULL,
                            with_chr_prefix = FALSE,
                            streamlined = FALSE,
                            ...){
-  
+
   #warn/notify the user what version of this function they are using
   message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
-  
+
   #check if any invalid parameters are provided
   check_excess_params(...)
-  
+
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
-  
+
   #get samples with the dedicated helper function
   metadata = id_ease(these_samples_metadata = these_samples_metadata,
                      these_sample_ids = these_sample_ids,
                      this_seq_type = this_seq_type)
-  
+
   sample_ids = metadata$sample_id
-  
+
   #return CN segments based on the selected projection
   if(projection %in% valid_projections){
-    all_segs = GAMBLR.data::sample_data[[projection]]$seg %>% 
+    all_segs = GAMBLR.data::sample_data[[projection]]$seg %>%
       dplyr::filter(ID %in% sample_ids)
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
   }
-  
+
   #perform wrangling on the region to have it in the correct format.
   if(!missing(region)){
     if(length(region) > 1){
@@ -88,14 +88,14 @@ get_cn_segments = function(these_sample_ids = NULL,
     qend = startend[2]
   }else{
     if(missing(chromosome)){
-      stop("You have not provided a region, or a region in an acceptable format..") 
+      stop("You have not provided a region, or a region in an acceptable format..")
     }else{
       if(length(chromosome) > 1){
         stop("You are providing more than one region...")
       }
     }
   }
-  
+
   #deal with chr prefixes for region, based on selected genome projection.
   if(projection == "grch37"){
     if(all(grepl("chr", chromosome))){
@@ -106,15 +106,15 @@ get_cn_segments = function(these_sample_ids = NULL,
       chromosome = paste0("chr", chromosome)
     }
   }
-  
+
   #enforce data type for qend and qstart coordiantes.
   qstart = as.numeric(qstart)
   qend = as.numeric(qend)
-  
+
   all_segs = all_segs %>%
     dplyr::filter((chrom == chromosome & start <= qstart & end >= qend) | (chrom == chromosome & start >= qstart & end <= qend)) %>%
     as.data.frame()
-  
+
   #deal with chr prefixes
   if(!with_chr_prefix){
     if(all(str_detect(all_segs$chrom, "chr"))){
@@ -127,12 +127,12 @@ get_cn_segments = function(these_sample_ids = NULL,
         dplyr::mutate(chrom = paste0("chr", chrom))
     }
   }
-  
+
   #subset to only a few columns with streamlined = TRUE.
   if(streamlined){
     all_segs = dplyr::select(all_segs, ID, CN)
   }
-  
+
   #return data frame with CN segments
   return(all_segs)
 }

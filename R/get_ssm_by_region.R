@@ -31,7 +31,7 @@
 #'
 #' @return A data frame containing all mutations (MAF) in the specified region.
 #'
-#' @import dplyr stringr
+#' @import dplyr
 #'
 #' @examples
 #' my_mutations = get_ssm_by_region(region = "chr8:128,723,128-128,774,067")
@@ -65,15 +65,15 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   #check if any invalid parameters are provided
   check_excess_params(...)
-  
+
   #get samples with the dedicated helper function
   metadata = id_ease(these_samples_metadata = these_samples_metadata,
                      these_sample_ids = these_sample_ids,
                      verbose = verbose,
                      this_seq_type = this_seq_type)
-  
+
   sample_ids = metadata$sample_id
-  
+
   #return SSMs based on the selected projection
   if(missing(maf_data)){
     this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
@@ -81,7 +81,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
       dplyr::filter((tolower(!!sym("Pipeline")) == mode))
     this_maf <- GAMBLR.data::sample_data[[projection]]$ashm %>%
       dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == mode)) %>% 
+      dplyr::filter((tolower(!!sym("Pipeline")) == mode)) %>%
       bind_rows(this_maf, .)
   }else{
     this_maf = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids)
@@ -91,7 +91,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
   if(!missing(this_study)){
     this_maf <- this_maf %>%
       dplyr::filter((!!sym("Study")) == this_study)
-  }  
+  }
 
   #split region into chunks (chr, start, end) and deal with chr prefixes based on the selected projection
   if(length(region) > 1){
@@ -125,15 +125,15 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   #subset the maf to the specified region
   muts_region = dplyr::filter(this_maf, Chromosome == chromosome & Start_Position > qstart & Start_Position < qend)
-  
+
   # Handle possible duplicates
   muts_region <- muts_region %>%
     distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
-  
+
   if(streamlined){
     muts_region = muts_region %>%
       dplyr::select(Start_Position, Tumor_Sample_Barcode)
   }
-  
+
   return(muts_region)
 }
