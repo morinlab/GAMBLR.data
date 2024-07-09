@@ -17,6 +17,7 @@ get_ssm_by_regions(
   use_name_column = FALSE,
   projection = "grch37",
   verbose = FALSE,
+  engine = "default",
   ...
 )
 }
@@ -50,6 +51,10 @@ This parameter can also accept an additional column with region names that will 
 
 \item{verbose}{Set to TRUE to maximize the output to console. Default is TRUE.
 This parameter also dictates the verbosity of any helper function internally called inside the main function.}
+
+\item{engine}{String indicating which approach to use. Accepted values are
+"default" (legacy behaviour with for loop for each region) and
+"overlaps" (more efficient approach using overlaps).}
 
 \item{...}{Any additional parameters.}
 }
