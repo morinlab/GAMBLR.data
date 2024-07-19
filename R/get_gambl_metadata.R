@@ -54,7 +54,7 @@
 #'   \item{sex}{The biological sex of the patient, if available. Allowable options: M, F, NA}
 #' }
 #'
-#' @import dplyr
+#' @import dplyr purrr
 #'
 #' @export
 #'
@@ -123,6 +123,23 @@ get_gambl_metadata = function(
             return()
         }
     }
+
+    metadata <- metadata %>%
+        dplyr::left_join(
+            gambl_metadata,
+            by = "sample_id",
+            suffix = c(".X", ".Y")
+        ) %>%
+        split.default(gsub('.[XY]', '', names(.))) %>%
+        purrr::map_dfc( ~ if (ncol(.x) == 1)
+            .x
+            else
+            dplyr::mutate(.x,!!sym(gsub('.X', '', names(
+                .x
+            )[1])) := dplyr::coalesce(!!!syms(names(
+                .x
+            ))))) %>%
+        dplyr::select(!contains("."))
 
     return(metadata)
 }

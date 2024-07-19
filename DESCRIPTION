@@ -34,7 +34,10 @@ Imports:
     dplyr,
     ggplot2,
     parallel,
-    stringr,
+    purrr,
     tibble,
     tidyr
 LazyDataCompression: xz
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
