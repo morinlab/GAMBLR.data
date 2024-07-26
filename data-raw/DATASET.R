@@ -459,3 +459,12 @@ mirna_targetscan <- system.file(
       sep = ":"
     )
 usethis::use_data(mirna_targetscan, overwrite = TRUE)
+
+
+protein_domains <- system.file(
+        "extdata",
+        "protein_domains.tsv.gz",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv()
+usethis::use_data(protein_domains, overwrite = TRUE)

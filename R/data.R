@@ -890,3 +890,27 @@
 #'   \item{hot_spot}{Hot spot annotation.}
 #' }
 "hotspots_annotations"
+
+
+#' Protein Domains
+#'
+#' A data frame with high-quality positions of amino acid positions in their 
+#' corresponding domains.
+#'
+#' @format ## `protein_domains`
+#' A data frame with 92849 rows and 12 columns
+#' \describe{
+#'   \item{HGNC}{HUGO Gene Nomenclature Committee.}
+#'   \item{refseq.ID}{Reference sequence identifier.}
+#'   \item{protein.ID}{Protein identifier.}
+#'   \item{aa.length}{Amino acid length.}
+#'   \item{Start}{Coordinate of amino acid position.}
+#'   \item{End}{Coordinate of amino acid position.}
+#'   \item{domain.source}{Domain source.}
+#'   \item{Label}{Abbreviated domain type.}
+#'   \item{domain.anno}{Domain type.}
+#'   \item{pfam}{Protein family.}
+#'   \item{Description}{Description of the domain.}
+#'   \item{Description}{NA.}
+#' }
+"protein_domains"
