@@ -392,7 +392,7 @@
 
 #' Lymphoma Genes BL v0.1
 #'
-#' Genes frequently associated with Burkitt Lymphome (BL). This is version 0.1.
+#' Genes frequently associated with Burkitt Lymphoma (BL). This is version 0.1.
 #'
 #' @format ## `lymphoma_genes_bl_v0.1`
 #' A data frame withh 128 rows and 11 columns.
@@ -412,24 +412,41 @@
 "lymphoma_genes_bl_v0.1"
 
 
+#' Lymphoma Genes BL v0.2
+#'
+#' Genes frequently associated with Burkitt Lymphoma (BL). This is version 0.2.
+#'
+#' @format ## `lymphoma_genes_bl_v0.2`
+#' A data frame withh 111 rows and 9 columns.
+#' \describe{
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{Mean.Variant.Quality}{Mean variant quality.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#'   \item{PMID}{Pubmed ID to associated study.}
+#'   \item{MutationEffect}{Annotates the effect of the gene mutation.}
+#'   \item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
+#' }
+"lymphoma_genes_bl_v0.2"
+
 #' Lymphoma Genes BL Latest
 #'
-#' Genes frequently associated with Burkitt Lymphome (BL). This is the most up-to-date version of this dataset.
+#' Genes frequently associated with Burkitt Lymphoma (BL). This is the most up-to-date version of this dataset.
 #'
 #' @format ## `lymphoma_genes_bl_v_latest`
-#' A data frame withh 128 rows and 11 columns.
+#' A data frame withh 111 rows and 9 columns.
 #' \describe{
-#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
-#'   \item{Gene}{Gene symbol in Hugo format.}
-#'   \item{earliest_support_BL}{Pubmeed ID to associated study.}
-#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
-#'   \item{aSHM_target_DLBCL}{Boolean variable annotating if the event is an aSHM target in DLBCL or not.}
-#'   \item{Currator_comments}{Comments from the currator.}
-#'   \item{Enrichment_DLBCL_BL}{Annotates the event if it is enriched in BL or DLBCL.}
-#'   \item{frequency_BL_Thomas}{The frequency of which the event was reported in the Thomas study.}
-#'   \item{frequency_BL_Panea}{The frequency of which the event was reported in the Panea study.}
-#'   \item{n_BL_Panea_original}{Total number of mutated tumors as originally reported in Panea study.}
-#'   \item{frequency_BL_Panea_original}{Frequency of mutation as originally reported in Panea study.}
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{Mean.Variant.Quality}{Mean variant quality.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#'   \item{PMID}{Pubmed ID to associated study.}
+#'   \item{MutationEffect}{Annotates the effect of the gene mutation.}
+#'   \item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
 #' }
 "lymphoma_genes_bl_v_latest"
 
@@ -457,6 +474,26 @@
 #' }
 "lymphoma_genes_dlbcl_v0.1"
 
+#' Lymphoma Genes DLBCL v0.2
+#'
+#' Genes frequently associated with Diffuse large B cell lymphoma (DLBCL). This is version 0.2.
+#'
+#' @format ## `lymphoma_genes_dlbcl_v0.2`
+#' A data frame withh 335 rows and 9 columns.
+#' \describe{
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{Mean.Variant.Quality}{Mean variant quality.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#'   \item{PMID}{Pubmed ID to associated study.}
+#'   \item{MutationEffect}{Annotates the effect of the gene mutation.}
+#'   \item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
+#'   \item{MutationEffect.citekey}{Alphanumeric representation of the citekey to associated study where mutation effect is described.}
+#'   \item{Mutation.PMID}{Whether this gene is a feature in LymphGen classifier.}
+#' }
+"lymphoma_genes_dlbcl_v0.2"
 
 #' Lymphoma Genes DLBCL Latest
 #'
@@ -464,21 +501,19 @@
 #' This is the most up-to-date version of this dataset.
 #'
 #' @format ## `lymphoma_genes_dlbcl_v_latest`
-#' A data frame with 243 rows and 13 columns.
+#' A data frame withh 335 rows and 9 columns.
 #' \describe{
-#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
-#'   \item{Gene}{Gene symbol in Hugo format.}
-#'   \item{Chappuy}{Boolean variable stating if the event is described in the study (Chappuy).}
-#'   \item{Reddy}{Boolean variable stating if the event is described in the study (Reddy).}
-#'   \item{LymphGen}{Boolean variable stating if the event is a described lymphgen or not.}
-#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
-#'   \item{other_support}{Variable that annotates the event if there are other support available.}
-#'   \item{Lacy}{Boolean variable stating if the event is described in the study (Lacy).}
-#'   \item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
-#'   \item{known_hotspots}{Boolean varaible annotating if the event is a known hotspot or not.}
-#'   \item{earliest_support}{Pubmeed ID to associated study.}
-#'   \item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
-#'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{Mean.Variant.Quality}{Mean variant quality.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#'   \item{PMID}{Pubmed ID to associated study.}
+#'   \item{MutationEffect}{Annotates the effect of the gene mutation.}
+#'   \item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
+#'   \item{MutationEffect.citekey}{Alphanumeric representation of the citekey to associated study where mutation effect is described.}
+#'   \item{Mutation.PMID}{Whether this gene is a feature in LymphGen classifier.}
 #' }
 "lymphoma_genes_dlbcl_v_latest"
 
@@ -531,28 +566,59 @@
 #' }
 "lymphoma_genes_mcl_v0.1"
 
+#' Lymphoma Genes MCL v0.2
+#'
+#' Genes frequently associated with Mantle cell lymphoma (MCL). This is version 0.2.
+#'
+#' @format ## `lymphoma_genes_mcl_v0.2`
+#' A data frame withh 69 rows and 16 columns.
+#' \describe{
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{curated}{Whether this is a manually curated gene.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{Bea}{Whether this gene was described in Bea study.}
+#'   \item{Zhang}{Whether this gene was described in Zhang study.}
+#'   \item{Pararajalingam}{Whether this gene was described in Pararajalingam study.}
+#'   \item{Nadeu}{Whether this gene was described in Nadeu study.}
+#'   \item{Other_support}{Whether there is a support for this gene other than the studies above.}
+#'   \item{appx_overall_freq}{Approximate frequency of mutations at this gene in MCL.}
+#'   \item{gambl_freq}{Frequency of mutations at this gene in MCL as inferred in GAMBL.}
+#'   \item{common_alias}{Alias name for this gene.}
+#'   \item{noncoding_driver_suspect}{Whether there are relevant non-coding mutations at this gene.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{CIViC}{Whether this gene is reported in the CIViC knowledge base.}
+#'   \item{Earliest_support}{The earlist study to describe this gene to be mutated in MCL.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#' }
+"lymphoma_genes_mcl_v0.2"
+
 
 #' Lymphoma Genes MCL Latest
 #'
 #' Genes frequently associated with Mantle cell lymphoma (MCL).
-#' #' This is the most up-to-date version of this dataset.
+#' This is the most up-to-date version of this dataset.
 #'
 #' @format ## `lymphoma_genes_mcl_v_latest`
-#' A data frame with 53 rows and 13 columns.
+#' A data frame withh 69 rows and 16 columns.
 #' \describe{
-#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
-#'   \item{Gene}{Gene symbol in Hugo format.v}
-#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
-#'   \item{Bea}{Boolean variable stating if the event is described in the study (Bea).}
-#'   \item{Zhang}{Boolean variable stating if the event is described in the study (Zhang).}
-#'   \item{Pararajalingam}{Boolean variable stating if the event is described in the study (Pararajalingam).}
-#'   \item{Nadeu}{Boolean variable stating if the event is described in the study (Nadeu).}
-#'   \item{Other_support}{Variable that annotates the event if there are other support available.}
-#'   \item{appx_overall_freq}{Approximate overall frequency.}
-#'   \item{gambl_freq}{Frequency of event described in GAMBL.}
-#'   \item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
-#'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
-#'   \item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{curated}{Whether this is a manually curated gene.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{Bea}{Whether this gene was described in Bea study.}
+#'   \item{Zhang}{Whether this gene was described in Zhang study.}
+#'   \item{Pararajalingam}{Whether this gene was described in Pararajalingam study.}
+#'   \item{Nadeu}{Whether this gene was described in Nadeu study.}
+#'   \item{Other_support}{Whether there is a support for this gene other than the studies above.}
+#'   \item{appx_overall_freq}{Approximate frequency of mutations at this gene in MCL.}
+#'   \item{gambl_freq}{Frequency of mutations at this gene in MCL as inferred in GAMBL.}
+#'   \item{common_alias}{Alias name for this gene.}
+#'   \item{noncoding_driver_suspect}{Whether there are relevant non-coding mutations at this gene.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{CIViC}{Whether this gene is reported in the CIViC knowledge base.}
+#'   \item{Earliest_support}{The earlist study to describe this gene to be mutated in MCL.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
 #' }
 "lymphoma_genes_mcl_v_latest"
 

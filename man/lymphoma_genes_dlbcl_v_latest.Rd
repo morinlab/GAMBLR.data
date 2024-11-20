@@ -7,21 +7,19 @@
 \format{
 \subsection{\code{lymphoma_genes_dlbcl_v_latest}}{
 
-A data frame with 243 rows and 13 columns.
+A data frame withh 335 rows and 9 columns.
 \describe{
-\item{ensembl_gene_id}{Gene ID in ensembl format.}
-\item{Gene}{Gene symbol in Hugo format.}
-\item{Chappuy}{Boolean variable stating if the event is described in the study (Chappuy).}
-\item{Reddy}{Boolean variable stating if the event is described in the study (Reddy).}
-\item{LymphGen}{Boolean variable stating if the event is a described lymphgen or not.}
-\item{curated}{Boolean variable annotating if the event is currated or not.}
-\item{other_support}{Variable that annotates the event if there are other support available.}
-\item{Lacy}{Boolean variable stating if the event is described in the study (Lacy).}
-\item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
-\item{known_hotspots}{Boolean varaible annotating if the event is a known hotspot or not.}
-\item{earliest_support}{Pubmeed ID to associated study.}
-\item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
-\item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
+\item{Gene}{Gene ID in Hugo format.}
+\item{Tier}{Tier of gene in this pathology.}
+\item{aSHM}{Whether this gene is associated with aSHM.}
+\item{QC}{QC of a particular gene.}
+\item{Mean.Variant.Quality}{Mean variant quality.}
+\item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+\item{PMID}{Pubmed ID to associated study.}
+\item{MutationEffect}{Annotates the effect of the gene mutation.}
+\item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
+\item{MutationEffect.citekey}{Alphanumeric representation of the citekey to associated study where mutation effect is described.}
+\item{Mutation.PMID}{Whether this gene is a feature in LymphGen classifier.}
 }
 }
 }
