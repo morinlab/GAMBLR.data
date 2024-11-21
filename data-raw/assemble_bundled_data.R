@@ -28,6 +28,7 @@ pmids <- list(
     "Reddy_DLBCL" = 28985567,
     "Schmitz_DLBCL" = 29641966,
     "Chapuy_DLBCL" = 29713087,
+    "Chapuy_other" = 22343534,
     "Arthur_DLBCL" = 30275490,
     "Hilton_DLBCL" = 37319384
 )
@@ -288,11 +289,30 @@ chapuy_data$meta <- chapuy_data$meta %>%
   select(all_of(colnames_for_bundled_meta)) %>%
   filter(!sample_id == "DLBCL-RICOVER_148-Tumor")
 
+# Importing DLBCL NCI/Golub data
+golub_data <- list()
+
+golub_data$meta <- get_gambl_metadata(seq_type_filter="capture") %>%
+  dplyr::filter(cohort == "NCI_DLBCL_Golub") %>%
+  mutate(reference_PMID = pmids$Chapuy_other) %>%
+  mutate(genetic_subgroup = lymphgen)
+
+golub_data$full_ssm <- get_ssm_by_samples(
+  these_samples_metadata = golub_data$meta
+)
+
+golub_data$grch37$ssm_to_bundle <- dplyr::filter(
+    golub_data$full_ssm,
+    Hugo_Symbol %in% all_lymphoma_genes
+)
+
+golub_data$meta <- golub_data$meta %>%
+  select(all_of(colnames_for_bundled_meta))
 
 # Importing DLBCL cell lines
 cell_lines_data <- list()
 
-cell_lines_data$meta <- get_gambl_metadata() %>%
+cell_lines_data$meta <- get_gambl_metadata(seq_type_filter = "genome") %>%
     filter(sample_id %in% c(
         "DOHH-2", "SU-DHL-10", "OCI-Ly10", "OCI-Ly3", "SU-DHL-4"
     )) %>%
@@ -426,7 +446,8 @@ sample_data$meta = bind_rows(sample_data$meta,reddy_data$meta_to_bundle)
 sample_data$meta = bind_rows(
     sample_data$meta,
     schmitz_data$meta,
-    chapuy_data$meta
+    chapuy_data$meta,
+    golub_data$meta
 )
 
 sample_data$grch37$maf <- bind_rows(
@@ -449,6 +470,10 @@ sample_data$grch37$maf <- bind_rows(
     chapuy_data$grch37$ssm_to_bundle %>% mutate(
         Pipeline = "SLMS-3",
         Study = "Chapuy"
+    ),
+    golub_data$grch37$ssm_to_bundle %>% mutate(
+        Pipeline = "SLMS-3",
+        Study = "NCI_Golub"
     )
 )
 
@@ -538,7 +563,7 @@ coding_maf <- get_ssm_by_samples(
     )
 
 these_samples_capture <- sample_data$meta %>%
-    filter(cohort %in% c("dlbcl_reddy", "dlbcl_schmitz", "dlbcl_chapuy")) %>%
+    filter(seq_type %in% c("capture")) %>%
     pull(sample_id)
 
 coding_maf_capture <- get_ssm_by_samples(
@@ -565,8 +590,11 @@ dim(sample_data$grch37$maf)
 grch37_ashm <- get_ssm_by_regions(
     regions_bed = grch37_ashm_regions,
     streamlined = FALSE,
-    basic_columns = TRUE
-)
+    basic_columns = FALSE
+) %>%
+    select(
+        any_of(c(colnames(sample_data$grch37$maf), "RefSeq"))
+    )
 grch37_ashm <- grch37_ashm %>%
     filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
 
@@ -589,8 +617,11 @@ hg38_ashm <- get_ssm_by_regions(
     regions_bed = hg38_ashm_regions,
     projection = "hg38",
     streamlined = FALSE,
-    basic_columns = TRUE
-)
+    basic_columns = FALSE
+) %>%
+    select(
+        any_of(c(colnames(sample_data$hg38$maf), "RefSeq"))
+    )
 hg38_ashm <- hg38_ashm %>%
     filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
 
