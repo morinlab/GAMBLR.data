@@ -44,7 +44,6 @@
 #' 
 #' @return Either a matrix or a long tidy table of counts per window.
 #'
-#' @rawNamespace import(data.table, except = c("last", "first", "between", "transpose"))
 #' @import dplyr tidyr
 #' @export
 #'
@@ -104,8 +103,8 @@ calc_mutation_frequency_bin_region <- function(region,
   
   
   if (
-    (str_detect(chromosome, "chr") & projection == "grch37") |
-    (!str_detect(chromosome, "chr") & projection == "hg38")
+    (grepl("chr", chromosome) & projection == "grch37") |
+    (!grepl("chr", chromosome) & projection == "hg38")
   ) {
     stop("chr prefixing status of region and specified projection don't match. ")
   }
@@ -178,19 +177,20 @@ calc_mutation_frequency_bin_region <- function(region,
   } else {
     #  Subset provided maf to specified region
     message("Using provided maf...")
-    maf.dt <- data.table(maf_data)
-    region_bed <- data.table(
-      "Chromosome" = as.character(chromosome),
-      "Start_Position" = as.numeric(start_pos),
-      "End_Position" = as.numeric(end_pos)
+    region_bed <- data.frame(
+      "chrom" = as.character(chromosome),
+      "start" = as.numeric(start_pos),
+      "end" = as.numeric(end_pos)
     )
-    setkey(region_bed)
-    region_ssm <- foverlaps(maf.dt, region_bed) %>%
+    region_ssm <- cool_overlaps(
+            maf_data, region_bed,
+            columns2 = c("chrom", "start", "end")
+        ) %>%
       dplyr::filter(!is.na(Start_Position)) %>%
-      dplyr::mutate(end = i.Start_Position - 1) %>%
+      dplyr::mutate(end = Start_Position - 1) %>%
       dplyr::select(
         chrom = Chromosome,
-        start = i.Start_Position,
+        start = Start_Position,
         end,
         sample_id = Tumor_Sample_Barcode
       ) %>%

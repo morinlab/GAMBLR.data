@@ -7,19 +7,17 @@
 \format{
 \subsection{\code{lymphoma_genes_bl_v_latest}}{
 
-A data frame withh 128 rows and 11 columns.
+A data frame withh 111 rows and 9 columns.
 \describe{
-\item{ensembl_gene_id}{Gene ID in ensembl format.}
-\item{Gene}{Gene symbol in Hugo format.}
-\item{earliest_support_BL}{Pubmeed ID to associated study.}
-\item{curated}{Boolean variable annotating if the event is currated or not.}
-\item{aSHM_target_DLBCL}{Boolean variable annotating if the event is an aSHM target in DLBCL or not.}
-\item{Currator_comments}{Comments from the currator.}
-\item{Enrichment_DLBCL_BL}{Annotates the event if it is enriched in BL or DLBCL.}
-\item{frequency_BL_Thomas}{The frequency of which the event was reported in the Thomas study.}
-\item{frequency_BL_Panea}{The frequency of which the event was reported in the Panea study.}
-\item{n_BL_Panea_original}{Total number of mutated tumors as originally reported in Panea study.}
-\item{frequency_BL_Panea_original}{Frequency of mutation as originally reported in Panea study.}
+\item{Gene}{Gene ID in Hugo format.}
+\item{Tier}{Tier of gene in this pathology.}
+\item{aSHM}{Whether this gene is associated with aSHM.}
+\item{QC}{QC of a particular gene.}
+\item{Mean.Variant.Quality}{Mean variant quality.}
+\item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+\item{PMID}{Pubmed ID to associated study.}
+\item{MutationEffect}{Annotates the effect of the gene mutation.}
+\item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
 }
 }
 }
@@ -27,6 +25,6 @@ A data frame withh 128 rows and 11 columns.
 lymphoma_genes_bl_v_latest
 }
 \description{
-Genes frequently associated with Burkitt Lymphome (BL). This is the most up-to-date version of this dataset.
+Genes frequently associated with Burkitt Lymphoma (BL). This is the most up-to-date version of this dataset.
 }
 \keyword{datasets}

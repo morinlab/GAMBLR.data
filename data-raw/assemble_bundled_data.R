@@ -28,6 +28,7 @@ pmids <- list(
     "Reddy_DLBCL" = 28985567,
     "Schmitz_DLBCL" = 29641966,
     "Chapuy_DLBCL" = 29713087,
+    "Chapuy_other" = 22343534,
     "Arthur_DLBCL" = 30275490,
     "Hilton_DLBCL" = 37319384
 )
@@ -233,9 +234,11 @@ reddy_meta_gambl$genome_build = "hg19-reddy"
 reddy_meta_gambl$pairing_status = "unmatched"
 
 #warning: this is very slow!
+all_cols_with_refseq <- c(names(GAMBLR.helpers:::maf_header[1:45]), "RefSeq")
 reddy_full_ssm <- get_ssm_by_samples(
-  these_samples_metadata = reddy_meta_gambl
-)
+  these_samples_metadata = reddy_meta_gambl,
+  basic_columns = FALSE
+) %>% select(all_of(all_cols_with_refseq))
 
 #restrict to the most inclusive DLBCL gene list
 all_lymphoma_genes = lymphoma_genes_comprehensive %>%
@@ -255,8 +258,9 @@ schmitz_data$meta <- get_gambl_metadata(seq_type_filter="capture") %>%
   )
 
 schmitz_data$full_ssm <- get_ssm_by_samples(
-  these_samples_metadata = schmitz_data$meta
-)
+  these_samples_metadata = schmitz_data$meta,
+  basic_columns = FALSE
+) %>% select(all_of(all_cols_with_refseq))
 
 schmitz_data$grch37$ssm_to_bundle <- dplyr::filter(
     schmitz_data$full_ssm,
@@ -276,8 +280,9 @@ chapuy_data$meta <- get_gambl_metadata(seq_type_filter="capture") %>%
   mutate(genetic_subgroup = lymphgen)
 
 chapuy_data$full_ssm <- get_ssm_by_samples(
-  these_samples_metadata = chapuy_data$meta
-)
+  these_samples_metadata = chapuy_data$meta,
+  basic_columns = FALSE
+) %>% select(all_of(all_cols_with_refseq))
 
 chapuy_data$grch37$ssm_to_bundle <- dplyr::filter(
     chapuy_data$full_ssm,
@@ -288,11 +293,31 @@ chapuy_data$meta <- chapuy_data$meta %>%
   select(all_of(colnames_for_bundled_meta)) %>%
   filter(!sample_id == "DLBCL-RICOVER_148-Tumor")
 
+# Importing DLBCL NCI/Golub data
+golub_data <- list()
+
+golub_data$meta <- get_gambl_metadata(seq_type_filter="capture") %>%
+  dplyr::filter(cohort == "NCI_DLBCL_Golub") %>%
+  mutate(reference_PMID = pmids$Chapuy_other) %>%
+  mutate(genetic_subgroup = lymphgen)
+
+golub_data$full_ssm <- get_ssm_by_samples(
+  these_samples_metadata = golub_data$meta,
+  basic_columns = FALSE
+) %>% select(all_of(all_cols_with_refseq))
+
+golub_data$grch37$ssm_to_bundle <- dplyr::filter(
+    golub_data$full_ssm,
+    Hugo_Symbol %in% all_lymphoma_genes
+)
+
+golub_data$meta <- golub_data$meta %>%
+  select(all_of(colnames_for_bundled_meta))
 
 # Importing DLBCL cell lines
 cell_lines_data <- list()
 
-cell_lines_data$meta <- get_gambl_metadata() %>%
+cell_lines_data$meta <- get_gambl_metadata(seq_type_filter = "genome") %>%
     filter(sample_id %in% c(
         "DOHH-2", "SU-DHL-10", "OCI-Ly10", "OCI-Ly3", "SU-DHL-4"
     )) %>%
@@ -316,13 +341,15 @@ cell_lines_data$meta_to_bundle <- data.frame(
 colnames(cell_lines_data$meta_to_bundle) <- colnames_for_bundled_meta
 
 cell_lines_data$grch37$ssm_to_bundle <- get_ssm_by_samples(
-    these_samples_metadata = cell_lines_data$meta
-)
+    these_samples_metadata = cell_lines_data$meta,
+    basic_columns = FALSE
+) %>% select(all_of(all_cols_with_refseq))
 
 cell_lines_data$hg38$ssm_to_bundle <- get_ssm_by_samples(
     these_samples_metadata = cell_lines_data$meta,
-    projection = "hg38"
-)
+    projection = "hg38",
+    basic_columns = FALSE
+) %>% select(all_of(all_cols_with_refseq))
 
 cell_lines_data$grch37$cnv_to_bundle <- get_sample_cn_segments(
     these_sample_ids = cell_lines_data$meta$sample_id
@@ -426,30 +453,8 @@ sample_data$meta = bind_rows(sample_data$meta,reddy_data$meta_to_bundle)
 sample_data$meta = bind_rows(
     sample_data$meta,
     schmitz_data$meta,
-    chapuy_data$meta
-)
-
-sample_data$grch37$maf <- bind_rows(
-    fl_data$ssm_to_bundle %>% mutate(
-        Pipeline = "Publication",
-        Study = "Dreval"
-    ),
-    cell_lines_data$grch37$ssm %>% mutate(
-        Pipeline = "SLMS-3",
-        Study = NA
-    ),
-    reddy_data$grch37$ssm_to_bundle %>% mutate(
-        Pipeline = "SLMS-3",
-        Study = "Reddy"
-    ),
-    schmitz_data$grch37$ssm_to_bundle %>% mutate(
-        Pipeline = "SLMS-3",
-        Study = "Schmitz"
-    ),
-    chapuy_data$grch37$ssm_to_bundle %>% mutate(
-        Pipeline = "SLMS-3",
-        Study = "Chapuy"
-    )
+    chapuy_data$meta,
+    golub_data$meta
 )
 
 sample_data$hg38$maf <- bind_rows(
@@ -537,36 +542,49 @@ coding_maf <- get_ssm_by_samples(
         all_of(selected_columns)
     )
 
-these_samples_capture <- sample_data$meta %>%
-    filter(cohort %in% c("dlbcl_reddy", "dlbcl_schmitz", "dlbcl_chapuy")) %>%
-    pull(sample_id)
+fl_data$ssm_to_bundle <- fl_data$ssm_to_bundle %>%
+    dplyr::left_join(
+        coding_maf
+    ) %>%
+    distinct()
 
-coding_maf_capture <- get_ssm_by_samples(
-    these_sample_ids = these_samples_capture,
-    this_seq_type = "capture",
-    basic_columns = FALSE) %>%
-    select(
-        all_of(selected_columns)
+sample_data$grch37$maf <- bind_rows(
+    fl_data$ssm_to_bundle %>% mutate(
+        Pipeline = "Publication",
+        Study = "Dreval"
+    ),
+    cell_lines_data$grch37$ssm %>% mutate(
+        Pipeline = "SLMS-3",
+        Study = NA
+    ),
+    reddy_data$grch37$ssm_to_bundle %>% mutate(
+        Pipeline = "SLMS-3",
+        Study = "Reddy"
+    ),
+    schmitz_data$grch37$ssm_to_bundle %>% mutate(
+        Pipeline = "SLMS-3",
+        Study = "Schmitz"
+    ),
+    chapuy_data$grch37$ssm_to_bundle %>% mutate(
+        Pipeline = "SLMS-3",
+        Study = "Chapuy"
+    ),
+    golub_data$grch37$ssm_to_bundle %>% mutate(
+        Pipeline = "SLMS-3",
+        Study = "NCI_Golub"
     )
-
-coding_maf <- bind_rows(
-    coding_maf,
-    coding_maf_capture)
-
-dim(GAMBLR.data::sample_data$grch37$maf)
-
-sample_data$grch37$maf <- sample_data$grch37$maf %>%
-left_join(coding_maf)
-
-dim(sample_data$grch37$maf)
+)
 
 
 # Add aSHM mutations for the already released samples
 grch37_ashm <- get_ssm_by_regions(
     regions_bed = grch37_ashm_regions,
     streamlined = FALSE,
-    basic_columns = TRUE
-)
+    basic_columns = FALSE
+) %>%
+    select(
+        any_of(c(colnames(sample_data$grch37$maf), "RefSeq"))
+    )
 grch37_ashm <- grch37_ashm %>%
     filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
 
@@ -589,8 +607,11 @@ hg38_ashm <- get_ssm_by_regions(
     regions_bed = hg38_ashm_regions,
     projection = "hg38",
     streamlined = FALSE,
-    basic_columns = TRUE
-)
+    basic_columns = FALSE
+) %>%
+    select(
+        any_of(c(colnames(sample_data$hg38$maf), "RefSeq"))
+    )
 hg38_ashm <- hg38_ashm %>%
     filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
 
@@ -791,7 +812,7 @@ sample_data$hg38$maf <- bind_rows(
 trios_ashm_grch37 <- get_ssm_by_regions(
     regions_bed = grch37_ashm_regions,
     streamlined = FALSE,
-    basic_columns = TRUE
+    basic_columns = FALSE
 )
 trios_ashm_grch37 <- trios_ashm_grch37 %>%
     filter(Tumor_Sample_Barcode %in% trios_meta$Tumor_Sample_Barcode)
@@ -800,7 +821,8 @@ trios_ashm_grch37 <- trios_ashm_grch37 %>%
     mutate(
         Pipeline = "SLMS-3",
         Study = "Hilton"
-    )
+    ) %>%
+    select(all_of(colnames(sample_data$grch37$maf)))
 
 
 sample_data$grch37$ashm <- bind_rows(
@@ -813,7 +835,7 @@ trios_ashm_hg38 <- get_ssm_by_regions(
     regions_bed = hg38_ashm_regions,
     projection = "hg38",
     streamlined = FALSE,
-    basic_columns = TRUE
+    basic_columns = FALSE
 )
 trios_ashm_hg38 <- trios_ashm_hg38 %>%
     filter(Tumor_Sample_Barcode %in% trios_meta$Tumor_Sample_Barcode)
@@ -822,7 +844,8 @@ trios_ashm_hg38 <- trios_ashm_hg38 %>%
     mutate(
         Pipeline = "SLMS-3",
         Study = "Hilton"
-    )
+    ) %>%
+    select(all_of(colnames(sample_data$hg38$maf)))
 
 sample_data$hg38$ashm <- bind_rows(
     sample_data$hg38$ashm,
@@ -831,9 +854,25 @@ sample_data$hg38$ashm <- bind_rows(
 
 setwd("~/my_dir/repos/GAMBLR.data/")
 
+# Add data from Reddy paper
+reddy_original_maf <- read_tsv(
+    "inst/extdata/studies/reddy_original_variants_with_VAF.maf.gz"
+) %>%
+select(any_of(colnames(sample_data$grch37$maf)))
+
+sample_data$grch37$maf <- bind_rows(
+    sample_data$grch37$maf,
+    reddy_original_maf %>%
+        mutate(
+            Pipeline = "Publication",
+            Study = "Reddy"
+        )
+)
+
 usethis::use_data(
     sample_data,
-    overwrite = TRUE
+    overwrite = TRUE,
+    compress = "xz"
 )
 
 library(data.tree)

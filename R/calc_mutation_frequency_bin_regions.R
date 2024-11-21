@@ -41,8 +41,7 @@
 #' 
 #' @return A table of mutation counts for sliding windows across one or more regions. May be long or wide.
 #'
-#' @rawNamespace import(data.table, except = c("last", "first", "between", "transpose"))
-#' @import dplyr tidyr tibble parallel
+#' @import dplyr tidyr tibble
 #' @export
 #'
 #' @examples
@@ -89,8 +88,8 @@ calc_mutation_frequency_bin_regions <- function(regions_list = NULL,
   regions <- regions$regions_list
   
   if (
-    (str_detect(regions_bed$chrom[1], "chr") & projection == "grch37") |
-    (!str_detect(regions_bed$chrom[1], "chr") & projection == "hg38")
+    (grepl("chr", regions_bed$chrom[1]) & projection == "grch37") |
+    (!grepl("chr", regions_bed$chrom[1]) & projection == "hg38")
   ) {
     stop("chr prefixing status of provided regions and specified projection don't match. ")
   }
@@ -104,7 +103,7 @@ calc_mutation_frequency_bin_regions <- function(regions_list = NULL,
   these_sample_ids <- metadata$sample_id
   
   # Obtain sliding window mutation frequencies for all regions
-  dfs <- parallel::mclapply(names(regions), function(x) {
+  dfs <- mclapply(names(regions), function(x) {
     df <- calc_mutation_frequency_bin_region(
       region = regions[x],
       these_samples_metadata = metadata,
