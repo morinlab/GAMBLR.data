@@ -871,7 +871,8 @@ sample_data$grch37$maf <- bind_rows(
 
 usethis::use_data(
     sample_data,
-    overwrite = TRUE
+    overwrite = TRUE,
+    compress = "xz"
 )
 
 library(data.tree)
