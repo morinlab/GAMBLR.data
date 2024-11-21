@@ -42,6 +42,11 @@
 #' @param verbose Set to FALSE to minimize the output to console. Default is
 #'      TRUE. This parameter also dictates the verbosity of any helper function
 #'      internally called inside the main function.
+#' @param tool_name Optionally specify which tool to report variant from. The
+#'      default is slms-3, also supports "publication" to return the exact
+#'      variants as reported in the original papers.
+#' @param this_study Optionally specify first name of the author for the paper
+#'      from which the variants should be returned for.
 #' @param ... Any additional parameters.
 #'
 #' @return data frame
@@ -77,6 +82,8 @@ get_coding_ssm = function(
     force_unmatched_samples,
     projection = "grch37",
     this_seq_type = "genome",
+    tool_name = "slms-3",
+    this_study,
     basic_columns = TRUE,
     maf_cols = NULL,
     min_read_support = 3,
@@ -124,7 +131,14 @@ get_coding_ssm = function(
 
     #return SSMs based on the selected projection
     muts = GAMBLR.data::sample_data[[projection]]$maf %>% 
-        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids)
+        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+        dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
+    
+    # Optionally return variants from a particular study
+    if(!missing(this_study)){
+        sample_ssm <- sample_ssm %>%
+            dplyr::filter((!!sym("Study")) == this_study)
+    }
 
     if(!include_silent){
         coding_class = coding_class[coding_class != "Silent"]
