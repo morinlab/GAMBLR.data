@@ -203,6 +203,7 @@ cool_overlaps <- function(
         data1 <- data1 %>%
             tidyr::unite("row_id", 1:ncol(data1), remove = FALSE)
 
+        colnames(overlap) <- gsub("\\.x$", "", colnames(overlap))
         overlap <- overlap %>%
             tidyr::unite("row_id", 1:(ncol(data1)-1), remove = FALSE) %>%
             dplyr::arrange(match(row_id, data1$row_id)) %>%
