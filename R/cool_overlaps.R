@@ -113,11 +113,13 @@ cool_overlaps <- function(
 
     # When the same columns are provided they will become .x and .y
     if(start1 == start2) {
+        original_start1 <- start1
         start1 <- paste0(start1, ".x")
         start2 <- paste0(start2, ".y")
 
     }
     if(end1 == end2) {
+        original_end1 <- end1
         end1 <- paste0(end1, ".x")
         end2 <- paste0(end2, ".y")
 
@@ -193,6 +195,20 @@ cool_overlaps <- function(
                 overlap
             )
         )
+        if(original_start1 %in% colnames(no_annotation)){
+            colnames(no_annotation) = gsub(
+                original_start1,
+                start1,
+                colnames(no_annotation)
+            )
+        }
+        if(original_end1 %in% colnames(no_annotation)){
+            colnames(no_annotation) = gsub(
+                original_end1,
+                end1,
+                colnames(no_annotation)
+            )
+        }
         overlap <- bind_rows(
             overlap,
             no_annotation
