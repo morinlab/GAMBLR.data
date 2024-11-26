@@ -9,7 +9,8 @@ cool_overlaps(
   data2,
   columns1 = c("Chromosome", "Start_Position", "End_Position"),
   columns2 = c("Chromosome", "Start_Position", "End_Position"),
-  type = "any"
+  type = "any",
+  nomatch = FALSE
 )
 }
 \arguments{
@@ -29,6 +30,11 @@ overlapping regions.}
 \item{type}{Character specifying the way to find overlaps. Accepted values
 are "any" (used as default), "start", "end", "within", and "equal".
 Please see function description for more details of different types.}
+
+\item{nomatch}{Whether the rows from data1 that do not have overlap in data2
+should be returned or not. The default is FALSE (rows without overlap
+are not returned). If TRUE is specified, the row order in the output
+data will match the exact order of rows in the input data1.}
 }
 \value{
 data frame

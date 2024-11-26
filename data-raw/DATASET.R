@@ -509,3 +509,20 @@ protein_domains <- system.file(
     ) %>%
     read_tsv()
 usethis::use_data(protein_domains, overwrite = TRUE)
+
+# Cytobands
+cytobands_grch37 <- system.file(
+        "extdata",
+        "cytobands_grch37.tsv",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv()
+usethis::use_data(cytobands_grch37, overwrite = TRUE)
+
+cytobands_hg38 <- system.file(
+        "extdata",
+        "cytobands_hg38.tsv",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv()
+usethis::use_data(cytobands_hg38, overwrite = TRUE)

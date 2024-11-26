@@ -980,3 +980,33 @@
 #'   \item{Description}{NA.}
 #' }
 "protein_domains"
+
+#' Cytobands coordinates (grch37)
+#'
+#' A data frame in bed format with coordinates of cytobands relative to grch37.
+#'
+#' @format ## `cytobands_grch37`
+#' A data frame with 862 rows and 5 columns
+#' \describe{
+#'   \item{cb.chromosome}{Chromosome of the cytoband.}
+#'   \item{cb.start}{Start position of the cytoband.}
+#'   \item{cb.end}{End position of the cytoband.}
+#'   \item{cb.name}{Cytoband name.}
+#'   \item{label}{Cytoband label.}
+#' }
+"cytobands_grch37"
+
+#' Cytobands coordinates (hg38)
+#'
+#' A data frame in bed format with coordinates of cytobands relative to hg38.
+#'
+#' @format ## `cytobands_hg38`
+#' A data frame with 862 rows and 5 columns
+#' \describe{
+#'   \item{cb.chromosome}{Chromosome of the cytoband.}
+#'   \item{cb.start}{Start position of the cytoband.}
+#'   \item{cb.end}{End position of the cytoband.}
+#'   \item{cb.name}{Cytoband name.}
+#'   \item{label}{Cytoband label.}
+#' }
+"cytobands_hg38"
