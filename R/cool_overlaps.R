@@ -35,6 +35,10 @@
 #' @param type Character specifying the way to find overlaps. Accepted values
 #'      are "any" (used as default), "start", "end", "within", and "equal".
 #'      Please see function description for more details of different types.
+#' @param nomatch Whether the rows from data1 that do not have overlap in data2
+#'      should be returned or not. The default is FALSE (rows without overlap
+#'      are not returned). If TRUE is specified, the row order in the output
+#'      data will match the exact order of rows in the input data1.
 #'
 #' @return data frame
 #'
@@ -70,7 +74,7 @@
 #'     columns2 = c("chrom", "start", "end")
 #' )
 #'
-#' @import dplyr
+#' @import dplyr tidyr
 #' @export
 #'
 cool_overlaps <- function(
@@ -78,7 +82,8 @@ cool_overlaps <- function(
     data2,
     columns1 = c("Chromosome", "Start_Position", "End_Position"),
     columns2 = c("Chromosome", "Start_Position", "End_Position"),
-    type = "any"
+    type = "any",
+    nomatch = FALSE
 ){
 
     # Ensure all columns provided for overlap are present in the data frame
@@ -107,6 +112,8 @@ cool_overlaps <- function(
     columns2 <- columns2[!columns2 %in% c(start2, end2)]
 
     # When the same columns are provided they will become .x and .y
+    original_start1 <- start1
+    original_end1 <- end1
     if(start1 == start2) {
         start1 <- paste0(start1, ".x")
         start2 <- paste0(start2, ".y")
@@ -177,6 +184,47 @@ cool_overlaps <- function(
         stop(
             "Please supply one of any, start, end, within, or equal with type."
         )
+    }
+
+    # This will ensure that features from data1 that don't have match in data2
+    # will be returned with NA annotation
+    if(nomatch){
+        no_annotation <- suppressMessages(
+            anti_join(
+                data1,
+                overlap
+            )
+        )
+        if(original_start1 %in% colnames(no_annotation)){
+            colnames(no_annotation) = gsub(
+                original_start1,
+                start1,
+                colnames(no_annotation)
+            )
+        }
+        if(original_end1 %in% colnames(no_annotation)){
+            colnames(no_annotation) = gsub(
+                original_end1,
+                end1,
+                colnames(no_annotation)
+            )
+        }
+        overlap <- bind_rows(
+            overlap,
+            no_annotation
+        )
+
+        # Ensure order is consistent between input data and the output after
+        # overlap is found since we used bind_rows
+        data1 <- data1 %>%
+            tidyr::unite("row_id", 1:ncol(data1), remove = FALSE)
+
+        colnames(overlap) <- gsub("\\.x$", "", colnames(overlap))
+        overlap <- overlap %>%
+            tidyr::unite("row_id", 1:(ncol(data1)-1), remove = FALSE) %>%
+            dplyr::arrange(match(row_id, data1$row_id)) %>%
+            dplyr::select(-row_id)
+
     }
 
     return(overlap)

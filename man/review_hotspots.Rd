@@ -6,7 +6,8 @@
 \usage{
 review_hotspots(
   annotated_maf,
-  genes_of_interest = c("FOXO1", "MYD88", "CREBBP", "NOTCH1", "NOTCH2", "CD79B", "EZH2"),
+  genes_of_interest = c("FOXO1", "MYD88", "CREBBP", "NOTCH1", "NOTCH2", "CD79B",
+    "EZH2"),
   genome_build = "grch37"
 )
 }

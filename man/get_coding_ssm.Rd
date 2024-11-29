@@ -14,6 +14,8 @@ get_coding_ssm(
   force_unmatched_samples,
   projection = "grch37",
   this_seq_type = "genome",
+  tool_name = "slms-3",
+  this_study,
   basic_columns = TRUE,
   maf_cols = NULL,
   min_read_support = 3,
@@ -23,48 +25,75 @@ get_coding_ssm(
 )
 }
 \arguments{
-\item{limit_cohort}{Optional, supply this to restrict mutations to one or more cohorts in a vector.}
+\item{limit_cohort}{Optional, supply this to restrict mutations to one or
+more cohorts in a vector.}
 
-\item{exclude_cohort}{Optional, supply this to exclude mutations from one or more cohorts in a vector.}
+\item{exclude_cohort}{Optional, supply this to exclude mutations from one or
+more cohorts in a vector.}
 
-\item{limit_pathology}{Optional, supply this to restrict mutations to one pathology.}
+\item{limit_pathology}{Optional, supply this to restrict mutations to one
+pathology.}
 
-\item{limit_samples}{Optional, supply this to restrict mutations to a vector of sample_id (instead of sub-setting using the provided metadata).}
+\item{limit_samples}{Optional, supply this to restrict mutations to a vector
+of sample_id (instead of sub-setting using the provided metadata).}
 
-\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
+\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single
+sample ID as a string) that you want results for.}
 
-\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
-If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
+\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in
+a column) to subset the return to. If not provided (and if
+\code{these_sample_ids} is not provided), the function will return all
+samples from the specified seq_type in the metadata.}
 
-\item{force_unmatched_samples}{Optional argument for forcing unmatched samples, using \link{get_ssm_by_samples}.}
+\item{force_unmatched_samples}{Optional argument for forcing unmatched
+samples, using \link{get_ssm_by_samples}.}
 
-\item{projection}{Reference genome build for the coordinates in the MAF file. The default is grch37.}
+\item{projection}{Reference genome build for the coordinates in the MAF file.
+The default is grch37.}
 
 \item{this_seq_type}{The this_seq_type you want back, default is genome.}
 
-\item{basic_columns}{Set to FALSE to override the default behavior of returning only the first 45 columns of MAF data.}
+\item{tool_name}{Optionally specify which tool to report variant from. The
+default is slms-3, also supports "publication" to return the exact
+variants as reported in the original papers.}
 
-\item{maf_cols}{if \code{basic_columns} is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).}
+\item{this_study}{Optionally specify first name of the author for the paper
+from which the variants should be returned for.}
 
-\item{min_read_support}{Only returns variants with at least this many reads in t_alt_count.}
+\item{basic_columns}{Set to FALSE to override the default behavior of
+returning only the first 45 columns of MAF data.}
 
-\item{include_silent}{Logical parameter indicating whether to include silent mutations into coding mutations. Default is TRUE.}
+\item{maf_cols}{if \code{basic_columns} is set to FALSE, the user can specify what
+columns to be returned within the MAF. This parameter can either be a
+vector of indexes (integer) or a vector of characters (matching columns
+in MAF).}
 
-\item{verbose}{Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.}
+\item{min_read_support}{Only returns variants with at least this many reads
+in t_alt_count.}
+
+\item{include_silent}{Logical parameter indicating whether to include silent
+mutations into coding mutations. Default is TRUE.}
+
+\item{verbose}{Set to FALSE to minimize the output to console. Default is
+TRUE. This parameter also dictates the verbosity of any helper function
+internally called inside the main function.}
 
 \item{...}{Any additional parameters.}
 }
 \value{
-A data frame (.maf) with coding SSMs in reference to the selected projection.
+data frame
 }
 \description{
-Convenience function for loading coding Simple Somatic Mutations (SSM) from the bundled data \link{sample_data}.
+Convenience function for loading coding Simple Somatic Mutations
+(SSM) from the bundled data \link{sample_data}.
 }
 \details{
-This "bare bones" function was developed to retrieve coding SSM calls for non-GSC-users.
-Effectively retrieve coding SSM calls. Multiple filtering parameters are available for this function.
-For more information on how to implement the filtering parameters, refer to the parameter descriptions as well as examples in the vignettes.
-This function depends on the bundled sample data in this package.
+This "bare bones" function was developed to retrieve coding SSM
+calls for non-GSC-users. Effectively retrieve coding SSM calls. Multiple
+filtering parameters are available for this function. For more
+information on how to implement the filtering parameters, refer to the
+parameter descriptions as well as examples in the vignettes. This
+function depends on the bundled sample data in this package.
 }
 \examples{
 #load pacakges
@@ -74,11 +103,13 @@ library(dplyr)
 ssm_grch37 = get_coding_ssm(this_seq_type = "genome")
 
 #return SSMs in reference to hg38:
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\% 
+cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
   dplyr::filter(cohort == "DLBCL_cell_lines")
 
-ssm_hg38 = get_coding_ssm(projection = "hg38", 
-                          these_samples_metadata = cell_line_meta, 
-                          this_seq_type = "genome")
+ssm_hg38 = get_coding_ssm(
+     projection = "hg38",
+     these_samples_metadata = cell_line_meta,
+     this_seq_type = "genome"
+)
 
 }
