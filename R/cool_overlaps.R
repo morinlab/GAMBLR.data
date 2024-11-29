@@ -112,14 +112,14 @@ cool_overlaps <- function(
     columns2 <- columns2[!columns2 %in% c(start2, end2)]
 
     # When the same columns are provided they will become .x and .y
+    original_start1 <- start1
+    original_end1 <- end1
     if(start1 == start2) {
-        original_start1 <- start1
         start1 <- paste0(start1, ".x")
         start2 <- paste0(start2, ".y")
 
     }
     if(end1 == end2) {
-        original_end1 <- end1
         end1 <- paste0(end1, ".x")
         end2 <- paste0(end2, ".y")
 
