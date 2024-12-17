@@ -526,3 +526,12 @@ cytobands_hg38 <- system.file(
     ) %>%
     read_tsv()
 usethis::use_data(cytobands_hg38, overwrite = TRUE)
+
+# DLBCL90 genes
+dlbcl90_genes <- system.file(
+        "extdata",
+        "DLBCL90.txt",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv()
+usethis::use_data(dlbcl90_genes, overwrite = TRUE)

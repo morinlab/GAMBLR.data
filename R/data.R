@@ -1010,3 +1010,19 @@
 #'   \item{label}{Cytoband label.}
 #' }
 "cytobands_hg38"
+
+#' DLBCL90 genes
+#'
+#' A data frame with genes and their weights for DLBCL90.
+#'
+#' @format ## `dlbcl90_genes`
+#' A data frame with 88 rows and 6 columns
+#' \describe{
+#'   \item{Gene.symbol}{Human-readable gene symbol matching the symbols used for the DLBCL90 code set design.}
+#'   \item{coef}{Relative weight of the gene in DLBCL90 classification.}
+#'   \item{Assay}{Name of the assay.}
+#'   \item{ensembl_gene_id}{ENSEMBL gene id.}
+#'   \item{gene_id}{ENSEMBL gene id with version.}
+#'   \item{hgnc_symbol}{Human-readable gene symbol matching Gencode 33.}
+#' }
+"dlbcl90_genes"
