@@ -1016,7 +1016,7 @@
 #' A data frame with genes and their weights for DLBCL90.
 #'
 #' @format ## `dlbcl90_genes`
-#' A data frame with 73 rows and 6 columns
+#' A data frame with 88 rows and 6 columns
 #' \describe{
 #'   \item{Gene.symbol}{Human-readable gene symbol matching the symbols used for the DLBCL90 code set design.}
 #'   \item{coef}{Relative weight of the gene in DLBCL90 classification.}
