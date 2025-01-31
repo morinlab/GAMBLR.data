@@ -5,65 +5,38 @@
 \title{Get CN Segments.}
 \usage{
 get_cn_segments(
-  these_sample_ids = NULL,
-  these_samples_metadata = NULL,
-  region,
-  chromosome,
-  qstart,
-  qend,
+  these_samples_metadata,
   projection = "grch37",
-  this_seq_type = "genome",
-  with_chr_prefix = FALSE,
-  streamlined = FALSE,
+  this_seq_type,
   ...
 )
 }
 \arguments{
-\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
+\item{these_samples_metadata}{User must provide a metadata table to restrict the data to the samples in your table.
+The metadata also ensures the proper handling of duplicate sample_id across seq_types and ensures the
+seq_type in the metadata faithfully represents the seq_type of the data}
 
-\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
-If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
+\item{projection}{Desired genome coordinate system for returned CN segments. Default is "grch37".}
 
-\item{region}{Region formatted like chrX:1234-5678 or X:1234-56789.}
-
-\item{chromosome}{The chromosome you are restricting to. Required parameter if region is not specified.}
-
-\item{qstart}{Start coordinate of the range you are restricting to. Required parameter if region is not specified.}
-
-\item{qend}{End coordinate of the range you are restricting to. Required parameter if region is not specified.}
-
-\item{projection}{Selected genome projection for returned CN segments. Default is "grch37".}
-
-\item{this_seq_type}{Seq type for returned CN segments. Default is genome.}
-
-\item{with_chr_prefix}{Boolean parameter for toggling if chr prefixes should be present in the return, default is FALSE.}
-
-\item{streamlined}{Return a basic rather than full MAF format. Default is FALSE.}
-
-\item{...}{Any additional parameters.}
+\item{this_seq_type}{Deprecated.}
 }
 \value{
 A data frame with CN segments for the specified region.
 }
 \description{
-Retrieve all copy number segments from the GAMBL database that overlap with a single genomic coordinate range.
+Retrieve all copy number segments from the GAMBL outputs
 }
 \details{
-This function returns CN segments for s specified region.
-There are multiple ways a region can be specified.
-For example, the user can provide the full region in a "region" format (chr:start-end) to the \code{region} parameter.
-Or, the user can provide chromosome, start and end coordinates individually with \code{chr}, \code{qstart}, and \code{qend} parameters.
-For more usage examples, refer to the parameter descriptions and examples in the vignettes.
+This function merely loads and returns all the seg_data available for a projection (genome build)
 }
 \examples{
-#Example using chromosome, qstart and qend parameters:
-segments_region_grch37 = get_cn_segments(chromosome = "chr8",
-                                         qstart = 128723128,
-                                         qend = 128774067)
+# Example for the capture samples:
 
-#Example using the regions parameter:
-segments_region_hg38 = get_cn_segments(region = "chr8:128,723,128-128,774,067",
-                                       projection = "hg38",
-                                       with_chr_prefix = TRUE)
+genome_metadata = GAMBLR.data::get_gambl_metadata(seq_type_filter="genome") 
+                      
+genome_segments_hg38 = get_cn_segments(
+                             these_samples_metadata = genome_metadata,
+                             projection="hg38")
+
 
 }

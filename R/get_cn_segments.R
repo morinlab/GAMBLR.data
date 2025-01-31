@@ -1,55 +1,45 @@
+## GAMBLR.data
+
+# Constructor function for segmented data
+#' @export
+create_seg_data <- function(seg_df, genome_build) {
+  if (!inherits(seg_df, "data.frame")) stop("data must be a data frame")
+  if (!genome_build %in% c("grch37", "hg38")) stop("Invalid genome build")
+  
+  structure(seg_df, 
+            class = c("seg_data", class(seg_df)), 
+            genome_build = genome_build)
+}
+
 #' @title Get CN Segments.
 #'
-#' @description Retrieve all copy number segments from the GAMBL database that overlap with a single genomic coordinate range.
+#' @description Retrieve all copy number segments from the GAMBL outputs
 #'
-#' @details This function returns CN segments for s specified region.
-#' There are multiple ways a region can be specified.
-#' For example, the user can provide the full region in a "region" format (chr:start-end) to the `region` parameter.
-#' Or, the user can provide chromosome, start and end coordinates individually with `chr`, `qstart`, and `qend` parameters.
-#' For more usage examples, refer to the parameter descriptions and examples in the vignettes.
-#'
-#' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
-#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to.
-#' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
-#' @param region Region formatted like chrX:1234-5678 or X:1234-56789.
-#' @param chromosome The chromosome you are restricting to. Required parameter if region is not specified.
-#' @param qstart Start coordinate of the range you are restricting to. Required parameter if region is not specified.
-#' @param qend End coordinate of the range you are restricting to. Required parameter if region is not specified.
-#' @param projection Selected genome projection for returned CN segments. Default is "grch37".
-#' @param this_seq_type Seq type for returned CN segments. Default is genome.
-#' @param with_chr_prefix Boolean parameter for toggling if chr prefixes should be present in the return, default is FALSE.
-#' @param streamlined Return a basic rather than full MAF format. Default is FALSE.
-#' @param ... Any additional parameters.
+#' @details This function merely loads and returns all the seg_data available for a projection (genome build)
+#' @param these_samples_metadata User must provide a metadata table to restrict the data to the samples in your table. 
+#' The metadata also ensures the proper handling of duplicate sample_id across seq_types and ensures the 
+#' seq_type in the metadata faithfully represents the seq_type of the data
+#' @param projection Desired genome coordinate system for returned CN segments. Default is "grch37".
+#' @param this_seq_type Deprecated.
 #'
 #' @return A data frame with CN segments for the specified region.
 #'
-#' @import dplyr
-#'
+#' @import dplyr readr glue GAMBLR.helpers
 #' @export
 #'
 #' @examples
-#' #Example using chromosome, qstart and qend parameters:
-#' segments_region_grch37 = get_cn_segments(chromosome = "chr8",
-#'                                          qstart = 128723128,
-#'                                          qend = 128774067)
+#' # Example for the capture samples:
+#' 
+#' genome_metadata = GAMBLR.data::get_gambl_metadata(seq_type_filter="genome") 
+#'                       
+#' genome_segments_hg38 = get_cn_segments(
+#'                              these_samples_metadata = genome_metadata,
+#'                              projection="hg38")
 #'
-#' #Example using the regions parameter:
-#' segments_region_hg38 = get_cn_segments(region = "chr8:128,723,128-128,774,067",
-#'                                        projection = "hg38",
-#'                                        with_chr_prefix = TRUE)
 #'
-get_cn_segments = function(these_sample_ids = NULL,
-                           these_samples_metadata = NULL,
-                           region,
-                           chromosome,
-                           qstart,
-                           qend,
+get_cn_segments = function(these_samples_metadata,
                            projection = "grch37",
-                           this_seq_type = "genome",
-                           with_chr_prefix = FALSE,
-                           streamlined = FALSE,
-                           ...){
-
+                           this_seq_type,...){
   #warn/notify the user what version of this function they are using
   message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
 
@@ -59,13 +49,9 @@ get_cn_segments = function(these_sample_ids = NULL,
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
 
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     this_seq_type = this_seq_type)
+  metadata = these_samples_metadata
 
   sample_ids = metadata$sample_id
-
   #return CN segments based on the selected projection
   if(projection %in% valid_projections){
     all_segs = GAMBLR.data::sample_data[[projection]]$seg %>%
@@ -75,48 +61,8 @@ get_cn_segments = function(these_sample_ids = NULL,
                paste(valid_projections,collapse=", ")))
   }
 
-  #perform wrangling on the region to have it in the correct format.
-  if(!missing(region)){
-    if(length(region) > 1){
-      stop("You are providing more than one region...")
-    }
-    region = gsub(",", "", region)
-    split_chunks = unlist(strsplit(region, ":"))
-    chromosome = split_chunks[1]
-    startend = unlist(strsplit(split_chunks[2], "-"))
-    qstart = startend[1]
-    qend = startend[2]
-  }else{
-    if(missing(chromosome)){
-      stop("You have not provided a region, or a region in an acceptable format..")
-    }else{
-      if(length(chromosome) > 1){
-        stop("You are providing more than one region...")
-      }
-    }
-  }
-
-  #deal with chr prefixes for region, based on selected genome projection.
-  if(projection == "grch37"){
-    if(all(grepl("chr", chromosome))){
-      chromosome = gsub("chr", "", chromosome)
-    }
-  }else{
-    if(all(!grepl("chr", chromosome))){
-      chromosome = paste0("chr", chromosome)
-    }
-  }
-
-  #enforce data type for qend and qstart coordiantes.
-  qstart = as.numeric(qstart)
-  qend = as.numeric(qend)
-
-  all_segs = all_segs %>%
-    dplyr::filter((chrom == chromosome & start <= qstart & end >= qend) | (chrom == chromosome & start >= qstart & end <= qend)) %>%
-    as.data.frame()
-
-  #deal with chr prefixes
-  if(!with_chr_prefix){
+  #ensure chr prefixes are there when necessary 
+  if(projection=="grch37"){
     if(all(str_detect(all_segs$chrom, "chr"))){
       all_segs = all_segs %>%
         dplyr::mutate(chrom = gsub("chr", "", chrom))
@@ -128,11 +74,7 @@ get_cn_segments = function(these_sample_ids = NULL,
     }
   }
 
-  #subset to only a few columns with streamlined = TRUE.
-  if(streamlined){
-    all_segs = dplyr::select(all_segs, ID, CN)
-  }
-
-  #return data frame with CN segments
+  #return S3 class with CN segments and genome_build 
+  all_segs = create_seg_data(all_segs,projection)
   return(all_segs)
 }
