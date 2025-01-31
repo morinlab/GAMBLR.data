@@ -17,7 +17,7 @@ get_ssm_by_regions(
   use_name_column = FALSE,
   projection = "grch37",
   verbose = FALSE,
-  engine = "default",
+  engine = "overlaps",
   ...
 )
 }
@@ -35,9 +35,6 @@ If not provided (and if \code{these_sample_ids} is not provided), the function w
 
 \item{mode}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
-\item{this_study}{Optionally specify first name of the author for the paper
-from which the variants should be returned for.}
-
 \item{regions_list}{A vector of regions in the chr:start-end format to restrict the returned SSM calls to.}
 
 \item{regions_bed}{A data frame in BED format with the coordinates you want to retrieve (recommended).
@@ -53,8 +50,8 @@ This parameter can also accept an additional column with region names that will 
 This parameter also dictates the verbosity of any helper function internally called inside the main function.}
 
 \item{engine}{String indicating which approach to use. Accepted values are
-"default" (legacy behaviour with for loop for each region) and
-"overlaps" (more efficient approach using overlaps).}
+"legacy" (legacy behaviour) and
+"overlaps" (more efficient approach using cool_overlaps).}
 
 \item{...}{Any additional parameters.}
 }
@@ -72,8 +69,8 @@ This function internally calls get_ssm_by_region to retrieve SSM calls for the s
 regions_bed = dplyr::mutate(GAMBLR.data::grch37_ashm_regions,
   name = paste(gene, region, sep = "_"))
 
-ashm_basic_details = get_ssm_by_regions(regions_bed = regions_bed,
-                                        streamlined = FALSE,
-                                        use_name_column = TRUE)
+# get a full MAF-format data frame for all aSHM regions on grch37 coordinates
+ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
+                                        streamlined = FALSE)
 
 }

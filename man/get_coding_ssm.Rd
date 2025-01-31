@@ -66,12 +66,14 @@ parameter descriptions as well as examples in the vignettes. This
 function depends on the bundled sample data in this package.
 }
 \examples{
-#load pacakges
-library(dplyr)
- #mutations from exome data originally aligned to grch37
+
+ # Get mutations from exome data originally aligned to grch37
 ssm_exomes_grch37 = get_coding_ssm(projection = "grch37",this_seq_type = "capture")
 
-#mutations from genome data, hg38 build
+# Get mutations from genome data, hg38 build
 ssm_genomes_hg38 = get_coding_ssm(projection = "hg38",this_seq_type = "genome")
+
+
+
 
 }
