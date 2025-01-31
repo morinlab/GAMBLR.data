@@ -12,8 +12,6 @@
 #' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
 #' @param this_seq_type The this_seq_type you want back, default is genome.
 #' @param mode Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
-#' @param this_study Optionally specify first name of the author for the paper
-#'      from which the variants should be returned for.
 #' @param regions_list A vector of regions in the chr:start-end format to restrict the returned SSM calls to.
 #' @param regions_bed A data frame in BED format with the coordinates you want to retrieve (recommended).
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE`
@@ -23,8 +21,8 @@
 #' @param verbose Set to TRUE to maximize the output to console. Default is TRUE.
 #' This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param engine String indicating which approach to use. Accepted values are
-#'      "default" (legacy behaviour with for loop for each region) and
-#'      "overlaps" (more efficient approach using overlaps).
+#'      "legacy" (legacy behaviour) and
+#'      "overlaps" (more efficient approach using cool_overlaps).
 #' @param ... Any additional parameters.
 #'
 #' @return Returns a data frame of variants in MAF-like format.
@@ -38,9 +36,9 @@
 #' regions_bed = dplyr::mutate(GAMBLR.data::grch37_ashm_regions,
 #'   name = paste(gene, region, sep = "_"))
 #'
-#' ashm_basic_details = get_ssm_by_regions(regions_bed = regions_bed,
-#'                                         streamlined = FALSE,
-#'                                         use_name_column = TRUE)
+#' # get a full MAF-format data frame for all aSHM regions on grch37 coordinates
+#' ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
+#'                                         streamlined = FALSE)
 #'
 get_ssm_by_regions = function(these_sample_ids = NULL,
                               these_samples_metadata = NULL,
@@ -54,7 +52,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                               use_name_column = FALSE,
                               projection = "grch37",
                               verbose = FALSE,
-                              engine = "default",
+                              engine = "overlaps",
                               ...){
 
   # check provided projection
@@ -107,11 +105,11 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
   #    and no need to handle the this_study parameter explicitly.
   # 2a. Check which engine is specified and handle maf_data accordingly
   
-  if(missing(maf_data)){
+  if(missing(maf_data)){ #Missing maf data
     #warn/notify the user what version of this function they are using
     message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
 
-    if(missing(this_study)){
+    if(missing(this_study)){ ### study not provided
         if(engine == "overlaps"){
             if(verbose){
                 print("Using the non-default engine for efficiency...")
@@ -142,7 +140,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
             dplyr::rename_with(~ gsub(".x", "", .x, fixed = TRUE)) %>%
             dplyr::select(all_of(c(names(sample_maf), "region"))) %>%
             dplyr::group_split(region)
-        } else {
+        } else { #legacy
             region_mafs = lapply(
                 regions, function(x){
                     get_ssm_by_region(
@@ -158,7 +156,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
                 }
             )
         }
-    }else{
+    }else{ #Study was provided (This next block of code is redundant)
         if(engine == "overlaps"){
             if(verbose){
                 print("Using the non-default engine for efficiency...")
@@ -192,7 +190,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
             dplyr::select(all_of(c(names(sample_maf), "region"))) %>%
             dplyr::group_split(region)
 
-        } else {
+        } else { #legacy
             region_mafs = lapply(
                 regions, function(x){
                     get_ssm_by_region(
@@ -210,7 +208,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
             )
         }
     }
-  }else{
+  }else{ #end missing MAF data
     if(engine == "overlaps"){
       if(verbose){
         print("Using the non-default engine for efficiency...")
@@ -235,7 +233,7 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
         dplyr::rename_with(~ gsub(".x", "", .x, fixed = TRUE)) %>%
             dplyr::select(all_of(c(names(sample_maf), "region"))) %>%
             dplyr::group_split(region)
-    }else{
+    }else{ #legacy
       region_mafs = lapply(regions, function(x){get_ssm_by_region(region = x,
                                                                     maf_data = maf_data,
                                                                     these_samples_metadata = metadata,
@@ -256,7 +254,9 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
       rn = regions_bed[["name"]]
     }
   }
-
+  if(!streamlined){
+    return(bind_rows(region_mafs))
+  }
   #add the region name to the to-be-returned maf
   tibbled_data = tibble(region_mafs, region_name = rn)
 
@@ -264,11 +264,8 @@ get_ssm_by_regions = function(these_sample_ids = NULL,
   unnested_df = tibbled_data %>%
     unnest_longer(region_mafs)
 
-  if(streamlined){
-    unlisted_df = mutate(unnested_df, start = region_mafs$Start_Position, sample_id = region_mafs$Tumor_Sample_Barcode) %>%
+  unlisted_df = mutate(unnested_df, start = region_mafs$Start_Position, sample_id = region_mafs$Tumor_Sample_Barcode) %>%
       dplyr::select(start, sample_id, region_name)
-  }else{
-      return(bind_rows(region_mafs))
-  }
+  
   return(unlisted_df)
 }

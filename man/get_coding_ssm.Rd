@@ -5,19 +5,12 @@
 \title{Get Coding SSMs}
 \usage{
 get_coding_ssm(
-  limit_cohort,
-  exclude_cohort,
-  limit_pathology,
-  limit_samples,
   these_sample_ids = NULL,
   these_samples_metadata = NULL,
-  force_unmatched_samples,
   projection = "grch37",
   this_seq_type = "genome",
   tool_name = "slms-3",
-  this_study,
   basic_columns = TRUE,
-  maf_cols = NULL,
   min_read_support = 3,
   include_silent = TRUE,
   verbose = FALSE,
@@ -25,18 +18,6 @@ get_coding_ssm(
 )
 }
 \arguments{
-\item{limit_cohort}{Optional, supply this to restrict mutations to one or
-more cohorts in a vector.}
-
-\item{exclude_cohort}{Optional, supply this to exclude mutations from one or
-more cohorts in a vector.}
-
-\item{limit_pathology}{Optional, supply this to restrict mutations to one
-pathology.}
-
-\item{limit_samples}{Optional, supply this to restrict mutations to a vector
-of sample_id (instead of sub-setting using the provided metadata).}
-
 \item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single
 sample ID as a string) that you want results for.}
 
@@ -44,9 +25,6 @@ sample ID as a string) that you want results for.}
 a column) to subset the return to. If not provided (and if
 \code{these_sample_ids} is not provided), the function will return all
 samples from the specified seq_type in the metadata.}
-
-\item{force_unmatched_samples}{Optional argument for forcing unmatched
-samples, using \link{get_ssm_by_samples}.}
 
 \item{projection}{Reference genome build for the coordinates in the MAF file.
 The default is grch37.}
@@ -57,16 +35,8 @@ The default is grch37.}
 default is slms-3, also supports "publication" to return the exact
 variants as reported in the original papers.}
 
-\item{this_study}{Optionally specify first name of the author for the paper
-from which the variants should be returned for.}
-
 \item{basic_columns}{Set to FALSE to override the default behavior of
 returning only the first 45 columns of MAF data.}
-
-\item{maf_cols}{if \code{basic_columns} is set to FALSE, the user can specify what
-columns to be returned within the MAF. This parameter can either be a
-vector of indexes (integer) or a vector of characters (matching columns
-in MAF).}
 
 \item{min_read_support}{Only returns variants with at least this many reads
 in t_alt_count.}
@@ -98,18 +68,10 @@ function depends on the bundled sample data in this package.
 \examples{
 #load pacakges
 library(dplyr)
+ #mutations from exome data originally aligned to grch37
+ssm_exomes_grch37 = get_coding_ssm(projection = "grch37",this_seq_type = "capture")
 
-#return SSMs in reference to GRCh37:
-ssm_grch37 = get_coding_ssm(this_seq_type = "genome")
-
-#return SSMs in reference to hg38:
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
-  dplyr::filter(cohort == "DLBCL_cell_lines")
-
-ssm_hg38 = get_coding_ssm(
-     projection = "hg38",
-     these_samples_metadata = cell_line_meta,
-     this_seq_type = "genome"
-)
+#mutations from genome data, hg38 build
+ssm_genomes_hg38 = get_coding_ssm(projection = "hg38",this_seq_type = "genome")
 
 }

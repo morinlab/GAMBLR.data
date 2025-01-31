@@ -74,18 +74,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   sample_ids = metadata$sample_id
 
-  #return SSMs based on the selected projection
-  if(missing(maf_data)){
-    this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == mode))
-    this_maf <- GAMBLR.data::sample_data[[projection]]$ashm %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == mode)) %>%
-      bind_rows(this_maf, .)
-  }else{
-    this_maf = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids)
-  }
+  
 
   # Optionally return variants from a particular study
   if(!missing(this_study)){
@@ -117,15 +106,23 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     chromosome = gsub("chr", "", chromosome)
   }
 
-  #remove the Pipeline variable if present
-  #it's in the bundled MAF calls, but typically not in a MAF from elsewhere
-  if("Pipeline" %in% colnames(this_maf)){
-    this_maf = dplyr::select(this_maf, -Pipeline)
+  #return SSMs based on the selected projection
+  if(missing(maf_data)){
+    # Filter by position on-the-fly to avoid wastefully building the same large MAF each time
+    this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
+      dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend) %>%
+      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+      dplyr::filter((tolower(!!sym("Pipeline")) == mode))
+    muts_region <- GAMBLR.data::sample_data[[projection]]$ashm %>%
+      dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend) %>%
+      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
+      dplyr::filter((tolower(!!sym("Pipeline")) == mode)) %>%
+      bind_rows(this_maf, .)
+  }else{
+    muts_region = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids) %>%
+      dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend)
   }
-
-  #subset the maf to the specified region
-  muts_region = dplyr::filter(this_maf, Chromosome == chromosome & Start_Position > qstart & Start_Position < qend)
-
+  
   # Handle possible duplicates
   muts_region <- muts_region %>%
     distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
