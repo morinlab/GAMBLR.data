@@ -61,14 +61,12 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
     sample_ssm = GAMBLR.data::sample_data[[projection]]$maf %>%
         dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
         dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
-    print(colnames(sample_ssm))
     sample_ssm <- bind_rows(
         sample_ssm,
         GAMBLR.data::sample_data[[projection]]$ashm %>%
             dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
             dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
     )
-    print(colnames(sample_ssm))
     
   }else{
     stop(paste("please provide a valid projection. The following are available:",
@@ -79,6 +77,7 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
   # Handle possible duplicates
   sample_ssm <- sample_ssm %>%
     distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
+  # bundle genome_build with the maf_data
   sample_ssm = create_maf_data(sample_ssm,projection)
   # use S3-safe version of dplyr function
   sample_ssm = mutate.genomic_data(sample_ssm,maf_seq_type = this_seq_type)

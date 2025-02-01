@@ -14,7 +14,6 @@ get_ssm_by_regions(
   projection = "grch37",
   verbose = FALSE,
   tool_name = "slms-3",
-  engine = "overlaps",
   ...
 )
 }
@@ -39,10 +38,6 @@ This parameter also dictates the verbosity of any helper function internally cal
 
 \item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
-\item{engine}{String indicating which approach to use. Accepted values are
-"legacy" (legacy behaviour) and
-"overlaps" (more efficient approach using cool_overlaps).}
-
 \item{...}{Any additional parameters.}
 }
 \value{
@@ -56,10 +51,22 @@ This function internally calls get_ssm_by_region to retrieve SSM calls for the s
 }
 \examples{
 #basic usage, adding custom names from bundled ashm data frame
-regions_bed = GAMBLR.data::grch37_ashm_regions
-these_samples_metadata = get_gambl_metadata()
+regions_bed = create_bed_data( GAMBLR.data::grch37_ashm_regions,
+                          fix_names = "concat",
+                          concat_cols = c("gene","region"),
+                          sep="-")
+
+my_meta = get_gambl_metadata()
 # get a full MAF-format data frame for all aSHM regions on grch37 coordinates
 ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
+                                        these_samples_metadata = my_meta,
                                         streamlined = FALSE)
+
+# This example intentionally fails
+ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
+                              these_samples_metadata = my_meta,
+                               projection="hg38")
+# Error in get_ssm_by_regions(regions_bed = regions_bed, these_samples_metadata = my_meta,  : 
+# requested projection: hg38 and genome_build of regions_bed: grch37 don't match
 
 }
