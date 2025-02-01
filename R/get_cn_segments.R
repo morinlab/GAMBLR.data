@@ -21,6 +21,7 @@ create_seg_data <- function(seg_df, genome_build) {
 #' seq_type in the metadata faithfully represents the seq_type of the data
 #' @param projection Desired genome coordinate system for returned CN segments. Default is "grch37".
 #' @param this_seq_type Deprecated.
+#' @param ... Additional parameters to be passed to the function.
 #'
 #' @return A data frame with CN segments for the specified region.
 #'

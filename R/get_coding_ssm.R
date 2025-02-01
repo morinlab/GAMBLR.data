@@ -67,8 +67,7 @@ ungroup.genomic_data <- function(.data, ...) {
 #' @description Combine multiple maf_data objects and retain metadata such as genome_build. This function
 #' will not allow you to combine maf_data objects that have different genome_build values. An error will also
 #' be thrown if the same sample id is found in more than one of the inputs
-#' @param ... Other arguments
-#' @param id_col Specify the name of the column containing the sample_id (default: Tumor_Sample_Barcode)
+#' @param ... All maf_data or seg_data objects to be combined
 #'
 #' @return data.frame
 #' @export
