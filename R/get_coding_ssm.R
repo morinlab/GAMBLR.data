@@ -72,9 +72,9 @@ group_by.genomic_data <- function(.data, ..., .add = FALSE) {
   preserve_genomic_attributes(new_data, .data)
 }
 #' @export
-ungroup.genomic_data <- function(.data, ...) {
-  new_data <- dplyr::ungroup(as.data.frame(.data), ...)
-  preserve_genomic_attributes(new_data, .data)
+ungroup.genomic_data <- function(x, ...) {
+  new_data <- dplyr::ungroup(as.data.frame(x), ...)
+  preserve_genomic_attributes(new_data, x)
 }
 
 #' Bind maf data together

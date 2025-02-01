@@ -1,7 +1,15 @@
 ## GAMBLR.data
-
-# Constructor function for segmented data
+#' Create Segmented Data
+#'
+#' This function creates segmented data from the given input.
+#'
+#' @param seg_df A data frame containing the segmented data.
+#' @param genome_build A string specifying the genome build ("grch37" or "hg38").
+#' @return A data frame with class attributes for segmented data.
 #' @export
+#' @examples
+#' seg_df <- data.frame(...)
+#' create_seg_data(seg_df, "grch37")
 create_seg_data <- function(seg_df, genome_build) {
   if (!inherits(seg_df, "data.frame")) stop("data must be a data frame")
   if (!genome_build %in% c("grch37", "hg38")) stop("Invalid genome build")
