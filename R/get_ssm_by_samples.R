@@ -40,7 +40,6 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
                                this_study,
                                these_genes,
                                basic_columns = TRUE,
-                               maf_cols = NULL,
                                verbose = FALSE,
                                ...){
 
@@ -93,10 +92,6 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
     sample_ssm = dplyr::select(sample_ssm, c(1:45))
   }
 
-  #subset maf to a specific set of columns (defined in maf_cols)
-  if(!is.null(maf_cols) && !basic_columns){
-    sample_ssm = dplyr::select(sample_ssm, all_of(maf_cols))
-  }
 
   # Handle possible duplicates
   sample_ssm <- sample_ssm %>%
@@ -120,7 +115,6 @@ get_ssm_by_sample = function(this_sample_id = NULL,
                              projection = "grch37",
                              these_genes,
                              basic_columns = TRUE,
-                             maf_cols = NULL,
                              verbose = FALSE,
                              ...){
 
@@ -130,7 +124,6 @@ get_ssm_by_sample = function(this_sample_id = NULL,
                      projection = projection,
                      these_genes = these_genes,
                      basic_columns = basic_columns,
-                     maf_cols = maf_cols,
                      verbose = verbose,
                      ...)
 }

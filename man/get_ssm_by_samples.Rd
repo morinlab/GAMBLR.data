@@ -14,7 +14,6 @@ get_ssm_by_samples(
   this_study,
   these_genes,
   basic_columns = TRUE,
-  maf_cols = NULL,
   verbose = FALSE,
   ...
 )
@@ -26,7 +25,6 @@ get_ssm_by_sample(
   projection = "grch37",
   these_genes,
   basic_columns = TRUE,
-  maf_cols = NULL,
   verbose = FALSE,
   ...
 )

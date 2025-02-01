@@ -63,12 +63,12 @@ get_cn_segments = function(these_samples_metadata,
 
   #ensure chr prefixes are there when necessary 
   if(projection=="grch37"){
-    if(all(str_detect(all_segs$chrom, "chr"))){
+    if(grepl("chr",all_segs$chrom[1])){
       all_segs = all_segs %>%
         dplyr::mutate(chrom = gsub("chr", "", chrom))
     }
   }else{
-    if(all(!str_detect(all_segs$chrom, "chr"))){
+    if(!grepl("chr",all_segs$chrom[1])){
       all_segs = all_segs %>%
         dplyr::mutate(chrom = paste0("chr", chrom))
     }
