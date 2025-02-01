@@ -24,7 +24,7 @@ create_seg_data <- function(seg_df, genome_build) {
 #'
 #' @return A data frame with CN segments for the specified region.
 #'
-#' @import dplyr readr glue
+#' @import dplyr
 #' @export
 #'
 #' @examples
