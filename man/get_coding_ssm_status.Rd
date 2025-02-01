@@ -12,7 +12,7 @@ get_coding_ssm_status(
   keep_multihit_hotspot = FALSE,
   review_hotspots = TRUE,
   genes_of_interest = c("FOXO1", "MYD88", "CREBBP"),
-  genome_build = "hg19",
+  genome_build,
   include_silent = FALSE,
   include_silent_genes,
   ...
@@ -46,7 +46,7 @@ lymphoma-related genes. Default is TRUE.}
 FOXO1, MYD88, and CREBBP are supported.}
 
 \item{genome_build}{Reference genome build for the coordinates in the MAF
-file. The default is hg19 genome build.}
+file. The default is inferred from maf_data.}
 
 \item{include_silent}{Logical parameter indicating whether to include silent
 mutations into coding mutations. Default is FALSE.}
@@ -79,11 +79,19 @@ and review for this version of the function.
 }
 \examples{
 coding_tabulated_df = get_coding_ssm_status(
- maf_data = GAMBLR.data::sample_data$grch37$maf,
- gene_symbols = "EGFR"
+ maf_data = get_coding_ssm(),
+ gene_symbols = c("EZH2","KMT2D","CREBBP","MYC")
 )
+
+
 
 #all lymphoma genes from bundled NHL gene list
 coding_tabulated_df = get_coding_ssm_status()
+
+#this example will fail because hg38 is not supported by this function (yet)
+coding_tabulated_df = get_coding_ssm_status(maf_data=
+                        get_coding_ssm(projection = "hg38"))
+# Error in get_coding_ssm_status(maf_data = get_coding_ssm(projection = "hg38")) : 
+# Currently only grch37 projection (hg19 genome build) is supported.
 
 }

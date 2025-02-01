@@ -35,7 +35,7 @@
 #' @param genes_of_interest A vector of genes for hotspot review. Currently only
 #'      FOXO1, MYD88, and CREBBP are supported.
 #' @param genome_build Reference genome build for the coordinates in the MAF
-#'      file. The default is hg19 genome build.
+#'      file. The default is inferred from maf_data. 
 #' @param include_silent Logical parameter indicating whether to include silent
 #'      mutations into coding mutations. Default is FALSE.
 #' @param include_silent_genes Optionally, provide a list of genes for which the
@@ -50,12 +50,20 @@
 #'
 #' @examples
 #' coding_tabulated_df = get_coding_ssm_status(
-#'  maf_data = GAMBLR.data::sample_data$grch37$maf,
-#'  gene_symbols = "EGFR"
+#'  maf_data = get_coding_ssm(),
+#'  gene_symbols = c("EZH2","KMT2D","CREBBP","MYC")
 #' )
+#'
+#' 
 #'
 #' #all lymphoma genes from bundled NHL gene list
 #' coding_tabulated_df = get_coding_ssm_status()
+#' 
+#' #this example will fail because hg38 is not supported by this function (yet)
+#' coding_tabulated_df = get_coding_ssm_status(maf_data=
+#'                         get_coding_ssm(projection = "hg38"))
+#' # Error in get_coding_ssm_status(maf_data = get_coding_ssm(projection = "hg38")) : 
+#' # Currently only grch37 projection (hg19 genome build) is supported.
 #'
 get_coding_ssm_status = function(
         gene_symbols,
@@ -65,17 +73,27 @@ get_coding_ssm_status = function(
         keep_multihit_hotspot = FALSE,
         review_hotspots = TRUE,
         genes_of_interest = c("FOXO1", "MYD88", "CREBBP"),
-        genome_build = "hg19",
+        genome_build,
         include_silent = FALSE,
         include_silent_genes,
         ...
     ){
-
+    if(missing(maf_data)){
+      stop("maf_data is required")
+    }
     # check if any invalid parameters are provided
     check_excess_params(...)
-
+    if("maf_data" %in% class(maf_data)){
+      if(missing(genome_build)){
+        genome_build = get_genome_build(maf_data)
+      }else{
+        if(!genome_build == get_genome_build(maf_data)){
+          stop("you have specified a genome_build that doesn't match the genome_build attached to maf_data")
+        }
+      }
+    }
     # check the projection
-    if(!genome_build == "hg19"){
+    if(!genome_build == "grch37"){
         stop(
             "Currently only grch37 projection (hg19 genome build) is supported."
         )
