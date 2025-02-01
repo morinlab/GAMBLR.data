@@ -1,4 +1,10 @@
-# Constructor function for MAF data
+#' Create MAF Data
+#'
+#' This function creates MAF (Mutation Annotation Format) data from the given input.
+#'
+#' @param maf_df A data frame containing the MAF data.
+#' @param genome_build A string specifying the genome build ("grch37" or "hg38").
+#' @return A data frame with class attributes for MAF data.
 #' @export
 create_maf_data <- function(maf_df, genome_build) {
   if (!inherits(maf_df, "data.frame")) stop("data must be a data frame")
@@ -9,13 +15,24 @@ create_maf_data <- function(maf_df, genome_build) {
             genome_build = genome_build)
 }
 
-# Accessor function to retrieve genome_build
+#' Get Genome Build
+#'
+#' This function retrieves the genome build attribute from the data.
+#'
+#' @param data A data frame with genome build attribute.
+#' @return A string specifying the genome build.
 #' @export
 get_genome_build <- function(data) {
   attr(data, "genome_build")
 }
 
-# Helper function to preserve attributes and class after dplyr operations
+#' Preserve Genomic Attributes
+#'
+#' This function preserves the genomic attributes and class after dplyr operations.
+#'
+#' @param new_data A data frame resulting from dplyr operations.
+#' @param old_data The original data frame with genomic attributes.
+#' @return A data frame with preserved genomic attributes.
 #' @export
 preserve_genomic_attributes <- function(new_data, old_data) {
   attr(new_data, "genome_build") <- attr(old_data, "genome_build")
@@ -59,8 +76,6 @@ ungroup.genomic_data <- function(.data, ...) {
   new_data <- dplyr::ungroup(as.data.frame(.data), ...)
   preserve_genomic_attributes(new_data, .data)
 }
-
-# Merger function to preserve metadata and protect against accidental mixing across genome_builds
 
 #' Bind maf data together
 #'

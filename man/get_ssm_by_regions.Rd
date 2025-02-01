@@ -44,13 +44,6 @@ This parameter also dictates the verbosity of any helper function internally cal
 "overlaps" (more efficient approach using cool_overlaps).}
 
 \item{...}{Any additional parameters.}
-
-\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
-
-\item{maf_data}{Optional data frame with mutations in MAF format.
-If user provides a maf, the function trusts that the user has already subset this to samples of interest, correct seq_type.
-i.e the following parameters are ignored; \code{these_samples_metadata}, \code{these_sample_ids}, and \code{this_seq_type}
-If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
 }
 \value{
 Returns a data frame of variants in MAF-like format.

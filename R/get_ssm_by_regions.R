@@ -4,12 +4,7 @@
 #'
 #' @details This function internally calls get_ssm_by_region to retrieve SSM calls for the specified regions.
 #'
-#' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
 #' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to.
-#' @param maf_data Optional data frame with mutations in MAF format.
-#' If user provides a maf, the function trusts that the user has already subset this to samples of interest, correct seq_type.
-#' i.e the following parameters are ignored; `these_samples_metadata`, `these_sample_ids`, and `this_seq_type`
-#' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
 #' @param this_seq_type The this_seq_type you want back, default is genome.
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
 #' @param regions_list A vector of regions in the chr:start-end format to restrict the returned SSM calls to.
@@ -136,7 +131,7 @@ get_ssm_by_regions <- function(these_samples_metadata,
         )
       }
     )
-    maf_df = do.call("bind_rows_")
+    maf_df = do.call("bind_genomic_data",region_mafs)
 
   }
 }
