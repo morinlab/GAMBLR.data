@@ -11,8 +11,6 @@ get_ssm_by_samples(
   this_seq_type = "genome",
   projection = "grch37",
   tool_name = "slms-3",
-  this_study,
-  these_genes,
   basic_columns = TRUE,
   verbose = FALSE,
   ...

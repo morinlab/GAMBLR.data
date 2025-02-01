@@ -19,6 +19,8 @@ seq_type in the metadata faithfully represents the seq_type of the data}
 \item{projection}{Desired genome coordinate system for returned CN segments. Default is "grch37".}
 
 \item{this_seq_type}{Deprecated.}
+
+\item{...}{Additional parameters to be passed to the function.}
 }
 \value{
 A data frame with CN segments for the specified region.

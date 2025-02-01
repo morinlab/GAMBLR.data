@@ -10,7 +10,6 @@ get_ssm_by_regions(
   maf_data,
   this_seq_type = "genome",
   mode = "slms-3",
-  this_study,
   regions_list,
   regions_bed,
   streamlined = TRUE,

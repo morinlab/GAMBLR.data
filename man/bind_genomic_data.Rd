@@ -7,9 +7,7 @@
 bind_genomic_data(...)
 }
 \arguments{
-\item{...}{Other arguments}
-
-\item{id_col}{Specify the name of the column containing the sample_id (default: Tumor_Sample_Barcode)}
+\item{...}{All maf_data or seg_data objects to be combined}
 }
 \value{
 data.frame
