@@ -223,7 +223,6 @@ bind_genomic_data <- function(..., check_id = TRUE) {
 #'        Defaults to "" (no separator).
 #' @return A data frame with class attributes for BED data.
 #' 
-#' @import stringr
 #' @export
 #' 
 #' @examples
@@ -396,7 +395,7 @@ create_bed_data <- function(bed_df,
   # enforce strict matching of chr prefixing
   if(genome_build == "grch37"){
     if(any(grepl("chr",bed_df$chrom))){
-      bed_df = mutate(bed_df,chrom = str_remove(chrom,"chr"))
+      bed_df = mutate(bed_df,chrom = gsub("chr", "", chrom))
     }
   }
   # Create the S3 object with additional class attributes and genome_build attribute.

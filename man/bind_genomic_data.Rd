@@ -2,7 +2,7 @@
 % Please edit documentation in R/genomic_data.R
 \name{bind_genomic_data}
 \alias{bind_genomic_data}
-\title{Bind maf data together}
+\title{Bind maf or other genomic data together}
 \usage{
 bind_genomic_data(..., check_id = TRUE)
 }

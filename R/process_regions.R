@@ -43,19 +43,19 @@ process_regions <- function(regions_list = NULL,
     if (is.null(regions_bed)) {
       message("Using default GAMBLR aSHM regions. ")
       if (projection == "grch37") {
-        regions_bed <- grch37_ashm_regions %>%
-          dplyr::mutate(chr_name = str_remove(chr_name, "chr")) %>%
-          dplyr::mutate(name = str_c(gene, region, sep = "_"))
-      } else {
-        regions_bed <- hg38_ashm_regions %>%
-          dplyr::mutate(name = str_c(gene, region, sep = "_"))
+        regions_bed <-  create_bed_data(grch37_ashm_regions,
+                                        fix_names="concat",
+                                        concat_cols=c("gene","region"),
+                                        sep="_")
+      } else if(projection=="hg38") {
+        regions_bed <-  create_bed_data(hg38_ashm_regions,
+                                        fix_names="concat",
+                                        concat_cols=c("gene","region"),
+                                        sep="_")
+      }else{
+        stop("unsupported projection!")
       }
-      # Fix column names
-      regions_bed <- regions_bed %>%
-        rename_with(
-          ~ str_remove(.x, "^hg.*_")
-        ) %>%
-        dplyr::rename(chrom = chr_name)
+      
       if (!is.null(skip_regions)) {
         # drop user-specified regions
         regions_bed <- regions_bed %>%
