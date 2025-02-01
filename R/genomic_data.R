@@ -111,7 +111,7 @@ ungroup.genomic_data <- function(x, ...) {
   preserve_genomic_attributes(new_data, x)
 }
 
-#' Bind maf data together
+#' Bind maf or other genomic data together
 #'
 #' @description Combine multiple maf_data objects and retain metadata such as genome_build.
 #' This function will not allow you to combine maf_data objects that have different genome_build values.
