@@ -140,6 +140,6 @@ get_gambl_metadata = function(
                 .x
             ))))) %>%
         dplyr::select(!contains("."))
-
-    return(metadata)
+    #ensure only unique rows are returned
+    return(unique(metadata))
 }
