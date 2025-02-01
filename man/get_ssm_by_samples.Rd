@@ -2,7 +2,6 @@
 % Please edit documentation in R/get_ssm_by_samples.R
 \name{get_ssm_by_samples}
 \alias{get_ssm_by_samples}
-\alias{get_ssm_by_sample}
 \title{Get SSM By Samples.}
 \usage{
 get_ssm_by_samples(
@@ -11,28 +10,12 @@ get_ssm_by_samples(
   this_seq_type = "genome",
   projection = "grch37",
   tool_name = "slms-3",
-  this_study,
-  these_genes,
-  basic_columns = TRUE,
-  maf_cols = NULL,
-  verbose = FALSE,
-  ...
-)
-
-get_ssm_by_sample(
-  this_sample_id = NULL,
-  these_samples_metadata = NULL,
-  this_seq_type = "genome",
-  projection = "grch37",
-  these_genes,
-  basic_columns = TRUE,
-  maf_cols = NULL,
   verbose = FALSE,
   ...
 )
 }
 \arguments{
-\item{these_sample_ids}{A vector of sample IDs that you want results for.}
+\item{these_sample_ids}{A vector of one or more sample IDs that you want results for.}
 
 \item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.
 If not provided and these_sample_ids is also not provided, the function will return SSM for all samples from the specified seq_type in the bundled metadata.}
@@ -43,26 +26,15 @@ If not provided and these_sample_ids is also not provided, the function will ret
 
 \item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
-\item{this_study}{Optionally specify first name of the author for the paper
-from which the variants should be returned for.}
-
-\item{these_genes}{A vector of genes to subset ssm to.}
-
-\item{basic_columns}{Return first 43 columns of MAF rather than full details. Default is TRUE.}
-
-\item{maf_cols}{if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters.}
-
 \item{verbose}{Enable for debugging/noisier output.}
 
 \item{...}{Any additional parameters.}
-
-\item{this_sample_id}{A single sample ID you want the data from.}
 }
 \value{
 data frame in MAF format.
 }
 \description{
-Get the SSMs (i.e. load MAF) for a single sample or a collection fo samples.
+Get the SSMs (i.e. load MAF) for a single sample or a collection of samples.
 }
 \details{
 Retrieve a maf for a specific sample or a set of samples.
@@ -70,16 +42,13 @@ Either specify the sample IDs of interest with \code{these_sample_ids}.
 Or a metadata table subset to the sample IDs of interest with \code{these_samples_metadata}.
 }
 \examples{
-#load packages
+#load a common dependency
 library(dplyr)
 
-#return a MAF for DLBCL cell line
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
+#Get genome-wide set of mutations from all DLBCL cell lines
+cell_line_meta = get_gambl_metadata() \%>\% 
   dplyr::filter(cohort == "DLBCL_cell_lines")
 
 dlbcl_maf = get_ssm_by_samples(these_samples_metadata = cell_line_meta)
-
-#basic usage, using a single sample ID
-dohh2_maf = get_ssm_by_sample(this_sample_id = "DOHH-2")
 
 }

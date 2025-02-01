@@ -11,8 +11,6 @@ get_ssm_by_patients(
   this_seq_type = "genome",
   tool_name = "slms-3",
   this_study,
-  basic_columns = TRUE,
-  maf_cols = NULL,
   verbose = FALSE,
   ...
 )
@@ -31,11 +29,7 @@ If the vector of patient IDs is missing (\code{these_patient_ids}), this functio
 \item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
 \item{this_study}{Optionally specify first name of the author for the paper
-from which the variants should be returned for.}
-
-\item{basic_columns}{Return first 45 columns of MAF rather than full details. Default is TRUE.}
-
-\item{maf_cols}{if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF.
+from which the variants should be returned for.
 This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).}
 
 \item{verbose}{Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.}

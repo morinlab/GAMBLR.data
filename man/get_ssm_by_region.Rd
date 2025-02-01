@@ -15,7 +15,7 @@ get_ssm_by_region(
   streamlined = FALSE,
   projection = "grch37",
   this_seq_type = "genome",
-  mode = "slms-3",
+  tool_name = "slms-3",
   this_study,
   verbose = FALSE,
   ...
@@ -45,7 +45,7 @@ i.e the following parameters are ignored; \code{these_samples_metadata}, \code{t
 
 \item{this_seq_type}{The seq_type you want back, default is genome.}
 
-\item{mode}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
+\item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
 \item{this_study}{Optionally specify first name of the author for the paper
 from which the variants should be returned for.}

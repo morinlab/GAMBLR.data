@@ -1,23 +1,17 @@
 #' @title Get SSM By Samples.
 #'
-#' @description Get the SSMs (i.e. load MAF) for a single sample or a collection fo samples.
+#' @description Get the SSMs (i.e. load MAF) for a single sample or a collection of samples.
 #'
 #' @details Retrieve a maf for a specific sample or a set of samples.
 #' Either specify the sample IDs of interest with `these_sample_ids`.
 #' Or a metadata table subset to the sample IDs of interest with `these_samples_metadata`.
 #'
-#' @param this_sample_id A single sample ID you want the data from.
-#' @param these_sample_ids A vector of sample IDs that you want results for.
+#' @param these_sample_ids A vector of one or more sample IDs that you want results for.
 #' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to auto-subset the data to samples in that table before returning.
 #' If not provided and these_sample_ids is also not provided, the function will return SSM for all samples from the specified seq_type in the bundled metadata.
 #' @param this_seq_type Default is genome.
 #' @param projection The projection genome build. Supports hg38 and grch37.
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
-#' @param this_study Optionally specify first name of the author for the paper
-#'      from which the variants should be returned for.
-#' @param these_genes A vector of genes to subset ssm to.
-#' @param basic_columns Return first 43 columns of MAF rather than full details. Default is TRUE.
-#' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF. This parameter can either be a vector of indexes (integer) or a vector of characters.
 #' @param verbose Enable for debugging/noisier output.
 #' @param ... Any additional parameters.
 #'
@@ -28,11 +22,11 @@
 #' @export
 #'
 #' @examples
-#' #load packages
+#' #load a common dependency
 #' library(dplyr)
 #'
-#' #return a MAF for DLBCL cell line
-#' cell_line_meta = GAMBLR.data::sample_data$meta %>%
+#' #Get genome-wide set of mutations from all DLBCL cell lines
+#' cell_line_meta = get_gambl_metadata() %>% 
 #'   dplyr::filter(cohort == "DLBCL_cell_lines")
 #'
 #' dlbcl_maf = get_ssm_by_samples(these_samples_metadata = cell_line_meta)
@@ -42,10 +36,6 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
                                this_seq_type = "genome",
                                projection = "grch37",
                                tool_name = "slms-3",
-                               this_study,
-                               these_genes,
-                               basic_columns = TRUE,
-                               maf_cols = NULL,
                                verbose = FALSE,
                                ...){
 
@@ -71,69 +61,26 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
     sample_ssm = GAMBLR.data::sample_data[[projection]]$maf %>%
         dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
         dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
+    print(colnames(sample_ssm))
     sample_ssm <- bind_rows(
         sample_ssm,
         GAMBLR.data::sample_data[[projection]]$ashm %>%
             dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
             dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
     )
+    print(colnames(sample_ssm))
+    
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
   }
 
-  if(!missing(these_genes)){
-    sample_ssm = sample_ssm %>%
-      dplyr::filter(Hugo_Symbol %in% these_genes)
-  }
-
-  # Optionally return variants from a particular study
-  if(!missing(this_study)){
-    sample_ssm <- sample_ssm %>%
-      dplyr::filter((!!sym("Study")) == this_study)
-  }  
-
-  #subset maf to only include first 43 columns (default)
-  if(basic_columns){
-    sample_ssm = dplyr::select(sample_ssm, c(1:45))
-  }
-
-  #subset maf to a specific set of columns (defined in maf_cols)
-  if(!is.null(maf_cols) && !basic_columns){
-    sample_ssm = dplyr::select(sample_ssm, all_of(maf_cols))
-  }
 
   # Handle possible duplicates
   sample_ssm <- sample_ssm %>%
     distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
-
+  sample_ssm = create_maf_data(sample_ssm,projection)
+  # use S3-safe version of dplyr function
+  sample_ssm = mutate.genomic_data(sample_ssm,maf_seq_type = this_seq_type)
   return(sample_ssm)
-}
-
-
-#' @rdname get_ssm_by_samples
-#'
-#' @examples
-#' #basic usage, using a single sample ID
-#' dohh2_maf = get_ssm_by_sample(this_sample_id = "DOHH-2")
-#'
-get_ssm_by_sample = function(this_sample_id = NULL,
-                             these_samples_metadata = NULL,
-                             this_seq_type = "genome",
-                             projection = "grch37",
-                             these_genes,
-                             basic_columns = TRUE,
-                             maf_cols = NULL,
-                             verbose = FALSE,
-                             ...){
-
-  get_ssm_by_samples(these_sample_ids = this_sample_id,
-                     these_samples_metadata = these_samples_metadata,
-                     this_seq_type = this_seq_type,
-                     projection = projection,
-                     these_genes = these_genes,
-                     basic_columns = basic_columns,
-                     maf_cols = maf_cols,
-                     verbose = verbose,
-                     ...)
 }

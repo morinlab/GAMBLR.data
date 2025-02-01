@@ -18,8 +18,6 @@
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
 #' @param this_study Optionally specify first name of the author for the paper
 #'      from which the variants should be returned for.
-#' @param basic_columns Return first 45 columns of MAF rather than full details. Default is TRUE.
-#' @param maf_cols if basic_columns is set to FALSE, the user can specify what columns to be returned within the MAF.
 #' This parameter can either be a vector of indexes (integer) or a vector of characters (matching columns in MAF).
 #' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.
@@ -50,8 +48,6 @@ get_ssm_by_patients = function(these_patient_ids,
                                this_seq_type = "genome",
                                tool_name = "slms-3",
                                this_study,
-                               basic_columns = TRUE,
-                               maf_cols = NULL,
                                verbose = FALSE,
                                ...){
 
@@ -75,13 +71,13 @@ get_ssm_by_patients = function(these_patient_ids,
   }
 
   #run get_ssm_by_samples with these_samples_metadata parameter
-  return(GAMBLR.data::get_ssm_by_samples(these_samples_metadata = these_samples_metadata,
+  samples_ssm = GAMBLR.data::get_ssm_by_samples(these_samples_metadata = these_samples_metadata,
                                          projection = projection,
                                          this_seq_type = this_seq_type,
                                          tool_name = tool_name,
-                                         this_study = this_study,
-                                         basic_columns = basic_columns,
-                                         maf_cols = maf_cols,
                                          verbose = verbose,
-                                         ...))
+                                         ...)
+  samples_ssm = create_maf_data(samples_ssm,projection)
+  # use S3-safe version of dplyr function
+  samples_ssm = mutate.genomic_data(samples_ssm,maf_seq_type = this_seq_type)
 }
