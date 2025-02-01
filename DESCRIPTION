@@ -34,7 +34,8 @@ Imports:
     ggplot2,
     purrr,
     tibble,
-    tidyr
+    tidyr,
+    stringr
 LazyDataCompression: xz
 Suggests: 
     testthat (>= 3.0.0)
