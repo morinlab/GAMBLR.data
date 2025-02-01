@@ -54,6 +54,26 @@ preserve_genomic_attributes <- function(new_data, old_data) {
   return(new_data)
 }
 
+#' Strip Genomic Data Classes
+#'
+#' This function removes custom classes associated with genomic data objects
+#' (by default, "genomic_data", "maf_data", and "bed_data") from the class attribute
+#' of an object. This can be useful when you want to revert an S3 object to its
+#' underlying data.frame (or data.table) classes without converting the object.
+#'
+#' @param x An object, such as one of your genomic data objects.
+#' @param classes A character vector of class names to remove. The default is
+#'        c("genomic_data", "maf_data", "bed_data").
+#' @return The object with the specified classes removed.
+#' @export
+strip_genomic_classes <- function(x, classes = c("genomic_data", "maf_data", "bed_data")) {
+  current_classes <- class(x)
+  new_classes <- setdiff(current_classes, classes)
+  class(x) <- new_classes
+  return(x)
+}
+
+
 # S3 methods for genomic_data class
 #' @export
 mutate.genomic_data <- function(.data, ...) {

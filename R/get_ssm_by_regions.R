@@ -11,7 +11,6 @@
 #' @param regions_bed A data frame in BED format with the coordinates you want to retrieve (recommended).
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE`
 #' @param streamlined If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).
-#' @param use_name_column If your bed-format data frame has a name column (must be named "name") these can be used to name your regions in the returned data frame.
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.
 #' @param verbose Set to TRUE to maximize the output to console. Default is TRUE.
 #' This parameter also dictates the verbosity of any helper function internally called inside the main function.
@@ -48,7 +47,6 @@ get_ssm_by_regions <- function(these_samples_metadata,
                                regions_bed,
                                this_seq_type = "genome",
                                streamlined = TRUE,
-                               use_name_column = FALSE,
                                projection = "grch37",
                                verbose = FALSE,
                                tool_name = "slms-3",
@@ -133,10 +131,11 @@ get_ssm_by_regions <- function(these_samples_metadata,
       dplyr::rename_with(~ gsub(".x", "", .x, fixed = TRUE)) %>%
       dplyr::select(all_of(c(names(sample_maf), "region"))) %>%
       dplyr::group_split(region)
-    maf_df = do.call(bind_genomic_data, c(region_mafs, list(check_id = FALSE)))
+    maf_df = do.call(bind_rows, region_mafs)
     
     if(streamlined){
-      maf_df = dplyr::select(maf_df,Start_Position,Tumor_Sample_Barcode)
+      maf_df = dplyr::select(maf_df,Start_Position,Tumor_Sample_Barcode,region) %>%
+        dplyr::rename(c("sample_id"="Tumor_Sample_Barcode"))
     }
     return(maf_df)
     

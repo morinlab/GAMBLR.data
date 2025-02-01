@@ -55,8 +55,10 @@
 #' mult_freq_all = calc_mutation_frequency_bin_regions(regions_list = reg_vec)
 #' mult_freq_all = calc_mutation_frequency_bin_regions(regions_bed = reg_bed)
 #'
-#' #subset to a specific sample ID
-#' mult_reg_freq_dohh2 = calc_mutation_frequency_bin_regions(regions_list = reg_vec,
+#' #restrict the analysis to specific samples using the metadata
+#' my_meta = get_gambl_metadata() %>% 
+#'               dplyr::filter(pathology %in% c("DLBCL","FL"))
+#' mult_reg_freq_fl_dlbcl = calc_mutation_frequency_bin_regions(regions_list = reg_vec,
 #'                                                           these_sample_ids = "DOHH-2")
 #'
 calc_mutation_frequency_bin_regions <- function(regions_list = NULL,

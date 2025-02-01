@@ -6,16 +6,13 @@
 \usage{
 get_ashm_count_matrix(
   regions_bed,
-  maf_data,
   these_samples_metadata,
-  this_seq_type
+  this_seq_type,
+  projection = "grch37"
 )
 }
 \arguments{
 \item{regions_bed}{A bed file with one row for each region.}
-
-\item{maf_data}{Optionally provide a data frame in the MAF format, otherwise
-the database will be used.}
 
 \item{these_samples_metadata}{This is used to complete your matrix. All GAMBL
 samples will be used by default. Provide a data frame with at least
@@ -23,6 +20,9 @@ sample_id for all samples if you are using non-GAMBL data.}
 
 \item{this_seq_type}{The seq type to return results for. Only used if no
 metadata is provided with these_samples_metadata.}
+
+\item{projection}{Which genome build to use for the mutations
+(must match the coordinate system your regions to avoid a nonsense result)}
 }
 \value{
 matrix
@@ -35,14 +35,31 @@ region using a set of hypermutated regions.
 Values are the number of mutations in that patient in the region.
 }
 \examples{
-regions_bed <- dplyr::mutate(
-     GAMBLR.data::grch37_ashm_regions,
-     name = paste(gene, region, sep = "_")
-)
-
+regions_bed = create_bed_data(GAMBLR.data::grch37_ashm_regions,
+                              fix_names="concat",
+                              concat_cols=c("gene","region"),
+                              sep="-")
+my_meta = get_gambl_metadata() \%>\% dplyr::filter(pathology=="DLBCL")
 matrix <- get_ashm_count_matrix(
      regions_bed = regions_bed,
      this_seq_type = "genome"
 )
+
+#this example intentionally fails 
+ matrix <- get_ashm_count_matrix(regions_bed=regions_bed,this_seq_type = "genome",
+                            these_samples_metadata = my_meta,
+                            projection = "hg38")
+# Error in get_ashm_count_matrix(
+# Your projection argument does not match the genome_build of regions_bed
+
+# format the name column to include the chromosome coordinates instead of the gene
+regions_bed = create_bed_data(GAMBLR.data::hg38_ashm_regions,
+                           fix_names="concat",
+                           concat_cols=c("chr_name","hg38_start","hg38_end"),
+                           sep="-")
+                           
+ matrix_hg38 <- get_ashm_count_matrix(regions_bed=regions_bed,this_seq_type = "genome",
+                            these_samples_metadata = my_meta,
+                            projection = "hg38")
 
 }

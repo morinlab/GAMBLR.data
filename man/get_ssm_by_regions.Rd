@@ -10,7 +10,6 @@ get_ssm_by_regions(
   regions_bed,
   this_seq_type = "genome",
   streamlined = TRUE,
-  use_name_column = FALSE,
   projection = "grch37",
   verbose = FALSE,
   tool_name = "slms-3",
@@ -28,8 +27,6 @@ This parameter can also accept an additional column with region names that will 
 \item{this_seq_type}{The this_seq_type you want back, default is genome.}
 
 \item{streamlined}{If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).}
-
-\item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions in the returned data frame.}
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.}
 
