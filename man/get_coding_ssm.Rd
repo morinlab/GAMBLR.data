@@ -10,7 +10,6 @@ get_coding_ssm(
   projection = "grch37",
   this_seq_type = "genome",
   tool_name = "slms-3",
-  basic_columns = TRUE,
   min_read_support = 3,
   include_silent = TRUE,
   verbose = FALSE,
@@ -34,9 +33,6 @@ The default is grch37.}
 \item{tool_name}{Optionally specify which tool to report variant from. The
 default is slms-3, also supports "publication" to return the exact
 variants as reported in the original papers.}
-
-\item{basic_columns}{Set to FALSE to override the default behavior of
-returning only the first 45 columns of MAF data.}
 
 \item{min_read_support}{Only returns variants with at least this many reads
 in t_alt_count.}

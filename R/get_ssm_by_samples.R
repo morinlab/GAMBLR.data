@@ -12,7 +12,6 @@
 #' @param this_seq_type Default is genome.
 #' @param projection The projection genome build. Supports hg38 and grch37.
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
-#' @param basic_columns Return first 43 columns of MAF rather than full details. Default is TRUE.
 #' @param verbose Enable for debugging/noisier output.
 #' @param ... Any additional parameters.
 #'
@@ -37,7 +36,6 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
                                this_seq_type = "genome",
                                projection = "grch37",
                                tool_name = "slms-3",
-                               basic_columns = TRUE,
                                verbose = FALSE,
                                ...){
 
@@ -63,31 +61,18 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
     sample_ssm = GAMBLR.data::sample_data[[projection]]$maf %>%
         dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
         dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
+    print(colnames(sample_ssm))
     sample_ssm <- bind_rows(
         sample_ssm,
         GAMBLR.data::sample_data[[projection]]$ashm %>%
             dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
             dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
     )
+    print(colnames(sample_ssm))
+    
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
-  }
-
-  if(!missing(these_genes)){
-    sample_ssm = sample_ssm %>%
-      dplyr::filter(Hugo_Symbol %in% these_genes)
-  }
-
-  # Optionally return variants from a particular study
-  if(!missing(this_study)){
-    sample_ssm <- sample_ssm %>%
-      dplyr::filter((!!sym("Study")) == this_study)
-  }  
-
-  #subset maf to only include first 43 columns (default)
-  if(basic_columns){
-    sample_ssm = dplyr::select(sample_ssm, c(1:45))
   }
 
 
@@ -98,30 +83,4 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
   # use S3-safe version of dplyr function
   sample_ssm = mutate.genomic_data(sample_ssm,maf_seq_type = this_seq_type)
   return(sample_ssm)
-}
-
-
-#' @rdname get_ssm_by_samples
-#'
-#' @examples
-#' #basic usage, using a single sample ID
-#' dohh2_maf = get_ssm_by_sample(this_sample_id = "DOHH-2")
-#'
-get_ssm_by_sample = function(this_sample_id = NULL,
-                             these_samples_metadata = NULL,
-                             this_seq_type = "genome",
-                             projection = "grch37",
-                             these_genes,
-                             basic_columns = TRUE,
-                             verbose = FALSE,
-                             ...){
-
-  get_ssm_by_samples(these_sample_ids = this_sample_id,
-                     these_samples_metadata = these_samples_metadata,
-                     this_seq_type = this_seq_type,
-                     projection = projection,
-                     these_genes = these_genes,
-                     basic_columns = basic_columns,
-                     verbose = verbose,
-                     ...)
 }

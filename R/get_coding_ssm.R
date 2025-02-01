@@ -147,8 +147,6 @@ bind_genomic_data <- function(...) {
 #' @param projection Reference genome build for the coordinates in the MAF file.
 #'      The default is grch37.
 #' @param this_seq_type The this_seq_type you want back, default is genome.
-#' @param basic_columns Set to FALSE to override the default behavior of
-#'      returning only the first 45 columns of MAF data.
 #' @param min_read_support Only returns variants with at least this many reads
 #'      in t_alt_count.
 #' @param include_silent Logical parameter indicating whether to include silent
@@ -184,7 +182,6 @@ get_coding_ssm = function(
     projection = "grch37",
     this_seq_type = "genome",
     tool_name = "slms-3",
-    basic_columns = TRUE,
     min_read_support = 3,
     include_silent = TRUE,
     verbose = FALSE,

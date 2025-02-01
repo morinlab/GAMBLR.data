@@ -19,7 +19,7 @@
 #' @param streamlined Return Start_Position and Tumor_Smaple_Barcode as the only two MAF columns. Default is FALSE.
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38).
 #' @param this_seq_type The seq_type you want back, default is genome.
-#' @param mode Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
+#' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
 #' @param this_study Optionally specify first name of the author for the paper
 #'      from which the variants should be returned for.
 #' @param verbose Set to FALSE to prevent ANY message to be printed.
@@ -51,7 +51,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
                              streamlined = FALSE,
                              projection = "grch37",
                              this_seq_type = "genome",
-                             mode = "slms-3",
+                             tool_name = "slms-3",
                              this_study,
                              verbose = FALSE,
                              ...){
@@ -112,11 +112,11 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
       dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend) %>%
       dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == mode))
+      dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
     muts_region <- GAMBLR.data::sample_data[[projection]]$ashm %>%
       dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend) %>%
       dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == mode)) %>%
+      dplyr::filter((tolower(!!sym("Pipeline")) == tool_name)) %>%
       bind_rows(this_maf, .)
   }else{
     muts_region = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids) %>%
@@ -131,6 +131,8 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     muts_region = muts_region %>%
       dplyr::select(Start_Position, Tumor_Sample_Barcode)
   }
-
+  muts_region = create_maf_data(muts_region,projection)
+  # use S3-safe version of dplyr function
+  muts_region = mutate.genomic_data(muts_region,maf_seq_type = this_seq_type)
   return(muts_region)
 }

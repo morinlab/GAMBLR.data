@@ -2,7 +2,6 @@
 % Please edit documentation in R/get_ssm_by_samples.R
 \name{get_ssm_by_samples}
 \alias{get_ssm_by_samples}
-\alias{get_ssm_by_sample}
 \title{Get SSM By Samples.}
 \usage{
 get_ssm_by_samples(
@@ -11,18 +10,6 @@ get_ssm_by_samples(
   this_seq_type = "genome",
   projection = "grch37",
   tool_name = "slms-3",
-  basic_columns = TRUE,
-  verbose = FALSE,
-  ...
-)
-
-get_ssm_by_sample(
-  this_sample_id = NULL,
-  these_samples_metadata = NULL,
-  this_seq_type = "genome",
-  projection = "grch37",
-  these_genes,
-  basic_columns = TRUE,
   verbose = FALSE,
   ...
 )
@@ -38,8 +25,6 @@ If not provided and these_sample_ids is also not provided, the function will ret
 \item{projection}{The projection genome build. Supports hg38 and grch37.}
 
 \item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
-
-\item{basic_columns}{Return first 43 columns of MAF rather than full details. Default is TRUE.}
 
 \item{verbose}{Enable for debugging/noisier output.}
 
@@ -65,8 +50,5 @@ cell_line_meta = get_gambl_metadata() \%>\%
   dplyr::filter(cohort == "DLBCL_cell_lines")
 
 dlbcl_maf = get_ssm_by_samples(these_samples_metadata = cell_line_meta)
-
-#basic usage, using a single sample ID
-dohh2_maf = get_ssm_by_sample(this_sample_id = "DOHH-2")
 
 }
