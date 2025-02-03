@@ -10,6 +10,7 @@
 #' @param skip_regions Character vector of genes to drop from GAMBLR aSHM regions.
 #' @param only_regions Character vector of genes to include from GAMBLR aSHM regions.
 #' @param projection Specify which genome build projection to use. The default is "grch37", also accepts "hg38".
+#' @param sort Set to TRUE to force regions_bed to be ordered on chromosome and coordinate
 #'
 #' @return A list with two objects, regions as a vector and in bed format.
 #'
@@ -36,7 +37,8 @@ process_regions <- function(regions_list = NULL,
                             region_padding = 0,
                             skip_regions = NULL,
                             only_regions = NULL,
-                            projection = "grch37") {
+                            projection = "grch37",
+                            sort = FALSE) {
 
   # Use default ashm region table if no regions are provided
   if (is.null(regions_list)) {
@@ -80,18 +82,36 @@ process_regions <- function(regions_list = NULL,
   } else {
     # Convert character vector of regions to df
     regions_bed <- bind_rows(lapply(regions_list, function(x) {
+
       chunks <- region_to_chunks(x)
+      if(projection=="grch37"){
+        chunks$chromosome = gsub("chr","",chunks$chromosome)
+      }else if(projection=="hg38" && !any(grepl("chr",chunks$chromosome))){
+        chunks$chromosome = paste0("chr",chunks$chromosome)
+      }
       df <- data.frame(
         chrom = chunks$chromosome,
         start = as.numeric(chunks$start),
         end = as.numeric(chunks$end)
       )
     }))
+    if(sort){
+      if(projection=="hg38"){
+        chrom_order = c(paste0("chr",c(1:22)),"chrX","chrY")
+      }else{
+        chrom_order = c(c(1:22),"X","Y")
+      }
+      
+      regions_bed = mutate(regions_bed,
+                           chrom=factor(chrom,levels=chrom_order)) %>%
+        arrange(chrom,start) %>%
+        mutate(chrom = as.character(chrom))
+    }
     if (!is.null(names(regions_list))) {
       regions_bed$name <- names(regions_list)
       regions_bed$gene <- names(regions_list)
     } else {
-      stop("Regions provided as an unnamed character vector. Please use a named vector instead...")
+      regions_bed = mutate(regions_bed,name=paste0(chrom,":",start,"-",end))
     }
   }
 
