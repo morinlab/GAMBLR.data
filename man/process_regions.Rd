@@ -10,7 +10,8 @@ process_regions(
   region_padding = 0,
   skip_regions = NULL,
   only_regions = NULL,
-  projection = "grch37"
+  projection = "grch37",
+  sort = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ process_regions(
 \item{only_regions}{Character vector of genes to include from GAMBLR aSHM regions.}
 
 \item{projection}{Specify which genome build projection to use. The default is "grch37", also accepts "hg38".}
+
+\item{sort}{Set to TRUE to force regions_bed to be ordered on chromosome and coordinate}
 }
 \value{
 A list with two objects, regions as a vector and in bed format.
