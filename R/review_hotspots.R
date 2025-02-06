@@ -22,7 +22,16 @@
 #'
 review_hotspots = function(annotated_maf,
                            genes_of_interest = c("FOXO1", "MYD88", "CREBBP", "NOTCH1", "NOTCH2", "CD79B", "EZH2"),
-                           genome_build = "grch37"){
+                           genome_build){
+  if(missing(genome_build)){
+    if("maf_data" %in% class(annotated_maf)){
+      genome_build = get_genome_build(annotated_maf)
+      #drop our S3 classes because these additional attributes seem to cause some problems when the data is subsequently munged.
+      annotated_maf = strip_genomic_classes(annotated_maf)
+    }else{
+      stop("genome_build is required")
+    }
+  }
 
   # define the list of genes currently supported for review
   supported_genes = c("FOXO1", "MYD88", "CREBBP", "NOTCH1", "NOTCH2", "CD79B", "EZH2")
@@ -99,5 +108,7 @@ review_hotspots = function(annotated_maf,
                                           ! Variant_Classification %in% truncating_variants,
                                           "TRUE", hot_spot))
   }
+  annotated_maf = create_maf_data(annotated_maf,genome_build)
+  
   return(annotated_maf)
 }
