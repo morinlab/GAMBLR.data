@@ -1,5 +1,79 @@
 # functions for creating and working with S3 objects
 
+#' Check and set the genome_build/projection
+#'
+#' This helper function checks the genome build of each genomic data object in
+#' \code{genomic_data_list} (using \code{get_genome_build()}) and ensures they are consistent.
+#' If all objects share a single, unique genome build, that value is returned. If a
+#' user-specified genome build (\code{suggested}) is provided, it is compared to the
+#' inferred build and must match; otherwise, an error is raised. If the genomic data
+#' objects have conflicting genome builds, or if no genome build can be inferred and
+#' no \code{suggested} value is provided, the function stops with an error.
+#'
+#' @param genomic_data_list A list of genomic data objects. Each object should have a genome build
+#'   that can be retrieved by \code{get_genome_build()}.
+#' @param suggested An optional character string specifying a genome build (projection) to be used.
+#'   If provided, it must match the genome build inferred from the data objects.
+#'
+#' @return A character string representing the genome build to be used.
+#' @export
+#'
+#' @examples
+#' # Example 1: When genomic data objects all have the same genome build.
+#' # Assuming maf_data and seg_data both have a genome build of "hg38":
+#' genomic_data <- list(maf_data = maf_data, seg_data = seg_data)
+#' projection <- check_get_projection(genomic_data, suggested = "hg38")
+#'
+#' # Example 2: When the genomic data objects conflict or no genome build is available.
+#' # This will throw an error:
+#' genomic_data <- list(maf_data = maf_data, seg_data = seg_data_with_different_build)
+#' projection <- check_get_projection(genomic_data, suggested = "hg38")
+#' 
+check_get_projection <- function(genomic_data_list, suggested) {
+  # Extract genome builds from each genomic data object
+  builds <- sapply(genomic_data_list, get_genome_build)
+  uniq_builds <- unique(builds)
+  
+  if (length(uniq_builds) == 1) {
+    # A single, consistent genome build was inferred.
+    if (!missing(suggested) && suggested != uniq_builds) {
+      stop("Mismatch between user-specified genome_build and the genome_build inferred from objects.")
+    }
+    return(uniq_builds)
+  }
+  
+  if (length(uniq_builds) > 1) {
+    # Conflicting genome builds among the objects.
+    stop("Conflicting genome_build values found: ", paste(uniq_builds, collapse = ", "))
+  }
+  
+  # No genome build could be inferred.
+  if (missing(suggested)) {
+    stop("No projection provided and genome_build cannot be inferred from the inputs.")
+  }
+  
+  return(suggested)
+}
+
+check_get_projection <- function(genomic_data_list, suggested) {
+  builds <- sapply(genomic_data_list, get_genome_build)
+  uniq_builds <- unique(builds)
+  if (length(uniq_builds) == 1) {
+    # If a genome build can be inferred unambiguously
+    if (!missing(suggested) && suggested != uniq_builds) {
+      stop("Mismatch between user-specified genome_build and the genome_build inferred from objects.")
+    }
+    return(uniq_builds)
+  }
+  if (length(uniq_builds) > 1) {
+    stop("Conflicting genome_build values found: ", paste(uniq_builds, collapse = ", "))
+  }
+  # If no genome build could be inferred (uniq_builds is empty)
+  if (missing(suggested)) {
+    stop("No projection provided and genome_build cannot be inferred from the inputs.")
+  }
+  return(suggested)
+}
 
 #' Create MAF Data
 #'
