@@ -32,7 +32,7 @@ LazyData: true
 Imports:
     dplyr,
     ggplot2,
-    tibble
+    tidyr
 LazyDataCompression: xz
 Suggests: 
     testthat (>= 3.0.0)
