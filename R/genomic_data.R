@@ -49,8 +49,15 @@ get_genome_build <- function(data) {
 #' @return A data frame with preserved genomic attributes.
 #' @export
 preserve_genomic_attributes <- function(new_data, old_data) {
+  # Preserve the genome_build attribute
   attr(new_data, "genome_build") <- attr(old_data, "genome_build")
-  class(new_data) <- class(old_data)
+  
+  # Combine the new data’s classes with the genomic classes
+  new_data_classes <- class(new_data)
+  # Ensure the genomic classes are at the front
+  new_classes <- unique(c("maf_data", "genomic_data", new_data_classes))
+  class(new_data) <- new_classes
+  
   return(new_data)
 }
 

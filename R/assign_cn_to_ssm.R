@@ -2,26 +2,26 @@
 #'
 #' @description Annotate mutations with their copy number information.
 #'
-#' @details This function takes a sample ID with the `this_sample_id` parameter
-#'      and annotates mutations with copy number information. A variety of
-#'      parameters are at hand for a customized workflow. For example,
-#'      the user can specify if only coding mutations are of interest. To do so,
-#'      set `coding_only = TRUE`. This function internally calls
-#'      `get_ssm_by_samples` and `get_sample_cn_segments`. This function can
-#'      also take a vector with genes of interest (`genes`) that the returned
-#'      data frame will be restricted to.
-#'
-#' @param this_sample_id Sample ID of the sample you want to annotate.
-#' @param genes A vector of characters with gene symbols (Hugo).
-#' @param this_seq_type Specified seq type for returned data. Default is genome.
-#' @param projection Specified genome projection that returned data is in
-#'      reference to. Default is grch37.
-#' @param coding_only Optional. Set to TRUE to restrict to only coding variants
-#'      (ssm). Deafult is FALSE.
+#' @details This function takes a metadata table and returns all mutations
+#'      for the samples in that metadata. Each mutation is annotated with the 
+#'      local copy number state of each mutated site. The user can specify if
+#'      only coding mutations are of interest. To do so,
+#'      set `coding_only = TRUE`. When necessary, this function relies on
+#'      `get_ssm_by_samples` and `get_cn_segments` to obtain the required data. 
+#' @param these_samples_metadata Metadata table with one or more rows to specify
+#'      the samples to process.
+#' @param maf_data A data frame of mutations in MAF format or maf_data object 
+#'      (e.g. from `get_coding_ssm` or `get_ssm_by_sample`).
+#' @param seg_data A data frame of segmented copy number data or seg_data object
+#' @param projection Specified genome projection that returned data is relative to. 
+#'      This is only required when it cannot be inferred from maf_df or seg_df 
+#'      (or they are not provided). 
+#' @param coding_only Optional. Set to TRUE to restrict to only variants in coding space
+#'      Default is to work with genome-wide variants.
 #' @param assume_diploid Optional, this parameter annotates every mutation as
 #'      copy neutral. Default is FALSE.
 #' @param include_silent Logical parameter indicating whether to include silent
-#'      mutations into coding mutations. Default is FALSE. This parameter only
+#'      mutations in coding space. Default is FALSE. This parameter only
 #'      makes sense if `coding_only` is set to TRUE.
 #' @param ... Any additional parameters.
 #'
@@ -36,41 +36,98 @@
 #' @export
 #'
 #' @examples
-#' cn_list = assign_cn_to_ssm(
-#'      this_sample_id = "DOHH-2",
-#'      coding_only = TRUE
-#' )
+#' # long-handed way
+#' # 1. get some metadata for a collection of samples
+#' some_meta = get_gambl_metadata() %>%
+#'         dplyr::filter(cohort=="FL_Dreval",
+#'         grepl("SP",sample_id))
+#' # 2. Get the SSMs for these samples
+#' 
+#' ssm_genomes_grch37 = get_coding_ssm(projection = "grch37",
+#'                                   these_samples_metadata = some_meta)
+#' # peek at the results
+#' ssm_genomes_grch37 %>% dplyr::select(1:8)
+#' 
+#' # 3. Lazily let this function obtain the corresponding seg_data for the right genome_build
+#' cn_list = assign_cn_to_ssm(some_meta,ssm_genomes_grch37)
+#' 
+#' cn_list$maf %>% dplyr::select(1:8,log.ratio,CN)
+#' 
+#' # This won't work because the hg38 seg_data is not bundled
+#' ssm_genomes_hg38 = get_coding_ssm(projection = "hg38",
+#'                                   these_samples_metadata = some_meta)
+#' cn_list = assign_cn_to_ssm(some_meta,ssm_genomes_hg38)
+#'
+#' # Easiest/laziest way:
+#' cn_list = assign_cn_to_ssm(projection = "grch37")
+#' 
+#' 
+#' cn_list$maf %>% dplyr::group_by(Tumor_Sample_Barcode,CN) %>%
+#'   dplyr::count()
 #'
 assign_cn_to_ssm = function(
-    this_sample_id,
-    genes,
-    this_seq_type = "genome",
-    projection = "grch37",
+    these_samples_metadata,
+    maf_data,
+    seg_data,
+    projection,
     coding_only = FALSE,
     assume_diploid = FALSE,
     include_silent = FALSE,
     ...
 ){
-
-    #warn/notify the user what version of this function they are using
-    message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
-
+    if(missing(these_samples_metadata)){
+        stop("No metadata provided. these_samples_metadata is required")
+    }
     #check if any invalid parameters are provided
     check_excess_params(...)
-
-    #ensure only one sample ID is provided
-    if(length(this_sample_id) > 1){
-        stop(
-            "This function only supports queries of 1 sample ID at the time..."
-        )
+    genomic_data = list()
+    if(!missing(maf_data)){
+      genomic_data[["maf_data"]] = maf_data
+    }
+    if(!missing(seg_data)){
+      genomic_data[["seg_data"]] = seg_data
     }
 
-    #get maf
-    maf_sample = get_ssm_by_sample(
-        this_sample_id = this_sample_id,
+    projection <- check_get_projection(genomic_data, suggested = projection)
+
+    if(missing(seg_data)){
+      seg_sample = get_cn_segments(
+        these_samples_metadata =  these_samples_metadata,
+        projection = projection
+      )
+      missing_from_seg = dplyr::filter(these_samples_metadata,
+                                  !sample_id %in% seg_sample$ID) %>% 
+        pull(sample_id) %>%
+        unique()
+      if(length(missing_from_seg) == length(unique(these_samples_metadata$sample_id))){
+        stop(paste("No seg_data could be found for ANY of the samples provided for",projection))
+      }
+      if(length(missing_from_seg)){
+        warning(paste("missing seg_data for",length(missing_from_seg),"samples"))
+      }
+    }else{
+      seg_sample = seg_data
+    }
+    
+    if(missing(maf_data)){
+      #get maf
+      maf_sample = get_ssm_by_samples(
+        these_samples_metadata = these_samples_metadata,
         projection = projection,
-        this_seq_type = this_seq_type
-    )
+      )
+      missing_from_maf = dplyr::filter(these_samples_metadata,
+                                       !sample_id %in% maf_sample$Tumor_Sample_Barcode) %>% 
+        pull(sample_id) %>%
+        unique()
+      if(length(missing_from_maf) == length(unique(these_samples_metadata$sample_id))){
+        stop(paste("No mutation could be found for ANY of the samples provided for",projection))
+      }
+      if(length(missing_from_maf)){
+        warning(paste("missing mutation for",length(missing_from_maf),"samples"))
+      }
+    }else{
+      maf_sample = maf_data
+    }
 
     #maf filtering
     #silent mutations
@@ -86,20 +143,7 @@ assign_cn_to_ssm = function(
         )
     }
 
-    #subset to genes of interest
-    if(!missing(genes)){
-        maf_sample = dplyr::filter(maf_sample, Hugo_Symbol %in% genes)
-        if(nrow(maf_sample) == 0){
-            stop("No variants left after filtering on the provided genes...")
-        }
-    }
 
-    #get seg
-    seg_sample = get_sample_cn_segments(
-        these_sample_ids = this_sample_id,
-        projection = projection,
-        this_seq_type = this_seq_type
-    )
 
     #annotate all CN segments as copy number neutral
     if(assume_diploid){
@@ -110,18 +154,21 @@ assign_cn_to_ssm = function(
     #wrangle the seg file
     seg_sample = seg_sample %>%
         dplyr::filter(end - start > 100) %>%
-        mutate(chrom = gsub("chr", "", chrom)) %>%
         rename(
             Chromosome = chrom,
             Start_Position = start,
             End_Position = end,
-            LOH = LOH_flag
+            LOH = LOH_flag,
+            Tumor_Sample_Barcode = ID
         ) %>%
         mutate(across(LOH, as.factor))
-
+   
     #perform an overlap join and add CN columns from the seg file and subset
     # MAF to basic columns (first 45)
-    maf_tmp = cool_overlaps(maf_sample, seg_sample, type = "any")
+    maf_tmp = cool_overlaps(maf_sample, seg_sample, 
+                            type = "any",
+                            columns1=c("Chromosome","Start_Position","End_Position","Tumor_Sample_Barcode"),
+                            columns2=c("Chromosome","Start_Position","End_Position","Tumor_Sample_Barcode"))
 
     #rename and change order of columns to match expected format
     maf_with_segs = maf_tmp %>%
