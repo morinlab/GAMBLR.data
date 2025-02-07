@@ -24,8 +24,12 @@ This function takes an already loaded MAF data frame with the \code{mutation_maf
 my_metadata = get_gambl_metadata()
 all_coding_ssm = get_coding_ssm(these_samples_metadata = my_metadata,
                                 projection = "grch37",
-                                this_seq_type = "genome")
+                                this_seq_type = "genome") \%>\%
+                   dplyr::filter(Hugo_Symbol \%in\% c("EZH2","MEF2B","MYD88","KMT2D")) \%>\%
+                   dplyr::arrange(Hugo_Symbol)
 
 hot_ssms = annotate_hotspots(all_coding_ssm)
+hot_ssms \%>\% dplyr::filter(!is.na(hot_spot)) \%>\% 
+      dplyr::select(1:5,37,hot_spot) 
 
 }
