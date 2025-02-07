@@ -29,18 +29,18 @@
 #' @export
 #'
 #' @examples
-#' #load packages
-#' library(dplyr)
 #'
-#' #basic usage, these_patient_ids
-#' my_patient = get_ssm_by_patients(these_patient_ids = "DOHH-2")
-#'
-#' #using a subset metadata tablee to retreive patient SSMs
-#' cell_line_meta = GAMBLR.data::sample_data$meta %>%
-#'  dplyr::filter(cohort == "DLBCL_cell_lines")
-#'
-#' patient_maf = get_ssm_by_patients(these_samples_metadata = cell_line_meta,
-#'                                   this_seq_type = "genome")
+#' # Lets find which patient_id occur more than once in the metadata first
+#' my_ids = get_gambl_metadata(seq_type_filter = c("genome","capture")) %>% 
+#'              dplyr::group_by(patient_id) %>% 
+#'              dplyr::tally() %>% 
+#'              dplyr::filter(n>1) %>% 
+#'              dplyr::pull(patient_id)
+#' 
+#' #now let's get every SSM for all samples from these patients
+#' patient_maf = get_ssm_by_patients(these_patient_ids = my_ids)
+#' patient_maf %>% dplyr::group_by(Tumor_Sample_Barcode) %>% 
+#'                 dplyr::count() %>% head()
 #'
 get_ssm_by_patients = function(these_patient_ids,
                                these_samples_metadata,
