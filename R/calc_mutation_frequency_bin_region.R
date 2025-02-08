@@ -48,14 +48,13 @@
 #' @export
 #'
 #' @examples
-#' myc_mut_freq = calc_mutation_frequency_bin_region(region = "8:128747680-128753674",
+#' myc_region = "8:128747680-128753674" 
+#' myc_mut_freq = calc_mutation_frequency_bin_region(region = myc_region,
 #'                                                   slide_by = 10,
 #'                                                   window_size = 10000)
+#' dplyr::arrange(myc_mut_freq,desc(mutation_count))
 #'
 calc_mutation_frequency_bin_region <- function(region,
-                                               chromosome,
-                                               start_pos,
-                                               end_pos,
                                                these_samples_metadata = NULL,
                                                these_sample_ids = NULL,
                                                this_seq_type = "genome",
@@ -73,25 +72,19 @@ calc_mutation_frequency_bin_region <- function(region,
   check_excess_params(...)
   
   # Create objects to describe region both as string and individual objects
-  try(if (missing(region) & missing(chromosome)) {
-    stop("No region information provided. Please provide a region as a string in the chrom:start-end format, or as individual arguments. ")
+  try(if (missing(region)) {
+    stop("No region information provided. Please provide a region as a string in the chrom:start-end format")
   })
   
   if ((drop_unmutated | min_count_per_bin > 0) & return_format == "wide") {
     message("To return a wide table, all samples and windows must be kept. Ignoring drop_unmutated and min_count_per_bin arguments. ")
   }
   
-  if (missing(region)) {
-    region <- paste0(
-      chromosome, ":", start_pos, "-",
-      end_pos
-    )
-  } else {
-    chunks <- region_to_chunks(region)
-    chromosome <- chunks$chromosome
-    start_pos <- as.numeric(chunks$start)
-    end_pos <- as.numeric(chunks$end)
-  }
+  
+  chunks <- region_to_chunks(region)
+  chromosome <- chunks$chromosome
+  start_pos <- as.numeric(chunks$start)
+  end_pos <- as.numeric(chunks$end)
   
   # Harmonize metadata and sample IDs
   metadata <- id_ease(

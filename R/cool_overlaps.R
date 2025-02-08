@@ -41,6 +41,7 @@
 #'      data will match the exact order of rows in the input data1.
 #'
 #' @return data frame
+#' @keywords internal
 #'
 #' @examples
 #' # obtain maf data

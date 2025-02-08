@@ -53,10 +53,10 @@ or an already subset metadata table (\code{these_samples_metadata}).
 \examples{
 
 # Lets find which patient_id occur more than once in the metadata first
-my_ids = get_gambl_metadata(seq_type_filter = c("genome","capture")) \%>\% 
-             dplyr::group_by(patient_id) \%>\% 
-             dplyr::tally() \%>\% 
-             dplyr::filter(n>1) \%>\% 
+my_ids = get_gambl_metadata(seq_type_filter = c("genome","capture")) \%>\%
+             dplyr::group_by(patient_id) \%>\%
+             dplyr::tally() \%>\%
+             dplyr::filter(n>1) \%>\%
              dplyr::pull(patient_id)
 
 #now let's get every SSM for all samples from these patients

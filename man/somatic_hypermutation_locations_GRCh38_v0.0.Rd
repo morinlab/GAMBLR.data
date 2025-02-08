@@ -25,4 +25,4 @@ somatic_hypermutation_locations_GRCh38_v0.0
 \description{
 A data frame with somatic hypermutation locations in respect to GRCh38, version 0.0.
 }
-\keyword{datasets}
+\keyword{internal}

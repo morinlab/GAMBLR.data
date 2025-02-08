@@ -21,4 +21,4 @@ hotspot_regions_hg38
 \description{
 Mutation hotspot regions in respect to hg38.
 }
-\keyword{datasets}
+\keyword{internal}

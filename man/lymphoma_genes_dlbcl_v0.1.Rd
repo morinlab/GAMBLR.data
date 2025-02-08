@@ -31,4 +31,4 @@ lymphoma_genes_dlbcl_v0.1
 \description{
 Genes frequently associated with Diffuse large B cell lymphoma (DLBCL). This is version 0.1.
 }
-\keyword{datasets}
+\keyword{internal}

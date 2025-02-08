@@ -15,3 +15,4 @@ A string specifying the genome build.
 \description{
 This function retrieves the genome build attribute from the data.
 }
+\keyword{internal}

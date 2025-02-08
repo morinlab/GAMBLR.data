@@ -15,16 +15,22 @@ create_bed_data(
 \arguments{
 \item{bed_df}{A data frame containing the BED data.}
 
-\item{genome_build}{A string specifying the genome build ("grch37" or "hg38").
-If NULL, the function will try to infer the genome build from the object name.}
+\item{genome_build}{A string specifying the genome build
+("grch37" or "hg38").
+If NULL, the function will try to infer the genome build
+from the object name.}
 
-\item{fix_names}{Either NULL (the default), or one of "chrom_start_end" or "concat".
-If not NULL and duplicate names are detected, the function will apply the chosen fix.}
+\item{fix_names}{Either NULL (the default), or one of "chrom_start_end"
+or "concat".
+If not NULL and duplicate names are detected, the function will
+apply the chosen fix.}
 
-\item{concat_cols}{When \code{fix_names = "concat"}, a character vector specifying which columns
+\item{concat_cols}{When \code{fix_names = "concat"}, a character vector
+specifying which columns
 from the original data to merge.}
 
-\item{sep}{The separator to use when concatenating columns if fix_names = "concat".
+\item{sep}{The separator to use when concatenating columns if
+fix_names = "concat".
 Defaults to "" (no separator).}
 }
 \value{
@@ -63,15 +69,13 @@ ashm_bed = create_bed_data(GAMBLR.data::grch37_ashm_regions,
                 concat_cols = c("gene","region"),
                 sep="-")
 # the build is automatically inferred if it is in the variable name
-# get_genome_build(ashm_bed)
-# [1] "grch37"
-
+get_genome_build(ashm_bed)
+print(ashm_bed)
 another_bed = create_bed_data(somatic_hypermutation_locations_GRCh37_v_latest,
                               fix_names = "concat",
                               concat_cols = c("chr_name","hg19_start","hg19_end"))
 
-# get_genome_build(another_bed)
-# [1] "grch37"
+get_genome_build(another_bed)
 
 # get a bed_data object for all gene regions and combine several columns to make a unique name
 gene_regions <- create_bed_data(hg38_gene_coordinates,
@@ -79,8 +83,6 @@ gene_regions <- create_bed_data(hg38_gene_coordinates,
                     sep="-",
                     concat_cols = c("chromosome","start","end","gene_name"))
                     
-#get_genome_build(gene_regions)
-# [1] "hg38"                     
-
+get_genome_build(gene_regions)
 
 }

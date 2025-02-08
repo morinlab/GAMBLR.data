@@ -12,11 +12,14 @@ get_cn_segments(
 )
 }
 \arguments{
-\item{these_samples_metadata}{User must provide a metadata table to restrict the data to the samples in your table.
-The metadata also ensures the proper handling of duplicate sample_id across seq_types and ensures the
-seq_type in the metadata faithfully represents the seq_type of the data}
+\item{these_samples_metadata}{User must provide a metadata table to
+restrict the data to the samples in your table.
+The metadata also ensures the proper handling of duplicate sample_id
+across seq_types and ensures the seq_type in the metadata faithfully
+represents the seq_type of the data}
 
-\item{projection}{Desired genome coordinate system for returned CN segments. Default is "grch37".}
+\item{projection}{Desired genome coordinate system for returned CN segments.
+Default is "grch37".}
 
 \item{this_seq_type}{Deprecated.}
 
@@ -29,13 +32,14 @@ A data frame with CN segments for the specified region.
 Retrieve all copy number segments from the GAMBL outputs
 }
 \details{
-This function merely loads and returns all the seg_data available for a projection (genome build)
+This function merely loads and returns all the seg_data
+available for a projection (genome build)
 }
 \examples{
 # Example for the capture samples:
 
-genome_metadata = GAMBLR.data::get_gambl_metadata(seq_type_filter="genome") 
-                      
+genome_metadata = get_gambl_metadata(seq_type_filter="genome")
+
 genome_segments_hg38 = get_cn_segments(
                              these_samples_metadata = genome_metadata,
                              projection="hg38")

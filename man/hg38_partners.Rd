@@ -23,4 +23,4 @@ hg38_partners
 \description{
 Translocation partners for oncogenes in with coordinates in respect to hg38.
 }
-\keyword{datasets}
+\keyword{internal}

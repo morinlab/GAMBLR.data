@@ -21,3 +21,4 @@ This function removes custom classes associated with genomic data objects
 of an object. This can be useful when you want to revert an S3 object to its
 underlying data.frame (or data.table) classes without converting the object.
 }
+\keyword{internal}

@@ -24,4 +24,4 @@ hg38_gene_coordinates
 \description{
 All gene coordinates in respect to hg38.
 }
-\keyword{datasets}
+\keyword{internal}

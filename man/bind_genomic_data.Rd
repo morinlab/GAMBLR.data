@@ -25,3 +25,4 @@ An error will also be thrown if the same sample id is found in more than one of 
 merged_maf = bind_genomic_data(maf1, maf2,check_id=FALSE)
 
 }
+\keyword{internal}

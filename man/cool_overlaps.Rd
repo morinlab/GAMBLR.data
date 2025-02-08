@@ -96,3 +96,4 @@ overlap <- cool_overlaps(
 )
 
 }
+\keyword{internal}

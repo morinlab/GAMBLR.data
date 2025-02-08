@@ -23,4 +23,4 @@ https://github.com/morinlab/g3viz/tree/master/data
 \examples{
 mutation.table.df
 }
-\keyword{datasets}
+\keyword{internal}

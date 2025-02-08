@@ -6,9 +6,6 @@
 \usage{
 calc_mutation_frequency_bin_region(
   region,
-  chromosome,
-  start_pos,
-  end_pos,
   these_samples_metadata = NULL,
   these_sample_ids = NULL,
   this_seq_type = "genome",
@@ -26,12 +23,6 @@ calc_mutation_frequency_bin_region(
 \arguments{
 \item{region}{A string describing a genomic region in the "chrom:start-end" format.
 The region must be specified in this format OR as separate chromosome, start_pos, end_pos arguments.}
-
-\item{chromosome}{Chromosome name in region.}
-
-\item{start_pos}{Start coordinate of region.}
-
-\item{end_pos}{End coordinate of region.}
 
 \item{these_samples_metadata}{Optional data frame containing a sample_id column.
 If not providing a maf file, seq_type is also a required column.}
@@ -69,6 +60,12 @@ or binary mutated/unmutated status (FALSE). Default is TRUE.}
 Only effective with "long" return format.}
 
 \item{...}{Any additional parameters.}
+
+\item{chromosome}{Chromosome name in region.}
+
+\item{start_pos}{Start coordinate of region.}
+
+\item{end_pos}{End coordinate of region.}
 }
 \value{
 Either a matrix or a long tidy table of counts per window.
@@ -87,8 +84,10 @@ To return a matrix of sliding window counts over multiple regions,
 see \code{calc_mutation_frequency_bin_regions}.
 }
 \examples{
-myc_mut_freq = calc_mutation_frequency_bin_region(region = "8:128747680-128753674",
+myc_region = "8:128747680-128753674" 
+myc_mut_freq = calc_mutation_frequency_bin_region(region = myc_region,
                                                   slide_by = 10,
                                                   window_size = 10000)
+dplyr::arrange(myc_mut_freq,desc(mutation_count))
 
 }

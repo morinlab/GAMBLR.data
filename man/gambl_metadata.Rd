@@ -45,4 +45,4 @@ gambl_metadata
 \description{
 A data frame with metadata for a collection of GAMBL samples.
 }
-\keyword{datasets}
+\keyword{internal}

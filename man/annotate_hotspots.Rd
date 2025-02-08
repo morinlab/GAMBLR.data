@@ -15,21 +15,24 @@ annotate_hotspots(mutation_maf, ...)
 The same data frame with one additional column "hot_spot".
 }
 \description{
-Annotate MAF-like data frome with a hot_spot column indicating recurrent mutations.
+Annotate MAF-like data frome with a hot_spot column indicating
+recurrent mutations.
 }
 \details{
-This function takes an already loaded MAF data frame with the \code{mutation_maf} parameter.
+This function takes an already loaded MAF data frame with the
+\code{mutation_maf} parameter.
 }
 \examples{
 my_metadata = get_gambl_metadata()
 all_coding_ssm = get_coding_ssm(these_samples_metadata = my_metadata,
                                 projection = "grch37",
                                 this_seq_type = "genome") \%>\%
-                   dplyr::filter(Hugo_Symbol \%in\% c("EZH2","MEF2B","MYD88","KMT2D")) \%>\%
+                   dplyr::filter(Hugo_Symbol \%in\% c("EZH2",
+                                 "MEF2B","MYD88","KMT2D")) \%>\%
                    dplyr::arrange(Hugo_Symbol)
 
 hot_ssms = annotate_hotspots(all_coding_ssm)
-hot_ssms \%>\% dplyr::filter(!is.na(hot_spot)) \%>\% 
-      dplyr::select(1:5,37,hot_spot) 
+hot_ssms \%>\% dplyr::filter(!is.na(hot_spot)) \%>\%
+      dplyr::select(1:5,37,hot_spot)
 
 }

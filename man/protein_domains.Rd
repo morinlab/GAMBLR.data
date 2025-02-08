@@ -31,4 +31,4 @@ protein_domains
 A data frame with high-quality positions of amino acid positions in their
 corresponding domains.
 }
-\keyword{datasets}
+\keyword{internal}

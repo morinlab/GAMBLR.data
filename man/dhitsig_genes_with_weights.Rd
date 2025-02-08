@@ -21,4 +21,4 @@ dhitsig_genes_with_weights
 \description{
 A data frame with double hit signature genes (both as ensembl IDs and Hugo symbols) and importance scores.
 }
-\keyword{datasets}
+\keyword{internal}

@@ -23,4 +23,4 @@ colour_codes
 \description{
 A data frame with colour codes (hex) arranged into different categories, groups.
 }
-\keyword{datasets}
+\keyword{internal}

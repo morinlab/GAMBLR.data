@@ -21,4 +21,4 @@ target_regions_grch37
 \description{
 Target regions in respect to grch37.
 }
-\keyword{datasets}
+\keyword{internal}

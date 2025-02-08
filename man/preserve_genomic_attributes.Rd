@@ -17,3 +17,4 @@ A data frame with preserved genomic attributes.
 \description{
 This function preserves the genomic attributes and class after dplyr operations.
 }
+\keyword{internal}

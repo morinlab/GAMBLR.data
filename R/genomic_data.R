@@ -3,30 +3,34 @@
 #' Check and set the genome_build/projection
 #'
 #' This helper function checks the genome build of each genomic data object in
-#' \code{genomic_data_list} (using \code{get_genome_build()}) and ensures they are consistent.
-#' If all objects share a single, unique genome build, that value is returned. If a
-#' user-specified genome build (\code{suggested}) is provided, it is compared to the
-#' inferred build and must match; otherwise, an error is raised. If the genomic data
-#' objects have conflicting genome builds, or if no genome build can be inferred and
-#' no \code{suggested} value is provided, the function stops with an error.
+#' \code{genomic_data_list} (using \code{get_genome_build()}) and ensures
+#' they are consistent. If all objects share a single, unique genome build,
+#' that value is returned. If a user-specified genome build (\code{suggested})
+#' is provided, it is compared to the inferred build and must match; otherwise,
+#' an error is raised. If the genomic data objects have conflicting genome
+#' builds or if no genome build can be inferred and no \code{suggested}
+#' value is provided, the function stops with an error.
 #'
-#' @param genomic_data_list A list of genomic data objects. Each object should have a genome build
-#'   that can be retrieved by \code{get_genome_build()}.
-#' @param suggested An optional character string specifying a genome build (projection) to be used.
-#'   If provided, it must match the genome build inferred from the data objects.
+#' @param genomic_data_list A list of genomic data objects. Each object should
+#' have a genome build that can be retrieved by \code{get_genome_build()}.
+#' @param suggested An optional character string specifying a genome build
+#' (projection) to be used. If provided, it must match the genome build inferred
+#' from the data objects.
 #'
 #' @return A character string representing the genome build to be used.
 #' @export
-#'
+#' @keywords internal
 #' @examples
 #' # Example 1: When genomic data objects all have the same genome build.
 #' # Assuming maf_data and seg_data both have a genome build of "hg38":
 #' genomic_data <- list(maf_data = maf_data, seg_data = seg_data)
 #' projection <- check_get_projection(genomic_data, suggested = "hg38")
 #'
-#' # Example 2: When the genomic data objects conflict or no genome build is available.
-#' # This will throw an error:
-#' genomic_data <- list(maf_data = maf_data, seg_data = seg_data_with_different_build)
+#' # Example 2: When the genomic data objects conflict or no genome build
+#' # is available.
+#' # This will raise an error:
+#' genomic_data <- list(maf_data = maf_data,
+#'                      seg_data = seg_data_with_different_build)
 #' projection <- check_get_projection(genomic_data, suggested = "hg38")
 #' 
 check_get_projection <- function(genomic_data_list, suggested) {
@@ -37,43 +41,48 @@ check_get_projection <- function(genomic_data_list, suggested) {
   if (length(uniq_builds) == 1) {
     # A single, consistent genome build was inferred.
     if (!missing(suggested) && suggested != uniq_builds) {
-      stop("Mismatch between user-specified genome_build and the genome_build inferred from objects.")
+      stop("Mismatch between user-specified genome_build and
+      the genome_build inferred from objects.")
     }
     return(uniq_builds)
   }
   
   if (length(uniq_builds) > 1) {
     # Conflicting genome builds among the objects.
-    stop("Conflicting genome_build values found: ", paste(uniq_builds, collapse = ", "))
+    stop("Conflicting genome_build values found: ",
+    paste(uniq_builds, collapse = ", "))
   }
-  
+
   # No genome build could be inferred.
   if (missing(suggested)) {
-    stop("No projection provided and genome_build cannot be inferred from the inputs.")
+    stop("No projection provided and genome_build
+    cannot be inferred from the inputs.")
   }
-  
+
   return(suggested)
 }
 
-check_get_projection <- function(genomic_data_list, suggested) {
-  builds <- sapply(genomic_data_list, get_genome_build)
-  uniq_builds <- unique(builds)
-  if (length(uniq_builds) == 1) {
-    # If a genome build can be inferred unambiguously
-    if (!missing(suggested) && suggested != uniq_builds) {
-      stop("Mismatch between user-specified genome_build and the genome_build inferred from objects.")
-    }
-    return(uniq_builds)
-  }
-  if (length(uniq_builds) > 1) {
-    stop("Conflicting genome_build values found: ", paste(uniq_builds, collapse = ", "))
-  }
-  # If no genome build could be inferred (uniq_builds is empty)
-  if (missing(suggested)) {
-    stop("No projection provided and genome_build cannot be inferred from the inputs.")
-  }
-  return(suggested)
+## GAMBLR.data
+#' Create Segmented Data
+#'
+#' This function creates segmented data from the given input.
+#'
+#' @param seg_df A data frame containing the segmented data.
+#' @param genome_build Required character vector specifying the genome build
+#' currently supported: "grch37" or "hg38".
+#' @return A data frame with class attributes for segmented data.
+#' @export
+#' @examples
+#' seg_df <- data.frame(...)
+#' create_seg_data(seg_df, "grch37")
+create_seg_data <- function(seg_df, genome_build) {
+  if (!inherits(seg_df, "data.frame")) stop("data must be a data frame")
+  if (!genome_build %in% c("grch37", "hg38")) stop("Invalid genome build")
+  structure(seg_df,
+            class = c("seg_data", class(seg_df)),
+            genome_build = genome_build)
 }
+
 
 #' Create MAF Data
 #'
@@ -93,6 +102,7 @@ create_maf_data <- function(maf_df, genome_build) {
 }
 
 #' @export
+#' @keywords internal
 print.maf_data <- function(x, ...) {
   cat("MAF Data Object\n")
   cat("Genome Build:", attr(x, "genome_build"), "\n")
@@ -110,6 +120,7 @@ print.maf_data <- function(x, ...) {
 #' @param data A data frame with genome build attribute.
 #' @return A string specifying the genome build.
 #' @export
+#' @keywords internal
 get_genome_build <- function(data) {
   attr(data, "genome_build")
 }
@@ -122,6 +133,7 @@ get_genome_build <- function(data) {
 #' @param old_data The original data frame with genomic attributes.
 #' @return A data frame with preserved genomic attributes.
 #' @export
+#' @keywords internal
 preserve_genomic_attributes <- function(new_data, old_data) {
   # Preserve the genome_build attribute
   attr(new_data, "genome_build") <- attr(old_data, "genome_build")
@@ -147,6 +159,7 @@ preserve_genomic_attributes <- function(new_data, old_data) {
 #'        c("genomic_data", "maf_data", "bed_data").
 #' @return The object with the specified classes removed.
 #' @export
+#' @keywords internal
 strip_genomic_classes <- function(x, classes = c("genomic_data", "maf_data", "bed_data")) {
   current_classes <- class(x)
   new_classes <- setdiff(current_classes, classes)
@@ -157,31 +170,37 @@ strip_genomic_classes <- function(x, classes = c("genomic_data", "maf_data", "be
 
 # S3 methods for genomic_data class
 #' @export
+#' @keywords internal
 mutate.genomic_data <- function(.data, ...) {
   new_data <- dplyr::mutate(as.data.frame(.data), ...)
   preserve_genomic_attributes(new_data, .data)
 }
 #' @export
+#' @keywords internal
 filter.genomic_data <- function(.data, ...) {
   new_data <- dplyr::filter(as.data.frame(.data), ...)
   preserve_genomic_attributes(new_data, .data)
 }
 #' @export
+#' @keywords internal
 select.genomic_data <- function(.data, ...) {
   new_data <- dplyr::select(as.data.frame(.data), ...)
   preserve_genomic_attributes(new_data, .data)
 }
 #' @export
+#' @keywords internal
 rename.genomic_data <- function(.data, ...) {
   new_data <- dplyr::rename(as.data.frame(.data), ...)
   preserve_genomic_attributes(new_data, .data)
 }
 #' @export
+#' @keywords internal
 arrange.genomic_data <- function(.data, ...) {
   new_data <- dplyr::arrange(as.data.frame(.data), ...)
   preserve_genomic_attributes(new_data, .data)
 }
 #' @export
+#' @keywords internal
 group_by.genomic_data <- function(.data, ..., .add = FALSE) {
   new_data <- dplyr::group_by(as.data.frame(.data), ..., .add = .add)
   preserve_genomic_attributes(new_data, .data)
@@ -209,8 +228,9 @@ ungroup.genomic_data <- function(x, ...) {
 #'
 #' merged_maf = bind_genomic_data(maf1, maf2,check_id=FALSE)
 #'
+#' @keywords internal
 bind_genomic_data <- function(..., check_id = TRUE) {
-  
+
   in_list <- list(...)
   
   if ("maf_data" %in% class(in_list[[1]])) {
@@ -224,7 +244,8 @@ bind_genomic_data <- function(..., check_id = TRUE) {
   }
   
   # Ensure all inputs are either maf_data or seg_data objects
-  if (!all(sapply(in_list, inherits, "maf_data")) && !all(sapply(in_list, inherits, "seg_data"))) {
+  if (!all(sapply(in_list, inherits, "maf_data")) &&
+         !all(sapply(in_list, inherits, "seg_data"))) {
     stop("All inputs must be maf_data objects or seg_data objects.")
   }
   
@@ -232,11 +253,13 @@ bind_genomic_data <- function(..., check_id = TRUE) {
   genome_builds <- unique(sapply(in_list, get_genome_build))
   
   if (length(genome_builds) > 1) {
-    stop("Cannot bind seg_data or maf_data objects with different genome builds: ", 
+    stop("Cannot bind seg_data or maf_data objects
+    with different genome builds: ", 
          paste(genome_builds, collapse = ", "))
   }
   
-  # If check_id is TRUE, verify that the expected ID column exists and that IDs are unique.
+  # If check_id is TRUE, verify that the expected ID column exists and
+  # that IDs are unique.
   if (check_id) {
     # Collect unique sample IDs from each dataset
     id_sets <- lapply(in_list, function(df) {
@@ -252,15 +275,18 @@ bind_genomic_data <- function(..., check_id = TRUE) {
     
     # If any ID is found in multiple datasets, throw an error
     if (length(duplicate_ids) > 0) {
-      stop("Duplicate IDs found in multiple input data frames: ", paste(duplicate_ids, collapse = ", "))
+      stop("Duplicate IDs found in multiple input data frames: ",
+      paste(duplicate_ids, collapse = ", "))
     }
   }
   
   combined <- dplyr::bind_rows(in_list)
-  attr(combined, "genome_build") <- genome_builds[1]  # Assign the common genome build
+  attr(combined, "genome_build") <- genome_builds[1]  
+# Assign the common genome build
   
   if (!"maf_data" %in% class(combined)) {
-    class(combined) <- c("maf_data", "genomic_data", class(combined))  # Preserve class
+    class(combined) <- c("maf_data", "genomic_data", class(combined))
+# Preserve class
   }
   
   return(combined)
@@ -294,13 +320,19 @@ bind_genomic_data <- function(..., check_id = TRUE) {
 #' where they occur.
 #'
 #' @param bed_df A data frame containing the BED data.
-#' @param genome_build A string specifying the genome build ("grch37" or "hg38").
-#'        If NULL, the function will try to infer the genome build from the object name.
-#' @param fix_names Either NULL (the default), or one of "chrom_start_end" or "concat".
-#'        If not NULL and duplicate names are detected, the function will apply the chosen fix.
-#' @param concat_cols When `fix_names = "concat"`, a character vector specifying which columns
+#' @param genome_build A string specifying the genome build
+#' ("grch37" or "hg38").
+#'        If NULL, the function will try to infer the genome build
+#' from the object name.
+#' @param fix_names Either NULL (the default), or one of "chrom_start_end"
+#' or "concat".
+#'        If not NULL and duplicate names are detected, the function will
+#' apply the chosen fix.
+#' @param concat_cols When `fix_names = "concat"`, a character vector
+#' specifying which columns
 #'        from the original data to merge.
-#' @param sep The separator to use when concatenating columns if fix_names = "concat".
+#' @param sep The separator to use when concatenating columns if
+#' fix_names = "concat".
 #'        Defaults to "" (no separator).
 #' @return A data frame with class attributes for BED data.
 #' 
@@ -314,15 +346,13 @@ bind_genomic_data <- function(..., check_id = TRUE) {
 #'                 concat_cols = c("gene","region"),
 #'                 sep="-")
 #' # the build is automatically inferred if it is in the variable name
-#' # get_genome_build(ashm_bed)
-#' # [1] "grch37"
-#' 
+#' get_genome_build(ashm_bed)
+#' print(ashm_bed)
 #' another_bed = create_bed_data(somatic_hypermutation_locations_GRCh37_v_latest,
 #'                               fix_names = "concat",
 #'                               concat_cols = c("chr_name","hg19_start","hg19_end"))
 #' 
-#' # get_genome_build(another_bed)
-#' # [1] "grch37"
+#' get_genome_build(another_bed)
 #' 
 #' # get a bed_data object for all gene regions and combine several columns to make a unique name
 #' gene_regions <- create_bed_data(hg38_gene_coordinates,
@@ -330,10 +360,8 @@ bind_genomic_data <- function(..., check_id = TRUE) {
 #'                     sep="-",
 #'                     concat_cols = c("chromosome","start","end","gene_name"))
 #'                     
-#' #get_genome_build(gene_regions)
-#' # [1] "hg38"                     
-#' 
-#' 
+#' get_genome_build(gene_regions)
+#'
 create_bed_data <- function(bed_df,
                             genome_build = NULL,
                             fix_names = NULL,

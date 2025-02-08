@@ -20,3 +20,4 @@ This function is designed to work as internal function-call in already available
 \details{
 Catch function calls containing unsupported arguments.
 }
+\keyword{internal}
