@@ -2,7 +2,6 @@
 
 export("%>%")
 export(collate_results)
-export(cool_overlaps)
 export(get_coding_ssm)
 export(get_coding_ssm_status)
 export(get_colours)
