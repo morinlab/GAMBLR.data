@@ -32,8 +32,6 @@ LazyData: true
 Imports:
     dplyr,
     ggplot2,
-    purrr,
-    tibble,
     tidyr
 LazyDataCompression: xz
 Suggests: 
