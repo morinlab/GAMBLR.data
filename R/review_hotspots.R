@@ -39,9 +39,9 @@ review_hotspots = function(annotated_maf,
   # check genome build because CREBBP coordinates are hg19-based or hg38-based
 
   if (genome_build %in% c("hg19", "grch37", "hs37d5", "GRCh37")){
-    coordinates = hotspot_regions_grch37
+    coordinates = GAMBLR.data::hotspot_regions_grch37
   }else if(genome_build %in% c("hg38", "grch38", "GRCh38")){
-    coordinates = hotspot_regions_hg38
+    coordinates = GAMBLR.data::hotspot_regions_hg38
   }else{
     stop("The genome build specified is not currently supported. Please provide MAF file in one of the following cordinates: hg19, grch37, hs37d5, GRCh37, hg38, grch38, or GRCh38")
   }
