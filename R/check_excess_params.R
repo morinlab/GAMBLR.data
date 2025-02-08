@@ -9,9 +9,9 @@
 #' @param ... Parameters to check.
 #'
 #' @return Nothing
-#' 
-#' @export
 #'
+#' @export
+#' @keywords internal
 check_excess_params = function(...){
   callingFun = as.list(sys.call(-1))[[1]]
   arguments <- list(...)
