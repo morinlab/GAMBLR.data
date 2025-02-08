@@ -60,12 +60,6 @@ or binary mutated/unmutated status (FALSE). Default is TRUE.}
 Only effective with "long" return format.}
 
 \item{...}{Any additional parameters.}
-
-\item{chromosome}{Chromosome name in region.}
-
-\item{start_pos}{Start coordinate of region.}
-
-\item{end_pos}{End coordinate of region.}
 }
 \value{
 Either a matrix or a long tidy table of counts per window.

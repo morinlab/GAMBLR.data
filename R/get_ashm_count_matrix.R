@@ -30,75 +30,72 @@
 #'      this_seq_type = "genome"
 #' )
 #'
-#' #this example intentionally fails 
-#'  matrix <- get_ashm_count_matrix(regions_bed=regions_bed,this_seq_type = "genome",
+#' #this example should fail because the regions_bed is not hg38
+#'  matrix <- get_ashm_count_matrix(regions_bed=regions_bed,
+#'                             this_seq_type = "genome",
 #'                             these_samples_metadata = my_meta,
 #'                             projection = "hg38")
 #' # Error in get_ashm_count_matrix(
 #' # Your projection argument does not match the genome_build of regions_bed
-#' 
-#' # format the name column to include the chromosome coordinates instead of the gene
+#'
+#' # format the name column to include the coordinates instead of the gene
 #' regions_bed = create_bed_data(GAMBLR.data::hg38_ashm_regions,
 #'                            fix_names="concat",
 #'                            concat_cols=c("chr_name","hg38_start","hg38_end"),
 #'                            sep="-")
-#'                            
-#'  matrix_hg38 <- get_ashm_count_matrix(regions_bed=regions_bed,this_seq_type = "genome",
-#'                             these_samples_metadata = my_meta,
-#'                             projection = "hg38")
 #'
+#'  matrix_hg38 <- get_ashm_count_matrix(regions_bed=regions_bed,
+#'                                       this_seq_type = "genome",
+#'                                       these_samples_metadata = my_meta,
+#'                                       projection = "hg38")
+#' print(dim(matrix_hg38))
+#' print(head(matrix_hg38[,c(1:8)]))
 get_ashm_count_matrix = function(
-        regions_bed,
-        these_samples_metadata,
-        this_seq_type,
-        projection = "grch37"
-    ){
-    if(missing(this_seq_type)){
-        if(missing(these_samples_metadata)){
-            stop(
-                "Please supply either the this_seq_type or a metadata from which it can be retrieved"
-            )
-        }
-        this_seq_type <- these_samples_metadata %>%
-            pull(seq_type) %>%
-            unique()
+  regions_bed,
+  these_samples_metadata,
+  this_seq_type,
+  projection = "grch37"
+) {
+  if (missing(this_seq_type)) {
+    if (missing(these_samples_metadata)) {
+      stop("Please supply either the this_seq_type or a
+      metadata from which it can be retrieved")
     }
+    this_seq_type <- these_samples_metadata %>%
+      pull(seq_type) %>%
+      unique()
+  }
 
-    if(missing(regions_bed)){
-        message(
-            "Using aSHM regions in grch37 genome_build as regions_bed"
-        )
-        if(projection=="grch37"){
-          regions_bed <- GAMBLR.data::grch37_ashm_regions %>%
-            mutate(name = paste(gene, region, sep = "_")) %>%
-            create_bed_data(genome_build = projection)
-        }else if(projection=="hg38"){
-          regions_bed <- GAMBLR.data::hg38_ashm_regions %>%
-            mutate(name = paste(gene, region, sep = "_")) %>%
-            create_bed_data(genome_build = projection)
-        }else{
-          stop(paste("unsupported genome build",projection))
-        }
-        
+  if (missing(regions_bed)){
+    message(
+      "Using aSHM regions in grch37 genome_build as regions_bed"
+    )
+    if (projection=="grch37"){
+      regions_bed <- GAMBLR.data::grch37_ashm_regions %>%
+        mutate(name = paste(gene, region, sep = "_")) %>%
+        create_bed_data(genome_build = projection)
+    } else if(projection=="hg38") {
+      regions_bed <- GAMBLR.data::hg38_ashm_regions %>%
+      mutate(name = paste(gene, region, sep = "_")) %>%
+      create_bed_data(genome_build = projection)
     }else{
-      if("bed_data" %in% class(regions_bed)){
-        if(!get_genome_build(regions_bed)==projection){
-          stop(paste("Your genome_build argument does not match the genome_build of regions_bed",get_genome_build(regions_bed),genome_build))
-        }
+      stop(paste("unsupported genome build",projection))
+    }
+  }else {
+    if ("bed_data" %in% class(regions_bed)) {
+      if(!get_genome_build(regions_bed)==projection) {
+        stop(paste("Your genome_build argument does not match the genome_build of regions_bed",get_genome_build(regions_bed),genome_build))
       }
     }
+  }
 
-    
-
-    if(missing(these_samples_metadata)){
-        all_meta <- get_gambl_metadata(
-            seq_type_filter=this_seq_type
-        ) %>%
-        dplyr::select(sample_id)
-    }else{
+  if (missing(these_samples_metadata)){
+    all_meta <- get_gambl_metadata(seq_type_filter=this_seq_type) %>%
+      dplyr::select(sample_id)
+  }else {
         all_meta <- these_samples_metadata %>%
             dplyr::select(sample_id)
-    }
+  }
   
     ashm_maf <- get_ssm_by_regions(
       regions_bed = regions_bed,

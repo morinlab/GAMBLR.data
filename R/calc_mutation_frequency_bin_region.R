@@ -13,9 +13,6 @@
 #'
 #' @param region A string describing a genomic region in the "chrom:start-end" format. 
 #' The region must be specified in this format OR as separate chromosome, start_pos, end_pos arguments.
-#' @param chromosome Chromosome name in region.
-#' @param start_pos Start coordinate of region.
-#' @param end_pos End coordinate of region.
 #' @param these_samples_metadata Optional data frame containing a sample_id column. 
 #' If not providing a maf file, seq_type is also a required column.
 #' @param these_sample_ids Optional vector of sample IDs. Output will be subset 
