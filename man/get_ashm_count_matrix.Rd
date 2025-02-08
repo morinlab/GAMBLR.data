@@ -45,21 +45,24 @@ matrix <- get_ashm_count_matrix(
      this_seq_type = "genome"
 )
 
-#this example intentionally fails 
- matrix <- get_ashm_count_matrix(regions_bed=regions_bed,this_seq_type = "genome",
+#this example should fail because the regions_bed is not hg38
+ matrix <- get_ashm_count_matrix(regions_bed=regions_bed,
+                            this_seq_type = "genome",
                             these_samples_metadata = my_meta,
                             projection = "hg38")
 # Error in get_ashm_count_matrix(
 # Your projection argument does not match the genome_build of regions_bed
 
-# format the name column to include the chromosome coordinates instead of the gene
+# format the name column to include the coordinates instead of the gene
 regions_bed = create_bed_data(GAMBLR.data::hg38_ashm_regions,
                            fix_names="concat",
                            concat_cols=c("chr_name","hg38_start","hg38_end"),
                            sep="-")
-                           
- matrix_hg38 <- get_ashm_count_matrix(regions_bed=regions_bed,this_seq_type = "genome",
-                            these_samples_metadata = my_meta,
-                            projection = "hg38")
 
+ matrix_hg38 <- get_ashm_count_matrix(regions_bed=regions_bed,
+                                      this_seq_type = "genome",
+                                      these_samples_metadata = my_meta,
+                                      projection = "hg38")
+print(dim(matrix_hg38))
+print(head(matrix_hg38[,c(1:8)]))
 }
