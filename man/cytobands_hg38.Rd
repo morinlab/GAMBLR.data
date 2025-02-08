@@ -23,4 +23,4 @@ cytobands_hg38
 \description{
 A data frame in bed format with coordinates of cytobands relative to hg38.
 }
-\keyword{datasets}
+\keyword{internal}

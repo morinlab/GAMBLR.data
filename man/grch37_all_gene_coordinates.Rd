@@ -24,4 +24,4 @@ grch37_all_gene_coordinates
 \description{
 All gene coordinates in respect to grch37.
 }
-\keyword{datasets}
+\keyword{internal}

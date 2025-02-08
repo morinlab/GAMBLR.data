@@ -22,4 +22,4 @@ chromosome_arms_hg38
 \description{
 A data frame with the chromosome arm coordinates in respect to hg38.
 }
-\keyword{datasets}
+\keyword{internal}

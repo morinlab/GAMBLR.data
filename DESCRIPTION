@@ -1,6 +1,6 @@
 Package: GAMBLR.data
 Title: Collection of Curated Data for Genomic Analysis of Mature B-cell Lymphomas in R
-Version: 1.2
+Version: 1.3
 Authors@R:
     c(
         person(given = "Ryan",
@@ -34,6 +34,6 @@ Imports:
     ggplot2,
     tidyr
 LazyDataCompression: xz
-Suggests: 
+Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

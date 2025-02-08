@@ -21,4 +21,4 @@ target_regions_hg38
 \description{
 Target regions in respect to hg38.
 }
-\keyword{datasets}
+\keyword{internal}

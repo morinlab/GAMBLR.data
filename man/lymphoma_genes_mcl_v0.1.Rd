@@ -31,4 +31,4 @@ lymphoma_genes_mcl_v0.1
 \description{
 Genes frequently associated with Mantle cell lymphoma (MCL). This is version 0.1.
 }
-\keyword{datasets}
+\keyword{internal}

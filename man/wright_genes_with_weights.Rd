@@ -21,4 +21,4 @@ wright_genes_with_weights
 \description{
 Description.
 }
-\keyword{datasets}
+\keyword{internal}

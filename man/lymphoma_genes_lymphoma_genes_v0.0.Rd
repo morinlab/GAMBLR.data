@@ -31,4 +31,4 @@ lymphoma_genes_lymphoma_genes_v0.0
 \description{
 A comprehenssive resource of genes associated with different types of lymphomas.
 }
-\keyword{datasets}
+\keyword{internal}

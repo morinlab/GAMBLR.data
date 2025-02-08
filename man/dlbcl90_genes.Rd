@@ -24,4 +24,4 @@ dlbcl90_genes
 \description{
 A data frame with genes and their weights for DLBCL90.
 }
-\keyword{datasets}
+\keyword{internal}

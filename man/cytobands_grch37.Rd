@@ -23,4 +23,4 @@ cytobands_grch37
 \description{
 A data frame in bed format with coordinates of cytobands relative to grch37.
 }
-\keyword{datasets}
+\keyword{internal}

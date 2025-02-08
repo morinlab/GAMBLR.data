@@ -27,4 +27,4 @@ lymphoma_genes_bl_v0.2
 \description{
 Genes frequently associated with Burkitt Lymphoma (BL). This is version 0.2.
 }
-\keyword{datasets}
+\keyword{internal}
