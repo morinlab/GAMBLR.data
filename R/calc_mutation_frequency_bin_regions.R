@@ -41,26 +41,28 @@
 #' 
 #' @return A table of mutation counts for sliding windows across one or more regions. May be long or wide.
 #'
-#' @import dplyr tidyr tibble
+#' @import dplyr tidyr tibble parallel
 #' @export
 #'
 #' @examples
-#' #get some regions
-#' these_regions <- process_regions(only_regions = c("MYC", "BCL2", "BCL6"))
-#' reg_vec <- these_regions$regions_list
-#' reg_bed <- these_regions$regions_bed
+
+#'  #load metadata.
+#'  my_meta = get_gambl_metadata()
+#'  dlbcl_bl_meta = dplyr::filter(my_meta, pathology %in% c("DLBCL", "BL"))
 #'
-#' # use a set of user defined regions (from genes) and
-#' # calculate mut frequency across all available samples
-#' mult_freq_all = calc_mutation_frequency_bin_regions(regions_list = reg_vec)
-#' mult_freq_all = calc_mutation_frequency_bin_regions(regions_bed = reg_bed)
 #'
-#' #restrict the analysis to specific samples using the metadata
-#' my_meta = get_gambl_metadata() %>% 
-#'               dplyr::filter(pathology %in% c("DLBCL","FL"))
-#' mult_reg_freq_fl_dlbcl = calc_mutation_frequency_bin_regions(regions_list = reg_vec,
-#'                                                           these_sample_ids = "DOHH-2")
-#'
+#'  #get ashm regions
+#'  some_regions = create_bed_data(grch37_ashm_regions,
+#'                                 fix_names = "concat",
+#'                                 concat_cols = c("gene","region"),
+#'                                 sep="-")
+#'  print(some_regions)
+#'  mut_count_matrix <- calc_mutation_frequency_bin_regions(
+#'    these_samples_metadata = dlbcl_bl_meta,
+#'    regions_bed = some_regions
+#'  )
+#' dim(mut_count_matrix)
+#' tail(mut_count_matrix[,c(1:10)])
 calc_mutation_frequency_bin_regions <- function(regions_list = NULL,
                                                 regions_bed = NULL,
                                                 these_samples_metadata = NULL,
