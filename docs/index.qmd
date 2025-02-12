@@ -9,7 +9,8 @@ format:
 about:
   id: about
   template: jolla
-  image: logo.png
+  image: ../GAMBLR.data.png
+  image-shape: rectangle
   links:
     - icon: info-circle
       text: Why use GAMBLR.data?

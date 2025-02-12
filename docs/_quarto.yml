@@ -6,9 +6,9 @@ project:
 website:
   title: "GAMBLR.data"
   description: "Collection of genomic data for analysis of Mature B-cell neoplasms"
-  favicon: logo.png
+  favicon: ../GAMBLR.data.png
   open-graph:
-    image: logo.png
+    image: ../GAMBLR.data.png
 
   # search
   search:
@@ -33,7 +33,7 @@ website:
         href: https://github.com/morinlab
 
   navbar:
-    logo: logo.png
+    logo: ../GAMBLR.data.png
     tools:
       - icon: github
         menu:
