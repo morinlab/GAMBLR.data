@@ -21,4 +21,4 @@ hotspot_regions_grch37
 \description{
 Mutation hotspot regions in respect to grch37.
 }
-\keyword{datasets}
+\keyword{internal}

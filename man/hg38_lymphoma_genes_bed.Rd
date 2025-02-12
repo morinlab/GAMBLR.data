@@ -22,4 +22,4 @@ hg38_lymphoma_genes_bed
 \description{
 Lymphoma associated genes in respect to hg38.
 }
-\keyword{datasets}
+\keyword{internal}

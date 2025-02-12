@@ -27,4 +27,4 @@ lymphoma_genes_comprehensive
 \description{
 A detailed data frame with lymphoma genes, annotated with evidence from literature and aSHM.
 }
-\keyword{datasets}
+\keyword{internal}

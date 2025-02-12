@@ -22,4 +22,4 @@ chromosome_arms_grch37
 \description{
 A data frame with the chromosome arm coordinates in respect to grch37.
 }
-\keyword{datasets}
+\keyword{internal}

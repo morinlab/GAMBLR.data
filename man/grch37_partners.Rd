@@ -23,4 +23,4 @@ grch37_partners
 \description{
 Translocation partners for oncogenes in with coordinates in respect to grch37.
 }
-\keyword{datasets}
+\keyword{internal}

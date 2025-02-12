@@ -22,4 +22,4 @@ grch37_lymphoma_genes_bed
 \description{
 Lymphoma associated genes in respect to grch37.
 }
-\keyword{datasets}
+\keyword{internal}

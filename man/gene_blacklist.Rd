@@ -19,4 +19,4 @@ gene_blacklist
 \description{
 A tibble with gene symbols (Hugo) that falls within blacklisted regions of the genome.
 }
-\keyword{datasets}
+\keyword{internal}

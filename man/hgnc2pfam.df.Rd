@@ -31,4 +31,4 @@ https://github.com/morinlab/g3viz/tree/master/data
 \examples{
 hgnc2pfam.df
 }
-\keyword{datasets}
+\keyword{internal}

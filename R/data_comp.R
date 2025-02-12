@@ -20,7 +20,7 @@
 #'
 #' @return A character vector of gene symbol or Ensembl IDs or a data frame.
 #'
-#' @import dplyr
+#' @import dplyr tidyr
 #' @export
 #'
 #' @examples
@@ -223,7 +223,7 @@ get_genes <- function(
 #'
 #' @return Either a vector or list of Hex codes.
 #'
-#' @import dplyr
+#' @import dplyr tidyr
 #' @export
 #'
 #' @examples
@@ -321,7 +321,7 @@ get_mapped_colours <- function(
 #'
 #' @return A data frame or named character vector of colour Hex codes.
 #'
-#' @import dplyr ggplot2 tibble
+#' @import dplyr ggplot2 tidyr
 #' @export
 #'
 #' @examples

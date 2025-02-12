@@ -22,4 +22,4 @@ reddy_genes
 \description{
 Genes identified as significantly mutated in DLBCL by the study of Reddy et al.
 }
-\keyword{datasets}
+\keyword{internal}

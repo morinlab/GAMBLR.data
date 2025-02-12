@@ -40,6 +40,7 @@
 #'   \item{end}{End coordinates for the specified chromosome arm.}
 #'   \item{arm}{Chromosome arm, either p or q.}
 #' }
+#' @keywords internal
 "chromosome_arms_grch37"
 
 
@@ -55,6 +56,7 @@
 #'   \item{end}{End coordinates for the specified chromosome arm.}
 #'   \item{arm}{Chromosome arm, either p or q.}
 #' }
+#' @keywords internal
 "chromosome_arms_hg38"
 
 
@@ -69,6 +71,7 @@
 #'   \item{ImportanceScore}{Numeric column with importance scores.}
 #'   \item{Hugo_Symbol}{Gene symbols in Hugo format as a factor with 104 levels.}
 #' }
+#' @keywords internal
 "dhitsig_genes_with_weights"
 
 
@@ -81,6 +84,7 @@
 #' \describe{
 #'   \item{Gene}{Genes symbols in Hugo format.}
 #' }
+#' @keywords internal
 "gene_blacklist"
 
 
@@ -98,6 +102,7 @@
 #'   \item{gene_name}{The gene name}
 #'   \item{hugo_symbol}{Gene symbol in Hugo format}
 #' }
+#' @keywords internal
 "grch37_all_gene_coordinates"
 
 
@@ -115,6 +120,7 @@
 #'   \item{gene_name}{The gene name}
 #'   \item{hugo_symbol}{Gene symbol in Hugo format}
 #' }
+#' @keywords internal
 "grch37_gene_coordinates"
 
 
@@ -130,6 +136,7 @@
 #'   \item{end_position}{The end coordinate for the gene}
 #'   \item{hgnc_symbol}{Gene symbol in Hugo format}
 #' }
+#' @keywords internal
 "grch37_lymphoma_genes_bed"
 
 
@@ -146,6 +153,7 @@
 #'   \item{gene}{Gene symbol in Hugo format}
 #'   \item{entrez}{Entrez ID}
 #' }
+#' @keywords internal
 "grch37_partners"
 
 #' hg38 Gene Coordinates.
@@ -162,6 +170,7 @@
 #'   \item{gene_name}{The gene name}
 #'   \item{hugo_symbol}{Gene symbol in Hugo format}
 #' }
+#' @keywords internal
 "hg38_gene_coordinates"
 
 
@@ -177,6 +186,7 @@
 #'   \item{end_position}{The end coordinate for the gene}
 #'   \item{hgnc_symbol}{Gene symbol in Hugo format}
 #' }
+#' @keywords internal
 "hg38_lymphoma_genes_bed"
 
 
@@ -193,6 +203,7 @@
 #'   \item{gene}{Gene symbol in Hugo format}
 #'   \item{entrez}{Entrez ID}
 #' }
+#' @keywords internal
 "hg38_partners"
 
 
@@ -207,6 +218,7 @@
 #'   \item{start}{The start coordinate for the region}
 #'   \item{end}{The end coordinate for the region}
 #' }
+#' @keywords internal
 "hotspot_regions_grch37"
 
 
@@ -221,6 +233,7 @@
 #'   \item{start}{The start coordinate for the region}
 #'   \item{end}{The end coordinate for the region}
 #' }
+#' @keywords internal
 "hotspot_regions_hg38"
 
 
@@ -241,6 +254,7 @@
 #'   \item{Lacy}{Boolean flag, TRUE if gene verified by the stated study (Lacy)}
 #'   \item{aSHM}{Boolean flag for annotating aSHM}
 #' }
+#' @keywords internal
 "lymphoma_genes_comprehensive"
 
 
@@ -256,6 +270,7 @@
 #'   \item{Approved name}{Approved name}
 #'   \item{HGNC ID}{HGNC ID}
 #' }
+#' @keywords internal
 "reddy_genes"
 
 
@@ -270,6 +285,7 @@
 #'   \item{start}{Start coordinate of the region}
 #'   \item{end}{End coordiante of the region}
 #' }
+#' @keywords internal
 "target_regions_grch37"
 
 
@@ -284,6 +300,7 @@
 #'   \item{start}{Start coordinate of the region}
 #'   \item{end}{End coordiante of the region}
 #' }
+#' @keywords internal
 "target_regions_hg38"
 
 
@@ -298,6 +315,7 @@
 #'   \item{Hugo_Symbol}{Gene symbol in Hugo format}
 #'   \item{Weight_tValue}{Weight Value for the specified gene}
 #' }
+#' @keywords internal
 "wright_genes_with_weights"
 
 
@@ -315,6 +333,7 @@
 #' }
 #' @examples
 #' mutation.table.df
+#' @keywords internal
 "mutation.table.df"
 
 #' Mapping table between gene.symbol, uniprot.id, and pfam
@@ -337,6 +356,7 @@
 #' @examples
 #' hgnc2pfam.df
 #' @source Pfam (v31.0) and UniProt
+#' @keywords internal
 "hgnc2pfam.df"
 
 
@@ -353,6 +373,7 @@
 #'   \item{colour}{Colour annotated in HEX format.}
 #'   \item{is_alias}{Describes if the colour has an alias (yes) or not (NA)}
 #' }
+#' @keywords internal
 "colour_codes"
 
 
@@ -392,7 +413,7 @@
 
 #' Lymphoma Genes BL v0.1
 #'
-#' Genes frequently associated with Burkitt Lymphome (BL). This is version 0.1.
+#' Genes frequently associated with Burkitt Lymphoma (BL). This is version 0.1.
 #'
 #' @format ## `lymphoma_genes_bl_v0.1`
 #' A data frame withh 128 rows and 11 columns.
@@ -409,27 +430,46 @@
 #'   \item{n_BL_Panea_original}{Total number of mutated tumors as originally reported in Panea study.}
 #'   \item{frequency_BL_Panea_original}{Frequency of mutation as originally reported in Panea study.}
 #' }
+#' @keywords internal
 "lymphoma_genes_bl_v0.1"
 
 
+#' Lymphoma Genes BL v0.2
+#'
+#' Genes frequently associated with Burkitt Lymphoma (BL). This is version 0.2.
+#'
+#' @format ## `lymphoma_genes_bl_v0.2`
+#' A data frame withh 111 rows and 9 columns.
+#' \describe{
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{Mean.Variant.Quality}{Mean variant quality.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#'   \item{PMID}{Pubmed ID to associated study.}
+#'   \item{MutationEffect}{Annotates the effect of the gene mutation.}
+#'   \item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
+#' }
+#' @keywords internal
+"lymphoma_genes_bl_v0.2"
+
 #' Lymphoma Genes BL Latest
 #'
-#' Genes frequently associated with Burkitt Lymphome (BL). This is the most up-to-date version of this dataset.
+#' Genes frequently associated with Burkitt Lymphoma (BL). This is the most up-to-date version of this dataset.
 #'
 #' @format ## `lymphoma_genes_bl_v_latest`
-#' A data frame withh 128 rows and 11 columns.
+#' A data frame withh 111 rows and 9 columns.
 #' \describe{
-#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
-#'   \item{Gene}{Gene symbol in Hugo format.}
-#'   \item{earliest_support_BL}{Pubmeed ID to associated study.}
-#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
-#'   \item{aSHM_target_DLBCL}{Boolean variable annotating if the event is an aSHM target in DLBCL or not.}
-#'   \item{Currator_comments}{Comments from the currator.}
-#'   \item{Enrichment_DLBCL_BL}{Annotates the event if it is enriched in BL or DLBCL.}
-#'   \item{frequency_BL_Thomas}{The frequency of which the event was reported in the Thomas study.}
-#'   \item{frequency_BL_Panea}{The frequency of which the event was reported in the Panea study.}
-#'   \item{n_BL_Panea_original}{Total number of mutated tumors as originally reported in Panea study.}
-#'   \item{frequency_BL_Panea_original}{Frequency of mutation as originally reported in Panea study.}
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{Mean.Variant.Quality}{Mean variant quality.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#'   \item{PMID}{Pubmed ID to associated study.}
+#'   \item{MutationEffect}{Annotates the effect of the gene mutation.}
+#'   \item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
 #' }
 "lymphoma_genes_bl_v_latest"
 
@@ -455,8 +495,30 @@
 #'   \item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
 #'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
 #' }
+#' @keywords internal
 "lymphoma_genes_dlbcl_v0.1"
 
+#' Lymphoma Genes DLBCL v0.2
+#'
+#' Genes frequently associated with Diffuse large B cell lymphoma (DLBCL). This is version 0.2.
+#'
+#' @format ## `lymphoma_genes_dlbcl_v0.2`
+#' A data frame withh 335 rows and 9 columns.
+#' \describe{
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{Mean.Variant.Quality}{Mean variant quality.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#'   \item{PMID}{Pubmed ID to associated study.}
+#'   \item{MutationEffect}{Annotates the effect of the gene mutation.}
+#'   \item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
+#'   \item{MutationEffect.citekey}{Alphanumeric representation of the citekey to associated study where mutation effect is described.}
+#'   \item{Mutation.PMID}{Whether this gene is a feature in LymphGen classifier.}
+#' }
+#' @keywords internal
+"lymphoma_genes_dlbcl_v0.2"
 
 #' Lymphoma Genes DLBCL Latest
 #'
@@ -464,21 +526,19 @@
 #' This is the most up-to-date version of this dataset.
 #'
 #' @format ## `lymphoma_genes_dlbcl_v_latest`
-#' A data frame with 243 rows and 13 columns.
+#' A data frame withh 335 rows and 9 columns.
 #' \describe{
-#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
-#'   \item{Gene}{Gene symbol in Hugo format.}
-#'   \item{Chappuy}{Boolean variable stating if the event is described in the study (Chappuy).}
-#'   \item{Reddy}{Boolean variable stating if the event is described in the study (Reddy).}
-#'   \item{LymphGen}{Boolean variable stating if the event is a described lymphgen or not.}
-#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
-#'   \item{other_support}{Variable that annotates the event if there are other support available.}
-#'   \item{Lacy}{Boolean variable stating if the event is described in the study (Lacy).}
-#'   \item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
-#'   \item{known_hotspots}{Boolean varaible annotating if the event is a known hotspot or not.}
-#'   \item{earliest_support}{Pubmeed ID to associated study.}
-#'   \item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
-#'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{Mean.Variant.Quality}{Mean variant quality.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#'   \item{PMID}{Pubmed ID to associated study.}
+#'   \item{MutationEffect}{Annotates the effect of the gene mutation.}
+#'   \item{Mutation.PMID}{Pubmed ID to associated study where mutation effect is described.}
+#'   \item{MutationEffect.citekey}{Alphanumeric representation of the citekey to associated study where mutation effect is described.}
+#'   \item{Mutation.PMID}{Whether this gene is a feature in LymphGen classifier.}
 #' }
 "lymphoma_genes_dlbcl_v_latest"
 
@@ -505,6 +565,7 @@
 #'   \item{Chappuy}{Boolean variable stating if the event is described in the study (Chappuy).}
 #'   \item{entrezgene_id}{Gene ID in entrez fromat.}
 #' }
+#' @keywords internal
 "lymphoma_genes_lymphoma_genes_v0.0"
 
 
@@ -529,30 +590,63 @@
 #'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
 #'   \item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
 #' }
+#' @keywords internal
 "lymphoma_genes_mcl_v0.1"
+
+#' Lymphoma Genes MCL v0.2
+#'
+#' Genes frequently associated with Mantle cell lymphoma (MCL). This is version 0.2.
+#'
+#' @format ## `lymphoma_genes_mcl_v0.2`
+#' A data frame withh 69 rows and 16 columns.
+#' \describe{
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{curated}{Whether this is a manually curated gene.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{Bea}{Whether this gene was described in Bea study.}
+#'   \item{Zhang}{Whether this gene was described in Zhang study.}
+#'   \item{Pararajalingam}{Whether this gene was described in Pararajalingam study.}
+#'   \item{Nadeu}{Whether this gene was described in Nadeu study.}
+#'   \item{Other_support}{Whether there is a support for this gene other than the studies above.}
+#'   \item{appx_overall_freq}{Approximate frequency of mutations at this gene in MCL.}
+#'   \item{gambl_freq}{Frequency of mutations at this gene in MCL as inferred in GAMBL.}
+#'   \item{common_alias}{Alias name for this gene.}
+#'   \item{noncoding_driver_suspect}{Whether there are relevant non-coding mutations at this gene.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{CIViC}{Whether this gene is reported in the CIViC knowledge base.}
+#'   \item{Earliest_support}{The earlist study to describe this gene to be mutated in MCL.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
+#' }
+#' @keywords internal
+"lymphoma_genes_mcl_v0.2"
 
 
 #' Lymphoma Genes MCL Latest
 #'
 #' Genes frequently associated with Mantle cell lymphoma (MCL).
-#' #' This is the most up-to-date version of this dataset.
+#' This is the most up-to-date version of this dataset.
 #'
 #' @format ## `lymphoma_genes_mcl_v_latest`
-#' A data frame with 53 rows and 13 columns.
+#' A data frame withh 69 rows and 16 columns.
 #' \describe{
-#'   \item{ensembl_gene_id}{Gene ID in ensembl format.}
-#'   \item{Gene}{Gene symbol in Hugo format.v}
-#'   \item{curated}{Boolean variable annotating if the event is currated or not.}
-#'   \item{Bea}{Boolean variable stating if the event is described in the study (Bea).}
-#'   \item{Zhang}{Boolean variable stating if the event is described in the study (Zhang).}
-#'   \item{Pararajalingam}{Boolean variable stating if the event is described in the study (Pararajalingam).}
-#'   \item{Nadeu}{Boolean variable stating if the event is described in the study (Nadeu).}
-#'   \item{Other_support}{Variable that annotates the event if there are other support available.}
-#'   \item{appx_overall_freq}{Approximate overall frequency.}
-#'   \item{gambl_freq}{Frequency of event described in GAMBL.}
-#'   \item{common_alias}{Variable annotating other common aliases for the event, if such exists.}
-#'   \item{noncoding_driver_support}{Boolean variable annotating if the event has noncoding driver support or not.}
-#'   \item{aSHM}{Boolean varaible annotating if the event is considered an aSHM or not.}
+#'   \item{Gene}{Gene ID in Hugo format.}
+#'   \item{curated}{Whether this is a manually curated gene.}
+#'   \item{Tier}{Tier of gene in this pathology.}
+#'   \item{Bea}{Whether this gene was described in Bea study.}
+#'   \item{Zhang}{Whether this gene was described in Zhang study.}
+#'   \item{Pararajalingam}{Whether this gene was described in Pararajalingam study.}
+#'   \item{Nadeu}{Whether this gene was described in Nadeu study.}
+#'   \item{Other_support}{Whether there is a support for this gene other than the studies above.}
+#'   \item{appx_overall_freq}{Approximate frequency of mutations at this gene in MCL.}
+#'   \item{gambl_freq}{Frequency of mutations at this gene in MCL as inferred in GAMBL.}
+#'   \item{common_alias}{Alias name for this gene.}
+#'   \item{noncoding_driver_suspect}{Whether there are relevant non-coding mutations at this gene.}
+#'   \item{aSHM}{Whether this gene is associated with aSHM.}
+#'   \item{QC}{QC of a particular gene.}
+#'   \item{CIViC}{Whether this gene is reported in the CIViC knowledge base.}
+#'   \item{Earliest_support}{The earlist study to describe this gene to be mutated in MCL.}
+#'   \item{citekey}{Alphanumeric representation of the citekey where this gene was first described.}
 #' }
 "lymphoma_genes_mcl_v_latest"
 
@@ -570,6 +664,7 @@
 #'   \item{grch37}{A list containing 3 data frames; maf, seg, and bedpe. All in respect to grch37.}
 #'   \item{hg38}{A list containing 3 data frames; maf, seg, and bedpe. All in respect to hg38.}
 #' }
+#' @keywords internal
 "sample_data"
 
 
@@ -587,6 +682,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh37_v0.0"
 
 
@@ -604,6 +700,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh37_v0.1"
 
 
@@ -621,6 +718,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh37_v0.2"
 
 
@@ -638,6 +736,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh37_v0.3"
 
 #' Somatic Hypermutation Locations GRCh37 v0.4
@@ -654,6 +753,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh37_v0.4"
 
 #' Somatic Hypermutation Locations GRCh37 v0.5
@@ -670,6 +770,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh37_v0.5"
 
 #' Somatic Hypermutation Locations GRCh37 Latest
@@ -686,6 +787,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh37_v_latest"
 
 
@@ -704,6 +806,7 @@
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #'   \item{name}{Location name.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh38_v0.0"
 
 
@@ -722,6 +825,7 @@
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #'   \item{name}{Location name.}v
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh38_v0.1"
 
 
@@ -739,6 +843,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh38_v0.2"
 
 
@@ -756,6 +861,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh38_v0.3"
 
 
@@ -773,6 +879,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh38_v0.4"
 
 #' Somatic Hypermutation Locations GRCh38 v0.5
@@ -789,6 +896,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh38_v0.5"
 
 #' Somatic Hypermutation Locations GRCh38 Latest
@@ -805,6 +913,7 @@
 #'   \item{region}{Region name.}
 #'   \item{regulatory_comment}{Annotates region with regulatory information.}
 #' }
+#' @keywords internal
 "somatic_hypermutation_locations_GRCh38_v_latest"
 
 
@@ -843,6 +952,7 @@
 #'   \item{sex}{Female or Male}
 #'   \item{time_point}{Smaple timepoint.}
 #' }
+#' @keywords internal
 "gambl_metadata"
 
 
@@ -889,4 +999,79 @@
 #'   \item{Chromosome}{Name of gene chromosome.}
 #'   \item{hot_spot}{Hot spot annotation.}
 #' }
+#' @keywords internal
 "hotspots_annotations"
+
+
+#' Protein Domains
+#'
+#' A data frame with high-quality positions of amino acid positions in their 
+#' corresponding domains.
+#'
+#' @format ## `protein_domains`
+#' A data frame with 92849 rows and 12 columns
+#' \describe{
+#'   \item{HGNC}{HUGO Gene Nomenclature Committee.}
+#'   \item{refseq.ID}{Reference sequence identifier.}
+#'   \item{protein.ID}{Protein identifier.}
+#'   \item{aa.length}{Amino acid length.}
+#'   \item{Start}{Coordinate of amino acid position.}
+#'   \item{End}{Coordinate of amino acid position.}
+#'   \item{domain.source}{Domain source.}
+#'   \item{Label}{Abbreviated domain type.}
+#'   \item{domain.anno}{Domain type.}
+#'   \item{pfam}{Protein family.}
+#'   \item{Description}{Description of the domain.}
+#'   \item{Description}{NA.}
+#' }
+#' @keywords internal
+"protein_domains"
+
+#' Cytobands coordinates (grch37)
+#'
+#' A data frame in bed format with coordinates of cytobands relative to grch37.
+#'
+#' @format ## `cytobands_grch37`
+#' A data frame with 862 rows and 5 columns
+#' \describe{
+#'   \item{cb.chromosome}{Chromosome of the cytoband.}
+#'   \item{cb.start}{Start position of the cytoband.}
+#'   \item{cb.end}{End position of the cytoband.}
+#'   \item{cb.name}{Cytoband name.}
+#'   \item{label}{Cytoband label.}
+#' }
+#' @keywords internal
+"cytobands_grch37"
+
+#' Cytobands coordinates (hg38)
+#'
+#' A data frame in bed format with coordinates of cytobands relative to hg38.
+#'
+#' @format ## `cytobands_hg38`
+#' A data frame with 862 rows and 5 columns
+#' \describe{
+#'   \item{cb.chromosome}{Chromosome of the cytoband.}
+#'   \item{cb.start}{Start position of the cytoband.}
+#'   \item{cb.end}{End position of the cytoband.}
+#'   \item{cb.name}{Cytoband name.}
+#'   \item{label}{Cytoband label.}
+#' }
+#' @keywords internal
+"cytobands_hg38"
+
+#' DLBCL90 genes
+#'
+#' A data frame with genes and their weights for DLBCL90.
+#'
+#' @format ## `dlbcl90_genes`
+#' A data frame with 88 rows and 6 columns
+#' \describe{
+#'   \item{Gene.symbol}{Human-readable gene symbol matching the symbols used for the DLBCL90 code set design.}
+#'   \item{coef}{Relative weight of the gene in DLBCL90 classification.}
+#'   \item{Assay}{Name of the assay.}
+#'   \item{ensembl_gene_id}{ENSEMBL gene id.}
+#'   \item{gene_id}{ENSEMBL gene id with version.}
+#'   \item{hgnc_symbol}{Human-readable gene symbol matching Gencode 33.}
+#' }
+#' @keywords internal
+"dlbcl90_genes"

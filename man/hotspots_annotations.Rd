@@ -24,4 +24,4 @@ A data frame with high-quality positions of ssm hotspots in selected genes.
 This resource is based on GAMBL data and was used for hotspot annotation in
 cFL/dFL classifier.
 }
-\keyword{datasets}
+\keyword{internal}

@@ -1,6 +1,8 @@
 #!/usr/bin/env Rscript
 
 library(usethis)
+library(readr)
+library(tidyr)
 library(dplyr)
 
 # Helper function to input the data objects
@@ -93,6 +95,7 @@ pathologies <- c(
 # This will need to be modified with the release of new data
 versions <- c(
     "0.1",
+    "0.2",
     "_latest"
 )
 
@@ -117,6 +120,32 @@ all <- bind_rows(
         version = c("0.0")
     )
 )
+
+# For lymphoma genes v 0.2 add the LLMPP gene lists but only tier 1 and 2 genes
+read_tsv("https://raw.githubusercontent.com/morinlab/LLMPP/refs/heads/main/resources/curated/bl_genes.tsv") %>%
+    filter(Tier<3) %>%
+    mutate(pathology = "BL") %>%
+    write_tsv("inst/extdata/lymphoma_genes/0.2/bl.tsv")
+read_tsv("https://raw.githubusercontent.com/morinlab/LLMPP/refs/heads/main/resources/curated/dlbcl_genes.tsv") %>%
+    filter(Tier<3) %>%
+    mutate(pathology = "DLBCL") %>%
+    write_tsv("inst/extdata/lymphoma_genes/0.2/dlbcl.tsv")
+read_tsv("https://raw.githubusercontent.com/morinlab/LLMPP/refs/heads/main/resources/curated/mcl_genes.tsv") %>%
+    filter(Tier<3) %>%
+    mutate(pathology = "MCL") %>%
+    write_tsv("inst/extdata/lymphoma_genes/0.2/mcl.tsv")
+read_tsv("https://raw.githubusercontent.com/morinlab/LLMPP/refs/heads/main/resources/curated/fl_genes.tsv") %>%
+    filter(Tier<3) %>%
+    mutate(pathology = "FL") %>%
+    write_tsv("inst/extdata/lymphoma_genes/0.2/fl.tsv")
+read_tsv("https://raw.githubusercontent.com/morinlab/LLMPP/refs/heads/main/resources/curated/mzl_genes.tsv") %>%
+    filter(Tier<3) %>%
+    mutate(pathology = "MZL") %>%
+    write_tsv("inst/extdata/lymphoma_genes/0.2/mzl.tsv")
+read_tsv("https://raw.githubusercontent.com/morinlab/LLMPP/refs/heads/main/resources/curated/cll_genes.csv") %>%
+    mutate(pathology = "CLL") %>%
+    select("Gene" = "Hugo_Symbol", everything()) %>%
+    write_tsv("inst/extdata/lymphoma_genes/0.2/cll.tsv")
 
 # Generate the rdas for each object
 apply(
@@ -259,24 +288,36 @@ lymphgen_anno = left_join(lymphgen_entrez,entrez_map) %>% dplyr::rename("Hugo_Sy
 
 library("biomaRt")
 
+lymphoma_genes_pathologies <- c(
+    "BL", "DLBCL", "MCL", "FL", "MCL", "CLL"
+)
+
+lg_llmpp <- data.frame(Gene = NA)
+for(p in lymphoma_genes_pathologies){
+    this_p <- read_tsv(
+        paste0(
+            "inst/extdata/lymphoma_genes/0.2/",
+            tolower(p),
+            ".tsv")
+    ) %>%
+    mutate(!!p := TRUE) %>%
+    select(Gene, !!p)
+    lg_llmpp <- full_join(this_p, lg_llmpp)
+}
+lg_llmpp <- lg_llmpp %>%
+    drop_na(Gene) %>%
+    mutate(across(everything(), ~replace_na(.,FALSE))) 
+lymphoma_genes <- lg_llmpp
+
 ensembl = useMart(biomart="ENSEMBL_MART_ENSEMBL", host="https://grch37.ensembl.org", path="/biomart/martservice" ,dataset="hsapiens_gene_ensembl")
-#need to get entrezgene_id, hgnc_symbol using ensembl_gene_id
+#need to get entrezgene_id, ensembl_gene_id using hgnc_symbol 
 gene_detail = getBM(attributes=c( 'ensembl_gene_id','entrezgene_id','hgnc_symbol'),
-      filters = 'ensembl_gene_id',
-      values = lymphoma_genes$ensembl_gene_id,
+      filters = 'hgnc_symbol',
+      values = lymphoma_genes$Gene,
       mart = ensembl,useCache = FALSE)
-
-#fill in missing entrezgene_id
-
-gene_detail[gene_detail$ensembl_gene_id =="ENSG00000036448","entrezgene_id"] = 9172
-
-gene_detail[gene_detail$ensembl_gene_id =="ENSG00000065526","entrezgene_id"] = 23013
-
-gene_detail[gene_detail$ensembl_gene_id =="ENSG00000102096","entrezgene_id"] = 11040
-
-gene_detail[gene_detail$ensembl_gene_id =="ENSG00000172578","entrezgene_id"] = 89857
-
-gene_detail[gene_detail$ensembl_gene_id =="ENSG00000205542","entrezgene_id"] = 7114
+gene_detail <- gene_detail %>%
+    distinct(hgnc_symbol, .keep_all = TRUE) %>%
+    mutate(Gene = hgnc_symbol)
 
 lymphoma_genes = left_join(lymphoma_genes,gene_detail)
 lymphoma_genes$LymphGen=FALSE
@@ -359,7 +400,7 @@ usethis::use_data(lymphoma_genes_comprehensive, overwrite = TRUE)
 #lymphoma_genes_comprehensive %>% dplyr::filter(Chapuy ==FALSE, Reddy==FALSE, LymphGen == FALSE)
 
 lymphoma_genes = dplyr::select(lymphoma_genes,-entrezgene_id) %>% group_by(Gene,ensembl_gene_id) %>% slice_head() %>% ungroup()
-
+usethis::use_data(lymphoma_genes, overwrite = TRUE)
 #DLBCL_curated_genes = lymphoma_genes %>% dplyr::filter(DLBCL==TRUE) %>% pull(Gene)
 
 #lymphoma_genes_comprehensive$curated = FALSE
@@ -423,3 +464,74 @@ hotspots_annotations <- system.file(
         Chromosome = as.character(Chromosome)
     )
 usethis::use_data(hotspots_annotations, overwrite = TRUE)
+
+
+mirna_targetscan <- system.file(
+        "extdata",
+        "Predicted_Target_Locations.default_predictions.hg19.bed.gz",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv(
+      col_names = c(
+        "Chromosome", 
+        "Start_Position", 
+        "End_Position", 
+        "Gene:miRNA", 
+        "context++_score_percentile", 
+        "Strand", 
+        "SP", 
+        "EP", 
+        "color", 
+        "block_count", 
+        "sites", 
+        "block"
+      )
+    ) %>%
+    select(
+      "Chromosome", 
+      "Start_Position", 
+      "End_Position", 
+      "Gene:miRNA", 
+      "sites"
+    ) %>%
+    separate(
+      "Gene:miRNA",
+      into = c("Hugo_Symbol", "miRNA"),
+      sep = ":"
+    )
+usethis::use_data(mirna_targetscan, overwrite = TRUE)
+
+
+protein_domains <- system.file(
+        "extdata",
+        "protein_domains.tsv.gz",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv()
+usethis::use_data(protein_domains, overwrite = TRUE)
+
+# Cytobands
+cytobands_grch37 <- system.file(
+        "extdata",
+        "cytobands_grch37.tsv",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv()
+usethis::use_data(cytobands_grch37, overwrite = TRUE)
+
+cytobands_hg38 <- system.file(
+        "extdata",
+        "cytobands_hg38.tsv",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv()
+usethis::use_data(cytobands_hg38, overwrite = TRUE)
+
+# DLBCL90 genes
+dlbcl90_genes <- system.file(
+        "extdata",
+        "DLBCL90.txt",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv()
+usethis::use_data(dlbcl90_genes, overwrite = TRUE)
