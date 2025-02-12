@@ -9,7 +9,7 @@ format:
 about:
   id: about
   template: jolla
-  image: ../GAMBLR.data.png
+  image: GAMBLR.data.png
   image-shape: rectangle
   links:
     - icon: info-circle
