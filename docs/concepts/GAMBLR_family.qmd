@@ -42,13 +42,13 @@ flowchart LR
   C ==> F("GAMBLR.viz")
   F ==> E
   F ==> H{"GAMBL\nconsortium\nmember?"}
-  H == YES ==> G
+  H == <span style='background-color:#ea9fa4'>YES</span> ==> G
   C ==> G("GAMBLR.results")
   G ==> I("GAMBLR")
-  H == NO ==> E
+  H == <span style='background-color:#ea9fa4'>NO</span> ==> E
   classDef A,B font-size:18pt;
-  style E fill:#6aa84f,stroke:#333,stroke-width:4,font-size:20px
-  style I fill:#6fa8dc,stroke:#333,stroke-width:4,font-size:20px
+  style E fill:#d5bd97,stroke:#333,stroke-width:4,font-size:20px
+  style I fill:#e3916a,stroke:#333,stroke-width:4,font-size:20px
 ```
 
 All dependencies should be installed automatically for you, just like with any other R package.
