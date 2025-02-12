@@ -72,71 +72,81 @@
   {
     "objectID": "faq.html",
     "href": "faq.html",
-    "title": "Frequently Asked Qestions",
+    "title": "Frequently Asked Questions",
     "section": "",
     "text": "This section will cover most of the questions you may have about GAMBLR.data. If there is something that is not covered, please feel free to reach out to us via GitHub by reporting an issue and we will be happy to add it to this page.",
     "crumbs": [
-      "Frequently Asked Qestions"
+      "Frequently Asked Questions"
     ]
   },
   {
     "objectID": "faq.html#what-exactly-is-meant-by-lymphoma-genes",
     "href": "faq.html#what-exactly-is-meant-by-lymphoma-genes",
-    "title": "Frequently Asked Qestions",
+    "title": "Frequently Asked Questions",
     "section": "What exactly is meant by “lymphoma genes”?",
     "text": "What exactly is meant by “lymphoma genes”?\nThe term lymphoma genes refers to the curated list of genes significantly mutated in mature B-cell lymphomas. This list is available within this package by simply calling lymphoma_genes. Several modifications of the curated list are available, including the lists split by pathology, and a more comprehensive list lymphoma_genes_comprehensive that provides more information such as which studies reported it as significantly mutated, whether it is target of aSHM etc.",
     "crumbs": [
-      "Frequently Asked Qestions"
+      "Frequently Asked Questions"
+    ]
+  },
+  {
+    "objectID": "faq.html#i-want-a-list-of-dlbcl-bl-fl-lymphoma-genes.-how-do-i-do-that",
+    "href": "faq.html#i-want-a-list-of-dlbcl-bl-fl-lymphoma-genes.-how-do-i-do-that",
+    "title": "Frequently Asked Questions",
+    "section": "I want a list of DLBCL (BL, FL, …) lymphoma genes. How do I do that?",
+    "text": "I want a list of DLBCL (BL, FL, …) lymphoma genes. How do I do that?\nThe lymphoma_genes is annotated with which pathology the gene mutation is associated with, and it makes it easy to obtain a list of relevant genes for a specific pathology. Here are examples for DLBCL, BL, and FL:\n1library(GAMBLR.data)\nlibrary(dplyr)\n\n2lymphoma_genes %&gt;% filter(DLBCL)\n3lymphoma_genes %&gt;% filter(BL)\n4lymphoma_genes %&gt;% filter(FL)\n\n1\n\nLoad required packages\n\n2\n\nObtain DLBCL-associated lymphoma genes\n\n3\n\nObtain BL-associated lymphoma genes\n\n4\n\nObtain FL-associated lymphoma genes\n\n\nIf you want to cite these gene lists, please acknowledge the article by Coyle et al.",
+    "crumbs": [
+      "Frequently Asked Questions"
     ]
   },
   {
     "objectID": "faq.html#someone-said-ashm-regions.-what-is-this",
     "href": "faq.html#someone-said-ashm-regions.-what-is-this",
-    "title": "Frequently Asked Qestions",
+    "title": "Frequently Asked Questions",
     "section": "Someone said “aSHM regions”. What is this?",
-    "text": "Someone said “aSHM regions”. What is this?\nThe GAMBLR.data comes with the list of aSHM regions. They are determined by variety of approaches but mostly by manually reviewing patters of thousands of variants across multiple lymphomas. They can be obtained by simply calling {projection}_ashm_regions. The aSHM regions are version-controlled to track the previous iterations of the list, but the {projection}_ashm_regions always refers to the latest and most complete version. If you want to access the previous iterations, they can be referred to as somatic_hypermutation_locations_GRCh3{projection_version}_v{version}. For more details please refer to the bundled data resources.",
+    "text": "Someone said “aSHM regions”. What is this?\nThe GAMBLR.data comes with the list of aSHM regions. They are determined by variety of approaches but mostly by manually reviewing patters of thousands of variants across multiple lymphomas. The regionsa are provided in both grch37 and hg38 projections. They can be obtained by simply calling {projection}_ashm_regions. The aSHM regions are version-controlled to track the previous iterations of the list, but the {projection}_ashm_regions always refers to the latest and most complete version. If you want to access the previous iterations, they can be referred to as somatic_hypermutation_locations_GRCh3{projection_version}_v{version}. For more details please refer to the bundled data resources.\nIf you want to cite these gene lists, please acknowledge articles by Arthur et al and Dreval et al where these regions were introduced.",
     "crumbs": [
-      "Frequently Asked Qestions"
+      "Frequently Asked Questions"
     ]
   },
   {
     "objectID": "faq.html#what-kind-of-somatic-variants-are-bundled",
     "href": "faq.html#what-kind-of-somatic-variants-are-bundled",
-    "title": "Frequently Asked Qestions",
+    "title": "Frequently Asked Questions",
     "section": "What kind of somatic variants are bundled?",
     "text": "What kind of somatic variants are bundled?\nThe GAMBLR.data provides simple somatic, copy number, and structural variants. For data that comes directly from the Supplemental Tables of supported studies, it is provided in the projection as reported in the original publications. For the rest of the samples it is available with respect to both grch37 and hg38.",
     "crumbs": [
-      "Frequently Asked Qestions"
+      "Frequently Asked Questions"
     ]
   },
   {
     "objectID": "faq.html#what-are-the-studies-bundled-with-the-package",
     "href": "faq.html#what-are-the-studies-bundled-with-the-package",
-    "title": "Frequently Asked Qestions",
+    "title": "Frequently Asked Questions",
     "section": "What are the studies bundled with the package?",
     "text": "What are the studies bundled with the package?\nThe data includes variants from the following studies:\n\n\n                  \n                    BL cHL COMFL DLBCL  FL HGBL MZL NS1 PMBCL\n  BL_Thomas        256   0     0     0   0    0   0   0     0\n  DLBCL_Arthur       0   0     1   152   0    0   0   0     0\n  DLBCL_cell_lines   0   0     0    10   0    0   0   0     0\n  dlbcl_chapuy       0   0     0   233   0    0   0   0     0\n  DLBCL_Hilton       0   0     9   137   6    5   1   1     0\n  dlbcl_reddy        0   0     0   999   0    0   0   0     0\n  dlbcl_schmitz      0   0     0   470   0    0   0   0     0\n  DLBCL_Thomas       0   0     0    43   0    0   0   0     0\n  FL_Dreval          0   0    27   335 296    0   0   0     0\n  NCI_DLBCL_Golub    0  18     0    69   0    0   0   0    37\n\n\nPlease see the use cases for the more information on each of these studies.",
     "crumbs": [
-      "Frequently Asked Qestions"
+      "Frequently Asked Questions"
     ]
   },
   {
     "objectID": "faq.html#which-variant-caller-is-used-to-call-the-variants",
     "href": "faq.html#which-variant-caller-is-used-to-call-the-variants",
-    "title": "Frequently Asked Qestions",
+    "title": "Frequently Asked Questions",
     "section": "Which variant caller is used to call the variants?",
-    "text": "Which variant caller is used to call the variants?\nThe simple somatic mutations are called using the SLMS-3 variant caller. Briefly, this is a voting approach of strelka2, mutect2, LoFreq, and SAGE. For more details about SLMS-3, please refer to the source code and manuscript by Thomas et al.. For copy number variants, the calls for WGS samples are obtained using battenberg or sequenza when the samples are matched, and contolfreec when the samples are unmatched. The samples subjected to whole exome sequencing, the copy number variants are called with battenberg for matched samples, and combination of cnvkit/pureCN for samples without matched normal sample. The structural variants are called using manta.",
+    "text": "Which variant caller is used to call the variants?\nThe simple somatic mutations are called using the SLMS-3 variant caller. Briefly, this is a voting approach of strelka2, mutect2, LoFreq, and SAGE. For more details about SLMS-3, please refer to the source code and manuscript by Thomas et al..\nFor copy number variants, the calls for WGS samples are obtained using battenberg or sequenza when the samples are matched, and contolfreec when the samples are unmatched. The samples subjected to whole exome sequencing, the copy number variants are called with battenberg for matched samples, and combination of cnvkit/pureCN for samples without matched normal sample.\nThe structural variants are called using manta.",
     "crumbs": [
-      "Frequently Asked Qestions"
+      "Frequently Asked Questions"
     ]
   },
   {
     "objectID": "faq.html#are-the-variant-calls-reported-for-throughout-the-whole-genome-space",
     "href": "faq.html#are-the-variant-calls-reported-for-throughout-the-whole-genome-space",
-    "title": "Frequently Asked Qestions",
+    "title": "Frequently Asked Questions",
     "section": "Are the variant calls reported for throughout the whole genome space?",
     "text": "Are the variant calls reported for throughout the whole genome space?\nThe data for BL samples from the manuscript by Thomas et al. and FL/DLBCL samples from the manuscript by Dreval et al. are directly pulled from the Supplemental Tables. They represent only coding variants. The rest of the simple somatic variants are restricted to only coding variants in lymphoma genes.",
     "crumbs": [
-      "Frequently Asked Qestions"
+      "Frequently Asked Questions"
     ]
   },
   {
@@ -144,17 +154,17 @@
     "href": "why.html",
     "title": "Why GAMBLR.data?",
     "section": "",
-    "text": "GAMBLR.data is an open-source portable R library.\nIf you’ve had issues with importing genomic data from large-scale lymphoma studies, need to work with standardized data used for analysis of somatic variants, find yourself translating between different genome build systems, or just want a great great comprehensive resource of genomic data in B-cell lymphomas, GAMBLR.data is for you.\nGAMBLR stands for Genomic Analysis of Mature B-cell Lymphomas in R, and is part of the family of R packages for lymphoma cancer research developed in the Morin Lab at the Simon Fraser University.",
+    "text": "GAMBLR.data is an open-source portable R library.\nIf you’ve had issues with importing genomic data from large-scale lymphoma studies, need to work with standardized data used for analysis of somatic variants, find yourself translating between different genome build systems, or just want a great great comprehensive resource of genomic data in B-cell lymphomas, GAMBLR.data is for you.\nGAMBLR stands for Genomic Analysis of Mature B-cell Lymphomas in R, and is part of the family of R packages for lymphoma cancer research called “GAMBLR-verse” and developed in the Morin Lab at the Simon Fraser University.",
     "crumbs": [
       "Why GAMBLR.data?"
     ]
   },
   {
-    "objectID": "why.html#gamblr-family",
-    "href": "why.html#gamblr-family",
+    "objectID": "why.html#gamblr-verse",
+    "href": "why.html#gamblr-verse",
     "title": "Why GAMBLR.data?",
-    "section": "GAMBLR family",
-    "text": "GAMBLR family\nGAMBLR.data is part of a larger family of R tools for the analysis of lymphoma genomic data.\nIt is designed to mainly serve as a storage of bundled data resources and works well with other tools in the GAMBLR family. We continue to bundle more data available through this package, as well as improve it’s functionality.\nFor more details, please refer to the GAMBLR family section.",
+    "section": "GAMBLR-verse",
+    "text": "GAMBLR-verse\nGAMBLR.data is part of a larger family of R tools for the analysis of lymphoma genomic data.\nIt is designed to serve as a storage of bundled data resources and works well with other tools in the GAMBLR family. We continue to bundle more data available through this package, as well as improve it’s functionality.\nFor more details, please refer to the GAMBLR family section.",
     "crumbs": [
       "Why GAMBLR.data?"
     ]
@@ -174,7 +184,7 @@
     "href": "why.html#use-cases",
     "title": "Why GAMBLR.data?",
     "section": "Use cases",
-    "text": "Use cases\nYou can use GAMBLR.data at any stage of your lymphoma data analysis workflow.\nGAMBLR.data helps with:\n\none-stop shop to obtain somatic variants from BL, DLBCL, and FL cases (studies by Thomas et al, Dreval et al, Schmitz et al, Chapuy et al, Reddy et al.) and variant calls from some DLBCL cell lines.\nQC metrics from major WGS and WEX studies of B-cell lymphomas (as reported in Dreval et al.)\nCurated lists of lymphoma genes for all major pathologies\nCurated list of regions targeted by aSHM in B-cell lymphomas\nCoordinates of chromosome arms in both genome projections\nGene coordinates in both genome projections\nCoordinates of oncogenes and SV partners in both genome projections\nHotspot regions for selected genes in both projections\nOther resources\n\nFor more details, please refer to the bundled data section.",
+    "text": "Use cases\nYou can use GAMBLR.data at any stage of your lymphoma data analysis workflow.\nGAMBLR.data helps with:\n\none-stop shop to obtain somatic variants from BL, DLBCL, and FL cases (studies by Thomas et al, Dreval et al, Schmitz et al, Chapuy et al, Reddy et al, Lohr et al) and variant calls from some DLBCL cell lines.\nQC metrics from major WGS and WEX studies of B-cell lymphomas (as reported in Dreval et al.)\nCurated lists of lymphoma genes for all major pathologies\nCurated list of regions targeted by aSHM in B-cell lymphomas\nCoordinates of chromosome arms and cytobands in both genome projections\nGene coordinates in both genome projections\nCoordinates of oncogenes and SV partners in both genome projections\nHotspot regions for selected genes in both projections\nOther resources\n\nFor more details, please refer to the bundled data section.",
     "crumbs": [
       "Why GAMBLR.data?"
     ]
@@ -194,7 +204,7 @@
     "href": "why.html#getting-started",
     "title": "Why GAMBLR.data?",
     "section": "Getting started",
-    "text": "Getting started\nIf you’re interested in trying GAMBLR.data we recommend the getting started tutorial.",
+    "text": "Getting started\nIf you’re interested in trying GAMBLR.data we recommend following the tutorials in GAMBLR.open.",
     "crumbs": [
       "Why GAMBLR.data?"
     ]
@@ -211,28 +221,28 @@
     "href": "index.html#install",
     "title": "GAMBLR.data",
     "section": "Install",
-    "text": "Install\nWe recommend installing the package directly from GitHub (requires devtools dependency).\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n1)\n\n1\n\nInstall GAMBLR.data directly from GitHub along with all bundled data.\n\n\n\n\n\nShow quickstart"
+    "text": "Install\nMost of the times, you would not need to install GAMBLR.data as a stand-alone package. GAMBLR.data is included as dependency and will be auto-installed for you with GAMBLR.open or GAMBLR from the GAMBLR-verse. However, if you do need to install this package separately, we recommend installing the package directly from GitHub (requires devtools dependency).\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n1)\n\n1\n\nInstall GAMBLR.data directly from GitHub along with all bundled data.\n\n\n\n\n\nQuickstart"
   },
   {
     "objectID": "index.html#quickstart",
     "href": "index.html#quickstart",
     "title": "GAMBLR.data",
     "section": "Quickstart",
-    "text": "Quickstart\nThe quick and easy way to get started is to make sure the devtools dependency is installed, then install the GAMBLR.data and run a simple function that returns metadata to confirm successful setup:\n# Verify devtools is installed\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\n# Install GAMBLR.data\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\n\n# Confirm successful setup\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants"
+    "text": "Quickstart\nThe quick and easy way to get started is to make sure the devtools dependency is installed, then install the GAMBLR.data and list the bundled objects to confirm successful setup:\n# Verify devtools is installed\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\n# Install GAMBLR.data\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\n\n# Confirm successful setup\nlibrary(GAMBLR.data) # load package\nls(\"package:GAMBLR.data\") # view all supplied objects"
   },
   {
     "objectID": "index.html#installation-for-developers",
     "href": "index.html#installation-for-developers",
     "title": "GAMBLR.data",
     "section": "Installation for developers",
-    "text": "Installation for developers\nThe easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository\ncd\ngit clone git@github.com:morinlab/GAMBLR.data.git\nIn your R editor of choice (which is hopefully VS Code now), set your working directory to the place you just cloned the repo.\nsetwd(\"~/GAMBLR.data\")\nInstall the package in R by running the following command (requires the devtools package):\ndevtools::install()\nAfter applying your modifications to the code, use the following command to quickly test your changes without directly installing the packaage (requires the devtools dependency):\ndevtools::load_all()\nGAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub documentation for details on how to do pull request."
+    "text": "Installation for developers\nThe easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository\ncd\ngit clone git@github.com:morinlab/GAMBLR.data.git\nIn your R editor of choice (which is hopefully VS Code), set your working directory to the directory you just cloned the repo into.\nsetwd(\"~/GAMBLR.data\")\nInstall the package in R by running the following command (requires the devtools package):\ndevtools::install()\nAfter applying your modifications to the code, use the following command to quickly test your changes without directly installing the package (requires the devtools dependency):\ndevtools::load_all()\nGAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub documentation for details on how to do pull request."
   },
   {
     "objectID": "install.html",
     "href": "install.html",
     "title": "Installation",
     "section": "",
-    "text": "Installation\nWe recommend installing the package directly from GitHub (requires devtools dependency).\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\nYou can confirm successful installation by running some of the easy and most popular commands:\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants\n\n\n\n\n Back to top",
+    "text": "Installation\nIn most instances, you would not need to install GAMBLR.data as a stand-alone package. GAMBLR.data is included as dependency and will be auto-installed for you with installation of GAMBLR.open or GAMBLR from the GAMBLR-verse. However, if you do need to install this package separately, we recommend installing the package directly from GitHub (requires devtools dependency).\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\nAfter installation, you can list the bundled objects to confirm successful setup:\n# Confirm successful setup\nlibrary(GAMBLR.data) # load package\nls(\"package:GAMBLR.data\") # view all supplied objects\n\n\n\n\n Back to top",
     "crumbs": [
       "Installation"
     ]
@@ -242,7 +252,7 @@
     "href": "concepts/GAMBLR_family.html",
     "title": "GAMBLR family of packages",
     "section": "",
-    "text": "GAMBLR.data is the first and most basic member of the GAMBLR family of packages. It serves the purpose of storing the bundled data helpful for genomic analysis of B-cell neoplasms in R.\nSome of the bundled data is versioned as it is continuously being updated. This includes, but is not limited to, regions targeted by aSHM (new regions are being added as they are identified), the curated list of lymphoma genes, somatic mutation hotspots, etc. Conveniently for the user, unless they request the specific version of the data, the most recent and up-to-date version is used by default.\nThe GAMBLR family includes:\n\nGAMBLR.data - this package.\nGAMBLR.helpers - a set of low-level functions for data operation.\nGAMBLR.utils - higher level set of functions to operate on genomic data.\nGAMBLR.viz - set of functions used mostly for visualizations.\nGAMBLR.predict - a collection of machine learning algorithms and functions to pre-format inputs for these models. Contains classifiers of Burkitt and Follicular lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of Chapuy et al, Lacy et al, and Runge et al.\nGAMBLR.open - used as a wrapper to load all of the packages listed above and also contains a light-weight functionality of GAMBLR.\nGAMBLR - used to access the full data in GAMBL project. Only available for members of the Morin Lab and memebers of the GAMBLR consortium. It requires access to GSC.\n\nThis diagram illustrates in a simplified way the dependency relationship of different packages in the GAMBLR family:\n\n\n\n\n\n%%{\n    init : {\n        \"flowchart\" : { \"curve\" : \"monotoneX\" },\n        'themeVariables': {'fontSize': '24px'}\n    }\n\n}%%\nflowchart LR\n  A(\"GAMBLR.data\") ==&gt; B(\"GAMBLR.helpers\")\n  B ==&gt; C(\"GAMBLR.utils\")\n  B ==&gt; D(\"GAMBLR.predict\")\n  D ==&gt; E(\"GAMBLR.open\")\n  C ==&gt; F(\"GAMBLR.viz\")\n  F ==&gt; E\n  F ==&gt; H{\"GAMBL\\nconsortium\\nmember?\"}\n  H == &lt;span style='background-color:#ea9fa4'&gt;YES&lt;/span&gt; ==&gt; G\n  C ==&gt; G(\"GAMBLR.results\")\n  G ==&gt; I(\"GAMBLR\")\n  H == &lt;span style='background-color:#ea9fa4'&gt;NO&lt;/span&gt; ==&gt; E\n  classDef A,B font-size:18pt;\n  style E fill:#d5bd97,stroke:#333,stroke-width:4,font-size:20px\n  style I fill:#e3916a,stroke:#333,stroke-width:4,font-size:20px\n\n\n\n\n\n\nAll dependencies should be installed automatically for you, just like with any other R package. If not, please report the issue in the appropriate GitHub repo.\n\n\n\n Back to top",
+    "text": "GAMBLR.data is the first and most basic member of the GAMBLR family of packages. It serves the purpose of storing the bundled data helpful for genomic analysis of B-cell neoplasms in R.\nSome of the bundled data is versioned as it is continuously being updated. This includes, but is not limited to, regions targeted by aSHM (new regions are being added as they are identified), the curated list of lymphoma genes, somatic mutation hotspots, etc. Conveniently for the user, unless they request the specific version of the data, the most recent and up-to-date version is used by default.\nThe GAMBLR family includes:\n\nGAMBLR.data - this package.\nGAMBLR.helpers - a set of low-level functions for data operation.\nGAMBLR.utils - higher level set of functions to operate on genomic data.\nGAMBLR.viz - set of functions used mostly for visualizations.\nGAMBLR.predict - a collection of machine learning algorithms and functions to pre-format inputs for these models. Contains classifiers of Burkitt and Follicular lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of Chapuy et al, Lacy et al, and Runge et al.\nGAMBLR.open - used as a wrapper to load all of the packages listed above and also contains a light-weight functionality of GAMBLR.\nGAMBLR - used to access the full data in GAMBL project. Only available for members of the Morin Lab and memebers of the GAMBLR consortium. It requires access to GSC.\n\nThis diagram illustrates in a simplified way the dependency relationship of different packages in the GAMBLR family:\n\n\n\n\n\n%%{\n    init : {\n        \"flowchart\" : { \"curve\" : \"monotoneX\" },\n        'themeVariables': {'fontSize': '24px'}\n    }\n\n}%%\nflowchart LR\n  A(\"GAMBLR.data\") ==&gt; B(\"GAMBLR.helpers\")\n  B ==&gt; C(\"GAMBLR.utils\")\n  B ==&gt; D(\"GAMBLR.predict\")\n  D ==&gt; E(\"GAMBLR.open\")\n  C ==&gt; F(\"GAMBLR.viz\")\n  F ==&gt; E\n  F ==&gt; H{\"GAMBL\\nconsortium\\nmember?\"}\n  H == YES ==&gt; G\n  C ==&gt; G(\"GAMBLR.results\")\n  G ==&gt; I(\"GAMBLR\")\n  H == NO ==&gt; E\n  classDef A,B font-size:18pt;\n  style E fill:#6aa84f,stroke:#333,stroke-width:4,font-size:20px\n  style I fill:#6fa8dc,stroke:#333,stroke-width:4,font-size:20px\n\n\n\n\n\n\nAll dependencies should be installed automatically for you, just like with any other R package. If not, please report the issue in the appropriate GitHub repo.\n\n\n\n Back to top",
     "crumbs": [
       "GAMBLR family of packages"
     ]

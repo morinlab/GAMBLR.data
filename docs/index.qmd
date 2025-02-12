@@ -34,8 +34,7 @@ about:
 
 ## Install
 
-We recommend installing the package directly from GitHub (requires `devtools`
-dependency).
+Most of the times, you would not need to install GAMBLR.data as a stand-alone package. GAMBLR.data is included as dependency and will be auto-installed for you with [GAMBLR.open](https://github.com/morinlab/GAMBLR.open) or [GAMBLR](https://github.com/morinlab/GAMBLR) from the [GAMBLR-verse](./concepts/GAMBLR_family.html). However, if you do need to install this package separately, we recommend installing the package directly from GitHub (requires `devtools` dependency).
 
 ```r
 devtools::install_github(
@@ -49,7 +48,7 @@ devtools::install_github(
 
 ###
 
-<div class="d-grid gap-2"><a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseQuickstart" role="button" aria-expanded="false" aria-controls="collapseQuickstart">Show quickstart</a></div>
+<div class="d-grid gap-2"><a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseQuickstart" role="button" aria-expanded="false" aria-controls="collapseQuickstart">Quickstart</a></div>
 
 ###
 
@@ -57,9 +56,7 @@ devtools::install_github(
 
 ## Quickstart
 
-The quick and easy way to get started is to make sure the `devtools` dependency
-is installed, then install the GAMBLR.data and run a simple function that
-returns metadata to confirm successful setup:
+The quick and easy way to get started is to make sure the `devtools` dependency is installed, then install the GAMBLR.data and list the bundled objects to confirm successful setup:
 
 ```r
 # Verify devtools is installed
@@ -72,28 +69,27 @@ devtools::install_github(
 )
 
 # Confirm successful setup
-get_gambl_metadata() # returns simple metadata data frame
-get_coding_ssm() # returns data frame in maf formatting with somatic variants
+library(GAMBLR.data) # load package
+ls("package:GAMBLR.data") # view all supplied objects
 ```
 
 :::
 
 ###
 
-<div class="d-grid gap-2"><a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseDevelopers" role="button" aria-expanded="false" aria-controls="collapseDevelopers"  margin="100px">Show installation for developers</a></div>
+<div class="d-grid gap-2"><a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseDevelopers" role="button" aria-expanded="false" aria-controls="collapseDevelopers"  margin="100px">Installation for developers</a></div>
 
 ::: {#collapseDevelopers .collapse .multi-collapse}
 
 ## Installation for developers
 
-The easiest way to obtain and contribute to GAMBLR.data is to do this via
-cloning the repository
+The easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository
 
 ```bash
 cd
 git clone git@github.com:morinlab/GAMBLR.data.git
 ```
-In your R editor of choice (which is __**hopefully**__ [VS Code](https://code.visualstudio.com/) now), set your working directory to the place you just cloned the repo.
+In your R editor of choice (which is __**hopefully**__ [VS Code](https://code.visualstudio.com/)), set your working directory to the directory you just cloned the repo into.
 
 ```bash
 setwd("~/GAMBLR.data")
@@ -107,7 +103,7 @@ devtools::install()
 ```
 
 After applying your modifications to the code, use the following command to
-quickly test your changes without directly installing the packaage (requires the
+quickly test your changes without directly installing the package (requires the
 `devtools` dependency):
 
 ```r
@@ -120,4 +116,3 @@ from all levels of users. All commits must be submitted via pull request on a
 branch. Please refer to the GitHub [documentation](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for details on how to do pull request.
 
 :::
-

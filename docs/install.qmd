@@ -7,7 +7,7 @@ hide:
 
 # Installation
 
-We recommend installing the package directly from GitHub (requires `devtools` dependency).
+In most instances, you would not need to install GAMBLR.data as a stand-alone package. GAMBLR.data is included as dependency and will be auto-installed for you with installation of [GAMBLR.open](https://github.com/morinlab/GAMBLR.open) or [GAMBLR](https://github.com/morinlab/GAMBLR) from the [GAMBLR-verse](./concepts/GAMBLR_family.html). However, if you do need to install this package separately, we recommend installing the package directly from GitHub (requires `devtools` dependency).
 
 ```r
 if (!require("devtools")) install.packages("devtools")
@@ -18,8 +18,9 @@ devtools::install_github(
 ) # <1>
 ```
 
-You can confirm successful installation by running some of the easy and most popular commands:
+After installation, you can list the bundled objects to confirm successful setup:
 ```r
-get_gambl_metadata() # returns simple metadata data frame
-get_coding_ssm() # returns data frame in maf formatting with somatic variants
+# Confirm successful setup
+library(GAMBLR.data) # load package
+ls("package:GAMBLR.data") # view all supplied objects
 ```

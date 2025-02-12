@@ -142,7 +142,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
         <li>
     <a class="dropdown-item" href="./faq.html">
- <span class="dropdown-text">Frequently Asked Qestions</span></a>
+ <span class="dropdown-text">Frequently Asked Questions</span></a>
   </li>  
     </ul>
   </li>
@@ -263,7 +263,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="install" class="level2">
 <h2 data-anchor-id="install">Install</h2>
-<p>We recommend installing the package directly from GitHub (requires <code>devtools</code> dependency).</p>
+<p>Most of the times, you would not need to install GAMBLR.data as a stand-alone package. GAMBLR.data is included as dependency and will be auto-installed for you with <a href="https://github.com/morinlab/GAMBLR.open">GAMBLR.open</a> or <a href="https://github.com/morinlab/GAMBLR">GAMBLR</a> from the <a href="./concepts/GAMBLR_family.html">GAMBLR-verse</a>. However, if you do need to install this package separately, we recommend installing the package directly from GitHub (requires <code>devtools</code> dependency).</p>
 <div class="sourceCode" id="annotated-cell-1"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(</span>
 <span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"morinlab/GAMBLR.data"</span>,</span>
 <span id="annotated-cell-1-3"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">repos =</span> BiocManager<span class="sc">::</span><span class="fu">repositories</span>()</span>
@@ -277,7 +277,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="section" class="level3">
 <h3 data-anchor-id="section"></h3>
 <div class="d-grid gap-2">
-<a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseQuickstart" role="button" aria-expanded="false" aria-controls="collapseQuickstart">Show quickstart</a>
+<a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseQuickstart" role="button" aria-expanded="false" aria-controls="collapseQuickstart">Quickstart</a>
 </div>
 </section>
 <section id="section-1" class="level3">
@@ -287,7 +287,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="collapseQuickstart" class="collapse multi-collapse">
 <section id="quickstart" class="level2">
 <h2 data-anchor-id="quickstart">Quickstart</h2>
-<p>The quick and easy way to get started is to make sure the <code>devtools</code> dependency is installed, then install the GAMBLR.data and run a simple function that returns metadata to confirm successful setup:</p>
+<p>The quick and easy way to get started is to make sure the <code>devtools</code> dependency is installed, then install the GAMBLR.data and list the bundled objects to confirm successful setup:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify devtools is installed</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"devtools"</span>)) <span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -298,14 +298,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Confirm successful setup</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_gambl_metadata</span>() <span class="co"># returns simple metadata data frame</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">get_coding_ssm</span>() <span class="co"># returns data frame in maf formatting with somatic variants</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GAMBLR.data) <span class="co"># load package</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span>(<span class="st">"package:GAMBLR.data"</span>) <span class="co"># view all supplied objects</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </div>
 <section id="section-2" class="level3">
 <h3 data-anchor-id="section-2"></h3>
 <div class="d-grid gap-2">
-<a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseDevelopers" role="button" aria-expanded="false" aria-controls="collapseDevelopers" margin="100px">Show installation for developers</a>
+<a class="btn btn-lg btn-primary" data-bs-toggle="collapse" href="#collapseDevelopers" role="button" aria-expanded="false" aria-controls="collapseDevelopers" margin="100px">Installation for developers</a>
 </div>
 </section>
 <div id="collapseDevelopers" class="collapse multi-collapse">
@@ -314,11 +314,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:morinlab/GAMBLR.data.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>In your R editor of choice (which is <strong><strong>hopefully</strong></strong> <a href="https://code.visualstudio.com/">VS Code</a> now), set your working directory to the place you just cloned the repo.</p>
+<p>In your R editor of choice (which is <strong><strong>hopefully</strong></strong> <a href="https://code.visualstudio.com/">VS Code</a>), set your working directory to the directory you just cloned the repo into.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">setwd</span><span class="er">(</span><span class="st">"~/GAMBLR.data"</span><span class="kw">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Install the package in R by running the following command (requires the <code>devtools</code> package):</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>After applying your modifications to the code, use the following command to quickly test your changes without directly installing the packaage (requires the <code>devtools</code> dependency):</p>
+<p>After applying your modifications to the code, use the following command to quickly test your changes without directly installing the package (requires the <code>devtools</code> dependency):</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">load_all</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>GAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">documentation</a> for details on how to do pull request.</p>
 </section>
