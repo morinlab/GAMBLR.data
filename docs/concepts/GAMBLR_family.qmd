@@ -24,21 +24,29 @@ The GAMBLR family includes:
 
 
 This diagram illustrates in a simplified way the dependency relationship of
-different packages in the GAMBLR.family:
+different packages in the GAMBLR family:
 
 ```{mermaid}
+%%{
+    init : {
+        "flowchart" : { "curve" : "monotoneX" },
+        'themeVariables': {'fontSize': '24px'}
+    }
+
+}%%
 flowchart LR
-  A("GAMBLR.data") --> B("GAMBLR.helpers")
-  B --> C("GAMBLR.utils")
-  B --> D("GAMBLR.predict")
-  D --> E("GAMBLR.open")
-  C --> F("GAMBLR.viz")
-  F --> E
-  F --> H{"GAMBL\nconsortium\nmember?"}
-  H -- YES --> G
-  C --> G("GAMBLR.results")
-  G --> I("GAMBLR")
-  H -- NO --> E
+  A("GAMBLR.data") ==> B("GAMBLR.helpers")
+  B ==> C("GAMBLR.utils")
+  B ==> D("GAMBLR.predict")
+  D ==> E("GAMBLR.open")
+  C ==> F("GAMBLR.viz")
+  F ==> E
+  F ==> H{"GAMBL\nconsortium\nmember?"}
+  H == YES ==> G
+  C ==> G("GAMBLR.results")
+  G ==> I("GAMBLR")
+  H == NO ==> E
+  classDef A,B font-size:18pt;
   style E fill:#6aa84f,stroke:#333,stroke-width:4,font-size:20px
   style I fill:#6fa8dc,stroke:#333,stroke-width:4,font-size:20px
 ```

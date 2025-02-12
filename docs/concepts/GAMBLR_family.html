@@ -254,24 +254,32 @@ ul.task-list li input[type="checkbox"] {
 <li><a href="https://github.com/morinlab/GAMBLR.open">GAMBLR.open</a> - used as a wrapper to load all of the packages listed above and also contains a light-weight functionality of <a href="https://github.com/morinlab/GAMBLR">GAMBLR</a>.</li>
 <li><a href="https://github.com/morinlab/GAMBLR">GAMBLR</a> - used to access the full data in GAMBL project. Only available for members of the Morin Lab and memebers of the GAMBLR consortium. It requires access to GSC.</li>
 </ul>
-<p>This diagram illustrates in a simplified way the dependency relationship of different packages in the GAMBLR.family:</p>
+<p>This diagram illustrates in a simplified way the dependency relationship of different packages in the GAMBLR family:</p>
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A("GAMBLR.data") --&gt; B("GAMBLR.helpers")
-  B --&gt; C("GAMBLR.utils")
-  B --&gt; D("GAMBLR.predict")
-  D --&gt; E("GAMBLR.open")
-  C --&gt; F("GAMBLR.viz")
-  F --&gt; E
-  F --&gt; H{"GAMBL\nconsortium\nmember?"}
-  H -- YES --&gt; G
-  C --&gt; G("GAMBLR.results")
-  G --&gt; I("GAMBLR")
-  H -- NO --&gt; E
+<pre class="mermaid mermaid-js">%%{
+    init : {
+        "flowchart" : { "curve" : "monotoneX" },
+        'themeVariables': {'fontSize': '24px'}
+    }
+
+}%%
+flowchart LR
+  A("GAMBLR.data") ==&gt; B("GAMBLR.helpers")
+  B ==&gt; C("GAMBLR.utils")
+  B ==&gt; D("GAMBLR.predict")
+  D ==&gt; E("GAMBLR.open")
+  C ==&gt; F("GAMBLR.viz")
+  F ==&gt; E
+  F ==&gt; H{"GAMBL\nconsortium\nmember?"}
+  H == YES ==&gt; G
+  C ==&gt; G("GAMBLR.results")
+  G ==&gt; I("GAMBLR")
+  H == NO ==&gt; E
+  classDef A,B font-size:18pt;
   style E fill:#6aa84f,stroke:#333,stroke-width:4,font-size:20px
   style I fill:#6fa8dc,stroke:#333,stroke-width:4,font-size:20px
 </pre>
