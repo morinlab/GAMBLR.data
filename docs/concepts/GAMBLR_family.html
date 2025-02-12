@@ -242,15 +242,17 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>GAMBLR.data is the first and most basic member of the <a href="(https://github.com/morinlab/GAMBLR)">GAMBLR</a> family of packages. It mostly serves the purpose of storing the bundled data helpful for genomic analysis of B-cell neoplasms in R, but also contains small basic functions serving as API to retrieve this data.</p>
+<p>GAMBLR.data is the first and most basic member of the <a href="(https://github.com/morinlab/GAMBLR)">GAMBLR</a> family of packages. It serves the purpose of storing the bundled data helpful for genomic analysis of B-cell neoplasms in R.</p>
 <p>Some of the bundled data is versioned as it is continuously being updated. This includes, but is not limited to, regions targeted by aSHM (new regions are being added as they are identified), the curated list of lymphoma genes, somatic mutation hotspots, etc. Conveniently for the user, unless they request the specific version of the data, the most recent and up-to-date version is used by default.</p>
 <p>The GAMBLR family includes:</p>
 <ul>
-<li>GAMBLR.data - this package</li>
-<li><a href="https://github.com/morinlab/GAMBLR.helpers">GAMBLR.helpers</a> - a set of low-level functions for data operation</li>
-<li><a href="https://github.com/morinlab/GAMBLR.utils">GAMBLR.utils</a> - higher level set of functions to operate on genomic data</li>
-<li><a href="https://github.com/morinlab/GAMBLR.viz">GAMBLR.viz</a> - set of functions used mostly for visualizations</li>
-<li><a href="https://github.com/morinlab/GAMBLR.results">GAMBLR.results</a> - used to access the full data in GAMBL project. Only available for members of the Morin Lab and requires access to GSC, but can also be run locally once properly configured and synced.</li>
+<li>GAMBLR.data - this package.</li>
+<li><a href="https://github.com/morinlab/GAMBLR.helpers">GAMBLR.helpers</a> - a set of low-level functions for data operation.</li>
+<li><a href="https://github.com/morinlab/GAMBLR.utils">GAMBLR.utils</a> - higher level set of functions to operate on genomic data.</li>
+<li><a href="https://github.com/morinlab/GAMBLR.viz">GAMBLR.viz</a> - set of functions used mostly for visualizations.</li>
+<li><a href="https://github.com/morinlab/GAMBLR.predict">GAMBLR.predict</a> - a collection of machine learning algorithms and functions to pre-format inputs for these models. Contains classifiers of <a href="https://doi.org/10.1182/blood.2022016534">Burkitt</a> and <a href="https://doi.org/10.1182/blood.2022018719">Follicular</a> lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of <a href="https://doi.org/10.1038/s41591-018-0016-8">Chapuy et al</a>, <a href="https://doi.org/10.1182/blood.2019003535">Lacy et al</a>, and <a href="https://doi.org/10.1111/bjh.17132">Runge et al</a>.</li>
+<li><a href="https://github.com/morinlab/GAMBLR.open">GAMBLR.open</a> - used as a wrapper to load all of the packages listed above and also contains a light-weight functionality of <a href="https://github.com/morinlab/GAMBLR">GAMBLR</a>.</li>
+<li><a href="https://github.com/morinlab/GAMBLR">GAMBLR</a> - used to access the full data in GAMBL project. Only available for members of the Morin Lab and memebers of the GAMBLR consortium. It requires access to GSC.</li>
 </ul>
 <p>This diagram illustrates in a simplified way the dependency relationship of different packages in the GAMBLR.family:</p>
 <div class="cell" data-layout-align="default">
@@ -261,10 +263,17 @@ ul.task-list li input[type="checkbox"] {
 <pre class="mermaid mermaid-js">flowchart LR
   A("GAMBLR.data") --&gt; B("GAMBLR.helpers")
   B --&gt; C("GAMBLR.utils")
-  C --&gt; D("GAMBLR.viz")
-  D --&gt; E{"Morin Lab member?"}
-  E -- YES --&gt; F("GAMBLR.results")
-  E -- NO --&gt; A
+  B --&gt; D("GAMBLR.predict")
+  D --&gt; E("GAMBLR.open")
+  C --&gt; F("GAMBLR.viz")
+  F --&gt; E
+  F --&gt; H{"GAMBL\nconsortium\nmember?"}
+  H -- YES --&gt; G
+  C --&gt; G("GAMBLR.results")
+  G --&gt; I("GAMBLR")
+  H -- NO --&gt; E
+  style E fill:#6aa84f,stroke:#333,stroke-width:4,font-size:20px
+  style I fill:#6fa8dc,stroke:#333,stroke-width:4,font-size:20px
 </pre>
 </div>
 <p></p></figure><p></p>

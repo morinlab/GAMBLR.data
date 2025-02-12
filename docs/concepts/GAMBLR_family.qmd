@@ -3,9 +3,8 @@ title: "GAMBLR family of packages"
 ---
 
 GAMBLR.data is the first and most basic member of the [GAMBLR]((https://github.com/morinlab/GAMBLR)) family of packages.
-It mostly serves the purpose of storing the bundled data helpful for genomic
-analysis of B-cell neoplasms in R, but also contains small basic functions
-serving as API to retrieve this data.
+It serves the purpose of storing the bundled data helpful for genomic
+analysis of B-cell neoplasms in R.
 
 Some of the bundled data is versioned as it is continuously being updated. This includes,
 but is not limited to, regions targeted by aSHM (new regions are being added as
@@ -15,13 +14,14 @@ data, the most recent and up-to-date version is used by default.
 
 The GAMBLR family includes:
 
-* GAMBLR.data - this package
-* [GAMBLR.helpers](https://github.com/morinlab/GAMBLR.helpers) - a set of low-level functions for data operation
-* [GAMBLR.utils](https://github.com/morinlab/GAMBLR.utils) - higher level set of functions to operate on genomic data
-* [GAMBLR.viz](https://github.com/morinlab/GAMBLR.viz) - set of functions used mostly for visualizations
-* [GAMBLR.results](https://github.com/morinlab/GAMBLR.results) - used to access the full data in GAMBL project. Only
-    available for members of the Morin Lab and requires access to GSC, but
-    can also be run locally once properly configured and synced.
+* GAMBLR.data - this package.
+* [GAMBLR.helpers](https://github.com/morinlab/GAMBLR.helpers) - a set of low-level functions for data operation.
+* [GAMBLR.utils](https://github.com/morinlab/GAMBLR.utils) - higher level set of functions to operate on genomic data.
+* [GAMBLR.viz](https://github.com/morinlab/GAMBLR.viz) - set of functions used mostly for visualizations.
+* [GAMBLR.predict](https://github.com/morinlab/GAMBLR.predict) - a collection of machine learning algorithms and functions to pre-format inputs for these models. Contains classifiers of [Burkitt](https://doi.org/10.1182/blood.2022016534) and [Follicular](https://doi.org/10.1182/blood.2022018719) lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of [Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et al](https://doi.org/10.1182/blood.2019003535), and [Runge et al](https://doi.org/10.1111/bjh.17132).
+* [GAMBLR.open](https://github.com/morinlab/GAMBLR.open) - used as a wrapper to load all of the packages listed above and also contains a light-weight functionality of [GAMBLR](https://github.com/morinlab/GAMBLR).
+* [GAMBLR](https://github.com/morinlab/GAMBLR) - used to access the full data in GAMBL project. Only available for members of the Morin Lab and memebers of the GAMBLR consortium. It requires access to GSC.
+
 
 This diagram illustrates in a simplified way the dependency relationship of
 different packages in the GAMBLR.family:
@@ -30,10 +30,17 @@ different packages in the GAMBLR.family:
 flowchart LR
   A("GAMBLR.data") --> B("GAMBLR.helpers")
   B --> C("GAMBLR.utils")
-  C --> D("GAMBLR.viz")
-  D --> E{"Morin Lab member?"}
-  E -- YES --> F("GAMBLR.results")
-  E -- NO --> A
+  B --> D("GAMBLR.predict")
+  D --> E("GAMBLR.open")
+  C --> F("GAMBLR.viz")
+  F --> E
+  F --> H{"GAMBL\nconsortium\nmember?"}
+  H -- YES --> G
+  C --> G("GAMBLR.results")
+  G --> I("GAMBLR")
+  H -- NO --> E
+  style E fill:#6aa84f,stroke:#333,stroke-width:4,font-size:20px
+  style I fill:#6fa8dc,stroke:#333,stroke-width:4,font-size:20px
 ```
 
 All dependencies should be installed automatically for you, just like with any other R package.
