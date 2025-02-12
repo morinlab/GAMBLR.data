@@ -59,7 +59,6 @@ website:
       contents:
         - install.qmd
         - faq.qmd
-        - auto: tutorials/*.qmd
     - id: concepts
       title: "Concepts"
       style: "docked"
