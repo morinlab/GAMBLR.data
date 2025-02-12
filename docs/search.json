@@ -1,120 +1,72 @@
 [
   {
-    "objectID": "resources/functions.html",
-    "href": "resources/functions.html",
-    "title": "Functions overview",
+    "objectID": "resources/bundled_data.html",
+    "href": "resources/bundled_data.html",
+    "title": "Data bunded with GAMBLR.data",
     "section": "",
-    "text": "The GAMBLR.data package not only stores data, but also provides some basic functionality to easily retrieve and operate on this data. Almost all of the functions listed below are the “lighter” version of those in the associated package GAMBLR.results, which means that the functions included here do not require you to be Morin Lab member or have access to GSC.\nThere is a limited number of basic functions available, therefore the functions are not separated into categories below. Nevertheless, these are the basic functions available:\n\nannotate_hotspots: Annotate maf data with hotspots. Will return the same maf as input with an additional logical column showing whether the particular SSM is in the hotspot region.\nassign_cn_to_ssm: Annotate maf data by assigning copy number state to SSM. Will return the same maf as input with an additional column showing the absolute copy number state of the variant in that position.\ncalc_mutation_frequency_bin_region: Calculate mutation frequency by sliding window. Will return a numeric matrix with rows corresponding to samples and values showing number of mutations in the given window. Operates only on one given region. If you need to analyze many regions, use the plural version of this function.\ncalc_mutation_frequency_bin_regions: Calculate mutation frequency by sliding window. Will return a numeric matrix with rows corresponding to samples and values showing number of mutations in the given window. This function is really just a wrapper for the singular version but works on many given regions.\ncheck_excess_params: Helper function that ensures arguments given to the functions in this package are appropriate, and will drop any unsupported arguments.\ncollate_results: This currently adds the QC metrics to the given set of samples in the metadata.\nget_ashm_count_matrix: Returns a matrix showing how many mutations are in the given aSHM region for each given sample.\nget_cn_segments: Returns copy number data in seg format in a given region.\nget_coding_ssm: Returns maf data with only coding mutations.\nget_coding_ssm_status: Returns a binary matrix showing whether or not each given sample is mutated in each given gene.\nget_gambl_metadata: Returns metadata for the whole collection of samples present in GAMBL.\nget_manta_sv: Returns SV calls from manta.\nget_sample_cn_segments: Returns the CNV data for a given sample in seg format.\nget_ssm_by_patients: Returns maf data (both coding and non-coding mutations) for a given set of patients. This will return maf data for multiple samples if they exist for a given patient.\nget_ssm_by_regions: Returns maf data of the variants in the given regions.\nget_ssm_by_samples: Returns maf data (both coding and non-coding mutations) for a given set of samples. This will return maf data for only the specified samples even if multiple samples exist for a given patient.\nid_ease: Internal function that converts a vector of sample ids into a data frame with metadata and vice versa. Used internally and is not really meant for standalone use.\nprocess_regions: Helper function that will harmonize genomic regions specified as character vectors or a data frame. Returns a list with two objects: regions as a vector and regions in bed format.\nregion_to_chunks: Helper function that will separate a chromosome region specified in UCSC format (chr:start-end) into individual chunks of chromosome, start, and end.\nreview_hotspots Review hotspot mutations at certain genes to ensure they are correctly annotated. For example, will mark any missence mutation within KAT domain of CREBBP as hotspot. Only selected genes are supported.\n\n\n\n\n Back to top",
+    "text": "The GAMBLR.data comes with many different bundled data objects that can be systematically organized in the following categories:",
     "crumbs": [
-      "Functions overview"
+      "Data bunded with GAMBLR.data"
     ]
   },
   {
-    "objectID": "concepts/GAMBLR_family.html",
-    "href": "concepts/GAMBLR_family.html",
-    "title": "GAMBLR family of packages",
+    "objectID": "resources/bundled_data.html#somatic-variants",
+    "href": "resources/bundled_data.html#somatic-variants",
+    "title": "Data bunded with GAMBLR.data",
+    "section": "Somatic variants",
+    "text": "Somatic variants\n\nsample_data A list of data frames containing the metadata, simple somatic, copy number, and structural variants collected together from the supplemental tables of large sequencing studies of B-cell lymphomas.",
+    "crumbs": [
+      "Data bunded with GAMBLR.data"
+    ]
+  },
+  {
+    "objectID": "resources/bundled_data.html#curated-gene-lists",
+    "href": "resources/bundled_data.html#curated-gene-lists",
+    "title": "Data bunded with GAMBLR.data",
+    "section": "Curated gene lists",
+    "text": "Curated gene lists\n\ngene_blacklist A tibble with gene symbols (Hugo) that fall within blacklisted regions of the genome. The genes in this data object represent common sequencing artifacts and are discarded during the data analysis.\nlymphoma_genes A data frame with a manually curated set of genes commonly mutated in lymphomas with associated TRUE/FALSE columns annotating lymphoma type(s) where the particular mutations are present. This object by default always represents the most recent version of the curated list.\nlymphoma_genes_bl_v0.1 A data frame with a manually curated set of genes commonly mutated in BL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred to directly by it’s version number.\nlymphoma_genes_bl_v_latest A data frame with a manually curated set of genes commonly mutated in BL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.\nlymphoma_genes_comprehensive A data frame with the curated list of genes reported as significantly mutated in the large lymphoma studies. Both Ensembl ID and Hugo Symbol are available as gene identifiers. This data contains annotations for the studies by Chapuy, Reddy, Wright (LymphGen), Lacy, as well as annotations for whether the gene is curated, reported as SMG in other_studies, or a target of aSHM.\nlymphoma_genes_dlbcl_v0.1 A data frame with a manually curated set of genes commonly mutated in DLBCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred to directly by it’s version number.\nlymphoma_genes_dlbcl_v_latest A data frame with a manually curated set of genes commonly mutated in DLBCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.\nlymphoma_genes_lymphoma_genes_v0.0 Legacy version of the curated list of genes significantly mutated in lymphomas. Bundled here for backwards compatibility and can be referred to directly by it’s version number.\nlymphoma_genes_mcl_v0.1 A data frame with a manually curated set of genes commonly mutated in MCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred directly by it’s version number.\nlymphoma_genes_mcl_v_latest A data frame with a manually curated set of genes commonly mutated in MCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.",
+    "crumbs": [
+      "Data bunded with GAMBLR.data"
+    ]
+  },
+  {
+    "objectID": "resources/bundled_data.html#coordinate-based-resources",
+    "href": "resources/bundled_data.html#coordinate-based-resources",
+    "title": "Data bunded with GAMBLR.data",
+    "section": "Coordinate-based resources",
+    "text": "Coordinate-based resources\n\nchromosome_arms_grch37: A data frame with the chromosome arm coordinates with respect to the grch37 projection.\nchromosome_arms_hg38 A data frame with the chromosome arm coordinates with respect to the hg38 projection.\ngrch37_gene_coordinates A data frame of all gene coordinates with respect to grch37. Contains both Ensembl ID and Hugo Symbol as identifiers.\ngrch37_lymphoma_genes_bed A data frame in the bed format for genes commonly associated with B-cell lymphomas. Coordinates are with respect to grch37.\ngrch37_oncogene A data frame with the coordinates of lymphoma oncogenes relative to grch37. Used in mapping of the breakpoint coordinates.\ngrch37_partners A data frame of translocation partners for oncogenes with coordinates relative to grch37.\nhg38_gene_coordinates A data frame of all gene coordinates with respect to hg38. Contains both Ensembl ID and Hugo Symbol as identifiers.\nhg38_lymphoma_genes_bed A data frame in the bed format for genes commonly associated with B-cell lymphomas. Coordinates are with respect to hg38.\nhg38_oncogene A data frame with the coordinates of lymphoma oncogenes relative to the hg38. Used in mapping of the breakpoint coordinates.\nhg38_partners A data frame of translocation partners for oncogenes with relative coordinates to hg38.\ngrch37_all_gene_coordinates A data frame of protein-coding gene coordinates relative to grch37. Contains both Ensembl ID and Hugo Symbol as identifiers. Mainly here for backwards compatibility with earlier GAMBLR versions.\nhotspot_regions_grch37 A data frame of mutation hotspot regions relative to grch37.\nhotspot_regions_hg38 A data frame of mutation hotspot regions relative to hg38.\ntarget_regions_grch37 A data frame with coordinates of the regions of the genome targeted by the whole exome sequencing panel Agilent V5 (no UTR) relative to grch37.\ntarget_regions_hg38 A data frame with coordinates of the regions of the genome targeted by the whole exome sequencing panel Agilent V5 (no UTR) relative to hg38.",
+    "crumbs": [
+      "Data bunded with GAMBLR.data"
+    ]
+  },
+  {
+    "objectID": "resources/bundled_data.html#ashm-regions",
+    "href": "resources/bundled_data.html#ashm-regions",
+    "title": "Data bunded with GAMBLR.data",
+    "section": "aSHM regions",
+    "text": "aSHM regions\n\ngrch37_ashm_regions Aberrant somatic hypermutation (aSHM) regions relative to grch37. This object always by default refers to the most recent version of the aSHM regions.\nhg38_ashm_regions Aberrant somatic hypermutation (aSHM) regions relative to hg38. This object always by default refers to the most recent version of the aSHM regions.\nsomatic_hypermutation_locations_GRCh37_v0.0 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.1 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.2 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.3 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.4 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.5 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v_latest Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is an alias for the latest version of this data.\nsomatic_hypermutation_locations_GRCh38_v0.0 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.1 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.2 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.3 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.4 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.5 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v_latest Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is an alias for the latest version of this data.",
+    "crumbs": [
+      "Data bunded with GAMBLR.data"
+    ]
+  },
+  {
+    "objectID": "resources/bundled_data.html#other-resources",
+    "href": "resources/bundled_data.html#other-resources",
+    "title": "Data bunded with GAMBLR.data",
+    "section": "Other resources",
+    "text": "Other resources\n\ncolour_codes A data frame with colour codes (HEX) arranged into different categories, groups.\ndhitsig_genes_with_weights A data frame with double hit signature genes (both as ensembl IDs and Hugo symbols) and importance scores.\ngambl_metadata A data frame with metadata for a collection of GAMBL samples. This represents a collection of whole genome, exome, targeted, RNA, and PrometION sequencing samples available as a data set known as GAMBL. This object rather serves an FYI purpose as not all samples listed here are published and bundled with GAMBLR.data.\nhgnc2pfam.df A dataset containing the mapping table between Hugo symbol, UniProt ID, and Pfam ACC. This dataset comes from the g3viz package and was obtained via this URL: https://github.com/morinlab/g3viz/tree/master/data\nhotspots_annotations Hotspot coordinates used in the feature annotation during matrix assembly of data for cFL classifier.\nmirage_metrics A data frame providing the data reported in the Supplemental Table of the MIRAGE study by Dreval et al, 2022\nmutation.table.df A data frame providing the linkage between Variant Classification, Mutation_Class, and Short_Name for the simple somatic mutations.\nreddy_genes A data frame of the genes reported as significantly mutated by the study of Reddy et al, 2017\nwright_genes_with_weights Wright genes with weight values from the study by Scott et al, 2014.",
+    "crumbs": [
+      "Data bunded with GAMBLR.data"
+    ]
+  },
+  {
+    "objectID": "concepts/glossary.html",
+    "href": "concepts/glossary.html",
+    "title": "GAMBLR.data glossary",
     "section": "",
-    "text": "GAMBLR.data is the first and most basic member of the GAMBLR family of packages. It mostly serves the purpose of storing the bundled data helpful for genomic analysis of B-cell neoplasms in R, but also contains small basic functions serving as API to retrieve this data.\nSome of the bundled data is versioned as it is continuously being updated. This includes, but is not limited to, regions targeted by aSHM (new regions are being added as they are identified), the curated list of lymphoma genes, somatic mutation hotspots, etc. Conveniently for the user, unless they request the specific version of the data, the most recent and up-to-date version is used by default.\nThe GAMBLR family includes:\n\nGAMBLR.data - this package\nGAMBLR.helpers - a set of low-level functions for data operation\nGAMBLR.utils - higher level set of functions to operate on genomic data\nGAMBLR.viz - set of functions used mostly for visualizations\nGAMBLR.results - used to access the full data in GAMBL project. Only available for members of the Morin Lab and requires access to GSC, but can also be run locally once properly configured and synced.\n\nThis diagram illustrates in a simplified way the dependency relationship of different packages in the GAMBLR.family:\n\n\n\n\n\nflowchart LR\n  A(\"GAMBLR.data\") --&gt; B(\"GAMBLR.helpers\")\n  B --&gt; C(\"GAMBLR.utils\")\n  C --&gt; D(\"GAMBLR.viz\")\n  D --&gt; E{\"Morin Lab member?\"}\n  E -- YES --&gt; F(\"GAMBLR.results\")\n  E -- NO --&gt; A\n\n\n\n\n\n\nAll dependencies should be installed automatically for you, just like with any other R package. If not, please report the issue in the appropriate GitHub repo.\n\n\n\n Back to top",
+    "text": "There are several key concepts underlying the logic behind the GAMBLR.data package. The main terms are:\n\nprojection: This is a coordinate system defining the relationship with genome build and chromosome prefixing. The main projections supported throughout GAMBLR.data are grch37 and hg38. The grch37 projection contains the same coordinate system as genome build hg19, but never has the “chr” prefix on chromosome names. In contrast, the hg38 projection is always chr-prefixed and is in the same coordinate system as the hg38 genome build. As GAMBL itself and the data bundled and available through this package represents a large collection of samples sequenced both locally and externally, there is always a difficulty associated with proper handling of prefixes, different custom contigs and their lengths in the fasta reference, coordinates, and other distinctions complicating the direct comparison between data and comprehensive data analysis. These difficulties are handled internallyby making data always available in both projections, regardless of initial genome build to which the sample was aligned.\nmetadata: This is a data frame with a set of minimal required columns: patient_id, Tumor_Sample_Barcode, sample_id, seq_type, sex, cohort, and pathology. The columns like sex and cohort can contain NA values but must be present in the metadata. The main purpose of this data frame is to provide a structure for the metadata that is always expected to be available and provides linkage between unique sample identifiers and associated basic metadata values. The columns Tumor_Sample_Barcode and sample_id are expected to share the same values, but are required to be present for direct operation on the outputs of different upstream tools.\n\n\n\n\n Back to top",
     "crumbs": [
-      "GAMBLR family of packages"
-    ]
-  },
-  {
-    "objectID": "install.html",
-    "href": "install.html",
-    "title": "Installation",
-    "section": "",
-    "text": "Installation\nWe recommend installing the package directly from GitHub (requires devtools dependency).\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\nYou can confirm successful installation by running some of the easy and most popular commands:\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants\n\n\n\n\n Back to top",
-    "crumbs": [
-      "Installation"
-    ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "GAMBLR.data",
-    "section": "",
-    "text": "Why use GAMBLR.data?\n  \n  \n    \n     How to install?\n  \n  \n    \n     How to use?\n  \n  \n    \n     Release notes\n  \n  \n    \n     GitHub"
-  },
-  {
-    "objectID": "index.html#install",
-    "href": "index.html#install",
-    "title": "GAMBLR.data",
-    "section": "Install",
-    "text": "Install\nWe recommend installing the package directly from GitHub (requires devtools dependency).\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n1)\n\n1\n\nInstall GAMBLR.data directly from GitHub along with all bundled data.\n\n\n\n\n\nShow quickstart"
-  },
-  {
-    "objectID": "index.html#quickstart",
-    "href": "index.html#quickstart",
-    "title": "GAMBLR.data",
-    "section": "Quickstart",
-    "text": "Quickstart\nThe quick and easy way to get started is to make sure the devtools dependency is installed, then install the GAMBLR.data and run a simple function that returns metadata to confirm successful setup:\n# Verify devtools is installed\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\n# Install GAMBLR.data\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\n\n# Confirm successful setup\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants"
-  },
-  {
-    "objectID": "index.html#installation-for-developers",
-    "href": "index.html#installation-for-developers",
-    "title": "GAMBLR.data",
-    "section": "Installation for developers",
-    "text": "Installation for developers\nThe easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository\ncd\ngit clone git@github.com:morinlab/GAMBLR.data.git\nIn your R editor of choice (which is hopefully VS Code now), set your working directory to the place you just cloned the repo.\nsetwd(\"~/GAMBLR.data\")\nInstall the package in R by running the following command (requires the devtools package):\ndevtools::install()\nAfter applying your modifications to the code, use the following command to quickly test your changes without directly installing the packaage (requires the devtools dependency):\ndevtools::load_all()\nGAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub documentation for details on how to do pull request."
-  },
-  {
-    "objectID": "why.html",
-    "href": "why.html",
-    "title": "Why GAMBLR.data?",
-    "section": "",
-    "text": "GAMBLR.data is an open-source portable R library.\nIf you’ve had issues with importing genomic data from large-scale lymphoma studies, need to work with standardized data used for analysis of somatic variants, find yourself translating between different genome build systems, or just want a great great comprehensive resource of genomic data in B-cell lymphomas, GAMBLR.data is for you.\nGAMBLR stands for Genomic Analysis of Mature B-cell Lymphomas in R, and is part of the family of R packages for lymphoma cancer research developed in the Morin Lab at the Simon Fraser University.",
-    "crumbs": [
-      "Why GAMBLR.data?"
-    ]
-  },
-  {
-    "objectID": "why.html#gamblr-family",
-    "href": "why.html#gamblr-family",
-    "title": "Why GAMBLR.data?",
-    "section": "GAMBLR family",
-    "text": "GAMBLR family\nGAMBLR.data is part of a larger family of R tools for the analysis of lymphoma genomic data.\nIt is designed to mainly serve as a storage of bundled data resources and works well with other tools in the GAMBLR family. We continue to bundle more data available through this package, as well as improve it’s functionality.\nFor more details, please refer to the GAMBLR family section.",
-    "crumbs": [
-      "Why GAMBLR.data?"
-    ]
-  },
-  {
-    "objectID": "why.html#local-experience",
-    "href": "why.html#local-experience",
-    "title": "Why GAMBLR.data?",
-    "section": "Local experience",
-    "text": "Local experience\nThe data bundled with the GAMBLR.data is immediately available upon package installation and does not require internet connection or ssh access to GSC resources. It can run anywhere that R is available without restrictions and limitations.",
-    "crumbs": [
-      "Why GAMBLR.data?"
-    ]
-  },
-  {
-    "objectID": "why.html#use-cases",
-    "href": "why.html#use-cases",
-    "title": "Why GAMBLR.data?",
-    "section": "Use cases",
-    "text": "Use cases\nYou can use GAMBLR.data at any stage of your lymphoma data analysis workflow.\nGAMBLR.data helps with:\n\none-stop shop to obtain somatic variants from BL, DLBCL, and FL cases (studies by Thomas et al, Dreval et al, Schmitz et al, Chapuy et al, Reddy et al.) and variant calls from some DLBCL cell lines.\nQC metrics from major WGS and WEX studies of B-cell lymphomas (as reported in Dreval et al.)\nCurated lists of lymphoma genes for all major pathologies\nCurated list of regions targeted by aSHM in B-cell lymphomas\nCoordinates of chromosome arms in both genome projections\nGene coordinates in both genome projections\nCoordinates of oncogenes and SV partners in both genome projections\nHotspot regions for selected genes in both projections\nOther resources\n\nFor more details, please refer to the bundled data section.",
-    "crumbs": [
-      "Why GAMBLR.data?"
-    ]
-  },
-  {
-    "objectID": "why.html#community",
-    "href": "why.html#community",
-    "title": "Why GAMBLR.data?",
-    "section": "Community",
-    "text": "Community\nCommunity discussions primarily happen through issue submission on GitHub.",
-    "crumbs": [
-      "Why GAMBLR.data?"
-    ]
-  },
-  {
-    "objectID": "why.html#getting-started",
-    "href": "why.html#getting-started",
-    "title": "Why GAMBLR.data?",
-    "section": "Getting started",
-    "text": "Getting started\nIf you’re interested in trying GAMBLR.data we recommend the getting started tutorial.",
-    "crumbs": [
-      "Why GAMBLR.data?"
+      "GAMBLR.data glossary"
     ]
   },
   {
@@ -188,73 +140,111 @@
     ]
   },
   {
-    "objectID": "concepts/glossary.html",
-    "href": "concepts/glossary.html",
-    "title": "GAMBLR.data glossary",
+    "objectID": "why.html",
+    "href": "why.html",
+    "title": "Why GAMBLR.data?",
     "section": "",
-    "text": "There are several key concepts underlying the logic behind the GAMBLR.data package. The main terms are:\n\nprojection: This is a coordinate system defining the relationship with genome build and chromosome prefixing. The main projections supported throughout GAMBLR.data are grch37 and hg38. The grch37 projection contains the same coordinate system as genome build hg19, but never has the “chr” prefix on chromosome names. In contrast, the hg38 projection is always chr-prefixed and is in the same coordinate system as the hg38 genome build. As GAMBL itself and the data bundled and available through this package represents a large collection of samples sequenced both locally and externally, there is always a difficulty associated with proper handling of prefixes, different custom contigs and their lengths in the fasta reference, coordinates, and other distinctions complicating the direct comparison between data and comprehensive data analysis. These difficulties are handled internallyby making data always available in both projections, regardless of initial genome build to which the sample was aligned.\nmetadata: This is a data frame with a set of minimal required columns: patient_id, Tumor_Sample_Barcode, sample_id, seq_type, sex, cohort, and pathology. The columns like sex and cohort can contain NA values but must be present in the metadata. The main purpose of this data frame is to provide a structure for the metadata that is always expected to be available and provides linkage between unique sample identifiers and associated basic metadata values. The columns Tumor_Sample_Barcode and sample_id are expected to share the same values, but are required to be present for direct operation on the outputs of different upstream tools.\n\n\n\n\n Back to top",
+    "text": "GAMBLR.data is an open-source portable R library.\nIf you’ve had issues with importing genomic data from large-scale lymphoma studies, need to work with standardized data used for analysis of somatic variants, find yourself translating between different genome build systems, or just want a great great comprehensive resource of genomic data in B-cell lymphomas, GAMBLR.data is for you.\nGAMBLR stands for Genomic Analysis of Mature B-cell Lymphomas in R, and is part of the family of R packages for lymphoma cancer research developed in the Morin Lab at the Simon Fraser University.",
     "crumbs": [
-      "GAMBLR.data glossary"
+      "Why GAMBLR.data?"
     ]
   },
   {
-    "objectID": "resources/bundled_data.html",
-    "href": "resources/bundled_data.html",
-    "title": "Data bunded with GAMBLR.data",
+    "objectID": "why.html#gamblr-family",
+    "href": "why.html#gamblr-family",
+    "title": "Why GAMBLR.data?",
+    "section": "GAMBLR family",
+    "text": "GAMBLR family\nGAMBLR.data is part of a larger family of R tools for the analysis of lymphoma genomic data.\nIt is designed to mainly serve as a storage of bundled data resources and works well with other tools in the GAMBLR family. We continue to bundle more data available through this package, as well as improve it’s functionality.\nFor more details, please refer to the GAMBLR family section.",
+    "crumbs": [
+      "Why GAMBLR.data?"
+    ]
+  },
+  {
+    "objectID": "why.html#local-experience",
+    "href": "why.html#local-experience",
+    "title": "Why GAMBLR.data?",
+    "section": "Local experience",
+    "text": "Local experience\nThe data bundled with the GAMBLR.data is immediately available upon package installation and does not require internet connection or ssh access to GSC resources. It can run anywhere that R is available without restrictions and limitations.",
+    "crumbs": [
+      "Why GAMBLR.data?"
+    ]
+  },
+  {
+    "objectID": "why.html#use-cases",
+    "href": "why.html#use-cases",
+    "title": "Why GAMBLR.data?",
+    "section": "Use cases",
+    "text": "Use cases\nYou can use GAMBLR.data at any stage of your lymphoma data analysis workflow.\nGAMBLR.data helps with:\n\none-stop shop to obtain somatic variants from BL, DLBCL, and FL cases (studies by Thomas et al, Dreval et al, Schmitz et al, Chapuy et al, Reddy et al.) and variant calls from some DLBCL cell lines.\nQC metrics from major WGS and WEX studies of B-cell lymphomas (as reported in Dreval et al.)\nCurated lists of lymphoma genes for all major pathologies\nCurated list of regions targeted by aSHM in B-cell lymphomas\nCoordinates of chromosome arms in both genome projections\nGene coordinates in both genome projections\nCoordinates of oncogenes and SV partners in both genome projections\nHotspot regions for selected genes in both projections\nOther resources\n\nFor more details, please refer to the bundled data section.",
+    "crumbs": [
+      "Why GAMBLR.data?"
+    ]
+  },
+  {
+    "objectID": "why.html#community",
+    "href": "why.html#community",
+    "title": "Why GAMBLR.data?",
+    "section": "Community",
+    "text": "Community\nCommunity discussions primarily happen through issue submission on GitHub.",
+    "crumbs": [
+      "Why GAMBLR.data?"
+    ]
+  },
+  {
+    "objectID": "why.html#getting-started",
+    "href": "why.html#getting-started",
+    "title": "Why GAMBLR.data?",
+    "section": "Getting started",
+    "text": "Getting started\nIf you’re interested in trying GAMBLR.data we recommend the getting started tutorial.",
+    "crumbs": [
+      "Why GAMBLR.data?"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "GAMBLR.data",
     "section": "",
-    "text": "The GAMBLR.data comes with many different bundled data objects that can be systematically organized in the following categories:",
+    "text": "Why use GAMBLR.data?\n  \n  \n    \n     How to install?\n  \n  \n    \n     How to use?\n  \n  \n    \n     Release notes\n  \n  \n    \n     GitHub"
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "GAMBLR.data",
+    "section": "Install",
+    "text": "Install\nWe recommend installing the package directly from GitHub (requires devtools dependency).\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n1)\n\n1\n\nInstall GAMBLR.data directly from GitHub along with all bundled data.\n\n\n\n\n\nShow quickstart"
+  },
+  {
+    "objectID": "index.html#quickstart",
+    "href": "index.html#quickstart",
+    "title": "GAMBLR.data",
+    "section": "Quickstart",
+    "text": "Quickstart\nThe quick and easy way to get started is to make sure the devtools dependency is installed, then install the GAMBLR.data and run a simple function that returns metadata to confirm successful setup:\n# Verify devtools is installed\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\n# Install GAMBLR.data\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\n\n# Confirm successful setup\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants"
+  },
+  {
+    "objectID": "index.html#installation-for-developers",
+    "href": "index.html#installation-for-developers",
+    "title": "GAMBLR.data",
+    "section": "Installation for developers",
+    "text": "Installation for developers\nThe easiest way to obtain and contribute to GAMBLR.data is to do this via cloning the repository\ncd\ngit clone git@github.com:morinlab/GAMBLR.data.git\nIn your R editor of choice (which is hopefully VS Code now), set your working directory to the place you just cloned the repo.\nsetwd(\"~/GAMBLR.data\")\nInstall the package in R by running the following command (requires the devtools package):\ndevtools::install()\nAfter applying your modifications to the code, use the following command to quickly test your changes without directly installing the packaage (requires the devtools dependency):\ndevtools::load_all()\nGAMBLR.data is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub documentation for details on how to do pull request."
+  },
+  {
+    "objectID": "install.html",
+    "href": "install.html",
+    "title": "Installation",
+    "section": "",
+    "text": "Installation\nWe recommend installing the package directly from GitHub (requires devtools dependency).\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\ndevtools::install_github(\n    \"morinlab/GAMBLR.data\",\n    repos = BiocManager::repositories()\n)\nYou can confirm successful installation by running some of the easy and most popular commands:\nget_gambl_metadata() # returns simple metadata data frame\nget_coding_ssm() # returns data frame in maf formatting with somatic variants\n\n\n\n\n Back to top",
     "crumbs": [
-      "Data bunded with GAMBLR.data"
+      "Installation"
     ]
   },
   {
-    "objectID": "resources/bundled_data.html#somatic-variants",
-    "href": "resources/bundled_data.html#somatic-variants",
-    "title": "Data bunded with GAMBLR.data",
-    "section": "Somatic variants",
-    "text": "Somatic variants\n\nsample_data A list of data frames containing the metadata, simple somatic, copy number, and structural variants collected together from the supplemental tables of large sequencing studies of B-cell lymphomas.",
+    "objectID": "concepts/GAMBLR_family.html",
+    "href": "concepts/GAMBLR_family.html",
+    "title": "GAMBLR family of packages",
+    "section": "",
+    "text": "GAMBLR.data is the first and most basic member of the GAMBLR family of packages. It mostly serves the purpose of storing the bundled data helpful for genomic analysis of B-cell neoplasms in R, but also contains small basic functions serving as API to retrieve this data.\nSome of the bundled data is versioned as it is continuously being updated. This includes, but is not limited to, regions targeted by aSHM (new regions are being added as they are identified), the curated list of lymphoma genes, somatic mutation hotspots, etc. Conveniently for the user, unless they request the specific version of the data, the most recent and up-to-date version is used by default.\nThe GAMBLR family includes:\n\nGAMBLR.data - this package\nGAMBLR.helpers - a set of low-level functions for data operation\nGAMBLR.utils - higher level set of functions to operate on genomic data\nGAMBLR.viz - set of functions used mostly for visualizations\nGAMBLR.results - used to access the full data in GAMBL project. Only available for members of the Morin Lab and requires access to GSC, but can also be run locally once properly configured and synced.\n\nThis diagram illustrates in a simplified way the dependency relationship of different packages in the GAMBLR.family:\n\n\n\n\n\nflowchart LR\n  A(\"GAMBLR.data\") --&gt; B(\"GAMBLR.helpers\")\n  B --&gt; C(\"GAMBLR.utils\")\n  C --&gt; D(\"GAMBLR.viz\")\n  D --&gt; E{\"Morin Lab member?\"}\n  E -- YES --&gt; F(\"GAMBLR.results\")\n  E -- NO --&gt; A\n\n\n\n\n\n\nAll dependencies should be installed automatically for you, just like with any other R package. If not, please report the issue in the appropriate GitHub repo.\n\n\n\n Back to top",
     "crumbs": [
-      "Data bunded with GAMBLR.data"
-    ]
-  },
-  {
-    "objectID": "resources/bundled_data.html#curated-gene-lists",
-    "href": "resources/bundled_data.html#curated-gene-lists",
-    "title": "Data bunded with GAMBLR.data",
-    "section": "Curated gene lists",
-    "text": "Curated gene lists\n\ngene_blacklist A tibble with gene symbols (Hugo) that fall within blacklisted regions of the genome. The genes in this data object represent common sequencing artifacts and are discarded during the data analysis.\nlymphoma_genes A data frame with a manually curated set of genes commonly mutated in lymphomas with associated TRUE/FALSE columns annotating lymphoma type(s) where the particular mutations are present. This object by default always represents the most recent version of the curated list.\nlymphoma_genes_bl_v0.1 A data frame with a manually curated set of genes commonly mutated in BL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred to directly by it’s version number.\nlymphoma_genes_bl_v_latest A data frame with a manually curated set of genes commonly mutated in BL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.\nlymphoma_genes_comprehensive A data frame with the curated list of genes reported as significantly mutated in the large lymphoma studies. Both Ensembl ID and Hugo Symbol are available as gene identifiers. This data contains annotations for the studies by Chapuy, Reddy, Wright (LymphGen), Lacy, as well as annotations for whether the gene is curated, reported as SMG in other_studies, or a target of aSHM.\nlymphoma_genes_dlbcl_v0.1 A data frame with a manually curated set of genes commonly mutated in DLBCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred to directly by it’s version number.\nlymphoma_genes_dlbcl_v_latest A data frame with a manually curated set of genes commonly mutated in DLBCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.\nlymphoma_genes_lymphoma_genes_v0.0 Legacy version of the curated list of genes significantly mutated in lymphomas. Bundled here for backwards compatibility and can be referred to directly by it’s version number.\nlymphoma_genes_mcl_v0.1 A data frame with a manually curated set of genes commonly mutated in MCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This is the versioned data and can be referred directly by it’s version number.\nlymphoma_genes_mcl_v_latest A data frame with a manually curated set of genes commonly mutated in MCL with associated TRUE/FALSE columns annotating whether the particular mutations are present. This object by default always represents the most recent version of the curated list.",
-    "crumbs": [
-      "Data bunded with GAMBLR.data"
-    ]
-  },
-  {
-    "objectID": "resources/bundled_data.html#coordinate-based-resources",
-    "href": "resources/bundled_data.html#coordinate-based-resources",
-    "title": "Data bunded with GAMBLR.data",
-    "section": "Coordinate-based resources",
-    "text": "Coordinate-based resources\n\nchromosome_arms_grch37: A data frame with the chromosome arm coordinates with respect to the grch37 projection.\nchromosome_arms_hg38 A data frame with the chromosome arm coordinates with respect to the hg38 projection.\ngrch37_gene_coordinates A data frame of all gene coordinates with respect to grch37. Contains both Ensembl ID and Hugo Symbol as identifiers.\ngrch37_lymphoma_genes_bed A data frame in the bed format for genes commonly associated with B-cell lymphomas. Coordinates are with respect to grch37.\ngrch37_oncogene A data frame with the coordinates of lymphoma oncogenes relative to grch37. Used in mapping of the breakpoint coordinates.\ngrch37_partners A data frame of translocation partners for oncogenes with coordinates relative to grch37.\nhg38_gene_coordinates A data frame of all gene coordinates with respect to hg38. Contains both Ensembl ID and Hugo Symbol as identifiers.\nhg38_lymphoma_genes_bed A data frame in the bed format for genes commonly associated with B-cell lymphomas. Coordinates are with respect to hg38.\nhg38_oncogene A data frame with the coordinates of lymphoma oncogenes relative to the hg38. Used in mapping of the breakpoint coordinates.\nhg38_partners A data frame of translocation partners for oncogenes with relative coordinates to hg38.\ngrch37_all_gene_coordinates A data frame of protein-coding gene coordinates relative to grch37. Contains both Ensembl ID and Hugo Symbol as identifiers. Mainly here for backwards compatibility with earlier GAMBLR versions.\nhotspot_regions_grch37 A data frame of mutation hotspot regions relative to grch37.\nhotspot_regions_hg38 A data frame of mutation hotspot regions relative to hg38.\ntarget_regions_grch37 A data frame with coordinates of the regions of the genome targeted by the whole exome sequencing panel Agilent V5 (no UTR) relative to grch37.\ntarget_regions_hg38 A data frame with coordinates of the regions of the genome targeted by the whole exome sequencing panel Agilent V5 (no UTR) relative to hg38.",
-    "crumbs": [
-      "Data bunded with GAMBLR.data"
-    ]
-  },
-  {
-    "objectID": "resources/bundled_data.html#ashm-regions",
-    "href": "resources/bundled_data.html#ashm-regions",
-    "title": "Data bunded with GAMBLR.data",
-    "section": "aSHM regions",
-    "text": "aSHM regions\n\ngrch37_ashm_regions Aberrant somatic hypermutation (aSHM) regions relative to grch37. This object always by default refers to the most recent version of the aSHM regions.\nhg38_ashm_regions Aberrant somatic hypermutation (aSHM) regions relative to hg38. This object always by default refers to the most recent version of the aSHM regions.\nsomatic_hypermutation_locations_GRCh37_v0.0 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.1 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.2 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.3 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.4 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v0.5 Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh37_v_latest Aberrant somatic hypermutation (aSHM) regions relative to grch37. This is an alias for the latest version of this data.\nsomatic_hypermutation_locations_GRCh38_v0.0 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.1 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.2 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.3 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.4 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v0.5 Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is the versioned data and can be referred to directly by it’s version number.\nsomatic_hypermutation_locations_GRCh38_v_latest Aberrant somatic hypermutation (aSHM) regions relative to hg38. This is an alias for the latest version of this data.",
-    "crumbs": [
-      "Data bunded with GAMBLR.data"
-    ]
-  },
-  {
-    "objectID": "resources/bundled_data.html#other-resources",
-    "href": "resources/bundled_data.html#other-resources",
-    "title": "Data bunded with GAMBLR.data",
-    "section": "Other resources",
-    "text": "Other resources\n\ncolour_codes A data frame with colour codes (HEX) arranged into different categories, groups.\ndhitsig_genes_with_weights A data frame with double hit signature genes (both as ensembl IDs and Hugo symbols) and importance scores.\ngambl_metadata A data frame with metadata for a collection of GAMBL samples. This represents a collection of whole genome, exome, targeted, RNA, and PrometION sequencing samples available as a data set known as GAMBL. This object rather serves an FYI purpose as not all samples listed here are published and bundled with GAMBLR.data.\nhgnc2pfam.df A dataset containing the mapping table between Hugo symbol, UniProt ID, and Pfam ACC. This dataset comes from the g3viz package and was obtained via this URL: https://github.com/morinlab/g3viz/tree/master/data\nhotspots_annotations Hotspot coordinates used in the feature annotation during matrix assembly of data for cFL classifier.\nmirage_metrics A data frame providing the data reported in the Supplemental Table of the MIRAGE study by Dreval et al, 2022\nmutation.table.df A data frame providing the linkage between Variant Classification, Mutation_Class, and Short_Name for the simple somatic mutations.\nreddy_genes A data frame of the genes reported as significantly mutated by the study of Reddy et al, 2017\nwright_genes_with_weights Wright genes with weight values from the study by Scott et al, 2014.",
-    "crumbs": [
-      "Data bunded with GAMBLR.data"
+      "GAMBLR family of packages"
     ]
   }
 ]
