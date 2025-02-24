@@ -205,11 +205,6 @@ gene_blacklist = system.file("extdata", "gene_blacklist_with_IG.tsv", package = 
 
 usethis::use_data(gene_blacklist, overwrite = TRUE)
 
-grch37_all_gene_coordinates = system.file("extdata", "grch37_gene_coordinates.tsv", package = "GAMBLR.data") %>%
-  read_tsv() %>% dplyr::filter(grepl("PATCH",chromosome))
-
-usethis::use_data(grch37_all_gene_coordinates, overwrite = TRUE)
-
 
 hg38_oncogene = system.file("extdata", "oncogene_regions.hg38.tsv", package = "GAMBLR.data") %>%
   read_tsv(col_types="ciici")
@@ -306,11 +301,11 @@ for(p in lymphoma_genes_pathologies){
 }
 lg_llmpp <- lg_llmpp %>%
     drop_na(Gene) %>%
-    mutate(across(everything(), ~replace_na(.,FALSE))) 
+    mutate(across(everything(), ~replace_na(.,FALSE)))
 lymphoma_genes <- lg_llmpp
 
 ensembl = useMart(biomart="ENSEMBL_MART_ENSEMBL", host="https://grch37.ensembl.org", path="/biomart/martservice" ,dataset="hsapiens_gene_ensembl")
-#need to get entrezgene_id, ensembl_gene_id using hgnc_symbol 
+#need to get entrezgene_id, ensembl_gene_id using hgnc_symbol
 gene_detail = getBM(attributes=c( 'ensembl_gene_id','entrezgene_id','hgnc_symbol'),
       filters = 'hgnc_symbol',
       values = lymphoma_genes$Gene,
@@ -473,25 +468,25 @@ mirna_targetscan <- system.file(
     ) %>%
     read_tsv(
       col_names = c(
-        "Chromosome", 
-        "Start_Position", 
-        "End_Position", 
-        "Gene:miRNA", 
-        "context++_score_percentile", 
-        "Strand", 
-        "SP", 
-        "EP", 
-        "color", 
-        "block_count", 
-        "sites", 
+        "Chromosome",
+        "Start_Position",
+        "End_Position",
+        "Gene:miRNA",
+        "context++_score_percentile",
+        "Strand",
+        "SP",
+        "EP",
+        "color",
+        "block_count",
+        "sites",
         "block"
       )
     ) %>%
     select(
-      "Chromosome", 
-      "Start_Position", 
-      "End_Position", 
-      "Gene:miRNA", 
+      "Chromosome",
+      "Start_Position",
+      "End_Position",
+      "Gene:miRNA",
       "sites"
     ) %>%
     separate(
