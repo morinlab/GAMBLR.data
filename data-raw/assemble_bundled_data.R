@@ -741,6 +741,26 @@ sample_data$meta <- bind_rows(
     trios_meta
 )
 
+### begin metadata fixing
+# This preserves the original cohort column and ensures there are no duplicates
+# in the metadata
+fix <- sample_data$meta
+fix <- fix %>% rename(study = cohort)
+
+setwd("/projects/rmorin/projects/gambl-repos/gambl-kdreval")
+
+fix <- left_join(
+    fix,
+    get_gambl_metadata() %>%
+        select(sample_id, seq_type, cohort)
+)
+
+fix <- fix %>% filter(!is.na(study))
+
+fix <- distinct(fix)
+
+sample_data$meta <- fix
+### end metadata fixing
 
 # trios grch37 ssm
 trios_ssm_grch37_genome <- get_ssm_by_samples(
