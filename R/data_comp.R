@@ -21,7 +21,6 @@
 #' @return A character vector of gene symbol or Ensembl IDs or a data frame.
 #'
 #' @import dplyr tidyr
-#' @export
 #'
 #' @examples
 #' all_dlbcl_genes <- get_genes(entities = "DLBCL", curated_only = FALSE)
@@ -224,7 +223,6 @@ get_genes <- function(
 #' @return Either a vector or list of Hex codes.
 #'
 #' @import dplyr tidyr
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -322,7 +320,6 @@ get_mapped_colours <- function(
 #' @return A data frame or named character vector of colour Hex codes.
 #'
 #' @import dplyr ggplot2 tidyr
-#' @export
 #'
 #' @examples
 #' \dontrun{

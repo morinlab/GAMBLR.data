@@ -88,24 +88,6 @@
 "gene_blacklist"
 
 
-#' Gene Coordinates for grch37 (all).
-#'
-#' All gene coordinates in respect to grch37.
-#'
-#' @format ## `grch37_all_gene_coordinates`
-#' A data frame with 2602 rows and 6 columns.
-#' \describe{
-#'   \item{ensembl_gene_id}{Ensembl gene ID}
-#'   \item{chromosome}{The chromosome that the gene is residing on}
-#'   \item{start}{The start coordinates for the gene}
-#'   \item{end}{The end coordinates for the gene}
-#'   \item{gene_name}{The gene name}
-#'   \item{hugo_symbol}{Gene symbol in Hugo format}
-#' }
-#' @keywords internal
-"grch37_all_gene_coordinates"
-
-
 #' grch37 Gene Coordinates.
 #'
 #' All gene coordinates in respect to grch37.
@@ -1005,7 +987,7 @@
 
 #' Protein Domains
 #'
-#' A data frame with high-quality positions of amino acid positions in their 
+#' A data frame with high-quality positions of amino acid positions in their
 #' corresponding domains.
 #'
 #' @format ## `protein_domains`
