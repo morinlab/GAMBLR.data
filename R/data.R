@@ -755,12 +755,29 @@
 #' @keywords internal
 "somatic_hypermutation_locations_GRCh37_v0.5"
 
+#' Somatic Hypermutation Locations GRCh37 v0.6
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh37, version 0.6.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh37_v0.6`
+#' A data frame with 127 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg19_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+#' @keywords internal
+"somatic_hypermutation_locations_GRCh37_v0.6"
+
 #' Somatic Hypermutation Locations GRCh37 Latest
 #'
 #' A data frame with somatic hypermutation locations in respect to GRCh37, the latest version.
 #'
 #' @format ## `somatic_hypermutation_locations_GRCh37_v_latest`
-#' A data frame with 129 rows and 6 columns.
+#' A data frame with 127 rows and 6 columns.
 #' \describe{
 #'   \item{chr_name}{Chromsome name.}
 #'   \item{hg19_start}{Start coordinate for region in respect to hg19.}
@@ -881,12 +898,29 @@
 #' @keywords internal
 "somatic_hypermutation_locations_GRCh38_v0.5"
 
+#' Somatic Hypermutation Locations GRCh38 v0.6
+#'
+#' A data frame with somatic hypermutation locations in respect to GRCh38, version 0.6.
+#'
+#' @format ## `somatic_hypermutation_locations_GRCh38_v0.6`
+#' A data frame with 127 rows and 6 columns.
+#' \describe{
+#'   \item{chr_name}{Chromsome name.}
+#'   \item{hg38_start}{Start coordinate for region in respect to hg19.}
+#'   \item{hg38_end}{End coordinate for region in respect to hg19.}
+#'   \item{gene}{Gene symbol in Hugo format.}
+#'   \item{region}{Region name.}
+#'   \item{regulatory_comment}{Annotates region with regulatory information.}
+#' }
+#' @keywords internal
+"somatic_hypermutation_locations_GRCh38_v0.6"
+
 #' Somatic Hypermutation Locations GRCh38 Latest
 #'
 #' A data frame with somatic hypermutation locations in respect to GRCh38, the latest version.
 #'
 #' @format ## `somatic_hypermutation_locations_GRCh38_v_latest`
-#' A data frame with 129 rows and 6 columns.
+#' A data frame with 127 rows and 6 columns.
 #' \describe{
 #'   \item{chr_name}{Chromsome name.}
 #'   \item{hg38_start}{Start coordinate for region in respect to hg19.}
