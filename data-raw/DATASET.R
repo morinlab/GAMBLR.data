@@ -530,3 +530,12 @@ dlbcl90_genes <- system.file(
     ) %>%
     read_tsv()
 usethis::use_data(dlbcl90_genes, overwrite = TRUE)
+
+# ENSG to Hugo_Symbol converter
+gencode_to_symbol <- system.file(
+        "extdata",
+        "gencode_to_symbol.hg38.tsv",
+        package = "GAMBLR.data"
+    ) %>%
+    read_tsv()
+usethis::use_data(gencode_to_symbol, overwrite = TRUE)
