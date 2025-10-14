@@ -1106,3 +1106,19 @@
 #' }
 #' @keywords internal
 "gencode_to_symbol"
+
+#' miRNAs target locations in grch37 genome build.
+#'
+#' A data frame with the coordinates of miRNA targets relative to the grch37 genome build.
+#'
+#' @format ## `mirna_targetscan`
+#' A data frame with 126699 rows and 6 columns.
+#' \describe{
+#'   \item{Chromosome}{Chromosomes with chr-prefix}
+#'   \item{Start_Position}{Start coordinate for the miRNA target locations.}
+#'   \item{End_Position}{End coordinate for the miRNA target locations.}
+#'   \item{Hugo_Symbol}{Gene name}
+#'   \item{miRNA}{miRNA that targets that region}
+#'   \item{sites}{Length of the seed region}
+#' }
+"mirna_targetscan"
