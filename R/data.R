@@ -1131,7 +1131,7 @@
 #' A data frame with 313 rows and 6 columns.
 #' \describe{
 #'   \item{chromosome_name}{The chromosome the region resides on, without chr prefixes}
-#'   \item{start_position}{Start coordinate for the region ([0-based])}
+#'   \item{start_position}{Start coordinate for the region (0-based)}
 #'   \item{end_position}{End coordinate for the region}
 #'   \item{feature}{Panel feature label, e.g. BCL2, BCL2-TSS, BCL2_SV}
 #'   \item{hgnc_symbol}{Gene name when the feature is a gene; NA otherwise. Histones use the legacy lymphoma_genes symbol, with the current symbol in hgnc_alias}
@@ -1148,7 +1148,7 @@
 #' A data frame with 313 rows and 6 columns.
 #' \describe{
 #'   \item{chromosome_name}{The chromosome the region resides on, with chr prefixes}
-#'   \item{start_position}{Start coordinate for the region ([0-based])}
+#'   \item{start_position}{Start coordinate for the region (0-based)}
 #'   \item{end_position}{End coordinate for the region}
 #'   \item{feature}{Panel feature label, e.g. BCL2, BCL2-TSS, BCL2_SV}
 #'   \item{hgnc_symbol}{Gene name when the feature is a gene; NA otherwise. Histones use the legacy lymphoma_genes symbol, with the current symbol in hgnc_alias}
