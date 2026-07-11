@@ -61,6 +61,32 @@ all_cols <- c(
 # restrict to the most inclusive DLBCL gene list
 all_lymphoma_genes <- lymphoma_genes_comprehensive$Gene
 
+# Built once, reused by every get_ssm_by_regions() call below that wants only
+# lymphoma-gene mutations. Restricting via tabix -R (region) instead of
+# pulling every mutation for a sample set and filtering by Hugo_Symbol
+# afterward is the whole point -- see get_ssm_by_regions().
+lymphoma_genes_bed_grch37 <- create_bed_data(
+    gene_to_region(gene_symbol = all_lymphoma_genes, projection = "grch37", return_as = "bed"),
+    genome_build = "grch37"
+)
+lymphoma_genes_bed_hg38 <- create_bed_data(
+    gene_to_region(gene_symbol = all_lymphoma_genes, projection = "hg38", return_as = "bed"),
+    genome_build = "hg38"
+)
+
+# Wraps an expression, printing its wall-clock time; returns the expression's
+# value unchanged. Used below to benchmark get_ssm_by_samples()
+# (subset_from_merge TRUE vs FALSE, per-sample loop) against
+# get_ssm_by_regions() (tabix -R) at each call site, to decide which
+# approach to standardize on for each use case.
+time_it <- function(label, expr) {
+    t0 <- Sys.time()
+    result <- expr
+    elapsed <- as.numeric(difftime(Sys.time(), t0, units = "secs"))
+    message(sprintf("[TIMING] %-55s %8.1fs", label, elapsed))
+    result
+}
+
 
 # Importing BL data from Thomas et al
 # It has more patients and also contains sample ids, not just patient ids
@@ -239,17 +265,15 @@ pull_data <- function(
         pull_meta,
         pull_projection = "grch37"
     ){
-    slms3 <- get_ssm_by_samples(
+    lymphoma_genes_bed <- if(pull_projection == "grch37") lymphoma_genes_bed_grch37 else lymphoma_genes_bed_hg38
+    slms3 <- get_ssm_by_regions(
+        regions_bed = lymphoma_genes_bed,
         these_samples_metadata = pull_meta,
         basic_columns = FALSE,
-        projection = pull_projection,
-        subset_from_merge = FALSE
+        projection = pull_projection
     ) %>%
     select(
         all_of(all_cols)
-    ) %>%
-    filter(
-        Hugo_Symbol %in% all_lymphoma_genes
     )
     return(slms3)
 }
@@ -344,10 +368,9 @@ all_capture_meta <- bind_rows(
         reddy_meta_gambl
     )
 
-# warning: this is very slow!
-all_capture_grch37_ssm_to_bundle <- pull_data(all_capture_meta)
+all_capture_grch37_ssm_to_bundle <- time_it("pull_data(all_capture_meta, grch37)", pull_data(all_capture_meta))
 print("Done collecting grch37")
-all_capture_hg38_ssm_to_bundle <- pull_data(all_capture_meta, "hg38")
+all_capture_hg38_ssm_to_bundle <- time_it("pull_data(all_capture_meta, hg38)", pull_data(all_capture_meta, "hg38"))
 print("Done collecting hg38")
 
 
@@ -377,16 +400,20 @@ cell_lines_data$meta_to_bundle <- data.frame(
 
 colnames(cell_lines_data$meta_to_bundle) <- colnames_for_bundled_meta
 
-cell_lines_data$grch37$ssm_to_bundle <- get_ssm_by_samples(
-    these_samples_metadata = cell_lines_data$meta,
-    basic_columns = FALSE
-) %>% select(all_of(all_cols))
+cell_lines_data$grch37$ssm_to_bundle <- time_it("cell_lines get_ssm_by_samples grch37", {
+    get_ssm_by_samples(
+        these_samples_metadata = cell_lines_data$meta,
+        basic_columns = FALSE
+    ) %>% select(all_of(all_cols))
+})
 
-cell_lines_data$hg38$ssm_to_bundle <- get_ssm_by_samples(
-    these_samples_metadata = cell_lines_data$meta,
-    projection = "hg38",
-    basic_columns = FALSE
-) %>% select(all_of(all_cols))
+cell_lines_data$hg38$ssm_to_bundle <- time_it("cell_lines get_ssm_by_samples hg38", {
+    get_ssm_by_samples(
+        these_samples_metadata = cell_lines_data$meta,
+        projection = "hg38",
+        basic_columns = FALSE
+    ) %>% select(all_of(all_cols))
+})
 
 cell_lines_data$grch37$cnv_to_bundle <- get_cn_segments(
     these_samples_metadata = cell_lines_data$meta,
@@ -590,13 +617,15 @@ this_study_samples <- GAMBLR.data::sample_data$meta %>%
     pull(sample_id)
 
 # FLs in grch37
-coding_maf <- get_ssm_by_samples(
-    these_samples_metadata =  get_gambl_metadata() %>%
-            filter(sample_id %in% this_study_samples),
-    basic_columns = FALSE) %>%
-    select(
-        all_of(selected_columns)
-    )
+coding_maf <- time_it("coding_maf get_ssm_by_samples", {
+    get_ssm_by_samples(
+        these_samples_metadata =  get_gambl_metadata() %>%
+                filter(sample_id %in% this_study_samples),
+        basic_columns = FALSE) %>%
+        select(
+            all_of(selected_columns)
+        )
+})
 
 fl_data$ssm_to_bundle <- fl_data$ssm_to_bundle %>%
     dplyr::left_join(
@@ -631,15 +660,17 @@ regions_bed_grch37 = GAMBLR.utils::create_bed_data(
 )
 
 # Add aSHM mutations for the already released samples
-grch37_ashm <- get_ssm_by_regions(
-    these_samples_metadata = sample_data$meta,
-    regions_bed = regions_bed_grch37,
-    streamlined = FALSE,
-    basic_columns = FALSE
-) %>%
-    select(
-        any_of(c(colnames(sample_data$grch37$maf), maf_columns_to_keep)) 
-    )
+grch37_ashm <- time_it("grch37_ashm get_ssm_by_regions", {
+    get_ssm_by_regions(
+        these_samples_metadata = sample_data$meta,
+        regions_bed = regions_bed_grch37,
+        streamlined = FALSE,
+        basic_columns = FALSE
+    ) %>%
+        select(
+            any_of(c(colnames(sample_data$grch37$maf), maf_columns_to_keep))
+        )
+})
 
 grch37_ashm <- grch37_ashm %>%
     filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
@@ -659,20 +690,22 @@ grch37_ashm <- left_join(
     studies
 )
 
-hg38_ashm <- get_ssm_by_regions(
-    these_samples_metadata = sample_data$meta,
-    regions_bed = GAMBLR.utils::create_bed_data(
-        GAMBLR.data::hg38_ashm_regions,
-        fix_names = "concat",
-        concat_cols = c("gene","region"),sep="-"
-    ),
-    projection = "hg38",
-    streamlined = FALSE,
-    basic_columns = FALSE
-) %>%
-    select(
-        any_of(c(colnames(sample_data$hg38$maf), maf_columns_to_keep))
-    )
+hg38_ashm <- time_it("hg38_ashm get_ssm_by_regions", {
+    get_ssm_by_regions(
+        these_samples_metadata = sample_data$meta,
+        regions_bed = GAMBLR.utils::create_bed_data(
+            GAMBLR.data::hg38_ashm_regions,
+            fix_names = "concat",
+            concat_cols = c("gene","region"),sep="-"
+        ),
+        projection = "hg38",
+        streamlined = FALSE,
+        basic_columns = FALSE
+    ) %>%
+        select(
+            any_of(c(colnames(sample_data$hg38$maf), maf_columns_to_keep))
+        )
+})
 hg38_ashm <- hg38_ashm %>%
     filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
 
@@ -706,45 +739,43 @@ publication_samples <- c(
 )
 print("extracting grch37 mutations in lymphoma genes with GAMBLR.results")
 
-sample_data$grch37$maf <- get_ssm_by_samples(
-    these_samples_metadata = get_gambl_metadata() %>%
-        filter(sample_id %in% publication_samples),
-    basic_columns = FALSE,
-    subset_from_merge = FALSE) %>%
-    filter(
-        Hugo_Symbol %in% all_lymphoma_genes
-    ) %>%
-    mutate(Pipeline = "SLMS-3") %>%
-    left_join(
-        .,
-        studies
-    ) %>%
-    select(colnames(sample_data$grch37$maf)) %>%
-    bind_rows(
-        .,
-        sample_data$grch37$maf
-    )
+sample_data$grch37$maf <- time_it("publication-samples get_ssm_by_regions grch37", {
+    get_ssm_by_regions(
+        regions_bed = lymphoma_genes_bed_grch37,
+        these_samples_metadata = get_gambl_metadata() %>%
+            filter(sample_id %in% publication_samples),
+        basic_columns = FALSE) %>%
+        mutate(Pipeline = "SLMS-3") %>%
+        left_join(
+            .,
+            studies
+        ) %>%
+        select(colnames(sample_data$grch37$maf)) %>%
+        bind_rows(
+            .,
+            sample_data$grch37$maf
+        )
+})
 print("extracting hg38 mutations in lymphoma genes with GAMBLR.results")
 
-sample_data$hg38$maf <- get_ssm_by_samples(
-    these_samples_metadata = get_gambl_metadata() %>%
-        filter(sample_id %in% publication_samples),
-    projection = "hg38",
-    basic_columns = FALSE,
-    subset_from_merge = FALSE) %>%
-    filter(
-        Hugo_Symbol %in% all_lymphoma_genes
-    ) %>%
-    mutate(Pipeline = "SLMS-3") %>%
-    left_join(
-        .,
-        studies
-    ) %>%
-    select(colnames(sample_data$hg38$maf)) %>%
-    bind_rows(
-        .,
-        sample_data$hg38$maf
-    )
+sample_data$hg38$maf <- time_it("publication-samples get_ssm_by_regions hg38", {
+    get_ssm_by_regions(
+        regions_bed = lymphoma_genes_bed_hg38,
+        these_samples_metadata = get_gambl_metadata() %>%
+            filter(sample_id %in% publication_samples),
+        projection = "hg38",
+        basic_columns = FALSE) %>%
+        mutate(Pipeline = "SLMS-3") %>%
+        left_join(
+            .,
+            studies
+        ) %>%
+        select(colnames(sample_data$hg38$maf)) %>%
+        bind_rows(
+            .,
+            sample_data$hg38$maf
+        )
+})
 print("done extracting all mutations in lymphoma genes with GAMBLR.results")
 
 setwd(PKG_ROOT)
@@ -831,31 +862,33 @@ sample_data$meta <- fix
 ### end metadata fixing
 
 # trios grch37 ssm
-genome_trios_ssm_grch37 <- get_ssm_by_samples(
-    these_samples_metadata = trios_meta %>%
-        filter(seq_type == "genome"),
-    basic_columns = FALSE,
-    subset_from_merge = TRUE
-) %>%
-    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
+genome_trios_ssm_grch37 <- time_it("trios get_ssm_by_regions genome grch37", {
+    get_ssm_by_regions(
+        regions_bed = lymphoma_genes_bed_grch37,
+        these_samples_metadata = trios_meta %>%
+            filter(seq_type == "genome"),
+        basic_columns = FALSE
     ) %>%
-    select(all_of(colnames(sample_data$grch37$maf)))
+        mutate(
+            Pipeline = "SLMS-3",
+            Study = "Hilton"
+        ) %>%
+        select(all_of(colnames(sample_data$grch37$maf)))
+})
 print("extracting mutations for Trios cohort")
-capture_trios_ssm_grch37 <- get_ssm_by_samples(
-    these_samples_metadata = trios_meta %>%
-        filter(seq_type == "capture"),
-    basic_columns = FALSE,
-    subset_from_merge = TRUE
-) %>%
-    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
+capture_trios_ssm_grch37 <- time_it("trios get_ssm_by_regions capture grch37", {
+    get_ssm_by_regions(
+        regions_bed = lymphoma_genes_bed_grch37,
+        these_samples_metadata = trios_meta %>%
+            filter(seq_type == "capture"),
+        basic_columns = FALSE
     ) %>%
-    select(all_of(colnames(sample_data$grch37$maf)))
+        mutate(
+            Pipeline = "SLMS-3",
+            Study = "Hilton"
+        ) %>%
+        select(all_of(colnames(sample_data$grch37$maf)))
+})
 
 trios_ssm_grch37 <- bind_rows(
     genome_trios_ssm_grch37,
@@ -863,33 +896,35 @@ trios_ssm_grch37 <- bind_rows(
 )
 
 # trios hg38 ssm
-genome_trios_ssm_hg38 <- get_ssm_by_samples(
-    these_samples_metadata = trios_meta %>%
-        filter(seq_type == "genome"),
-    basic_columns = FALSE,
-    subset_from_merge = TRUE,
-    projection = "hg38"
-) %>%
-    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
+genome_trios_ssm_hg38 <- time_it("trios get_ssm_by_regions genome hg38", {
+    get_ssm_by_regions(
+        regions_bed = lymphoma_genes_bed_hg38,
+        these_samples_metadata = trios_meta %>%
+            filter(seq_type == "genome"),
+        basic_columns = FALSE,
+        projection = "hg38"
     ) %>%
-    select(all_of(colnames(sample_data$hg38$maf)))
+        mutate(
+            Pipeline = "SLMS-3",
+            Study = "Hilton"
+        ) %>%
+        select(all_of(colnames(sample_data$hg38$maf)))
+})
 
-capture_trios_ssm_hg38 <- get_ssm_by_samples(
-    these_samples_metadata = trios_meta %>%
-        filter(seq_type == "capture"),
-    basic_columns = FALSE,
-    subset_from_merge = TRUE,
-    projection = "hg38"
-) %>%
-    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
+capture_trios_ssm_hg38 <- time_it("trios get_ssm_by_regions capture hg38", {
+    get_ssm_by_regions(
+        regions_bed = lymphoma_genes_bed_hg38,
+        these_samples_metadata = trios_meta %>%
+            filter(seq_type == "capture"),
+        basic_columns = FALSE,
+        projection = "hg38"
     ) %>%
-    select(all_of(colnames(sample_data$hg38$maf)))
+        mutate(
+            Pipeline = "SLMS-3",
+            Study = "Hilton"
+        ) %>%
+        select(all_of(colnames(sample_data$hg38$maf)))
+})
 
 trios_ssm_hg38 <- bind_rows(
     genome_trios_ssm_hg38,
@@ -913,12 +948,14 @@ regions_bed <- create_bed_data(
     sep = "-"
 )
 
-trios_ashm_grch37 <- get_ssm_by_regions(
-    these_samples_metadata = trios_meta,
-    regions_bed = regions_bed,
-    streamlined = FALSE,
-    basic_columns = FALSE
-)
+trios_ashm_grch37 <- time_it("trios_ashm get_ssm_by_regions grch37", {
+    get_ssm_by_regions(
+        these_samples_metadata = trios_meta,
+        regions_bed = regions_bed,
+        streamlined = FALSE,
+        basic_columns = FALSE
+    )
+})
 
 trios_ashm_grch37 <- trios_ashm_grch37 %>%
     filter(Tumor_Sample_Barcode %in% trios_meta$Tumor_Sample_Barcode)
@@ -945,13 +982,15 @@ regions_bed <- create_bed_data(
     sep = "-"
 )
 
-trios_ashm_hg38 <- get_ssm_by_regions(
-    these_samples_metadata = trios_meta,
-    regions_bed = regions_bed,
-    projection = "hg38",
-    streamlined = FALSE,
-    basic_columns = FALSE
-)
+trios_ashm_hg38 <- time_it("trios_ashm get_ssm_by_regions hg38", {
+    get_ssm_by_regions(
+        these_samples_metadata = trios_meta,
+        regions_bed = regions_bed,
+        projection = "hg38",
+        streamlined = FALSE,
+        basic_columns = FALSE
+    )
+})
 trios_ashm_hg38 <- trios_ashm_hg38 %>%
     filter(Tumor_Sample_Barcode %in% trios_meta$Tumor_Sample_Barcode)
 
