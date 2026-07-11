@@ -242,7 +242,8 @@ pull_data <- function(
     slms3 <- get_ssm_by_samples(
         these_samples_metadata = pull_meta,
         basic_columns = FALSE,
-        projection = pull_projection
+        projection = pull_projection,
+        subset_from_merge = FALSE
     ) %>%
     select(
         all_of(all_cols)
@@ -345,7 +346,10 @@ all_capture_meta <- bind_rows(
 
 # warning: this is very slow!
 all_capture_grch37_ssm_to_bundle <- pull_data(all_capture_meta)
+print("Done collecting grch37")
 all_capture_hg38_ssm_to_bundle <- pull_data(all_capture_meta, "hg38")
+print("Done collecting hg38")
+
 
 # Importing DLBCL cell lines
 cell_lines_data <- list()
@@ -384,15 +388,17 @@ cell_lines_data$hg38$ssm_to_bundle <- get_ssm_by_samples(
     basic_columns = FALSE
 ) %>% select(all_of(all_cols))
 
-cell_lines_data$grch37$cnv_to_bundle <- get_sample_cn_segments(
-    these_sample_ids = cell_lines_data$meta$sample_id
-)
+cell_lines_data$grch37$cnv_to_bundle <- get_cn_segments(
+    these_samples_metadata = cell_lines_data$meta,
+    projection="grch37"
+) %>% 
+    dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
 
-cell_lines_data$hg38$cnv_to_bundle <- get_sample_cn_segments(
-    these_sample_ids = cell_lines_data$meta$sample_id,
-    projection = "hg38",
-    with_chr_prefix = TRUE
-)
+cell_lines_data$hg38$cnv_to_bundle <- get_cn_segments(
+    these_samples_metadata = cell_lines_data$meta,
+    projection="hg38"
+) %>% 
+    dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
 
 cell_lines_data$grch37$sv_to_bundle <- get_manta_sv(
     these_samples_metadata = cell_lines_data$meta,
@@ -521,13 +527,13 @@ sample_data$hg38$maf <- bind_rows(
 
 sample_data$grch37$seg <- bind_rows(
     fl_data$cnv_to_bundle,
-    cell_lines_data$grch37$cnv
+    cell_lines_data$grch37$cnv_to_bundle
 )
 
 sample_data$hg38$seg <- bind_rows(
     bl_data$cnv_to_bundle,
     dlbcl_data$cnv_to_bundle,
-    cell_lines_data$hg38$cnv
+    cell_lines_data$hg38$cnv_to_bundle
 )
 
 #add SVs
@@ -618,20 +624,21 @@ sample_data$grch37$maf <- bind_rows(
     )
 )
 
+regions_bed_grch37 = GAMBLR.utils::create_bed_data(
+    GAMBLR.data::grch37_ashm_regions ,
+    fix_names = "concat",
+    concat_cols = c("gene","region"),sep="-"
+)
 
 # Add aSHM mutations for the already released samples
 grch37_ashm <- get_ssm_by_regions(
     these_samples_metadata = sample_data$meta,
-    regions_bed = GAMBLR.utils::create_bed_data(
-        GAMBLR.data::grch37_ashm_regions,
-        fix_names = "concat",
-        concat_cols = c("gene","region"),sep="-"
-    ),
+    regions_bed = regions_bed_grch37,
     streamlined = FALSE,
     basic_columns = FALSE
 ) %>%
     select(
-        any_of(c(colnames(sample_data$grch37$maf), maf_columns_to_keep))
+        any_of(c(colnames(sample_data$grch37$maf), maf_columns_to_keep)) 
     )
 
 grch37_ashm <- grch37_ashm %>%
@@ -679,6 +686,7 @@ hg38_ashm <- left_join(
 sample_data$grch37$ashm <- grch37_ashm
 sample_data$hg38$ashm <- hg38_ashm
 
+print("done extracting aSHM mutations from GAMBLR.results")
 
 # Now add the SLMS-3 calls in both projections for those samples that
 # are bundled as publication data
@@ -696,11 +704,13 @@ publication_samples <- c(
     publication_samples_grch37,
     publication_samples_hg38
 )
+print("extracting grch37 mutations in lymphoma genes with GAMBLR.results")
 
 sample_data$grch37$maf <- get_ssm_by_samples(
     these_samples_metadata = get_gambl_metadata() %>%
         filter(sample_id %in% publication_samples),
-    basic_columns = FALSE) %>%
+    basic_columns = FALSE,
+    subset_from_merge = FALSE) %>%
     filter(
         Hugo_Symbol %in% all_lymphoma_genes
     ) %>%
@@ -714,12 +724,14 @@ sample_data$grch37$maf <- get_ssm_by_samples(
         .,
         sample_data$grch37$maf
     )
+print("extracting hg38 mutations in lymphoma genes with GAMBLR.results")
 
 sample_data$hg38$maf <- get_ssm_by_samples(
     these_samples_metadata = get_gambl_metadata() %>%
         filter(sample_id %in% publication_samples),
     projection = "hg38",
-    basic_columns = FALSE) %>%
+    basic_columns = FALSE,
+    subset_from_merge = FALSE) %>%
     filter(
         Hugo_Symbol %in% all_lymphoma_genes
     ) %>%
@@ -733,7 +745,7 @@ sample_data$hg38$maf <- get_ssm_by_samples(
         .,
         sample_data$hg38$maf
     )
-
+print("done extracting all mutations in lymphoma genes with GAMBLR.results")
 
 setwd(PKG_ROOT)
 
@@ -831,7 +843,7 @@ genome_trios_ssm_grch37 <- get_ssm_by_samples(
         Study = "Hilton"
     ) %>%
     select(all_of(colnames(sample_data$grch37$maf)))
-
+print("extracting mutations for Trios cohort")
 capture_trios_ssm_grch37 <- get_ssm_by_samples(
     these_samples_metadata = trios_meta %>%
         filter(seq_type == "capture"),
@@ -955,6 +967,8 @@ sample_data$hg38$ashm <- bind_rows(
     trios_ashm_hg38
 ) %>% distinct
 
+print("Done getting aSHM from Trios")
+
 setwd(PKG_ROOT)
 
 # Add data from Reddy paper
@@ -984,6 +998,7 @@ sample_data$grch37$maf <- bind_rows(
 sample_metadata <- sample_data$meta
 usethis::use_data(sample_metadata, overwrite = TRUE, compress = "xz")
 
+print("Starting sqlite build")
 # 2. large sample-level frames -> SQLite
 source("data-raw/write_mutations_db.R")
 write_mutations_db(
