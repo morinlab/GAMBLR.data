@@ -21,13 +21,32 @@ shared backing store used by \code{\link[=get_genes]{get_genes()}} (and intended
 wiki / data API), replacing the versioned \verb{lymphoma_genes_*} .rda objects.
 }
 \details{
-The database is rebuilt from source by \code{data-raw/build_reference_db.R}.
-Tables: \code{gene_entity} (one row per gene x entity, with tier / aSHM / citekey /
-ensembl_gene_id / source_version), \code{ashm_regions}, and \code{build_info}.
+The database is rebuilt from source by \code{data-raw/build_reference_db.R}
+and is small (well under 1 MB), so — unlike \code{\link[=gambl_mutations_db]{gambl_mutations_db()}} — it is
+bundled inside the package (\code{inst/extdata/gambl_reference.db}).
 }
+\section{Table reference}{
+\tabular{lll}{
+   Table \tab Grain \tab Key columns \cr
+   \code{gene_entity} \tab one row per gene x lymphoma entity \tab \verb{gene, ensembl_gene_id, entity, tier, ashm, qc, citekey, pmid, mutation_effect, extra} (JSON of entity-specific fields), \code{source_version} \cr
+   \code{ashm_regions} \tab one row per gene x aSHM region x genome build \tab \verb{gene, chrom, start, end, region, regulatory_comment, build, source_version} \cr
+   \code{build_info} \tab key/value \tab provenance: \code{source} (LLMPP resources/curated), \code{source_version}, \code{built_at}, \code{builder} \cr
+}
+
+
+\code{gene_entity$entity} takes values like \code{"DLBCL"}, \code{"BL"}, \code{"FL"}, \code{"PMBL"},
+\code{"MCL"}, \code{"MZL"}; \code{tier} is \code{1} (high-confidence), \code{2} (lower-confidence), or
+\code{3} (retired). \code{ashm_regions$build} is \code{"grch37"} or \code{"hg38"}.
+}
+
 \examples{
 \dontrun{
 con <- gambl_reference_db()
 dplyr::tbl(con, "gene_entity")
+
+# high-confidence DLBCL genes
+dplyr::tbl(con, "gene_entity") |>
+  dplyr::filter(entity == "DLBCL", tier == 1) |>
+  dplyr::collect()
 }
 }

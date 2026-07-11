@@ -2,11 +2,13 @@
 #'
 #' @description Returns a (cached) read-only DBI connection to `gambl_mutations.db`,
 #' the SQLite database holding the large sample-level frames (MAF, aSHM, seg,
-#' bedpe) built from `sample_data` by `data-raw/build_mutations_db.R`.
+#' bedpe) built from the in-memory `sample_data` object assembled by
+#' `data-raw/assemble_bundled_data.R`, via the shared `write_mutations_db()`
+#' helper (`data-raw/write_mutations_db.R`).
 #'
-#' @details Unlike the small bundled reference database, this file is large
-#' (~1 GB) and is NOT shipped inside the package. It is distributed as a cached
-#' release asset. The path is resolved in this order:
+#' @details Unlike the small bundled [gambl_reference_db()], this file is large
+#' (several hundred MB) and is NOT shipped inside the package. It is
+#' distributed as a cached release asset. The path is resolved in this order:
 #' \enumerate{
 #'   \item the `db_path` argument;
 #'   \item `getOption("GAMBLR.data.mutations_db")`;
@@ -14,6 +16,33 @@
 #'   \item the user cache dir, `tools::R_user_dir("GAMBLR.data", "cache")`;
 #'   \item `gambl_mutations.db` in the working directory (development).
 #' }
+#'
+#' # Table reference
+#'
+#' Both genome builds are stacked into the same table (not split across
+#' separate tables); filter on `genome_build` (`"grch37"` / `"hg38"`) to select
+#' one. `maf` and `ashm` share the same (curated, 49-column) schema: a reduced
+#' column set, not the full upstream flatfile MAF.
+#'
+#' | Table | Rows (typical) | Grain | Key columns |
+#' | --- | --- | --- | --- |
+#' | `maf` | ~3.6M | one somatic mutation call | `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline, Study, genome_build` (+ ~35 more MAF-standard columns) |
+#' | `ashm` | ~135k | one mutation call in an aSHM region | same schema as `maf` |
+#' | `seg` | ~126k | one copy-number segment | `ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build` |
+#' | `bedpe` | ~900 | one Manta structural-variant breakpoint pair | `CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build` |
+#' | `sample_meta` | ~3.3k | one sample | `patient_id, sample_id, Tumor_Sample_Barcode, seq_type, pathology, cohort, study, ...` (31 columns total; its own `genome_build` column records the sample's native alignment build, unrelated to the per-row build stamp used in the other tables) |
+#' | `build_info` | 8 | key/value | provenance (`source`, `built_at`, `builder`) and expected row counts (`n_maf`, `n_ashm`, `n_seg`, `n_bedpe`, `n_samples`) used by the `data-raw/test_gambl_db.R` regression checks |
+#'
+#' ## Join keys
+#' `maf`, `ashm`, and `bedpe` (via `tumour_sample_id`) key to
+#' `sample_meta$Tumor_Sample_Barcode` / `sample_meta$sample_id`; `seg$ID` keys
+#' to `sample_meta$sample_id`.
+#'
+#' ## Indexes
+#' `maf`/`ashm`: `(genome_build, Chromosome, Start_Position)`,
+#' `Tumor_Sample_Barcode`, `Hugo_Symbol` (maf only), `Pipeline`, `Study` (maf
+#' only). `seg`: `(genome_build, ID)`, `(genome_build, chrom, start)`. `bedpe`:
+#' `tumour_sample_id`. `sample_meta`: `sample_id`, `Tumor_Sample_Barcode`.
 #'
 #' @param db_path Optional explicit path to the .db file.
 #'
@@ -23,6 +52,12 @@
 #' \dontrun{
 #' con <- gambl_mutations_db()
 #' DBI::dbListTables(con)
+#'
+#' # coding mutations in TP53, grch37, one pipeline
+#' dplyr::tbl(con, "maf") |>
+#'   dplyr::filter(genome_build == "grch37", Hugo_Symbol == "TP53",
+#'                Pipeline == "SLMS-3") |>
+#'   dplyr::collect()
 #' }
 #' @export
 gambl_mutations_db <- function(db_path = NULL) {

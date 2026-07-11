@@ -15,12 +15,14 @@ A read-only DBIConnection.
 \description{
 Returns a (cached) read-only DBI connection to \code{gambl_mutations.db},
 the SQLite database holding the large sample-level frames (MAF, aSHM, seg,
-bedpe) built from \code{sample_data} by \code{data-raw/build_mutations_db.R}.
+bedpe) built from the in-memory \code{sample_data} object assembled by
+\code{data-raw/assemble_bundled_data.R}, via the shared \code{write_mutations_db()}
+helper (\code{data-raw/write_mutations_db.R}).
 }
 \details{
-Unlike the small bundled reference database, this file is large
-(~1 GB) and is NOT shipped inside the package. It is distributed as a cached
-release asset. The path is resolved in this order:
+Unlike the small bundled \code{\link[=gambl_reference_db]{gambl_reference_db()}}, this file is large
+(several hundred MB) and is NOT shipped inside the package. It is
+distributed as a cached release asset. The path is resolved in this order:
 \enumerate{
 \item the \code{db_path} argument;
 \item \code{getOption("GAMBLR.data.mutations_db")};
@@ -29,9 +31,45 @@ release asset. The path is resolved in this order:
 \item \code{gambl_mutations.db} in the working directory (development).
 }
 }
+\section{Table reference}{
+Both genome builds are stacked into the same table (not split across
+separate tables); filter on \code{genome_build} (\code{"grch37"} / \code{"hg38"}) to select
+one. \code{maf} and \code{ashm} share the same (curated, 49-column) schema: a reduced
+column set, not the full upstream flatfile MAF.\tabular{llll}{
+   Table \tab Rows (typical) \tab Grain \tab Key columns \cr
+   \code{maf} \tab ~3.6M \tab one somatic mutation call \tab \verb{Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline, Study, genome_build} (+ ~35 more MAF-standard columns) \cr
+   \code{ashm} \tab ~135k \tab one mutation call in an aSHM region \tab same schema as \code{maf} \cr
+   \code{seg} \tab ~126k \tab one copy-number segment \tab \verb{ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build} \cr
+   \code{bedpe} \tab ~900 \tab one Manta structural-variant breakpoint pair \tab \verb{CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build} \cr
+   \code{sample_meta} \tab ~3.3k \tab one sample \tab \verb{patient_id, sample_id, Tumor_Sample_Barcode, seq_type, pathology, cohort, study, ...} (31 columns total; its own \code{genome_build} column records the sample's native alignment build, unrelated to the per-row build stamp used in the other tables) \cr
+   \code{build_info} \tab 8 \tab key/value \tab provenance (\code{source}, \code{built_at}, \code{builder}) and expected row counts (\code{n_maf}, \code{n_ashm}, \code{n_seg}, \code{n_bedpe}, \code{n_samples}) used by the \code{data-raw/test_gambl_db.R} regression checks \cr
+}
+
+\subsection{Join keys}{
+
+\code{maf}, \code{ashm}, and \code{bedpe} (via \code{tumour_sample_id}) key to
+\code{sample_meta$Tumor_Sample_Barcode} / \code{sample_meta$sample_id}; \code{seg$ID} keys
+to \code{sample_meta$sample_id}.
+}
+
+\subsection{Indexes}{
+
+\code{maf}/\code{ashm}: \verb{(genome_build, Chromosome, Start_Position)},
+\code{Tumor_Sample_Barcode}, \code{Hugo_Symbol} (maf only), \code{Pipeline}, \code{Study} (maf
+only). \code{seg}: \verb{(genome_build, ID)}, \verb{(genome_build, chrom, start)}. \code{bedpe}:
+\code{tumour_sample_id}. \code{sample_meta}: \code{sample_id}, \code{Tumor_Sample_Barcode}.
+}
+}
+
 \examples{
 \dontrun{
 con <- gambl_mutations_db()
 DBI::dbListTables(con)
+
+# coding mutations in TP53, grch37, one pipeline
+dplyr::tbl(con, "maf") |>
+  dplyr::filter(genome_build == "grch37", Hugo_Symbol == "TP53",
+               Pipeline == "SLMS-3") |>
+  dplyr::collect()
 }
 }
