@@ -436,68 +436,10 @@ cell_lines_data$hg38$sv_to_bundle <- get_manta_sv(
     projection = "hg38"
 )
 
-# Adding the manta SVs for published studies
-full_genome_meta <- get_gambl_metadata(seq_type_filter = "genome")
-
-bundled_meta <- full_genome_meta %>%
-    filter(
-        sample_id %in% GAMBLR.data::sample_data$meta$sample_id
-    )
-
-full_sv_to_bundle <- get_manta_sv(
-        these_samples_metadata = bundled_meta,
-        projection = "hg38"
-    )
-
-annotated_sv_to_bundle <- annotate_sv(
-    full_sv_to_bundle,
-    genome_build = "hg38"
-)
-annotated_sv_to_bundle <- annotated_sv_to_bundle %>%
-    filter(!is.na(partner)) %>%
-    mutate(
-        chrom1 = paste0("chr", chrom1),
-        chrom2 = paste0("chr", chrom2)
-    )
-
-# drop all annotation columns to restore original data subset just to the putative driver SVs
-annotated_sv_keep <- left_join(
-    full_sv_to_bundle,
-    annotated_sv_to_bundle,
-    by = c(
-        "CHROM_A" = "chrom1",
-        "CHROM_B" = "chrom2",
-        "START_A" = "start1",
-        "tumour_sample_id")
-    ) %>%
-    dplyr::filter(!is.na(partner)) %>%
-    select(c(1:16))
-
-# Now same for the grch37 projection
-full_sv_to_bundle_grch37 <- get_manta_sv(
-    these_samples_metadata = bundled_meta
-)
-
-annotated_sv_to_bundle_grch37 <- annotate_sv(
-    full_sv_to_bundle_grch37
-)
-
-annotated_sv_to_bundle_grch37 <- annotated_sv_to_bundle_grch37 %>%
-    filter(!is.na(partner))
-
-# drop all annotation columns to restore original data subset just to the putative driver SVs
-annotated_sv_keep_grch37 <- left_join(
-    full_sv_to_bundle_grch37,
-    annotated_sv_to_bundle_grch37,
-    by = c(
-        "CHROM_A" = "chrom1",
-        "CHROM_B" = "chrom2",
-        "START_A" = "start1",
-        "tumour_sample_id")
-    ) %>%
-    filter(!is.na(partner)) %>%
-    select(c(1:16))
-
+# Manta SVs for published studies: moved to after sample_data$meta is
+# finalized below (see "Adding the manta SVs for published studies"), so the
+# sample scope is the freshly-assembled local metadata for this run rather
+# than whatever GAMBLR.data happens to be installed.
 
 # Combine everything together
 sample_data <- list()
@@ -564,6 +506,72 @@ sample_data$hg38$seg <- bind_rows(
 )
 
 #add SVs
+# Adding the manta SVs for published studies. Scoped to sample_data$meta (the
+# metadata just finalized above, for this run) rather than
+# GAMBLR.data::sample_data$meta (whatever happens to be installed) so the SV
+# sample scope is self-consistent with the rest of this bundle instead of
+# drifting with installed-package state across runs.
+full_genome_meta <- get_gambl_metadata(seq_type_filter = "genome")
+
+bundled_meta <- full_genome_meta %>%
+    filter(
+        sample_id %in% sample_data$meta$sample_id
+    )
+
+full_sv_to_bundle <- get_manta_sv(
+        these_samples_metadata = bundled_meta,
+        projection = "hg38"
+    )
+
+annotated_sv_to_bundle <- annotate_sv(
+    full_sv_to_bundle,
+    genome_build = "hg38"
+)
+annotated_sv_to_bundle <- annotated_sv_to_bundle %>%
+    filter(!is.na(partner)) %>%
+    mutate(
+        chrom1 = paste0("chr", chrom1),
+        chrom2 = paste0("chr", chrom2)
+    )
+
+# drop all annotation columns to restore original data subset just to the putative driver SVs
+annotated_sv_keep <- left_join(
+    full_sv_to_bundle,
+    annotated_sv_to_bundle,
+    by = c(
+        "CHROM_A" = "chrom1",
+        "CHROM_B" = "chrom2",
+        "START_A" = "start1",
+        "tumour_sample_id")
+    ) %>%
+    dplyr::filter(!is.na(partner)) %>%
+    select(c(1:16))
+
+# Now same for the grch37 projection
+full_sv_to_bundle_grch37 <- get_manta_sv(
+    these_samples_metadata = bundled_meta
+)
+
+annotated_sv_to_bundle_grch37 <- annotate_sv(
+    full_sv_to_bundle_grch37
+)
+
+annotated_sv_to_bundle_grch37 <- annotated_sv_to_bundle_grch37 %>%
+    filter(!is.na(partner))
+
+# drop all annotation columns to restore original data subset just to the putative driver SVs
+annotated_sv_keep_grch37 <- left_join(
+    full_sv_to_bundle_grch37,
+    annotated_sv_to_bundle_grch37,
+    by = c(
+        "CHROM_A" = "chrom1",
+        "CHROM_B" = "chrom2",
+        "START_A" = "start1",
+        "tumour_sample_id")
+    ) %>%
+    filter(!is.na(partner)) %>%
+    select(c(1:16))
+
 sample_data$grch37$bedpe <- annotated_sv_keep_grch37
 sample_data$hg38$bedpe <- annotated_sv_keep
 
