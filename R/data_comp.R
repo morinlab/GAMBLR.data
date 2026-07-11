@@ -3,197 +3,124 @@
 #'
 #' @description Retrieve gene names from bundled lymphoma gene lists.
 #'
-#' @details Complete lists of genes described as significantly mutated in large
-#' lymphoma studies have been curated and provided with this package.
+#' @details Gene lists are read from the bundled normalized reference database
+#' (`inst/extdata/gambl_reference.db`), which is built from the LLMPP curated
+#' lists. Confidence tier and data version are columns in that database, so the
+#' previous per-entity, per-version `.rda` objects are no longer required.
 #'
 #' @param entities Optional vector specifying one or more lymphoma entities
 #'      e.g. MCL, DLBCL, BL.
-#' @param curated_only Specify FALSE to retrieve all genes or leave default
-#'      for the curated subset.
+#' @param curated_only When TRUE (default) return the curated set (Tier 1 and
+#'      Tier 2) and drop retired Tier 3 genes. Set FALSE to include all tiers.
+#'      Ignored when `tier` is supplied.
+#' @param tier Optional integer vector of confidence tiers to keep, e.g.
+#'      `tier = 1` for high-confidence genes only, or `tier = c(1, 2)`. When
+#'      supplied it takes precedence over `curated_only`.
 #' @param gene_format Specify what to return as output. Can be one of:
 #'      * "symbol" (the default): list of gene symbols
-#'      * "ensembl": list of ENSEMBLE IDs
-#'      * "data.frame": data frame with column Gene and per-entity gene status
-#' @param version Specify which version to return. Currently supported versions
-#'      are 0.0 (legacy version from original GAMBLR), 0.1, and _latest. The
-#'      latter will always point to the highest numeric version of the genes.
+#'      * "ensembl": list of Ensembl IDs
+#'      * "data.frame": one row per gene with a `<ENTITY>_Tier` column per
+#'        requested entity (the gene's tier there, or NA if absent). Filter
+#'        these columns to focus on tiers, e.g.
+#'        `dplyr::filter(df, DLBCL_Tier == 1, FL_Tier == 1) |> dplyr::pull(Gene)`.
+#' @param version Data version to return. Defaults to "_latest", the current
+#'      LLMPP-sourced version in the reference database. Legacy numeric versions
+#'      (0.0, 0.1) are no longer bundled.
 #'
-#' @return A character vector of gene symbol or Ensembl IDs or a data frame.
+#' @return A character vector of gene symbols or Ensembl IDs, or a data frame.
 #'
 #' @import dplyr tidyr
 #'
+#' @export
+#'
 #' @examples
-#' all_dlbcl_genes <- get_genes(entities = "DLBCL", curated_only = FALSE)
+#' # high-confidence (Tier 1) DLBCL genes
+#' dlbcl_tier1 <- get_genes(entities = "DLBCL", tier = 1)
+#'
+#' # genes that are Tier 1 in DLBCL, FL and BL simultaneously
+#' gene_df <- get_genes(entities = c("DLBCL", "FL", "BL"), gene_format = "data.frame")
+#' shared_tier1 <- dplyr::filter(gene_df, DLBCL_Tier == 1, FL_Tier == 1, BL_Tier == 1)
+#'
 #' all_curated_genes <- get_genes()
 
 get_genes <- function(
         entities = c("DLBCL", "MCL", "BL"),
         curated_only = TRUE,
+        tier = NULL,
         gene_format = "symbol",
         version = "_latest"
     ) {
 
-    # We need to handle the legacy version (0.0) separately
-    # because it was not pathology-specific
-    if (version == "0.0") {
+    # Gene lists are sourced from the normalized reference database (built from
+    # the LLMPP curated lists) rather than per-entity, per-version .rda objects.
+    # "version" and "tier" are columns, so lymphoma_genes_*_v0.1/v0.2/v_latest
+    # are no longer needed.
+    if (!version %in% c("_latest", "latest")) {
         message(
             paste(
-            "You have requested the legacy version of the lymphoma genes.",
-            "It is only provided here for backwards compatibility.",
-            "We recommend you use the most recent version by keeping the",
-            "default value of the argument version. Use at your own risk."
+                "Legacy per-version gene lists (e.g. 0.0, 0.1) are no longer",
+                "bundled. Data is now sourced from the LLMPP curated lists;",
+                "returning the current version."
             )
         )
-
-        legacy_lymphoma_genes <- eval(
-                parse(
-                    text = paste0(
-                        "GAMBLR.data::",
-                        "lymphoma_genes_lymphoma_genes_v0.0")
-                    )
-            )
-
-        legacy_lymphoma_genes <- legacy_lymphoma_genes %>%
-            dplyr::select(
-                Gene, ensembl_gene_id,
-                intersect(
-                    colnames(.),
-                    entities
-                )
-            )
-        if (curated_only) {
-            # drop any row where all pathologies have FALSE
-            legacy_lymphoma_genes <- legacy_lymphoma_genes %>%
-                dplyr::filter(
-                    ! if_all(3:ncol(.), ~ . == "FALSE")
-                )
-        }
-
-        if (gene_format == "symbol") {
-            return(legacy_lymphoma_genes$Gene)
-        } else if (gene_format == "ensembl") {
-            return(legacy_lymphoma_genes$ensembl_gene_id)
-        } else if (gene_format == "data.frame") {
-            return(legacy_lymphoma_genes)
-        } else {
-            stop(
-                "You requested output format that is not supported."
-            )
-        }
     }
 
-    #construct file name using entity
-    entities <- tolower(entities)
+    # `tier`, when supplied, selects exactly those confidence tiers (e.g.
+    # tier = 1 for high-confidence genes only) and takes precedence over
+    # `curated_only`. Otherwise curated_only == TRUE keeps the curated set
+    # (Tier 1 + Tier 2) and drops retired Tier 3 genes; FALSE returns all tiers.
+    keep_tiers <- if (!is.null(tier)) {
+        as.integer(tier)
+    } else if (curated_only) {
+        c(1L, 2L)
+    } else {
+        c(1L, 2L, 3L)
+    }
 
-    r_objects <- entities %>%
-        paste0(
-            "lymphoma_genes_",
-            .,
-            "_v",
-            version
-        )
+    con <- gambl_reference_db()
+    entities_u <- toupper(entities)
 
-    # check for unsupported gene sets
-    all_files <- system.file(
-        "extdata",
-        package = "GAMBLR.data"
-    ) %>%
-    list.files(
-        recursive = TRUE,
-        full.names = TRUE
-    )
+    available <- dplyr::tbl(con, "gene_entity") %>%
+        dplyr::distinct(entity) %>%
+        dplyr::pull(entity)
 
-    all_files <- gsub(
-        ".*extdata/",
-        "",
-        all_files
-    )
-
-    all_files <- all_files[grepl("lymphoma_genes", all_files)]
-
-    all_files <- all_files[grepl(version, all_files)]
-
-    available_entities <- gsub("(.*/\\s*(.*$))", "\\2", all_files)
-
-    available_entities <- gsub(".tsv", "", available_entities)
-
-    missing_sets <- setdiff(
-        entities,
-        available_entities
-    )
-
+    missing_sets <- setdiff(entities_u, available)
     if (length(missing_sets) > 0) {
         warning(
             paste(
                 "The gene set for the entity",
-                missing_sets,
+                paste(missing_sets, collapse = ", "),
                 "is not available and will not be returned."
             )
         )
-        r_objects <- r_objects[
-                grepl(
-                    paste(
-                        available_entities,
-                        collapse="|"
-                    ),
-                    r_objects
-                )
-            ]
-        entities <- entities[entities %in% available_entities]
+        entities_u <- intersect(entities_u, available)
     }
 
-    # Combine all lists into one df
-    # Do it in a way that when GAMBLR.data is ot imported, the data objects
-    # are still available
-    all_entities_data <- list()
-
-    for (i in seq_along(r_objects)) {
-        all_entities_data[[i]] <- eval(
-            parse(
-                text = paste0(
-                    "GAMBLR.data::",
-                    r_objects[i]
-                )
-            )
-        )
-    }
-
-    all_entities_data <- all_entities_data %>%
-        # only select necessary columns
-        lapply(
-            .,
-            `[`,
-            ,
-            c("ensembl_gene_id", "Gene", "curated")
-        )
-
-    names(all_entities_data) <- toupper(entities)
-
-    all_entities_data <- all_entities_data %>%
-        bind_rows(.id = "entity")
-
-    if (curated_only) {
-        # drop any row where curated is FALSE
-        all_entities_data <- all_entities_data %>%
-            dplyr::filter(
-                curated == "TRUE"
-            )
-    }
+    dat <- dplyr::tbl(con, "gene_entity") %>%
+        dplyr::filter(entity %in% entities_u, tier %in% keep_tiers) %>%
+        dplyr::select(entity, ensembl_gene_id, Gene = gene, tier) %>%
+        dplyr::collect()
 
     if (gene_format == "symbol") {
-        return(all_entities_data$Gene %>% unique %>% sort)
+        return(dat$Gene %>% unique %>% sort)
     } else if (gene_format == "ensembl") {
-        return(all_entities_data$ensembl_gene_id %>% unique %>% sort)
+        return(dat$ensembl_gene_id %>% unique %>% sort)
     } else if (gene_format == "data.frame") {
+        # one row per gene; one <ENTITY>_Tier column per requested entity
+        # holding the gene's tier there (NA if absent), so callers can do
+        # filter(df, DLBCL_Tier == 1, FL_Tier == 1, ...) %>% pull(Gene)
         return(
-            all_entities_data %>%
-            select(-curated) %>%
-            mutate(is_gene = "TRUE") %>%
-            tidyr::pivot_wider(
-                names_from = "entity",
-                values_from = "is_gene"
-            ) %>%
-            replace(is.na(.), "FALSE")
+            dat %>%
+                dplyr::distinct(Gene, ensembl_gene_id, entity, tier) %>%
+                tidyr::pivot_wider(
+                    id_cols = c(Gene, ensembl_gene_id),
+                    names_from = "entity",
+                    values_from = "tier",
+                    names_glue = "{entity}_Tier"
+                ) %>%
+                dplyr::select(Gene, ensembl_gene_id,
+                              dplyr::any_of(paste0(entities_u, "_Tier"))) %>%
+                dplyr::arrange(Gene)
         )
     } else {
         stop(

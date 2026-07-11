@@ -1,9 +1,24 @@
-setwd("~/my_dir/repos/GAMBLR.data/")
+# --- Working directory & config -------------------------------------------
+# Run from the GAMBLR.data checkout (holds inst/extdata and data/); override
+# with the GAMBLR_DATA_ROOT env var. No hard-coded paths.
+PKG_ROOT <- Sys.getenv("GAMBLR_DATA_ROOT", unset = getwd())
+stopifnot(dir.exists(PKG_ROOT))
+setwd(PKG_ROOT)
 
 library(readxl)
 library(GAMBLR)
 library(parallel)
 library(tidyverse)
+
+# GAMBLR.results locates GSC data via config.yml (repo_base / project_base).
+# check_config_and_value() looks first in the working directory, then falls back
+# to the copy shipped in GAMBLR.results/inst/extdata. As a last resort (and to
+# cover any direct config::get() calls), point R_CONFIG_FILE at that shipped
+# config when nothing else provides one.
+if (!file.exists("config.yml") && !nzchar(Sys.getenv("R_CONFIG_FILE"))) {
+    Sys.setenv(R_CONFIG_FILE = system.file("extdata", "config.yml",
+                                            package = "GAMBLR.results"))
+}
 
 # Global variables definition
 colnames_for_bundled_meta <- c(
@@ -278,7 +293,8 @@ reddy_meta <- read_excel(
         COO_consensus
     )
 
-setwd("/projects/rmorin/projects/gambl-repos/gambl-kdreval/")
+# (config is resolved via config.yml / the GAMBLR.results fallback; no chdir to
+# a gambl repo is needed to locate data — repo_base is absolute)
 
 reddy_meta_gambl <- get_gambl_metadata() %>%
     dplyr::filter(cohort == "dlbcl_reddy") %>%
@@ -719,7 +735,7 @@ sample_data$hg38$maf <- get_ssm_by_samples(
     )
 
 
-setwd("~/my_dir/repos/GAMBLR.data/")
+setwd(PKG_ROOT)
 
 # Add data from Arthur paper
 arthur_maf <- read_tsv(
@@ -764,7 +780,8 @@ trios_samples <- read_xlsx(
 ) %>%
 drop_na(DNAseq_sample_id)
 
-setwd("/projects/rmorin/projects/gambl-repos/gambl-kdreval/")
+# (config is resolved via config.yml / the GAMBLR.results fallback; no chdir to
+# a gambl repo is needed to locate data — repo_base is absolute)
 
 trios_meta <- get_gambl_metadata() %>%
     filter(
@@ -938,7 +955,7 @@ sample_data$hg38$ashm <- bind_rows(
     trios_ashm_hg38
 ) %>% distinct
 
-setwd("~/my_dir/repos/GAMBLR.data/")
+setwd(PKG_ROOT)
 
 # Add data from Reddy paper
 reddy_original_maf <- read_tsv(
@@ -955,11 +972,33 @@ sample_data$grch37$maf <- bind_rows(
         )
 )
 
-usethis::use_data(
+# --- Persist the assembled data -------------------------------------------
+# Previously this bundled the multi-GB `sample_data.rda`. Instead we now write:
+#   1. a lightweight, bundled `sample_metadata` object (metadata only), and
+#   2. the large per-sample frames to gambl_mutations.db (a release asset,
+#      NOT shipped in the package tarball).
+# This is built straight from the in-memory `sample_data` above, so there is no
+# sample_data.rda round-trip.
+
+# 1. lightweight bundled metadata (replaces sample_data$meta lookups)
+sample_metadata <- sample_data$meta
+usethis::use_data(sample_metadata, overwrite = TRUE, compress = "xz")
+
+# 2. large sample-level frames -> SQLite
+source("data-raw/write_mutations_db.R")
+write_mutations_db(
     sample_data,
-    overwrite = TRUE,
-    compress = "xz"
+    out_db = "gambl_mutations.db",
+    source_desc = paste0("assemble_bundled_data.R @ ", format(Sys.Date()))
 )
+
+# During the transition you may still want the legacy monolithic object
+# (e.g. until other GAMBLR packages are audited off sample_data). Flip to TRUE
+# to also write data/sample_data.rda.
+WRITE_LEGACY_SAMPLE_DATA <- FALSE
+if (WRITE_LEGACY_SAMPLE_DATA) {
+    usethis::use_data(sample_data, overwrite = TRUE, compress = "xz")
+}
 
 library(data.tree)
 
