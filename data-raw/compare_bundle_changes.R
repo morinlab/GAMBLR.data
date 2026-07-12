@@ -7,10 +7,12 @@
 #     new build but not the old) and how many are LOST (missing: present in
 #     the old build but not the new)
 #   - writes one example gained-event row per affected sample to
-#     <outdir>/{snv,cnv,sv}_gained_examples.log, for quick manual inspection
-#     without dumping every gained row. At most one row per sample that has
-#     >=1 gained event, so at most as many rows as there are samples -- in
-#     practice fewer, since not every sample is affected.
+#     <outdir>/{snv,cnv,sv}_gained_examples.log, and one example lost-event
+#     row per affected sample to <outdir>/{snv,cnv,sv}_lost_examples.log --
+#     for quick manual inspection without dumping every gained/lost row. At
+#     most one row per sample that has >=1 gained (or lost) event, so at most
+#     as many rows as there are samples -- in practice fewer, since not every
+#     sample is affected.
 #   - also writes the full per-sample gained/lost counts to
 #     <outdir>/{snv,cnv,sv}_persample_counts.tsv for further analysis.
 #
@@ -72,13 +74,14 @@ compare_events <- function(old_df, new_df, sample_col, key_cols, label) {
   list(per_sample = per_sample, gained = gained, lost = lost)
 }
 
-# One example gained row per affected sample.
-write_examples <- function(gained_df, sample_col, path) {
-  if (nrow(gained_df) == 0) {
-    message("no gained rows -- skipping ", path)
+# One example row per affected sample, from either the gained or the lost
+# data frame returned by compare_events() -- whichever is passed in.
+write_examples <- function(event_df, sample_col, path) {
+  if (nrow(event_df) == 0) {
+    message("no rows -- skipping ", path)
     return(invisible(NULL))
   }
-  examples <- gained_df %>%
+  examples <- event_df %>%
     group_by(.data[[sample_col]]) %>%
     slice_head(n = 1) %>%
     ungroup() %>%
@@ -106,6 +109,7 @@ old_snv <- bind_rows(
 snv_key <- c("Tumor_Sample_Barcode", "genome_build", "Chromosome", "Start_Position", "End_Position")
 snv_cmp <- compare_events(old_snv, new_snv, "Tumor_Sample_Barcode", snv_key, "SNV (maf+ashm)")
 write_examples(snv_cmp$gained, "Tumor_Sample_Barcode", file.path(outdir, "snv_gained_examples.log"))
+write_examples(snv_cmp$lost, "Tumor_Sample_Barcode", file.path(outdir, "snv_lost_examples.log"))
 write_counts(snv_cmp$per_sample, file.path(outdir, "snv_persample_counts.tsv"))
 
 # --- CNV: seg -----------------------------------------------------------------
@@ -117,6 +121,7 @@ old_cnv <- bind_rows(
 cnv_key <- c("ID", "genome_build", "chrom", "start", "end")
 cnv_cmp <- compare_events(old_cnv, new_cnv, "ID", cnv_key, "CNV (seg)")
 write_examples(cnv_cmp$gained, "ID", file.path(outdir, "cnv_gained_examples.log"))
+write_examples(cnv_cmp$lost, "ID", file.path(outdir, "cnv_lost_examples.log"))
 write_counts(cnv_cmp$per_sample, file.path(outdir, "cnv_persample_counts.tsv"))
 
 # --- SV: bedpe ------------------------------------------------------------------
@@ -128,6 +133,7 @@ old_sv <- bind_rows(
 sv_key <- c("tumour_sample_id", "genome_build", "CHROM_A", "START_A", "CHROM_B", "START_B")
 sv_cmp <- compare_events(old_sv, new_sv, "tumour_sample_id", sv_key, "SV (bedpe)")
 write_examples(sv_cmp$gained, "tumour_sample_id", file.path(outdir, "sv_gained_examples.log"))
+write_examples(sv_cmp$lost, "tumour_sample_id", file.path(outdir, "sv_lost_examples.log"))
 write_counts(sv_cmp$per_sample, file.path(outdir, "sv_persample_counts.tsv"))
 
 cat("\n=== summary ===\n")
