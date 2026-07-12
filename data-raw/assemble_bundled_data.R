@@ -74,14 +74,25 @@ all_lymphoma_genes <- lymphoma_genes_comprehensive$Gene
 
 # Built once, reused by every get_ssm_by_regions() call below that wants only
 # lymphoma-gene mutations. Restricting via tabix -R (region) instead of
-# pulling every mutation for a sample set and filtering by Hugo_Symbol
-# afterward is the whole point -- see get_ssm_by_regions().
+# pulling every mutation for a sample set is the performance win; every call
+# site still adds `filter(Hugo_Symbol %in% all_lymphoma_genes)` afterward on
+# the now-small result, because gene_to_region()'s coordinates and VEP's
+# Hugo_Symbol assignment don't always agree at gene boundaries -- without the
+# post-filter, mutations from overlapping/neighbouring genes and non-coding
+# loci (e.g. AC/AL/AF-prefixed lncRNA transcripts) leak in as false "gains".
+# GENE_PAD_BP widens the tabix window itself so real target-gene mutations
+# just outside gene_to_region()'s exact span (promoter/UTR/annotation-source
+# discrepancies) aren't lost before the Hugo_Symbol filter even sees them;
+# the filter makes over-padding cheap (extra I/O, not incorrect inclusion).
+GENE_PAD_BP <- 2000
 lymphoma_genes_bed_grch37 <- create_bed_data(
-    gene_to_region(gene_symbol = all_lymphoma_genes, projection = "grch37", return_as = "bed"),
+    gene_to_region(gene_symbol = all_lymphoma_genes, projection = "grch37",
+                   return_as = "bed", pad_length = GENE_PAD_BP),
     genome_build = "grch37"
 )
 lymphoma_genes_bed_hg38 <- create_bed_data(
-    gene_to_region(gene_symbol = all_lymphoma_genes, projection = "hg38", return_as = "bed"),
+    gene_to_region(gene_symbol = all_lymphoma_genes, projection = "hg38",
+                   return_as = "bed", pad_length = GENE_PAD_BP),
     genome_build = "hg38"
 )
 
@@ -283,6 +294,7 @@ pull_data <- function(
         basic_columns = FALSE,
         projection = pull_projection
     ) %>%
+    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
     select(
         all_of(all_cols)
     )
@@ -437,7 +449,6 @@ cell_lines_data$hg38$cnv_to_bundle <- get_cn_segments(
     projection="hg38"
 ) %>% 
     dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
-
 cell_lines_data$grch37$sv_to_bundle <- get_manta_sv(
     these_samples_metadata = cell_lines_data$meta,
 )
@@ -764,6 +775,7 @@ sample_data$grch37$maf <- time_it("publication-samples get_ssm_by_regions grch37
         these_samples_metadata = get_gambl_metadata() %>%
             filter(sample_id %in% publication_samples),
         basic_columns = FALSE) %>%
+        filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
         mutate(Pipeline = "SLMS-3") %>%
         left_join(
             .,
@@ -784,6 +796,7 @@ sample_data$hg38$maf <- time_it("publication-samples get_ssm_by_regions hg38", {
             filter(sample_id %in% publication_samples),
         projection = "hg38",
         basic_columns = FALSE) %>%
+        filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
         mutate(Pipeline = "SLMS-3") %>%
         left_join(
             .,
@@ -888,6 +901,7 @@ genome_trios_ssm_grch37 <- time_it("trios get_ssm_by_regions genome grch37", {
             filter(seq_type == "genome"),
         basic_columns = FALSE
     ) %>%
+        filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
         mutate(
             Pipeline = "SLMS-3",
             Study = "Hilton"
@@ -902,6 +916,7 @@ capture_trios_ssm_grch37 <- time_it("trios get_ssm_by_regions capture grch37", {
             filter(seq_type == "capture"),
         basic_columns = FALSE
     ) %>%
+        filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
         mutate(
             Pipeline = "SLMS-3",
             Study = "Hilton"
@@ -923,6 +938,7 @@ genome_trios_ssm_hg38 <- time_it("trios get_ssm_by_regions genome hg38", {
         basic_columns = FALSE,
         projection = "hg38"
     ) %>%
+        filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
         mutate(
             Pipeline = "SLMS-3",
             Study = "Hilton"
@@ -938,6 +954,7 @@ capture_trios_ssm_hg38 <- time_it("trios get_ssm_by_regions capture hg38", {
         basic_columns = FALSE,
         projection = "hg38"
     ) %>%
+        filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
         mutate(
             Pipeline = "SLMS-3",
             Study = "Hilton"
