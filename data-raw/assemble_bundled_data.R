@@ -453,14 +453,7 @@ cell_lines_data$hg38$cnv_to_bundle <- get_cn_segments(
     projection="hg38"
 ) %>% 
     dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
-cell_lines_data$grch37$sv_to_bundle <- get_manta_sv(
-    these_samples_metadata = cell_lines_data$meta,
-)
 
-cell_lines_data$hg38$sv_to_bundle <- get_manta_sv(
-    these_samples_metadata = cell_lines_data$meta,
-    projection = "hg38"
-)
 
 # Manta SVs for published studies: moved to after sample_data$meta is
 # finalized below (see "Adding the manta SVs for published studies"), so the
