@@ -84,7 +84,11 @@ all_lymphoma_genes <- lymphoma_genes_comprehensive$Gene
 # just outside gene_to_region()'s exact span (promoter/UTR/annotation-source
 # discrepancies) aren't lost before the Hugo_Symbol filter even sees them;
 # the filter makes over-padding cheap (extra I/O, not incorrect inclusion).
-GENE_PAD_BP <- 2000
+# 10kb is a 2x margin over VEP's default 5kb upstream/downstream annotation
+# window (the likely source of Hugo_Symbol on these rows) -- e.g. an ID3
+# variant 4.2kb upstream of its TSS (well inside VEP's 5kb default, but
+# outside a 2kb pad) was confirmed lost under the old 2000bp value.
+GENE_PAD_BP <- 10000
 lymphoma_genes_bed_grch37 <- create_bed_data(
     gene_to_region(gene_symbol = all_lymphoma_genes, projection = "grch37",
                    return_as = "bed", pad_length = GENE_PAD_BP),

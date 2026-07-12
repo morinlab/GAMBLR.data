@@ -54,14 +54,25 @@ compare_events <- function(old_df, new_df, sample_col, key_cols, label) {
   old_df$.key <- key_of(old_df)
   new_df$.key <- key_of(new_df)
 
-  gained <- new_df %>% filter(!.key %in% old_df$.key)
-  lost   <- old_df %>% filter(!.key %in% new_df$.key)
+  gained   <- new_df %>% filter(!.key %in% old_df$.key)
+  lost     <- old_df %>% filter(!.key %in% new_df$.key)
+  retained <- old_df %>% filter(.key %in% new_df$.key)
 
-  gained_per_sample <- gained %>% count(.data[[sample_col]], name = "n_gained")
-  lost_per_sample   <- lost   %>% count(.data[[sample_col]], name = "n_lost")
+  gained_per_sample   <- gained   %>% count(.data[[sample_col]], name = "n_gained")
+  lost_per_sample     <- lost     %>% count(.data[[sample_col]], name = "n_lost")
+  retained_per_sample <- retained %>% count(.data[[sample_col]], name = "n_retained")
 
+  # n_retained (present in both old and new) is joined in separately -- it's
+  # looked up only for the samples already in per_sample (those with >=1
+  # gained or lost event), not full_join'd, since retained_per_sample on its
+  # own covers essentially every sample including untouched ones.
   per_sample <- full_join(gained_per_sample, lost_per_sample, by = sample_col) %>%
-    mutate(n_gained = coalesce(n_gained, 0L), n_lost = coalesce(n_lost, 0L)) %>%
+    left_join(retained_per_sample, by = sample_col) %>%
+    mutate(
+      n_gained   = coalesce(n_gained, 0L),
+      n_lost     = coalesce(n_lost, 0L),
+      n_retained = coalesce(n_retained, 0L)
+    ) %>%
     arrange(desc(n_gained + n_lost))
 
   cat(sprintf(
