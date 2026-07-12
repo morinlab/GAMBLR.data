@@ -20,6 +20,17 @@ if (!file.exists("config.yml") && !nzchar(Sys.getenv("R_CONFIG_FILE"))) {
                                             package = "GAMBLR.results"))
 }
 
+# get_gambl_metadata()'s min_corrected_cov QC filter (default 15x) can drop
+# samples that were previously part of a released bundle out of a fresh one
+# (e.g. 01-16433_tumorA/B: FFPE genomes with coverage under the bar, silently
+# excluded, taking all their SNVs with them). Disable it for bundle assembly
+# so a rebuild doesn't lose samples that are already in the released dataset.
+# Shadows the package function for the rest of this script, so every call
+# site (there are ~13) picks this up in one place.
+get_gambl_metadata <- function(...) {
+    GAMBLR.results::get_gambl_metadata(..., min_corrected_cov = 0)
+}
+
 # Global variables definition
 colnames_for_bundled_meta <- c(
     "patient_id",
