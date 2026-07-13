@@ -99,10 +99,43 @@ Confirmed as an Arthur-specific bug, two compounding causes:
    other cohort in this script excludes samples this way, and no comment
    explained the original intent -- removed.
 
+**Update**: rebuilt with this fix and re-ran -- `08-15460` (bare) still
+showed the identical 100%-loss numbers, byte-for-byte. That ruled out
+`arthur_meta`/`arthur_case_ids` as the source: those only ever fed
+`sample_data$meta`, never `sample_data$maf` directly. Traced the real
+source instead by reading the *old raw flat file itself*:
+```r
+arthur_raw <- readr::read_tsv("inst/extdata/studies/DLBCL_Arthur.maf.gz",
+                               col_select = "Tumor_Sample_Barcode")
+grep("15460", unique(arthur_raw$Tumor_Sample_Barcode), value = TRUE)
+# [1] "08-15460"
+```
+Confirmed: the deleted raw dump used bare patient-style IDs for
+`Tumor_Sample_Barcode` (not GAMBL's real per-sample naming), directly and
+independently of `arthur_meta`. **Conclusion: this specific finding was
+never a bug.** Every "100%-loss" row keyed to `08-15460` (bare) is simply
+the expected disappearance of the old file's non-standard ID convention,
+now correctly superseded by GAMBL's real sample IDs (`08-15460T`: 1,515
+retained; `08-15460_tumorB`: 665 retained -- both present and correctly
+sized in both old and new bundles).
+
+Generalized this into a defensive fix rather than leaving it Arthur-specific:
+added `relabel_to_sample_id(df, study_name)`, applied to all four
+Publication-pipeline pulls (Thomas BL, Thomas DLBCL, Dreval, Reddy's
+original-variants file). It joins on `sample_study$study_id` and rewrites
+`Tumor_Sample_Barcode` to the real `sample_id` wherever they differ -- a
+no-op for Thomas/Dreval/Hilton (`study_id` already mirrors `sample_id`
+there) and an actual fix for Reddy (`study_id` is the paper's own raw
+"Sample ID", genuinely distinct from `sample_id`). Verified against
+synthetic data: relabels when a study_id match exists, no-ops when
+`Tumor_Sample_Barcode` already is the real sample_id, and passes through
+unmatched values unchanged rather than dropping them.
+
 Still need to: rebuild with this fix and re-run `compare_bundle_changes.R`
-to confirm the 100%-loss patients are resolved, and re-check whether this
-also explains the `DO52686`/`07-35482`-style samples from the earlier,
-larger (3.1M row) loss count.
+to confirm `08-15460` (bare) is gone from the loss list entirely, and
+check whether the same bare-vs-suffixed pattern explains the
+`DO52686`/`07-35482`-style samples from the earlier, larger (3.1M row)
+loss count.
 
 ## Fix: `study_id` used `patient_id` instead of `sample_id` for Thomas/Dreval/Hilton
 

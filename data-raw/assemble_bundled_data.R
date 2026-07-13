@@ -773,6 +773,26 @@ sample_data$hg38$seg <- bind_rows(
 # sample_data$sample_study, not an inline Study column.
 # ============================================================================
 
+# Publication-pipeline data is read directly from each paper's own
+# supplementary file, which isn't guaranteed to use GAMBL's own
+# Tumor_Sample_Barcode convention -- Arthur's now-removed raw dump was the
+# clearest example, using bare patient-style IDs instead of GAMBL's real
+# per-sample naming. Defensive relabel: for any row whose
+# Tumor_Sample_Barcode matches a study's own identifier
+# (sample_study$study_id) rather than GAMBL's real sample_id, replace it
+# with the real sample_id. A no-op wherever Tumor_Sample_Barcode already IS
+# the real sample_id -- true for Thomas/Dreval/Hilton, where study_id
+# mirrors sample_id (see thomas_bl_study above).
+relabel_to_sample_id <- function(df, study_name) {
+    lookup <- sample_data$sample_study %>%
+        filter(study == study_name, !is.na(study_id)) %>%
+        select(study_id, .gambl_sample_id = sample_id)
+    df %>%
+        left_join(lookup, by = c("Tumor_Sample_Barcode" = "study_id")) %>%
+        mutate(Tumor_Sample_Barcode = coalesce(.gambl_sample_id, Tumor_Sample_Barcode)) %>%
+        select(-.gambl_sample_id)
+}
+
 # This is needed for the proteinpainter compatibility. Reads from the
 # *installed* GAMBLR.data::sample_data (not the locally-built sample_data
 # above) -- a pre-existing, out-of-scope inconsistency, left as-is.
@@ -824,6 +844,7 @@ hg38_publication_rows <- bind_rows(
     bl_data$ssm_to_bundle %>% mutate(Pipeline = "Publication"),
     dlbcl_data$ssm_to_bundle %>% mutate(Pipeline = "Publication")
 ) %>%
+    relabel_to_sample_id("Thomas") %>%
     left_join(coding_maf)
 
 this_study_samples <- GAMBLR.data::sample_data$meta %>%
@@ -842,6 +863,7 @@ coding_maf <- time_it("coding_maf get_ssm_by_samples", {
 })
 
 fl_data$ssm_to_bundle <- fl_data$ssm_to_bundle %>%
+    relabel_to_sample_id("Dreval") %>%
     dplyr::left_join(
         coding_maf
     ) %>%
@@ -850,7 +872,7 @@ fl_data$ssm_to_bundle <- fl_data$ssm_to_bundle %>%
 # grch37 Publication rows (Dreval FL + Reddy's original variants).
 grch37_publication_rows <- bind_rows(
     fl_data$ssm_to_bundle %>% mutate(Pipeline = "Publication"),
-    reddy_original_maf %>% mutate(Pipeline = "Publication")
+    reddy_original_maf %>% relabel_to_sample_id("Reddy") %>% mutate(Pipeline = "Publication")
 )
 
 setwd(PKG_ROOT)
