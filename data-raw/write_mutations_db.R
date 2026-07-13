@@ -48,7 +48,6 @@ write_mutations_db <- function(sample_data,
   idx <- c(
     "CREATE INDEX idx_maf_pos     ON maf(genome_build, Chromosome, Start_Position)",
     "CREATE INDEX idx_maf_sample  ON maf(Tumor_Sample_Barcode)",
-    "CREATE INDEX idx_maf_gene    ON maf(Hugo_Symbol)",
     "CREATE INDEX idx_maf_pipe    ON maf(Pipeline)",
     "CREATE INDEX idx_maf_study   ON maf(Study)",
     "CREATE INDEX idx_ashm_pos    ON ashm(genome_build, Chromosome, Start_Position)",

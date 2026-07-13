@@ -55,9 +55,13 @@ to \code{sample_meta$sample_id}.
 \subsection{Indexes}{
 
 \code{maf}/\code{ashm}: \verb{(genome_build, Chromosome, Start_Position)},
-\code{Tumor_Sample_Barcode}, \code{Hugo_Symbol} (maf only), \code{Pipeline}, \code{Study} (maf
-only). \code{seg}: \verb{(genome_build, ID)}, \verb{(genome_build, chrom, start)}. \code{bedpe}:
-\code{tumour_sample_id}. \code{sample_meta}: \code{sample_id}, \code{Tumor_Sample_Barcode}.
+\code{Tumor_Sample_Barcode}, \code{Pipeline}, \code{Study} (maf only). No index on
+\code{Hugo_Symbol}: gene-restricted queries resolve the gene to a region first
+(the same logic used to populate these tables) and filter on
+\verb{(genome_build, Chromosome, Start_Position)} instead -- see
+\code{GAMBLR.data::get_ssm_from_db()}. \code{seg}: \verb{(genome_build, ID)},
+\verb{(genome_build, chrom, start)}. \code{bedpe}: \code{tumour_sample_id}.
+\code{sample_meta}: \code{sample_id}, \code{Tumor_Sample_Barcode}.
 }
 }
 

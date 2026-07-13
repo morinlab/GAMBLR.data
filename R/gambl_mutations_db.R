@@ -40,9 +40,13 @@
 #'
 #' ## Indexes
 #' `maf`/`ashm`: `(genome_build, Chromosome, Start_Position)`,
-#' `Tumor_Sample_Barcode`, `Hugo_Symbol` (maf only), `Pipeline`, `Study` (maf
-#' only). `seg`: `(genome_build, ID)`, `(genome_build, chrom, start)`. `bedpe`:
-#' `tumour_sample_id`. `sample_meta`: `sample_id`, `Tumor_Sample_Barcode`.
+#' `Tumor_Sample_Barcode`, `Pipeline`, `Study` (maf only). No index on
+#' `Hugo_Symbol`: gene-restricted queries resolve the gene to a region first
+#' (the same logic used to populate these tables) and filter on
+#' `(genome_build, Chromosome, Start_Position)` instead -- see
+#' `GAMBLR.data::get_ssm_from_db()`. `seg`: `(genome_build, ID)`,
+#' `(genome_build, chrom, start)`. `bedpe`: `tumour_sample_id`.
+#' `sample_meta`: `sample_id`, `Tumor_Sample_Barcode`.
 #'
 #' @param db_path Optional explicit path to the .db file.
 #'
