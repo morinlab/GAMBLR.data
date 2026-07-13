@@ -124,6 +124,17 @@ old_snv <- bind_rows(
   old_sd$grch37$ashm %>% mutate(genome_build = "grch37", .source = "ashm"),
   old_sd$hg38$ashm   %>% mutate(genome_build = "hg38", .source = "ashm")
 )
+
+# Pipeline == "strelka" (Arthur's old, unfiltered raw-flat-file dump) is
+# intentionally and entirely gone from the new bundle -- that source file
+# isn't read anymore. Confirmed (twice: 08-15460, DO52686) that its
+# Tumor_Sample_Barcode values are the raw file's own non-standard IDs, not
+# GAMBL's real sample_id, so every one of these rows is expected to show up
+# as "lost" regardless of anything else in the pipeline. Excluded here so
+# that expected, already-understood disappearance doesn't drown out
+# genuinely new findings on every run.
+old_snv <- old_snv %>% filter(is.na(Pipeline) | Pipeline != "strelka")
+
 snv_key <- c("Tumor_Sample_Barcode", "genome_build", "Chromosome", "Start_Position", "End_Position")
 snv_cmp <- compare_events(old_snv, new_snv, "Tumor_Sample_Barcode", snv_key, "SNV (maf+ashm)")
 write_examples(snv_cmp$gained, "Tumor_Sample_Barcode", file.path(outdir, "snv_gained_examples.log"))
