@@ -58,7 +58,24 @@ All structural/integrity checks passed:
 - [ ] Run `compare_bundle_changes.R` for the granular per-sample gained/lost/retained view (append results below).
 - [ ] Confirm Dreval×Hilton overlap samples (`05-32150T`, `08-15460T`, `09-33003T`, `15-13383T`, `17-36275T`) show 2 `sample_study` rows each and roughly halved mutation counts vs. the old bundle.
 - [ ] Confirm Arthur's `maf` rows are gene-panel-restricted (~150-237 distinct genes, not 65,121) and now have hg38 + aSHM coverage.
-- [ ] Functional check: `get_ssm_from_db(this_study = "Reddy")` / `GAMBLR.open::get_ssm_by_region(this_study = "Reddy", ...)` against the real DB.
+- [x] Functional check: `get_ssm_by_samples()`/`get_ssm_by_patients()` against real Reddy (capture) data -- 20,480 rows returned, confirming the query layer and underlying data are correct end to end (see note below; the initial zero-result was unrelated to this refactor).
+
+## Non-issue: `get_ssm_by_samples()`/`get_ssm_by_patients()` initially returned 0 rows for Reddy
+
+Root cause turned out to be unrelated to this refactor: both functions
+default `this_seq_type = "genome"` and filter `these_samples_metadata` by
+it *in addition to* whatever metadata you pass in, rather than inferring it.
+Reddy is a capture cohort (`seq_type == "capture"` for all 999 samples), so
+the default silently dropped every row before the query ever reached the
+database. Confirmed the data itself was fine throughout: a raw SQL query
+against `maf` for Reddy's `Tumor_Sample_Barcode` values returned 47,626
+rows the whole time. Passing `this_seq_type = "capture"` explicitly fixed
+both functions (20,480 rows each, matching after `get_ssm_from_db()`'s
+Pipeline/genome_build/read-support filters narrow the raw 47,626).
+
+Separate, pre-existing GAMBLR.open UX gap worth considering independently
+of this PR: neither function warns when the `seq_type` filter drops every
+row, so this fails silently rather than with a clear message.
 
 ## Fix: `study_id` used `patient_id` instead of `sample_id` for Thomas/Dreval/Hilton
 
