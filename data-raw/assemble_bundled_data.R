@@ -220,7 +220,7 @@ bl_data$cnv_to_bundle <- read_xlsx(
 thomas_bl_study <- data.frame(
     sample_id = bl_data$meta_to_bundle$sample_id,
     study = "Thomas",
-    study_id = bl_data$meta_to_bundle$patient_id,
+    study_id = as.character(bl_data$meta_to_bundle$patient_id),
     reference_PMID = pmids$Thomas_BL
 )
 
@@ -281,7 +281,7 @@ fl_data$cnv_to_bundle <- read_xlsx(
 dreval_study <- data.frame(
     sample_id = fl_data$meta_to_bundle$sample_id,
     study = "Dreval",
-    study_id = fl_data$meta_to_bundle$patient_id,
+    study_id = as.character(fl_data$meta_to_bundle$patient_id),
     reference_PMID = pmids$Dreval_FL
 )
 
@@ -339,7 +339,7 @@ dlbcl_data$cnv_to_bundle <- read_xlsx(
 thomas_dlbcl_study <- data.frame(
     sample_id = dlbcl_data$meta_to_bundle$sample_id,
     study = "Thomas",
-    study_id = dlbcl_data$meta_to_bundle$patient_id,
+    study_id = as.character(dlbcl_data$meta_to_bundle$patient_id),
     reference_PMID = pmids$Thomas_BL
 )
 
@@ -382,7 +382,7 @@ reddy_meta_full <- read_excel(
 reddy_study <- data.frame(
     sample_id = reddy_meta_full$sample_id,
     study = "Reddy",
-    study_id = reddy_meta_full$study_id,
+    study_id = as.character(reddy_meta_full$study_id),
     reference_PMID = pmids$Reddy_DLBCL
 )
 
@@ -554,7 +554,7 @@ arthur_meta <- get_gambl_metadata() %>%
 arthur_study <- data.frame(
     sample_id = arthur_meta$sample_id,
     study = "Arthur",
-    study_id = arthur_meta$patient_id,
+    study_id = as.character(arthur_meta$patient_id),
     reference_PMID = pmids$Arthur_DLBCL
 )
 
@@ -584,7 +584,7 @@ trios_meta <- get_gambl_metadata() %>%
 hilton_study <- data.frame(
     sample_id = trios_meta$sample_id,
     study = "Hilton",
-    study_id = trios_meta$patient_id,
+    study_id = as.character(trios_meta$patient_id),
     reference_PMID = pmids$Hilton_DLBCL
 )
 
