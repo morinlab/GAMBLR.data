@@ -137,6 +137,28 @@ check whether the same bare-vs-suffixed pattern explains the
 `DO52686`/`07-35482`-style samples from the earlier, larger (3.1M row)
 loss count.
 
+## Fix: cell lines need a separate, genome-wide SNV pull
+
+After the strelka-exclusion fix, `compare_bundle_changes.R` came back clean
+except for the 5 cell lines (`SU-DHL-4`, `OCI-Ly3`, `OCI-Ly10`, `SU-DHL-10`,
+`DOHH-2`), each showing ~43k-65k lost rows against a few hundred/~1k
+retained. This is the scope-reduction flagged during planning, now
+confirmed as something to actually fix rather than accept: the original
+pre-refactor cell-line pull used `get_ssm_by_samples()` with no gene-panel
+filter (genome-wide), but folding cell lines into the consolidated,
+panel-restricted SLMS-3 pull (Phase 4) silently reduced them to panel-only
+coverage.
+
+Fixed by excluding cell lines from `all_slms3_meta` (so they're not also
+pulled panel-restricted) and adding back a dedicated, unrestricted
+`get_ssm_by_samples()` pull for them specifically, both builds, bound into
+`slms3_grch37`/`slms3_hg38` alongside the panel-restricted data for
+everyone else. Still tagged `Pipeline = "SLMS-3"` (same underlying pipeline,
+just unrestricted scope for these 5 samples).
+
+Still need to: rebuild and re-run `compare_bundle_changes.R` to confirm the
+cell-line losses are gone.
+
 ## Fix: `study_id` used `patient_id` instead of `sample_id` for Thomas/Dreval/Hilton
 
 Caught in review (not by the automated checks above): the first pass at

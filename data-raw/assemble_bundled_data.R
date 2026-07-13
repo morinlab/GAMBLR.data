@@ -888,8 +888,12 @@ setwd(PKG_ROOT)
 # duplication structurally impossible regardless of how many cohorts a
 # sample belongs to.
 # ============================================================================
+# Cell lines are excluded here -- they get their own separate, genome-wide
+# pull below (not restricted to the lymphoma gene panel), so they must not
+# also go through this panel-restricted pull or they'd be pulled twice.
 all_slms3_meta <- sample_data$meta %>%
-    filter(seq_type %in% c("genome", "capture"))
+    filter(seq_type %in% c("genome", "capture"),
+           ! sample_id %in% cell_lines_data$meta$sample_id)
 
 slms3_grch37 <- bind_rows(
     time_it("SLMS-3 genome grch37", pull_data(all_slms3_meta %>% filter(seq_type == "genome"))),
@@ -902,6 +906,32 @@ slms3_hg38 <- bind_rows(
     time_it("SLMS-3 capture hg38", pull_data(all_slms3_meta %>% filter(seq_type == "capture"), "hg38"))
 ) %>% mutate(Pipeline = "SLMS-3")
 print("Done collecting hg38 SLMS-3")
+
+# Cell lines get their own, separate, genome-WIDE SNV pull -- not restricted
+# to the lymphoma gene panel like every other cohort above. This matches
+# their original pre-refactor behaviour, which was lost when they were first
+# folded into the panel-restricted consolidated pull above (confirmed via
+# compare_bundle_changes.R: cell lines showed ~50-65k "lost" rows per sample
+# against the old bundle, correctly diagnosed as a real scope reduction, not
+# a bug worth working around).
+cell_lines_ssm_grch37 <- time_it("cell lines get_ssm_by_samples grch37", {
+    get_ssm_by_samples(
+        these_samples_metadata = cell_lines_data$meta,
+        basic_columns = FALSE
+    ) %>% select(all_of(all_cols)) %>% mutate(Pipeline = "SLMS-3")
+})
+
+cell_lines_ssm_hg38 <- time_it("cell lines get_ssm_by_samples hg38", {
+    get_ssm_by_samples(
+        these_samples_metadata = cell_lines_data$meta,
+        projection = "hg38",
+        basic_columns = FALSE
+    ) %>% select(all_of(all_cols)) %>% mutate(Pipeline = "SLMS-3")
+})
+
+slms3_grch37 <- bind_rows(slms3_grch37, cell_lines_ssm_grch37)
+slms3_hg38 <- bind_rows(slms3_hg38, cell_lines_ssm_hg38)
+print("Done collecting cell line SLMS-3 (genome-wide)")
 
 
 # ============================================================================
