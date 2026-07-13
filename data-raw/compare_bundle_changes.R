@@ -107,15 +107,22 @@ write_counts <- function(per_sample, path) {
 }
 
 # --- SNV: maf + ashm combined ------------------------------------------------
+# maf and ashm are built by different code paths in assemble_bundled_data.R
+# (gene-region-restricted pull vs aSHM-region-restricted pull) -- .source
+# records which table each row came from so gained/lost examples can be
+# traced back to the right code path instead of being lumped together as
+# an undifferentiated "SNV". Not part of the comparison key: a row that
+# moved from one table to the other between builds still counts as
+# retained if its sample/position match.
 new_snv <- bind_rows(
-  dbGetQuery(con, "SELECT * FROM maf"),
-  dbGetQuery(con, "SELECT * FROM ashm")
+  dbGetQuery(con, "SELECT * FROM maf")  %>% mutate(.source = "maf"),
+  dbGetQuery(con, "SELECT * FROM ashm") %>% mutate(.source = "ashm")
 )
 old_snv <- bind_rows(
-  old_sd$grch37$maf  %>% mutate(genome_build = "grch37"),
-  old_sd$hg38$maf    %>% mutate(genome_build = "hg38"),
-  old_sd$grch37$ashm %>% mutate(genome_build = "grch37"),
-  old_sd$hg38$ashm   %>% mutate(genome_build = "hg38")
+  old_sd$grch37$maf  %>% mutate(genome_build = "grch37", .source = "maf"),
+  old_sd$hg38$maf    %>% mutate(genome_build = "hg38", .source = "maf"),
+  old_sd$grch37$ashm %>% mutate(genome_build = "grch37", .source = "ashm"),
+  old_sd$hg38$ashm   %>% mutate(genome_build = "hg38", .source = "ashm")
 )
 snv_key <- c("Tumor_Sample_Barcode", "genome_build", "Chromosome", "Start_Position", "End_Position")
 snv_cmp <- compare_events(old_snv, new_snv, "Tumor_Sample_Barcode", snv_key, "SNV (maf+ashm)")
