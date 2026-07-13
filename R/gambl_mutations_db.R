@@ -26,27 +26,38 @@
 #'
 #' | Table | Rows (typical) | Grain | Key columns |
 #' | --- | --- | --- | --- |
-#' | `maf` | ~3.6M | one somatic mutation call | `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline, Study, genome_build` (+ ~35 more MAF-standard columns) |
+#' | `maf` | ~3.6M | one somatic mutation call | `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline, genome_build` (+ ~35 more MAF-standard columns) |
 #' | `ashm` | ~135k | one mutation call in an aSHM region | same schema as `maf` |
 #' | `seg` | ~126k | one copy-number segment | `ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build` |
 #' | `bedpe` | ~900 | one Manta structural-variant breakpoint pair | `CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build` |
-#' | `sample_meta` | ~3.3k | one sample | `patient_id, sample_id, Tumor_Sample_Barcode, seq_type, pathology, cohort, study, ...` (31 columns total; its own `genome_build` column records the sample's native alignment build, unrelated to the per-row build stamp used in the other tables) |
-#' | `build_info` | 8 | key/value | provenance (`source`, `built_at`, `builder`) and expected row counts (`n_maf`, `n_ashm`, `n_seg`, `n_bedpe`, `n_samples`) used by the `data-raw/test_gambl_db.R` regression checks |
+#' | `sample_meta` | ~3.3k | one sample | `patient_id, sample_id, Tumor_Sample_Barcode, seq_type, pathology, cohort, study, ...` (its own `genome_build` column records the sample's native alignment build, unrelated to the per-row build stamp used in the other tables) |
+#' | `sample_study` | varies | one (sample, study) membership fact -- many-to-many, a sample belonging to N studies is N rows | `sample_id, study, study_id, reference_PMID`. `study_id` is that study's own identifier for the sample where it differs from GAMBL's `sample_id` (e.g. a paper's own case/patient ID); NA where no study-specific ID has been sourced. |
+#' | `build_info` | 9 | key/value | provenance (`source`, `built_at`, `builder`) and expected row counts (`n_maf`, `n_ashm`, `n_seg`, `n_bedpe`, `n_samples`, `n_sample_study`) used by the `data-raw/test_gambl_db.R` regression checks |
+#'
+#' `maf`/`ashm` do NOT carry a `Study` column. Cohort/study membership is
+#' tracked once per sample in `sample_study`, not once per mutation row --
+#' a mutation row's `Study` couldn't represent a sample belonging to more
+#' than one study anyway, and a per-row tag caused the same sample's
+#' mutations to be pulled and duplicated once per cohort-specific code path
+#' that claimed it (see `GAMBLR.data::get_ssm_from_db()`'s `this_study`
+#' parameter for how to filter by study post-refactor).
 #'
 #' ## Join keys
 #' `maf`, `ashm`, and `bedpe` (via `tumour_sample_id`) key to
 #' `sample_meta$Tumor_Sample_Barcode` / `sample_meta$sample_id`; `seg$ID` keys
-#' to `sample_meta$sample_id`.
+#' to `sample_meta$sample_id`; `sample_study$sample_id` keys to
+#' `sample_meta$sample_id`.
 #'
 #' ## Indexes
 #' `maf`/`ashm`: `(genome_build, Chromosome, Start_Position)`,
-#' `Tumor_Sample_Barcode`, `Pipeline`, `Study` (maf only). No index on
+#' `Tumor_Sample_Barcode`, `Pipeline` (maf only). No index on
 #' `Hugo_Symbol`: gene-restricted queries resolve the gene to a region first
 #' (the same logic used to populate these tables) and filter on
 #' `(genome_build, Chromosome, Start_Position)` instead -- see
 #' `GAMBLR.data::get_ssm_from_db()`. `seg`: `(genome_build, ID)`,
 #' `(genome_build, chrom, start)`. `bedpe`: `tumour_sample_id`.
-#' `sample_meta`: `sample_id`, `Tumor_Sample_Barcode`.
+#' `sample_meta`: `sample_id`, `Tumor_Sample_Barcode`. `sample_study`:
+#' `sample_id`, `study`.
 #'
 #' @param db_path Optional explicit path to the .db file.
 #'

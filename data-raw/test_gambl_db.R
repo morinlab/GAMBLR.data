@@ -32,11 +32,11 @@ cols <- function(t) dbListFields(con, t)
 builds_in <- function(t) sort(dbGetQuery(con, sprintf("SELECT DISTINCT genome_build g FROM %s", t))$g)
 
 cat("== tables present ==\n")
-for (t in c("maf","ashm","seg","bedpe","sample_meta","build_info"))
+for (t in c("maf","ashm","seg","bedpe","sample_meta","sample_study","build_info"))
   check(t %in% tbls, sprintf("table %s exists", t))
 
 cat("\n== row counts (all > 0) ==\n")
-for (t in c("maf","ashm","seg","bedpe","sample_meta")) {
+for (t in c("maf","ashm","seg","bedpe","sample_meta","sample_study")) {
   cnt <- if (t %in% tbls) n(t) else 0
   check(cnt > 0, sprintf("%-11s has %d rows", t, cnt))
 }
@@ -50,10 +50,11 @@ for (t in c("maf","ashm","seg","bedpe"))
 cat("\n== required columns present (what the accessors filter on) ==\n")
 req <- list(
   maf   = c("Chromosome","Start_Position","End_Position","Tumor_Sample_Barcode",
-            "Pipeline","Hugo_Symbol","Study","Variant_Classification","t_alt_count","genome_build"),
+            "Pipeline","Hugo_Symbol","Variant_Classification","t_alt_count","genome_build"),
   seg   = c("ID","chrom","start","end","CN","genome_build"),
   bedpe = c("tumour_sample_id","CHROM_A","START_A","CHROM_B","START_B","VAF_tumour","SCORE","FILTER","genome_build"),
-  sample_meta = c("sample_id","Tumor_Sample_Barcode","seq_type","study")
+  sample_meta = c("sample_id","Tumor_Sample_Barcode","seq_type","study"),
+  sample_study = c("sample_id","study","study_id","reference_PMID")
 )
 for (t in names(req)) if (t %in% tbls) {
   missing <- setdiff(req[[t]], cols(t))
@@ -63,8 +64,14 @@ for (t in names(req)) if (t %in% tbls) {
 }
 
 cat("\n== indexes present ==\n")
+# NB: idx_maf_gene was asserted here previously but was never actually
+# created by write_mutations_db.R (maf has no Hugo_Symbol index -- gene
+# queries resolve to a region first, see gambl_mutations_db()'s docs), so
+# this check always failed regardless of any other change. Fixed here to
+# assert indexes that actually exist.
 idx <- dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='index'")$name
-for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_gene","idx_seg_sample","idx_bedpe_sample"))
+for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_pipe","idx_seg_sample",
+            "idx_bedpe_sample","idx_study_sample","idx_study_study"))
   check(i %in% idx, sprintf("index %s", i))
 
 cat("\n== pipelines present ==\n")

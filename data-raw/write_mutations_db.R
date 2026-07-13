@@ -22,19 +22,53 @@ write_mutations_db <- function(sample_data,
   DBI::dbExecute(con, "PRAGMA journal_mode = OFF")
   DBI::dbExecute(con, "PRAGMA synchronous = OFF")
 
-  # sample metadata (single table, no genome build)
-  DBI::dbWriteTable(con, "sample_meta", as.data.frame(sample_data$meta),
-                    overwrite = TRUE)
+  # sample metadata (single table, no genome build). reference_PMID is
+  # dropped here -- it's single-valued (one row per sample) and can't
+  # correctly represent a sample belonging to more than one study (each with
+  # its own PMID); sample_study is the source of truth for that now.
+  sample_meta_out <- as.data.frame(sample_data$meta)
+  sample_meta_out$reference_PMID <- NULL
+  DBI::dbWriteTable(con, "sample_meta", sample_meta_out, overwrite = TRUE)
+
+  # sample_study: many-to-many bridge table (sample_id, study) replacing the
+  # old inline Study column on maf/ashm rows -- guarded so older sample_data
+  # objects that predate this table (e.g. via the legacy .rda adapter) don't
+  # hard-crash a build that simply won't have cohort-membership data.
+  n_sample_study <- 0L
+  if (!is.null(sample_data$sample_study) && nrow(sample_data$sample_study)) {
+    DBI::dbWriteTable(con, "sample_study", as.data.frame(sample_data$sample_study),
+                      overwrite = TRUE)
+    n_sample_study <- nrow(sample_data$sample_study)
+  }
+
+  # Natural mutation-call key, reused from GAMBLR.open::get_ssm_by_region()
+  # (which already applies the same distinct() at read time) as a write-time
+  # safety net: no cohort-specific pull block should ever again be able to
+  # introduce duplicate mutation rows for a sample that's pulled more than
+  # once, regardless of the reason.
+  dedup_keys <- list(
+    maf  = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2"),
+    ashm = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2")
+  )
 
   # genome-build-stamped frames; append per build to keep peak memory low
   write_element <- function(elem) {
     first <- TRUE
     total <- 0L
+    dk <- dedup_keys[[elem]]
     for (b in builds) {
       x <- sample_data[[b]][[elem]]
       if (is.null(x) || !nrow(x)) next
       x <- as.data.frame(x)
       x$genome_build <- b
+      if (!is.null(dk)) {
+        before <- nrow(x)
+        x <- dplyr::distinct(x, dplyr::across(dplyr::all_of(dk)), .keep_all = TRUE)
+        if (nrow(x) < before) {
+          message(sprintf("[write_mutations_db] %s/%s: dropped %d duplicate row(s)",
+                          elem, b, before - nrow(x)))
+        }
+      }
       DBI::dbWriteTable(con, elem, x, append = !first, overwrite = first)
       total <- total + nrow(x)
       first <- FALSE
@@ -49,26 +83,27 @@ write_mutations_db <- function(sample_data,
     "CREATE INDEX idx_maf_pos     ON maf(genome_build, Chromosome, Start_Position)",
     "CREATE INDEX idx_maf_sample  ON maf(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_maf_pipe    ON maf(Pipeline)",
-    "CREATE INDEX idx_maf_study   ON maf(Study)",
     "CREATE INDEX idx_ashm_pos    ON ashm(genome_build, Chromosome, Start_Position)",
     "CREATE INDEX idx_ashm_sample ON ashm(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_seg_sample  ON seg(genome_build, ID)",
     "CREATE INDEX idx_seg_pos     ON seg(genome_build, chrom, start)",
     "CREATE INDEX idx_bedpe_sample ON bedpe(tumour_sample_id)",
     "CREATE INDEX idx_meta_sample  ON sample_meta(sample_id)",
-    "CREATE INDEX idx_meta_barcode ON sample_meta(Tumor_Sample_Barcode)"
+    "CREATE INDEX idx_meta_barcode ON sample_meta(Tumor_Sample_Barcode)",
+    "CREATE INDEX idx_study_sample ON sample_study(sample_id)",
+    "CREATE INDEX idx_study_study  ON sample_study(study)"
   )
   for (stmt in idx) try(DBI::dbExecute(con, stmt), silent = TRUE)
 
   # self-describing provenance / expected-counts table (used by the tests)
   DBI::dbWriteTable(con, "build_info", data.frame(
     key = c("source", "built_at", "builder",
-            "n_maf", "n_ashm", "n_seg", "n_bedpe", "n_samples"),
+            "n_maf", "n_ashm", "n_seg", "n_bedpe", "n_samples", "n_sample_study"),
     value = c(source_desc,
               format(Sys.time(), tz = "UTC", usetz = TRUE),
               "write_mutations_db",
               counts[["maf"]], counts[["ashm"]], counts[["seg"]],
-              counts[["bedpe"]], nrow(sample_data$meta)),
+              counts[["bedpe"]], nrow(sample_data$meta), n_sample_study),
     stringsAsFactors = FALSE
   ), overwrite = TRUE)
 

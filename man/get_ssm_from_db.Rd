@@ -33,7 +33,14 @@ get_ssm_from_db(
 
 \item{min_read_support}{Keep only variants with \code{t_alt_count} >= this value.}
 
-\item{this_study}{Optional single \code{Study} to restrict to.}
+\item{this_study}{Optional single study to restrict to, matched against
+\code{sample_study$study} (not a \code{maf}/\code{ashm} column -- see
+\code{\link[=gambl_mutations_db]{gambl_mutations_db()}}'s schema docs). Resolves to the set of sample_ids
+belonging to that study, intersected with \code{sample_ids} if both are
+supplied; composes with \code{tool_name}/Pipeline exactly as before (e.g.
+\code{this_study="Reddy"} alone returns Reddy's SLMS-3 recall by default,
+while \verb{this_study="Reddy", tool_name="publication"} returns Reddy's
+as-published rows only).}
 
 \item{regions}{Optional data frame with columns \code{chrom}, \code{start}, \code{end}; rows
 are OR-ed (each region is an indexed range scan).}

@@ -13,7 +13,14 @@
 #' @param coding_only When TRUE, keep only coding `Variant_Classification`s.
 #' @param include_silent When FALSE (and `coding_only`), drop Silent mutations.
 #' @param min_read_support Keep only variants with `t_alt_count` >= this value.
-#' @param this_study Optional single `Study` to restrict to.
+#' @param this_study Optional single study to restrict to, matched against
+#'   `sample_study$study` (not a `maf`/`ashm` column -- see
+#'   [gambl_mutations_db()]'s schema docs). Resolves to the set of sample_ids
+#'   belonging to that study, intersected with `sample_ids` if both are
+#'   supplied; composes with `tool_name`/Pipeline exactly as before (e.g.
+#'   `this_study="Reddy"` alone returns Reddy's SLMS-3 recall by default,
+#'   while `this_study="Reddy", tool_name="publication"` returns Reddy's
+#'   as-published rows only).
 #' @param regions Optional data frame with columns `chrom`, `start`, `end`; rows
 #'   are OR-ed (each region is an indexed range scan).
 #' @param con Optional DBI connection (defaults to [gambl_mutations_db()]).
@@ -35,12 +42,27 @@ get_ssm_from_db <- function(projection = "grch37",
   cc <- if (include_silent) coding_class else coding_class[coding_class != "Silent"]
   tn <- if (!is.null(tool_name)) tolower(tool_name) else NULL
 
+  # this_study resolves to sample_ids via a join against sample_study, done
+  # once here rather than as a per-query filter inside base_query() -- reuses
+  # the existing sample_ids/Tumor_Sample_Barcode machinery below instead of
+  # requiring maf/ashm to carry their own Study column (they don't; see
+  # gambl_mutations_db()'s schema docs), and keeps this_study (which
+  # samples) and tool_name/Pipeline (which rows for those samples) composable
+  # exactly as they were.
+  if (!is.null(this_study)) {
+    study_sample_ids <- dplyr::tbl(con, "sample_study") %>%
+      dplyr::filter(study == this_study) %>%
+      dplyr::distinct(sample_id) %>%
+      dplyr::pull(sample_id)
+    sample_ids <- if (is.null(sample_ids)) study_sample_ids
+                  else intersect(sample_ids, study_sample_ids)
+  }
+
   # apply the filters that are common to a single (table, region) query
   base_query <- function(table_name, region = NULL) {
     q <- dplyr::tbl(con, table_name) %>%
       dplyr::filter(genome_build == projection)
     if (!is.null(tn))            q <- dplyr::filter(q, tolower(Pipeline) == tn)
-    if (!is.null(this_study))    q <- dplyr::filter(q, Study == this_study)
     if (coding_only)             q <- dplyr::filter(q, Variant_Classification %in% cc)
     if (min_read_support > 0)    q <- dplyr::filter(q, t_alt_count >= min_read_support)
     if (!is.null(sample_ids))    q <- dplyr::filter(q, Tumor_Sample_Barcode %in% sample_ids)
