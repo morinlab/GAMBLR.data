@@ -69,8 +69,11 @@ all_cols <- c(
     maf_columns_to_keep
 )
 
-# restrict to the most inclusive DLBCL gene list
-all_lymphoma_genes <- lymphoma_genes_comprehensive$Gene
+# restrict to the most inclusive DLBCL gene list. Expanded to include known
+# aliases (e.g. old/new HGNC histone names) so the Hugo_Symbol %in%
+# all_lymphoma_genes filters below don't drop rows annotated under a gene's
+# other name.
+all_lymphoma_genes <- GAMBLR.utils::expand_gene_aliases(lymphoma_genes_comprehensive$Gene)
 
 # Built once, reused by every get_ssm_by_regions() call below that wants only
 # lymphoma-gene mutations. Restricting via tabix -R (region) instead of
