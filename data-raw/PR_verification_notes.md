@@ -59,3 +59,21 @@ All structural/integrity checks passed:
 - [ ] Confirm Dreval×Hilton overlap samples (`05-32150T`, `08-15460T`, `09-33003T`, `15-13383T`, `17-36275T`) show 2 `sample_study` rows each and roughly halved mutation counts vs. the old bundle.
 - [ ] Confirm Arthur's `maf` rows are gene-panel-restricted (~150-237 distinct genes, not 65,121) and now have hg38 + aSHM coverage.
 - [ ] Functional check: `get_ssm_from_db(this_study = "Reddy")` / `GAMBLR.open::get_ssm_by_region(this_study = "Reddy", ...)` against the real DB.
+
+## Fix: `study_id` used `patient_id` instead of `sample_id` for Thomas/Dreval/Hilton
+
+Caught in review (not by the automated checks above): the first pass at
+populating `sample_study$study_id` used `patient_id` for Thomas BL, Thomas
+DLBCL, Dreval, and Hilton. For Hilton specifically this is a real bug, not
+just imprecision -- Hilton is a trios study, so a single patient can have
+multiple samples (e.g. `LY_RELY_116_tumorA` and `LY_RELY_116_tumorB`), and
+`patient_id` collapsed both to the same `study_id`, making the two
+`sample_study` rows ambiguous. Thomas/Dreval don't currently have that
+ambiguity in practice, but the same fix applies for consistency: all four
+now use `sample_id` (already sourced from each xlsx's own "Genome sample
+id"/`DNAseq_sample_id` column, i.e. already the closest thing to a
+study-native sample-level identifier) instead of `patient_id`. Arthur and
+Reddy were left unchanged -- Arthur's block already excludes
+`tumor`-suffixed sample_ids per patient (structurally safe from the same
+ambiguity), and Reddy's `study_id` comes from the paper's own distinct
+"Sample ID" column, already 1:1 with `sample_id`.

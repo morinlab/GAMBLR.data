@@ -217,10 +217,15 @@ bl_data$cnv_to_bundle <- read_xlsx(
     filter(ID %in% bl_data$meta_to_bundle$sample_id) %>%
 	mutate(CN = round(2 * 2^log.ratio))
 
+# study_id mirrors sample_id here (not patient_id): the xlsx's own
+# "Genome sample id" column was already adopted directly as sample_id, and
+# patient_id is patient-level, not sample-level -- ambiguous for any cohort
+# where a patient could have more than one sample (see hilton_study below
+# for a case where that ambiguity is real).
 thomas_bl_study <- data.frame(
     sample_id = bl_data$meta_to_bundle$sample_id,
     study = "Thomas",
-    study_id = as.character(bl_data$meta_to_bundle$patient_id),
+    study_id = as.character(bl_data$meta_to_bundle$sample_id),
     reference_PMID = pmids$Thomas_BL
 )
 
@@ -278,10 +283,11 @@ fl_data$cnv_to_bundle <- read_xlsx(
     ) %>%
     mutate(CN = round(2 * 2^log.ratio))
 
+# study_id mirrors sample_id, not patient_id -- see thomas_bl_study above.
 dreval_study <- data.frame(
     sample_id = fl_data$meta_to_bundle$sample_id,
     study = "Dreval",
-    study_id = as.character(fl_data$meta_to_bundle$patient_id),
+    study_id = as.character(fl_data$meta_to_bundle$sample_id),
     reference_PMID = pmids$Dreval_FL
 )
 
@@ -336,10 +342,11 @@ dlbcl_data$cnv_to_bundle <- read_xlsx(
     filter(ID %in% dlbcl_data$meta_to_bundle$sample_id) %>%
 	mutate(CN = round(2 * 2^log.ratio))
 
+# study_id mirrors sample_id, not patient_id -- see thomas_bl_study above.
 thomas_dlbcl_study <- data.frame(
     sample_id = dlbcl_data$meta_to_bundle$sample_id,
     study = "Thomas",
-    study_id = as.character(dlbcl_data$meta_to_bundle$patient_id),
+    study_id = as.character(dlbcl_data$meta_to_bundle$sample_id),
     reference_PMID = pmids$Thomas_BL
 )
 
@@ -578,13 +585,16 @@ trios_meta <- get_gambl_metadata() %>%
         reference_PMID = pmids$Hilton_DLBCL
     )
 
-# Unlike Thomas/Dreval/Reddy/Arthur, trios_meta comes straight from
-# get_gambl_metadata(), so GAMBL's real patient_id is already correct here --
-# used directly as study_id.
+# study_id uses sample_id, not patient_id: Hilton is a trios study, so a
+# single patient can have multiple samples (e.g. LY_RELY_116_tumorA and
+# LY_RELY_116_tumorB) -- patient_id would collapse them to the same
+# study_id, making the two rows ambiguous. sample_id already carries the
+# distinguishing suffix and matches what the paper itself would call each
+# sample.
 hilton_study <- data.frame(
     sample_id = trios_meta$sample_id,
     study = "Hilton",
-    study_id = as.character(trios_meta$patient_id),
+    study_id = as.character(trios_meta$sample_id),
     reference_PMID = pmids$Hilton_DLBCL
 )
 
