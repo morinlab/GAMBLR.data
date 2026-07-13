@@ -77,6 +77,33 @@ Separate, pre-existing GAMBLR.open UX gap worth considering independently
 of this PR: neither function warns when the `seq_type` filter drops every
 row, so this fails silently rather than with a clear message.
 
+## Fix: Arthur's Case ID -> patient_id matching, and a `!grepl("tumor", ...)` filter that dropped multi-sample patients entirely
+
+`compare_bundle_changes.R` showed some patients losing 100% of their SNVs
+with zero retention (e.g. patient `08-15460`: 19,897 lost, 0 retained --
+found via `egrep "Tumor_Sa|05-32150|08-15460" snv_persample_counts.tsv`).
+Confirmed as an Arthur-specific bug, two compounding causes:
+
+1. `arthur_meta` matched Arthur's own "Case ID" (from `DLBCL_Arthur.xlsx`)
+   against GAMBL's `patient_id` via `patient_id %in% arthur_case_ids$\`Case ID\``.
+   Same class of bug as the `study_id` chr/dbl mismatch fixed earlier:
+   `read_xlsx()` can silently type a leading-zero ID like `08-15460` as
+   numeric, and a numeric-vs-character `%in%` comparison fails to match
+   without any error or warning. Fixed by coercing both sides to character
+   and using an explicit `inner_join()` instead of a `%in%` filter.
+2. The block also had `! grepl("tumor", sample_id)`, which excludes every
+   sample for any patient with more than one tumor biopsy (e.g.
+   `..._tumorA`/`..._tumorB` -- the same multi-sample-per-patient pattern
+   Hilton has). For a patient whose *only* GAMBL samples are tumor-suffixed,
+   this filter matched nothing, dropping their SLMS-3 coverage entirely. No
+   other cohort in this script excludes samples this way, and no comment
+   explained the original intent -- removed.
+
+Still need to: rebuild with this fix and re-run `compare_bundle_changes.R`
+to confirm the 100%-loss patients are resolved, and re-check whether this
+also explains the `DO52686`/`07-35482`-style samples from the earlier,
+larger (3.1M row) loss count.
+
 ## Fix: `study_id` used `patient_id` instead of `sample_id` for Thomas/Dreval/Hilton
 
 Caught in review (not by the automated checks above): the first pass at

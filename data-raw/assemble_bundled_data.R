@@ -537,22 +537,35 @@ cell_lines_data$hg38$cnv_to_bundle <- get_cn_segments(
 # ~137 for a properly gene-panel-restricted SLMS-3 sample. That block is
 # removed entirely; Arthur's samples now flow through the same consolidated
 # SLMS-3 pull as every other cohort (Phase 4).
+# Case ID -> patient_id is done as an explicit join (not a
+# `patient_id %in% arthur_case_ids$\`Case ID\`` filter) so a type mismatch
+# between the xlsx's Case ID and GAMBL's patient_id (e.g. numeric vs
+# character -- the same class of bug already fixed for study_id/Reddy's
+# Sample ID elsewhere in this script; read_xlsx() can silently type a
+# leading-zero ID like "08-15460" as numeric) can't silently drop matching
+# patients from a %in% comparison. transmute() keeps only what's needed for
+# the join, since nothing else from this sheet is used downstream.
 arthur_case_ids <- read_xlsx(
     "inst/extdata/studies/DLBCL_Arthur.xlsx",
     sheet = 1
-) %>% filter(`WGS data` == 1)
+) %>% filter(`WGS data` == 1) %>%
+    transmute(patient_id = as.character(`Case ID`))
 
 # sample_id/Tumor_Sample_Barcode are GAMBL's own real values throughout --
 # never overwritten to the paper's own patient-level ID (as the removed
 # code used to do). Arthur's own "Case ID" is captured separately as
 # study_id in arthur_study below, joined to metadata by sample_id like any
 # other study-specific identifier.
+#
+# No `!grepl("tumor", sample_id)` filter here (the previous version of this
+# block had one): it excluded every sample for any patient with more than
+# one tumor biopsy (e.g. ..._tumorA/..._tumorB -- the same multi-sample-
+# per-patient pattern Hilton has), dropping those patients' SLMS-3 coverage
+# entirely. No other cohort in this script excludes samples this way.
 arthur_meta <- get_gambl_metadata() %>%
-    filter(
-        patient_id %in% arthur_case_ids$`Case ID`,
-        seq_type == "genome",
-        ! grepl("tumor", sample_id)
-    ) %>%
+    mutate(patient_id = as.character(patient_id)) %>%
+    inner_join(arthur_case_ids, by = "patient_id") %>%
+    filter(seq_type == "genome") %>%
     mutate(
         cohort = "DLBCL_Arthur",
         reference_PMID = pmids$Arthur_DLBCL
