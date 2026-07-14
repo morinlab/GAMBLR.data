@@ -75,6 +75,14 @@ all_cols <- c(
 # other name.
 all_lymphoma_genes <- GAMBLR.utils::expand_gene_aliases(lymphoma_genes_comprehensive$Gene)
 
+# Captured once, up front -- referenced by pull_data()'s diagnostics below.
+# GAMBLR.data:::coding_class is a lazy-loaded internal object; reading it on
+# every pull_data() call (deep into Phase 4) instead of once here means any
+# mid-run change to the installed GAMBLR.data package (e.g. a concurrent
+# devtools::install()) can hit a missing/replaced .rdb file well after this
+# script started, rather than failing fast at startup if at all.
+diag_coding_class <- GAMBLR.data:::coding_class
+
 # Built once, reused by every get_ssm_by_regions() call below that wants only
 # lymphoma-gene mutations. Restricting via tabix -R (region) instead of
 # pulling every mutation for a sample set is the performance win; every call
@@ -161,7 +169,7 @@ pull_data <- function(
         print(utils::head(probs, 20))
     }
     diag_summary_maf(raw, paste0(call_label, ": raw, pre Hugo_Symbol filter, all Variant_Classifications"))
-    diag_summary_maf(raw %>% filter(Variant_Classification %in% GAMBLR.data:::coding_class),
+    diag_summary_maf(raw %>% filter(Variant_Classification %in% diag_coding_class),
                       paste0(call_label, ": raw, pre Hugo_Symbol filter, coding-classified only"))
 
     slms3 <- raw %>%
@@ -171,7 +179,7 @@ pull_data <- function(
     )
 
     diag_summary_maf(slms3, paste0(call_label, ": final, post Hugo_Symbol filter, all Variant_Classifications"))
-    diag_summary_maf(slms3 %>% filter(Variant_Classification %in% GAMBLR.data:::coding_class),
+    diag_summary_maf(slms3 %>% filter(Variant_Classification %in% diag_coding_class),
                       paste0(call_label, ": final, post Hugo_Symbol filter, coding-classified only"))
 
     return(slms3)
