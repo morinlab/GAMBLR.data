@@ -1019,10 +1019,12 @@ all_slms3_meta <- get_gambl_metadata() %>%
 # those samples goes to zero downstream. diag_missing() catches this by name
 # instead of leaving it to be inferred later from a low mutation count.
 diag_missing(pre_refetch_ids, all_slms3_meta$sample_id, "all_slms3_meta live-metadata refetch (sample_ids dropped because live get_gambl_metadata() doesn't have them)")
-# study isn't in all_slms3_meta itself (it comes straight from
-# get_gambl_metadata(), which has no such column) -- join sample_study just
-# for this diagnostic so the breakdown is by study, not left un-grouped.
-diag_summary_maf(all_slms3_meta %>% rename(Tumor_Sample_Barcode = sample_id), "all_slms3_meta (post live-metadata refetch -- what Phase 4 actually pulls for)")
+# study isn't in all_slms3_meta itself -- join sample_study just for this
+# diagnostic so the breakdown is by study, not left un-grouped. Drop the
+# existing (unrelated) Tumor_Sample_Barcode column first: get_gambl_metadata()
+# already returns one alongside sample_id, so renaming sample_id would
+# otherwise collide with it.
+diag_summary_maf(all_slms3_meta %>% select(-any_of("Tumor_Sample_Barcode")) %>% rename(Tumor_Sample_Barcode = sample_id), "all_slms3_meta (post live-metadata refetch -- what Phase 4 actually pulls for)")
 
 slms3_grch37 <- bind_rows(
     time_it("SLMS-3 genome grch37", pull_data(all_slms3_meta %>% filter(seq_type == "genome"))),
@@ -1086,7 +1088,7 @@ ashm_pull_meta <- get_gambl_metadata() %>%
     filter(sample_id %in% sample_data$meta$sample_id)
 
 diag_missing(sample_data$meta$sample_id, ashm_pull_meta$sample_id, "ashm_pull_meta live-metadata refetch (sample_ids dropped because live get_gambl_metadata() doesn't have them)")
-diag_summary_maf(ashm_pull_meta %>% rename(Tumor_Sample_Barcode = sample_id), "ashm_pull_meta (what Phase 5 actually pulls for)")
+diag_summary_maf(ashm_pull_meta %>% select(-any_of("Tumor_Sample_Barcode")) %>% rename(Tumor_Sample_Barcode = sample_id), "ashm_pull_meta (what Phase 5 actually pulls for)")
 
 regions_bed_grch37 <- create_bed_data(
     grch37_ashm_regions,
