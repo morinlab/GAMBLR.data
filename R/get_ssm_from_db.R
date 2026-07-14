@@ -36,7 +36,8 @@
 #'   doesn't cost hundreds of separate round trips.
 #' @param con Optional DBI connection (defaults to [gambl_mutations_db()]).
 #'
-#' @return A data frame of MAF rows (the `genome_build` helper column is dropped).
+#' @return A data frame of MAF rows (the `genome_build`/`mutation_id` helper
+#'   columns are dropped).
 #'
 #' @export
 get_ssm_from_db <- function(projection = "grch37",
@@ -73,14 +74,14 @@ get_ssm_from_db <- function(projection = "grch37",
   # cohort's own published maf and our SLMS-3 recall both calling the same
   # position) only has room for one Pipeline value on its single maf/ashm
   # row -- write_mutations_db() picks one arbitrarily when it deduplicates.
-  # variant_pipeline (sample_id/Chromosome/Start_Position/End_Position/
-  # Tumor_Seq_Allele2/genome_build, Pipeline) records every pipeline that
-  # actually produced each variant, so tool_name is resolved against it via a
-  # semi-join instead of the maf/ashm row's own (possibly-not-representative)
-  # Pipeline value. Falls back to the old direct-column filter against DBs
-  # built before this table existed.
+  # variant_pipeline (mutation_id, elem, Pipeline) records every pipeline
+  # that actually produced each variant, keyed on the surrogate mutation_id
+  # surviving rows are assigned at write time (not the 5-column natural key
+  # -- see write_mutations_db.R for why), so tool_name is resolved against
+  # it via a single-column semi-join instead of the maf/ashm row's own
+  # (possibly-not-representative) Pipeline value. Falls back to the old
+  # direct-column filter against DBs built before this table existed.
   has_variant_pipeline <- !is.null(tn) && "variant_pipeline" %in% DBI::dbListTables(con)
-  variant_key_cols <- c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2")
 
   # apply the filters that are common to every query against this table,
   # regardless of how many regions (if any) are requested
@@ -89,10 +90,10 @@ get_ssm_from_db <- function(projection = "grch37",
       dplyr::filter(genome_build == projection)
     if (!is.null(tn)) {
       if (has_variant_pipeline) {
-        matching_keys <- dplyr::tbl(con, "variant_pipeline") %>%
-          dplyr::filter(elem == table_name, genome_build == projection, Pipeline == tn) %>%
-          dplyr::distinct(dplyr::across(dplyr::all_of(variant_key_cols)))
-        q <- dplyr::semi_join(q, matching_keys, by = variant_key_cols)
+        matching_ids <- dplyr::tbl(con, "variant_pipeline") %>%
+          dplyr::filter(elem == table_name, Pipeline == tn) %>%
+          dplyr::distinct(mutation_id)
+        q <- dplyr::semi_join(q, matching_ids, by = "mutation_id")
       } else {
         q <- dplyr::filter(q, Pipeline == tn)
       }
@@ -132,5 +133,6 @@ get_ssm_from_db <- function(projection = "grch37",
   res <- gather("maf")
   if (include_ashm) res <- dplyr::bind_rows(res, gather("ashm"))
   res$genome_build <- NULL
+  res$mutation_id <- NULL
   res
 }

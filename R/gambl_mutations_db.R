@@ -26,13 +26,13 @@
 #'
 #' | Table | Rows (typical) | Grain | Key columns |
 #' | --- | --- | --- | --- |
-#' | `maf` | ~3.6M | one somatic mutation call | `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. `"slms-3"`/`"publication"` -- normalized at write time so it can be matched with a plain, indexed equality), genome_build` (+ ~35 more MAF-standard columns) |
-#' | `ashm` | ~135k | one mutation call in an aSHM region | same schema as `maf` |
+#' | `maf` | ~3.6M | one somatic mutation call | `mutation_id` (surrogate integer key, unique within `maf` across both genome builds -- assigned at write time, after deduplication; `variant_pipeline` references it as a foreign key), `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. `"slms-3"`/`"publication"` -- normalized at write time so it can be matched with a plain, indexed equality), genome_build` (+ ~35 more MAF-standard columns) |
+#' | `ashm` | ~135k | one mutation call in an aSHM region | same schema as `maf` (its own independent `mutation_id` sequence) |
 #' | `seg` | ~126k | one copy-number segment | `ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build` |
 #' | `bedpe` | ~900 | one Manta structural-variant breakpoint pair | `CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build` |
 #' | `sample_meta` | ~3.3k | one sample | `patient_id, sample_id, Tumor_Sample_Barcode, seq_type, pathology, cohort, study, ...` (its own `genome_build` column records the sample's native alignment build, unrelated to the per-row build stamp used in the other tables) |
 #' | `sample_study` | varies | one (sample, study) membership fact -- many-to-many, a sample belonging to N studies is N rows | `sample_id, study, study_id, reference_PMID`. `study_id` is that study's own identifier for the sample where it differs from GAMBL's `sample_id` (e.g. a paper's own case/patient ID); NA where no study-specific ID has been sourced. |
-#' | `variant_pipeline` | varies | one (variant, Pipeline) fact -- many-to-many, a variant independently called by N pipelines is N rows | `Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, Tumor_Seq_Allele2, genome_build, elem, Pipeline`. `elem` is `"maf"` or `"ashm"`, identifying which table the variant belongs to. |
+#' | `variant_pipeline` | varies | one (mutation, Pipeline) fact -- many-to-many, a variant independently called by N pipelines is N rows | `mutation_id, elem, Pipeline`. `mutation_id` is a foreign key to `maf.mutation_id` or `ashm.mutation_id` depending on `elem` (`"maf"` or `"ashm"`) -- not a natural key, so this table doesn't repeat the variant's own position/sample columns. |
 #' | `build_info` | 10 | key/value | provenance (`source`, `built_at`, `builder`) and expected row counts (`n_maf`, `n_ashm`, `n_seg`, `n_bedpe`, `n_samples`, `n_sample_study`, `n_variant_pipeline`) used by the `data-raw/test_gambl_db.R` regression checks |
 #'
 #' `maf`/`ashm` do NOT carry a `Study` column. Cohort/study membership is
@@ -60,13 +60,13 @@
 #' `maf`, `ashm`, and `bedpe` (via `tumour_sample_id`) key to
 #' `sample_meta$Tumor_Sample_Barcode` / `sample_meta$sample_id`; `seg$ID` keys
 #' to `sample_meta$sample_id`; `sample_study$sample_id` keys to
-#' `sample_meta$sample_id`; `variant_pipeline` keys to `maf`/`ashm` (per
-#' `elem`) on `Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position,
-#' Tumor_Seq_Allele2, genome_build`.
+#' `sample_meta$sample_id`; `variant_pipeline$mutation_id` keys to
+#' `maf.mutation_id` or `ashm.mutation_id`, selecting which one via
+#' `variant_pipeline$elem`.
 #'
 #' ## Indexes
 #' `maf`/`ashm`: `(genome_build, Chromosome, Start_Position)`,
-#' `Tumor_Sample_Barcode`, `Pipeline` (maf only). No index on
+#' `Tumor_Sample_Barcode`, `Pipeline`, `mutation_id`. No index on
 #' `Hugo_Symbol`: gene-restricted queries resolve the gene to a region first
 #' (the same logic used to populate these tables) and filter on
 #' `(genome_build, Chromosome, Start_Position)` instead -- see
@@ -76,8 +76,8 @@
 #' CHROM_B, START_B)` (one per breakpoint end, so a region search that OR's
 #' both ends can use a different index per side).
 #' `sample_meta`: `sample_id`, `Tumor_Sample_Barcode`. `sample_study`:
-#' `sample_id`, `study`. `variant_pipeline`: `Tumor_Sample_Barcode`,
-#' `(elem, genome_build, Pipeline)`.
+#' `sample_id`, `study`. `variant_pipeline`: `mutation_id`,
+#' `(elem, Pipeline)`.
 #'
 #' @param db_path Optional explicit path to the .db file.
 #'

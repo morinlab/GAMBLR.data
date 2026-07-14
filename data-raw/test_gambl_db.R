@@ -49,14 +49,13 @@ for (t in c("maf","ashm","seg","bedpe"))
 
 cat("\n== required columns present (what the accessors filter on) ==\n")
 req <- list(
-  maf   = c("Chromosome","Start_Position","End_Position","Tumor_Sample_Barcode",
+  maf   = c("mutation_id","Chromosome","Start_Position","End_Position","Tumor_Sample_Barcode",
             "Pipeline","Hugo_Symbol","Variant_Classification","t_alt_count","genome_build"),
   seg   = c("ID","chrom","start","end","CN","genome_build"),
   bedpe = c("tumour_sample_id","CHROM_A","START_A","CHROM_B","START_B","VAF_tumour","SCORE","FILTER","genome_build"),
   sample_meta = c("sample_id","Tumor_Sample_Barcode","seq_type","study"),
   sample_study = c("sample_id","study","study_id","reference_PMID"),
-  variant_pipeline = c("Tumor_Sample_Barcode","Chromosome","Start_Position","End_Position",
-                       "Tumor_Seq_Allele2","genome_build","elem","Pipeline")
+  variant_pipeline = c("mutation_id","elem","Pipeline")
 )
 for (t in names(req)) if (t %in% tbls) {
   missing <- setdiff(req[[t]], cols(t))
@@ -72,11 +71,11 @@ cat("\n== indexes present ==\n")
 # this check always failed regardless of any other change. Fixed here to
 # assert indexes that actually exist.
 idx <- dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='index'")$name
-for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_pipe","idx_maf_variant_key",
-            "idx_ashm_variant_key","idx_seg_sample",
+for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_pipe","idx_maf_mutation_id",
+            "idx_ashm_mutation_id","idx_seg_sample",
             "idx_bedpe_sample","idx_bedpe_pos_a","idx_bedpe_pos_b",
             "idx_study_sample","idx_study_study",
-            "idx_vp_sample","idx_vp_pipe","idx_vp_variant_key"))
+            "idx_vp_pipe","idx_vp_mutation_id"))
   check(i %in% idx, sprintf("index %s", i))
 
 cat("\n== pipelines present ==\n")

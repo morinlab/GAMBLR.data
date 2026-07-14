@@ -51,18 +51,27 @@ write_mutations_db <- function(sample_data,
     ashm = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2")
   )
 
-  # variant_pipeline: many-to-many bridge table (variant key, Pipeline),
-  # same pattern as sample_study (sample_id, study). A single Pipeline column
-  # on maf/ashm can only hold one value per variant, but the same real
-  # mutation can legitimately be produced by more than one pipeline (e.g. a
-  # cohort's own published/curated maf and our independent SLMS-3 recall
-  # both calling the same position) -- when that happens the dedup below
-  # collapses them to one row keyed on whichever pipeline came first in
-  # sample_data[[b]][[elem]], silently making the call invisible to a
-  # tool_name-filtered query for the other pipeline even though the variant
-  # itself is still fully present in the table. Captured here, before dedup,
-  # so no pipeline's claim to a variant is ever lost regardless of which row
+  # variant_pipeline: many-to-many bridge table (mutation_id, Pipeline), same
+  # pattern as sample_study (sample_id, study). A single Pipeline column on
+  # maf/ashm can only hold one value per variant, but the same real mutation
+  # can legitimately be produced by more than one pipeline (e.g. a cohort's
+  # own published/curated maf and our independent SLMS-3 recall both calling
+  # the same position) -- when that happens the dedup below collapses them
+  # to one row, silently making the call invisible to a tool_name-filtered
+  # query for the other pipeline even though the variant itself is still
+  # fully present in the table. Captured here, before dedup, so no
+  # pipeline's claim to a variant is ever lost regardless of which row
   # "wins" as maf/ashm's single representative copy.
+  #
+  # mutation_id is a surrogate integer key assigned to each deduped maf/ashm
+  # row (unique within an elem, across both genome builds), and
+  # variant_pipeline references it as a plain foreign key instead of
+  # repeating the 5-column natural key on every row. Matching pre-dedup
+  # pipeline claims back to their surviving row still requires the natural
+  # key -- that cost doesn't disappear, it just moves here, to a one-time
+  # write-time join, instead of every read-time query in get_ssm_from_db()
+  # having to join on a 5-column composite (two of them text) instead of a
+  # single indexed integer column.
   variant_pipeline_rows <- list()
 
   # genome-build-stamped frames; append per build to keep peak memory low
@@ -70,31 +79,39 @@ write_mutations_db <- function(sample_data,
     first <- TRUE
     total <- 0L
     dk <- dedup_keys[[elem]]
+    next_id <- 1L
     for (b in builds) {
       x <- sample_data[[b]][[elem]]
       if (is.null(x) || !nrow(x)) next
       x <- as.data.frame(x)
       x$genome_build <- b
       # Normalized to lowercase here, once, at the write boundary -- so
-      # every reader (get_ssm_from_db(), raw SQL, this build's own
-      # variant_pipeline capture below) can match Pipeline with a plain
-      # equality against a plain index, instead of every query needing to
-      # wrap the column in LOWER()/tolower() (which a normal b-tree index
+      # every reader (get_ssm_from_db(), raw SQL) can match Pipeline with a
+      # plain equality against a plain index, instead of every query needing
+      # to wrap the column in LOWER()/tolower() (which a normal b-tree index
       # can't be used to satisfy).
       if ("Pipeline" %in% names(x)) x$Pipeline <- tolower(x$Pipeline)
-      if (!is.null(dk) && "Pipeline" %in% names(x)) {
-        variant_pipeline_rows[[length(variant_pipeline_rows) + 1]] <<- x %>%
-          dplyr::select(dplyr::all_of(dk), genome_build, Pipeline) %>%
-          dplyr::distinct() %>%
-          dplyr::mutate(elem = elem)
-      }
+
       if (!is.null(dk)) {
         before <- nrow(x)
-        x <- dplyr::distinct(x, dplyr::across(dplyr::all_of(dk)), .keep_all = TRUE)
-        if (nrow(x) < before) {
+        deduped <- dplyr::distinct(x, dplyr::across(dplyr::all_of(dk)), .keep_all = TRUE)
+        if (nrow(deduped) < before) {
           message(sprintf("[write_mutations_db] %s/%s: dropped %d duplicate row(s)",
-                          elem, b, before - nrow(x)))
+                          elem, b, before - nrow(deduped)))
         }
+        deduped$mutation_id <- seq.int(next_id, length.out = nrow(deduped))
+        next_id <- next_id + nrow(deduped)
+
+        if ("Pipeline" %in% names(x)) {
+          id_lookup <- deduped %>% dplyr::select(dplyr::all_of(dk), mutation_id)
+          variant_pipeline_rows[[length(variant_pipeline_rows) + 1]] <<- x %>%
+            dplyr::select(dplyr::all_of(dk), Pipeline) %>%
+            dplyr::distinct() %>%
+            dplyr::inner_join(id_lookup, by = dk) %>%
+            dplyr::select(mutation_id, Pipeline) %>%
+            dplyr::mutate(elem = elem)
+        }
+        x <- deduped
       }
       DBI::dbWriteTable(con, elem, x, append = !first, overwrite = first)
       total <- total + nrow(x)
@@ -118,20 +135,19 @@ write_mutations_db <- function(sample_data,
   # Pipeline is normalized to lowercase above, at write time, so readers
   # (get_ssm_from_db(), raw SQL) can match it with a plain equality instead
   # of wrapping the column in LOWER()/tolower(), which a normal b-tree index
-  # can't be used to satisfy. idx_*_variant_key give the variant_pipeline
+  # can't be used to satisfy. idx_*_mutation_id give the variant_pipeline
   # semi-join (in get_ssm_from_db()'s tool_name resolution) an index to
   # actually use on both sides of the join -- without one, that join has to
   # scan maf/ashm in full for every query with a non-NULL tool_name (the
   # default), which is most of them.
-  variant_key_ddl <- "Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, Tumor_Seq_Allele2"
   idx <- c(
     "CREATE INDEX idx_maf_pos     ON maf(genome_build, Chromosome, Start_Position)",
     "CREATE INDEX idx_maf_sample  ON maf(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_maf_pipe    ON maf(Pipeline)",
-    sprintf("CREATE INDEX idx_maf_variant_key ON maf(%s)", variant_key_ddl),
+    "CREATE INDEX idx_maf_mutation_id ON maf(mutation_id)",
     "CREATE INDEX idx_ashm_pos    ON ashm(genome_build, Chromosome, Start_Position)",
     "CREATE INDEX idx_ashm_sample ON ashm(Tumor_Sample_Barcode)",
-    sprintf("CREATE INDEX idx_ashm_variant_key ON ashm(%s)", variant_key_ddl),
+    "CREATE INDEX idx_ashm_mutation_id ON ashm(mutation_id)",
     "CREATE INDEX idx_seg_sample  ON seg(genome_build, ID)",
     "CREATE INDEX idx_seg_pos     ON seg(genome_build, chrom, start)",
     # bedpe previously only had an index on tumour_sample_id alone -- every
@@ -151,9 +167,8 @@ write_mutations_db <- function(sample_data,
     "CREATE INDEX idx_meta_barcode ON sample_meta(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_study_sample ON sample_study(sample_id)",
     "CREATE INDEX idx_study_study  ON sample_study(study)",
-    "CREATE INDEX idx_vp_sample ON variant_pipeline(Tumor_Sample_Barcode)",
-    "CREATE INDEX idx_vp_pipe   ON variant_pipeline(elem, genome_build, Pipeline)",
-    sprintf("CREATE INDEX idx_vp_variant_key ON variant_pipeline(%s)", variant_key_ddl)
+    "CREATE INDEX idx_vp_pipe   ON variant_pipeline(elem, Pipeline)",
+    "CREATE INDEX idx_vp_mutation_id ON variant_pipeline(mutation_id)"
   )
   for (stmt in idx) try(DBI::dbExecute(con, stmt), silent = TRUE)
 
