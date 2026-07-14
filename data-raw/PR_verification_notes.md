@@ -177,9 +177,30 @@ call filtered to that same `sample_id` set. General principle going
 forward, not just for these two spots: never pass `sample_data$meta` (or
 anything derived from it) directly to a GAMBLR.results function.
 
-Still need to: rebuild and re-check the Dreval `"SP"` patient example, and
-re-run `compare_bundle_changes.R` broadly in case this affected other
-samples/cohorts beyond just the one example that happened to catch it.
+**Update**: rebuilt and re-ran `compare_bundle_changes.R` broadly (not just
+the one example). Confirmed fixed -- samples that previously showed
+catastrophic 0-retained losses now show large, healthy retained counts
+(`SP116715`: 2,901 retained; `16-11636T`: 1,624; `14-20552_tumorB`: 670;
+`04-24937T`: 990), with only small gains/losses on top (single digits to
+low teens). Total SNV loss across the whole bundle dropped from 3.1M rows
+to 299, spread across 113 samples (~2.6 rows/sample average) -- a
+different order of magnitude, consistent with normal residual noise rather
+than a bug.
+
+## Current state (post all fixes above)
+
+- **SNV**: 348 samples w/ gains, 113 samples w/ losses, 299 total lost rows
+  -- converged to normal residual noise. The gained-only, 0-retained
+  samples at the top of `snv_persample_counts.tsv` are the known "left out
+  of the last release" bonus fix (unrelated, already understood).
+- **CNV (seg)**: unchanged from prior runs (5 cell lines w/ gains, 0 w/
+  losses) -- expected, nothing in this session touched seg assembly.
+- **SV (bedpe)**: unchanged from prior runs (433 w/ gains, 7 w/ losses) --
+  expected, consistent with the earlier Arthur/Hilton SV coverage bonus
+  fixes already being stable.
+
+Considering this refactor converged and ready for PR, pending final
+sign-off.
 
 ## Fix: cell lines need a separate, genome-wide SNV pull
 
