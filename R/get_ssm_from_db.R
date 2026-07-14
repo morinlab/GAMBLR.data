@@ -8,7 +8,13 @@
 #' @param projection Genome build / `genome_build` column value. Default "grch37".
 #' @param sample_ids Optional character vector of `Tumor_Sample_Barcode` to keep.
 #' @param tool_name Pipeline to keep (matched case-insensitively). Default
-#'   "slms-3"; set NULL to skip the Pipeline filter.
+#'   "slms-3"; set NULL to skip the Pipeline filter. Resolved via the
+#'   `variant_pipeline` join table (see [gambl_mutations_db()]'s schema
+#'   docs) rather than `maf`/`ashm`'s own Pipeline column, so a variant
+#'   independently called by more than one pipeline is still found by a
+#'   query for either one, even though its single maf/ashm row can only
+#'   carry one Pipeline value. Falls back to filtering the column directly
+#'   against DBs built before variant_pipeline existed.
 #' @param include_ashm When TRUE, also query the `ashm` table and row-bind it.
 #' @param coding_only When TRUE, keep only coding `Variant_Classification`s.
 #' @param include_silent When FALSE (and `coding_only`), drop Silent mutations.
@@ -58,11 +64,33 @@ get_ssm_from_db <- function(projection = "grch37",
                   else intersect(sample_ids, study_sample_ids)
   }
 
+  # A variant that's independently produced by more than one pipeline (e.g. a
+  # cohort's own published maf and our SLMS-3 recall both calling the same
+  # position) only has room for one Pipeline value on its single maf/ashm
+  # row -- write_mutations_db() picks one arbitrarily when it deduplicates.
+  # variant_pipeline (sample_id/Chromosome/Start_Position/End_Position/
+  # Tumor_Seq_Allele2/genome_build, Pipeline) records every pipeline that
+  # actually produced each variant, so tool_name is resolved against it via a
+  # semi-join instead of the maf/ashm row's own (possibly-not-representative)
+  # Pipeline value. Falls back to the old direct-column filter against DBs
+  # built before this table existed.
+  has_variant_pipeline <- !is.null(tn) && "variant_pipeline" %in% DBI::dbListTables(con)
+  variant_key_cols <- c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2")
+
   # apply the filters that are common to a single (table, region) query
   base_query <- function(table_name, region = NULL) {
     q <- dplyr::tbl(con, table_name) %>%
       dplyr::filter(genome_build == projection)
-    if (!is.null(tn))            q <- dplyr::filter(q, tolower(Pipeline) == tn)
+    if (!is.null(tn)) {
+      if (has_variant_pipeline) {
+        matching_keys <- dplyr::tbl(con, "variant_pipeline") %>%
+          dplyr::filter(elem == table_name, genome_build == projection, tolower(Pipeline) == tn) %>%
+          dplyr::distinct(dplyr::across(dplyr::all_of(variant_key_cols)))
+        q <- dplyr::semi_join(q, matching_keys, by = variant_key_cols)
+      } else {
+        q <- dplyr::filter(q, tolower(Pipeline) == tn)
+      }
+    }
     if (coding_only)             q <- dplyr::filter(q, Variant_Classification %in% cc)
     if (min_read_support > 0)    q <- dplyr::filter(q, t_alt_count >= min_read_support)
     if (!is.null(sample_ids))    q <- dplyr::filter(q, Tumor_Sample_Barcode %in% sample_ids)

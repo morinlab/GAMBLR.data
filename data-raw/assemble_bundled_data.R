@@ -125,16 +125,55 @@ pull_data <- function(
         pull_projection = "grch37"
     ){
     lymphoma_genes_bed <- if(pull_projection == "grch37") lymphoma_genes_bed_grch37 else lymphoma_genes_bed_hg38
-    slms3 <- get_ssm_by_regions(
+
+    # label identifies this specific call (projection x seq_type) in the log,
+    # since pull_data() is called 4 times per build (genome/capture x
+    # grch37/hg38) -- without this, diagnostics from different calls would
+    # be indistinguishable in the log.
+    call_label <- sprintf("pull_data(%s, seq_type=%s, n=%d samples)",
+                           pull_projection,
+                           paste(unique(pull_meta$seq_type), collapse = "/"),
+                           n_distinct(pull_meta$sample_id))
+    message(sprintf("[DIAG] %s: starting", call_label))
+    diag_summary(pull_meta, paste0(call_label, ": input metadata"), study_col = NULL)
+
+    raw <- get_ssm_by_regions(
         regions_bed = lymphoma_genes_bed,
         these_samples_metadata = pull_meta,
         basic_columns = FALSE,
         projection = pull_projection
-    ) %>%
+    )
+
+    # Catches exactly the kind of silent, no-error data loss this
+    # investigation is chasing: if get_ssm_by_regions() only partially read
+    # an underlying file, readr/vroom's parsing-problem log (normally only
+    # surfaced as a generic console warning) is captured here per-call
+    # instead, so a future run can show precisely which rows/columns had
+    # problems rather than just that "one or more parsing issues" occurred
+    # somewhere in the whole build.
+    probs <- tryCatch(readr::problems(raw), error = function(e) NULL)
+    n_probs <- if (!is.null(probs)) nrow(probs) else NA_integer_
+    message(sprintf("[DIAG] %s: raw get_ssm_by_regions() = %d rows, %d distinct Tumor_Sample_Barcode, %s parsing problem(s)",
+                     call_label, nrow(raw), n_distinct(raw$Tumor_Sample_Barcode),
+                     if (is.na(n_probs)) "unknown (problems() not applicable to this object)" else n_probs))
+    if (!is.null(probs) && nrow(probs) > 0) {
+        message(sprintf("[DIAG] %s: parsing problem detail (up to 20 rows):", call_label))
+        print(utils::head(probs, 20))
+    }
+    diag_summary_maf(raw, paste0(call_label, ": raw, pre Hugo_Symbol filter, all Variant_Classifications"))
+    diag_summary_maf(raw %>% filter(Variant_Classification %in% GAMBLR.data:::coding_class),
+                      paste0(call_label, ": raw, pre Hugo_Symbol filter, coding-classified only"))
+
+    slms3 <- raw %>%
     filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
     select(
         all_of(all_cols)
     )
+
+    diag_summary_maf(slms3, paste0(call_label, ": final, post Hugo_Symbol filter, all Variant_Classifications"))
+    diag_summary_maf(slms3 %>% filter(Variant_Classification %in% GAMBLR.data:::coding_class),
+                      paste0(call_label, ": final, post Hugo_Symbol filter, coding-classified only"))
+
     return(slms3)
 }
 
@@ -166,7 +205,7 @@ diag_summary <- function(df, label, sample_col = "sample_id", study_col = "study
 diag_summary_maf <- function(df, label, study_lookup = sample_data$sample_study) {
     message(sprintf("[DIAG] %s: %d rows, %d distinct Tumor_Sample_Barcode", label, nrow(df), n_distinct(df$Tumor_Sample_Barcode)))
     summary_tbl <- df %>%
-        left_join(study_lookup %>% select(sample_id, study), by = c("Tumor_Sample_Barcode" = "sample_id")) %>%
+        left_join(study_lookup %>% select(sample_id, study), by = c("Tumor_Sample_Barcode" = "sample_id"), relationship = "many-to-many") %>%
         group_by(study) %>%
         summarise(n_rows = n(), n_samples = n_distinct(Tumor_Sample_Barcode), .groups = "drop") %>%
         arrange(desc(n_rows))

@@ -187,7 +187,7 @@ to 299, spread across 113 samples (~2.6 rows/sample average) -- a
 different order of magnitude, consistent with normal residual noise rather
 than a bug.
 
-## Current state (post all fixes above)
+## Current state as of this point in the session (superseded -- see below)
 
 - **SNV**: 348 samples w/ gains, 113 samples w/ losses, 299 total lost rows
   -- converged to normal residual noise. The gained-only, 0-retained
@@ -199,8 +199,15 @@ than a bug.
   expected, consistent with the earlier Arthur/Hilton SV coverage bonus
   fixes already being stable.
 
-Considering this refactor converged and ready for PR, pending final
-sign-off.
+`compare_bundle_changes.R`'s row-count-based diffing was genuinely clean at
+this point -- but it can't detect a variant surviving with the *wrong*
+Pipeline tag (the row is still there, at the same position, just labeled
+differently), which is exactly the bug found afterward (see "Fix:
+write-time dedup silently relabeled real SLMS-3 calls as 'Publication'"
+below). Do not treat a clean `compare_bundle_changes.R` run alone as
+sufficient sign-off for Pipeline-level correctness -- cross-check with a
+`tool_name`-filtered query (e.g. `get_all_coding_ssm()` or
+`get_ssm_from_db(tool_name=...)`) per cohort as well.
 
 ## Fix: cell lines need a separate, genome-wide SNV pull
 
@@ -249,3 +256,137 @@ Reddy were left unchanged -- Arthur's block already excludes
 `tumor`-suffixed sample_ids per patient (structurally safe from the same
 ambiguity), and Reddy's `study_id` comes from the paper's own distinct
 "Sample ID" column, already 1:1 with `sample_id`.
+
+## Fix: `this_study_samples`/`these_samples`/`these_samples_dlbcl` filtered on `cohort` instead of `study`
+
+Found via a fresh GSC test (`get_all_coding_ssm()` against the built DB,
+joined to metadata): `FL_Dreval` showed only 7 of 441 samples with any
+coding-classified variant at all, each with 1-2 rows; `DLBCL_cell_lines`
+looked similarly too low. Traced to the "proteinpainter compatibility"
+block (Phase 3), which intentionally reads the *installed, stale*
+`GAMBLR.data::sample_data$meta` rather than the locally-built one (a
+pre-existing, documented, out-of-scope inconsistency) -- but filtered that
+stale snapshot on a column called `cohort`, when this script's own
+convention (and, empirically, the stale snapshot itself) uses `study`.
+`GAMBLR.data::sample_data$meta %>% filter(cohort %in% c("FL_Dreval",
+"DLBCL_cell_lines"))` returned only the 5 cell-line ids; switching to
+`filter(study %in% ...)` returned the correct 400+ ids. Fixed at all three
+call sites (`these_samples`, `these_samples_dlbcl`, `this_study_samples`).
+
+Mechanistically this bug only affected the RefSeq/Protein_position
+enrichment `left_join()` for Dreval/cell-line Publication rows (a
+non-match there just leaves those two columns `NA`, it can't drop rows) --
+so on its own it was not expected to explain the *row-count* collapse
+`get_all_coding_ssm()` showed. Confirmed by rebuilding: see below.
+
+## Real-time build diagnostics added to `assemble_bundled_data.R`
+
+To stop diagnosing via a slow guess-rebuild-test loop against the GSC, added
+`diag_summary()` / `diag_summary_maf()` / `diag_missing()` helper calls at
+every major checkpoint in the script (every Phase 1 cohort, the
+cohort-\>study rename/rejoin block, `sample_study` assembly, the Phase 3
+enrichment joins, the Phase 4 `all_slms3_meta` live-metadata refetch and
+pull outputs, the Phase 5 aSHM pull, and the final per-study
+coding-classified `maf` counts). Prints per-study row/sample counts and,
+at the two live-metadata refetch points, exactly which sample_ids get
+silently dropped (if any) -- the log now shows where a cohort's count
+changes during the build itself, not just after the fact.
+
+### First full run with diagnostics -- 2026-07-14
+
+The `cohort`/`study` fix produced healthy-looking **aggregate** per-study
+coding counts in the in-memory `sample_data` object, before the SQLite
+write:
+
+| Study | grch37 maf, coding-classified only | | hg38 maf, coding-classified only | |
+| --- | --- | --- | --- | --- |
+| | rows | samples | rows | samples |
+| Dreval | 39,765 | 441 | 4,982 | 437 |
+| Arthur | 17,855 | 159 | 2,084 | 157 |
+| Reddy | 17,805 | 981 | 10,816 | 947 |
+| Schmitz | 8,352 | 468 | 8,320 | 468 |
+| Thomas | 3,577 | 276 | 46,207 | 277 |
+| Chapuy | 3,226 | 230 | 3,189 | 230 |
+| Hilton | 3,078 | 158 | 2,607 | 158 |
+| NCI_Golub | 2,030 | 114 | 2,017 | 114 |
+| cell lines (no `sample_study` row, shown as `NA`) | 1,211 | 5 | 1,214 | 5 |
+
+Also visible in this run, two small pre-existing gaps (not blocking, not
+part of this refactor's scope):
+- `Reddy meta -> reddy_meta_gambl join`: 2 of 1001 Reddy sample_ids
+  (`Reddy_832T`, `Reddy_3813T`) have no matching live cohort.
+- `Hilton trios`: 1 of 160 (`14-27873_tumorA`) not found in live metadata.
+
+**This table turned out to mask a real, separate problem** -- see below.
+It aggregates Publication + SLMS-3 pipeline rows together, and Dreval's
+Publication-pipeline pull (the paper's own curated maf) dominates the
+total, so the healthy-looking aggregate hid the fact that the *SLMS-3*
+pipeline's own contribution was nearly empty.
+
+## Fix: write-time dedup silently relabeled real SLMS-3 calls as "Publication"
+
+A follow-up GSC test using `get_all_coding_ssm()` (which specifically
+restricts to `Pipeline == "slms-3"`, unlike the aggregate table above)
+still showed `FL_Dreval` at 7/441 samples with any coding variant, each
+with 1-2 rows -- i.e. the `cohort`/`study` fix above did not actually
+resolve the originally-reported symptom; it only fixed a separate,
+real-but-narrower bug (broken RefSeq/Protein_position enrichment).
+
+Extensive isolation via direct SQL against the built DB and side-by-side
+`GAMBLR.results::get_ssm_by_regions()` calls ruled out, in order: a stale
+DB path/cache (confirmed same file, fresh mtime), `tool_name`
+case-sensitivity (already handled via `tolower()` on both sides),
+`coding_class` casing/definition mismatches (byte-identical, confirmed via
+`LENGTH()`/`HEX()` in SQL), an oversized `sample_ids` `IN`-clause hitting a
+SQLite variable limit (reproduced with just Dreval's own 441 ids), a
+scale/multi-cohort-merge bug in `get_ssm_by_regions()` (incrementally
+rebuilt the exact Phase 4 sample scope -- Dreval alone, +Hilton, +Thomas,
++Arthur -- and every combination pulled healthy coding calls interactively),
+and the Hugo_Symbol post-filter dropping bystander genes (a single sample's
+raw coding calls were all confirmed to be on canonical panel genes and all
+survived the filter).
+
+Root cause, confirmed empirically: `sample_data$grch37$maf <-
+bind_rows(grch37_publication_rows, slms3_grch37)` puts Publication rows
+first, and `write_mutations_db()`'s dedup
+(`distinct(..., .keep_all = TRUE)`, keyed on `Tumor_Sample_Barcode,
+Chromosome, Start_Position, End_Position, Tumor_Seq_Allele2`) keeps
+whichever row comes first for a given key. Dreval's own published maf
+(`fl_data$ssm_to_bundle`) was itself originally SLMS-3-called, so a real
+mutation legitimately appears in *both* `grch37_publication_rows` and
+`slms3_grch37` with an identical key -- the dedup silently kept the
+Publication-tagged copy and dropped the SLMS-3-tagged one every time. The
+variant was never lost from the bundle, but it became invisible to
+`tool_name = "slms-3"`-style queries. Confirmed directly: of 6,807 real,
+undeduplicated SLMS-3 coding calls for Dreval (from a raw
+`get_ssm_by_regions()` pull), 6,791 (99.8%) have an exact key match among
+the DB's `Pipeline = "Publication"` rows.
+
+### Fix: `variant_pipeline` join table
+
+Same architectural pattern as `sample_study`: a single-valued `Pipeline`
+column on `maf`/`ashm` can't represent a variant independently called by
+more than one pipeline, any more than a single-valued `study` column could
+represent multi-cohort sample membership. Added `variant_pipeline`
+(`Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position,
+Tumor_Seq_Allele2, genome_build, elem, Pipeline` -- one row per
+(variant, Pipeline) pair, `elem` distinguishing `maf`/`ashm`), captured in
+`write_mutations_db()` from the full pre-dedup data before the existing
+dedup collapses each variant to one representative row. `get_ssm_from_db()`'s
+`tool_name` filter now resolves via a semi-join against `variant_pipeline`
+instead of `maf`/`ashm`'s own `Pipeline` column, with a fallback to the old
+direct-column filter for DBs built before this table existed.
+
+Verified via synthetic data: a variant called by both "Publication" and
+"SLMS-3" pipelines (identical key) is correctly deduplicated to one
+`maf` row but produces two `variant_pipeline` rows; `get_ssm_from_db(tool_name
+= "slms-3")` correctly finds it even though its surviving `maf` row is
+tagged "Publication"; `tool_name = "publication"` also finds it; and with
+`variant_pipeline` dropped (simulating an old DB), the query correctly
+falls back to the old (narrower, expected) behavior rather than erroring.
+
+**Still to do**: rebuild on the GSC with this fix and re-run
+`get_all_coding_ssm()`/direct SQL against the fresh DB to confirm Dreval's
+SLMS-3-tagged coding counts are healthy through the new join, and re-run
+`compare_bundle_changes.R` for the full per-sample gained/lost view against
+this latest build.

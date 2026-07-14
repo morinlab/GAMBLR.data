@@ -21,10 +21,11 @@ if (getRversion() >= "2.15.1") {
     "bin", "category", "chrom", "cohort", "colour", "curated", "end", 
     "ensembl_gene_id", "gambl_metadata", "gene", "genome_build", 
     "grch37_ashm_regions", "group", "head", "hg38_ashm_regions", 
-    "hot_spot", "hotspot_regions_grch37", "hotspot_regions_hg38", 
-    "is_alias", "log.ratio", "mutated", "mutation_count", "n_mut", 
-    "name", "pair_status", "pathology", "patient_id", "region", 
-    "row_id", "sample_id", "seq_type", "start", "t_alt_count", 
-    "tumour_sample_id", "window_end", "window_start"
+    "hot_spot", "hotspot_regions_grch37", "hotspot_regions_hg38",
+    "is_alias", "log.ratio", "mutated", "mutation_count", "n_mut",
+    "name", "pair_status", "pathology", "patient_id", "region",
+    "row_id", "sample_id", "seq_type", "start", "t_alt_count",
+    "tumour_sample_id", "window_end", "window_start",
+    "study", "Pipeline", "elem"
   ))
 }

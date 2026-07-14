@@ -32,7 +32,8 @@
 #' | `bedpe` | ~900 | one Manta structural-variant breakpoint pair | `CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build` |
 #' | `sample_meta` | ~3.3k | one sample | `patient_id, sample_id, Tumor_Sample_Barcode, seq_type, pathology, cohort, study, ...` (its own `genome_build` column records the sample's native alignment build, unrelated to the per-row build stamp used in the other tables) |
 #' | `sample_study` | varies | one (sample, study) membership fact -- many-to-many, a sample belonging to N studies is N rows | `sample_id, study, study_id, reference_PMID`. `study_id` is that study's own identifier for the sample where it differs from GAMBL's `sample_id` (e.g. a paper's own case/patient ID); NA where no study-specific ID has been sourced. |
-#' | `build_info` | 9 | key/value | provenance (`source`, `built_at`, `builder`) and expected row counts (`n_maf`, `n_ashm`, `n_seg`, `n_bedpe`, `n_samples`, `n_sample_study`) used by the `data-raw/test_gambl_db.R` regression checks |
+#' | `variant_pipeline` | varies | one (variant, Pipeline) fact -- many-to-many, a variant independently called by N pipelines is N rows | `Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, Tumor_Seq_Allele2, genome_build, elem, Pipeline`. `elem` is `"maf"` or `"ashm"`, identifying which table the variant belongs to. |
+#' | `build_info` | 10 | key/value | provenance (`source`, `built_at`, `builder`) and expected row counts (`n_maf`, `n_ashm`, `n_seg`, `n_bedpe`, `n_samples`, `n_sample_study`, `n_variant_pipeline`) used by the `data-raw/test_gambl_db.R` regression checks |
 #'
 #' `maf`/`ashm` do NOT carry a `Study` column. Cohort/study membership is
 #' tracked once per sample in `sample_study`, not once per mutation row --
@@ -42,11 +43,26 @@
 #' that claimed it (see `GAMBLR.data::get_ssm_from_db()`'s `this_study`
 #' parameter for how to filter by study post-refactor).
 #'
+#' Similarly, `maf`/`ashm` only ever carry ONE `Pipeline` value per variant,
+#' even though the same real mutation can be independently produced by more
+#' than one pipeline (e.g. a cohort's own published/curated maf and our
+#' separate SLMS-3 recall both calling the same position) -- when that
+#' happens, `write_mutations_db()`'s write-time dedup keeps one row
+#' arbitrarily (whichever pipeline's data was assembled first), which would
+#' otherwise make the variant invisible to a query for the *other* pipeline
+#' even though it's still fully present in the table. `variant_pipeline`
+#' records every pipeline that actually produced each variant, independent
+#' of which one "won" as `maf`/`ashm`'s single representative row; see
+#' `GAMBLR.data::get_ssm_from_db()`'s `tool_name` parameter, which resolves
+#' against this table rather than `maf`/`ashm`'s own `Pipeline` column.
+#'
 #' ## Join keys
 #' `maf`, `ashm`, and `bedpe` (via `tumour_sample_id`) key to
 #' `sample_meta$Tumor_Sample_Barcode` / `sample_meta$sample_id`; `seg$ID` keys
 #' to `sample_meta$sample_id`; `sample_study$sample_id` keys to
-#' `sample_meta$sample_id`.
+#' `sample_meta$sample_id`; `variant_pipeline` keys to `maf`/`ashm` (per
+#' `elem`) on `Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position,
+#' Tumor_Seq_Allele2, genome_build`.
 #'
 #' ## Indexes
 #' `maf`/`ashm`: `(genome_build, Chromosome, Start_Position)`,
@@ -57,7 +73,8 @@
 #' `GAMBLR.data::get_ssm_from_db()`. `seg`: `(genome_build, ID)`,
 #' `(genome_build, chrom, start)`. `bedpe`: `tumour_sample_id`.
 #' `sample_meta`: `sample_id`, `Tumor_Sample_Barcode`. `sample_study`:
-#' `sample_id`, `study`.
+#' `sample_id`, `study`. `variant_pipeline`: `Tumor_Sample_Barcode`,
+#' `(elem, genome_build, Pipeline)`.
 #'
 #' @param db_path Optional explicit path to the .db file.
 #'

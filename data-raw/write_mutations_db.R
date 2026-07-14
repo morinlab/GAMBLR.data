@@ -51,6 +51,20 @@ write_mutations_db <- function(sample_data,
     ashm = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2")
   )
 
+  # variant_pipeline: many-to-many bridge table (variant key, Pipeline),
+  # same pattern as sample_study (sample_id, study). A single Pipeline column
+  # on maf/ashm can only hold one value per variant, but the same real
+  # mutation can legitimately be produced by more than one pipeline (e.g. a
+  # cohort's own published/curated maf and our independent SLMS-3 recall
+  # both calling the same position) -- when that happens the dedup below
+  # collapses them to one row keyed on whichever pipeline came first in
+  # sample_data[[b]][[elem]], silently making the call invisible to a
+  # tool_name-filtered query for the other pipeline even though the variant
+  # itself is still fully present in the table. Captured here, before dedup,
+  # so no pipeline's claim to a variant is ever lost regardless of which row
+  # "wins" as maf/ashm's single representative copy.
+  variant_pipeline_rows <- list()
+
   # genome-build-stamped frames; append per build to keep peak memory low
   write_element <- function(elem) {
     first <- TRUE
@@ -61,6 +75,12 @@ write_mutations_db <- function(sample_data,
       if (is.null(x) || !nrow(x)) next
       x <- as.data.frame(x)
       x$genome_build <- b
+      if (!is.null(dk) && "Pipeline" %in% names(x)) {
+        variant_pipeline_rows[[length(variant_pipeline_rows) + 1]] <<- x %>%
+          dplyr::select(dplyr::all_of(dk), genome_build, Pipeline) %>%
+          dplyr::distinct() %>%
+          dplyr::mutate(elem = elem)
+      }
       if (!is.null(dk)) {
         before <- nrow(x)
         x <- dplyr::distinct(x, dplyr::across(dplyr::all_of(dk)), .keep_all = TRUE)
@@ -77,6 +97,13 @@ write_mutations_db <- function(sample_data,
   }
   counts <- vapply(c("maf", "ashm", "seg", "bedpe"), write_element, integer(1))
 
+  n_variant_pipeline <- 0L
+  if (length(variant_pipeline_rows)) {
+    variant_pipeline <- dplyr::bind_rows(variant_pipeline_rows)
+    DBI::dbWriteTable(con, "variant_pipeline", as.data.frame(variant_pipeline), overwrite = TRUE)
+    n_variant_pipeline <- nrow(variant_pipeline)
+  }
+
   # indexes mirroring how the GAMBLR.open accessors query the data.
   # wrapped in try() so a build missing an optional table/column is non-fatal.
   idx <- c(
@@ -91,19 +118,21 @@ write_mutations_db <- function(sample_data,
     "CREATE INDEX idx_meta_sample  ON sample_meta(sample_id)",
     "CREATE INDEX idx_meta_barcode ON sample_meta(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_study_sample ON sample_study(sample_id)",
-    "CREATE INDEX idx_study_study  ON sample_study(study)"
+    "CREATE INDEX idx_study_study  ON sample_study(study)",
+    "CREATE INDEX idx_vp_sample ON variant_pipeline(Tumor_Sample_Barcode)",
+    "CREATE INDEX idx_vp_pipe   ON variant_pipeline(elem, genome_build, Pipeline)"
   )
   for (stmt in idx) try(DBI::dbExecute(con, stmt), silent = TRUE)
 
   # self-describing provenance / expected-counts table (used by the tests)
   DBI::dbWriteTable(con, "build_info", data.frame(
     key = c("source", "built_at", "builder",
-            "n_maf", "n_ashm", "n_seg", "n_bedpe", "n_samples", "n_sample_study"),
+            "n_maf", "n_ashm", "n_seg", "n_bedpe", "n_samples", "n_sample_study", "n_variant_pipeline"),
     value = c(source_desc,
               format(Sys.time(), tz = "UTC", usetz = TRUE),
               "write_mutations_db",
               counts[["maf"]], counts[["ashm"]], counts[["seg"]],
-              counts[["bedpe"]], nrow(sample_data$meta), n_sample_study),
+              counts[["bedpe"]], nrow(sample_data$meta), n_sample_study, n_variant_pipeline),
     stringsAsFactors = FALSE
   ), overwrite = TRUE)
 

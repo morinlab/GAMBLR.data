@@ -32,11 +32,11 @@ cols <- function(t) dbListFields(con, t)
 builds_in <- function(t) sort(dbGetQuery(con, sprintf("SELECT DISTINCT genome_build g FROM %s", t))$g)
 
 cat("== tables present ==\n")
-for (t in c("maf","ashm","seg","bedpe","sample_meta","sample_study","build_info"))
+for (t in c("maf","ashm","seg","bedpe","sample_meta","sample_study","variant_pipeline","build_info"))
   check(t %in% tbls, sprintf("table %s exists", t))
 
 cat("\n== row counts (all > 0) ==\n")
-for (t in c("maf","ashm","seg","bedpe","sample_meta","sample_study")) {
+for (t in c("maf","ashm","seg","bedpe","sample_meta","sample_study","variant_pipeline")) {
   cnt <- if (t %in% tbls) n(t) else 0
   check(cnt > 0, sprintf("%-11s has %d rows", t, cnt))
 }
@@ -54,7 +54,9 @@ req <- list(
   seg   = c("ID","chrom","start","end","CN","genome_build"),
   bedpe = c("tumour_sample_id","CHROM_A","START_A","CHROM_B","START_B","VAF_tumour","SCORE","FILTER","genome_build"),
   sample_meta = c("sample_id","Tumor_Sample_Barcode","seq_type","study"),
-  sample_study = c("sample_id","study","study_id","reference_PMID")
+  sample_study = c("sample_id","study","study_id","reference_PMID"),
+  variant_pipeline = c("Tumor_Sample_Barcode","Chromosome","Start_Position","End_Position",
+                       "Tumor_Seq_Allele2","genome_build","elem","Pipeline")
 )
 for (t in names(req)) if (t %in% tbls) {
   missing <- setdiff(req[[t]], cols(t))
@@ -71,7 +73,8 @@ cat("\n== indexes present ==\n")
 # assert indexes that actually exist.
 idx <- dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='index'")$name
 for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_pipe","idx_seg_sample",
-            "idx_bedpe_sample","idx_study_sample","idx_study_study"))
+            "idx_bedpe_sample","idx_study_sample","idx_study_study",
+            "idx_vp_sample","idx_vp_pipe"))
   check(i %in% idx, sprintf("index %s", i))
 
 cat("\n== pipelines present ==\n")
@@ -92,6 +95,8 @@ if ("build_info" %in% tbls) {
   for (t in c("maf","ashm","seg","bedpe"))
     check(isTRUE(getbi(paste0("n_", t)) == n(t)),
           sprintf("build_info n_%s == COUNT(%s)", t, t))
+  check(isTRUE(getbi("n_variant_pipeline") == n("variant_pipeline")),
+        sprintf("build_info n_variant_pipeline == COUNT(variant_pipeline)"))
 }
 
 cat("\n== sample_metadata.rda matches sample_meta table ==\n")
