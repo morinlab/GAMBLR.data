@@ -30,8 +30,10 @@
 #'   `this_study="Reddy"` alone returns Reddy's SLMS-3 recall by default,
 #'   while `this_study="Reddy", tool_name="publication"` returns Reddy's
 #'   as-published rows only).
-#' @param regions Optional data frame with columns `chrom`, `start`, `end`; rows
-#'   are OR-ed (each region is an indexed range scan).
+#' @param regions Optional data frame with columns `chrom`, `start`, `end`;
+#'   rows are OR-ed and applied as a single combined query (not one query per
+#'   region), so passing hundreds of regions (e.g. one per gene in a panel)
+#'   doesn't cost hundreds of separate round trips.
 #' @param con Optional DBI connection (defaults to [gambl_mutations_db()]).
 #'
 #' @return A data frame of MAF rows (the `genome_build` helper column is dropped).
@@ -80,8 +82,9 @@ get_ssm_from_db <- function(projection = "grch37",
   has_variant_pipeline <- !is.null(tn) && "variant_pipeline" %in% DBI::dbListTables(con)
   variant_key_cols <- c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2")
 
-  # apply the filters that are common to a single (table, region) query
-  base_query <- function(table_name, region = NULL) {
+  # apply the filters that are common to every query against this table,
+  # regardless of how many regions (if any) are requested
+  base_query <- function(table_name) {
     q <- dplyr::tbl(con, table_name) %>%
       dplyr::filter(genome_build == projection)
     if (!is.null(tn)) {
@@ -97,23 +100,33 @@ get_ssm_from_db <- function(projection = "grch37",
     if (coding_only)             q <- dplyr::filter(q, Variant_Classification %in% cc)
     if (min_read_support > 0)    q <- dplyr::filter(q, t_alt_count >= min_read_support)
     if (!is.null(sample_ids))    q <- dplyr::filter(q, Tumor_Sample_Barcode %in% sample_ids)
-    if (!is.null(region)) {
-      rc <- region$chrom; rs <- region$start; re <- region$end
-      q <- dplyr::filter(q, Chromosome == rc &
-                            Start_Position > rs & Start_Position < re)
-    }
-    dplyr::collect(q)
+    q
   }
 
-  # one query per region (each uses the (genome_build, Chromosome, Start_Position)
-  # index), otherwise a single unrestricted query
+  # All regions are combined into a single OR'd condition and applied in one
+  # query, not one query per region. get_ssm_by_regions() commonly passes a
+  # region per gene in a panel (150-250+ for the full lymphoma gene list) --
+  # looping here used to mean that many separate round trips, each one
+  # redoing the tool_name/coding_only/sample_ids filters and re-running the
+  # variant_pipeline semi-join from scratch for every single region. A single
+  # combined query also fixes a latent duplicate-row bug the loop had: a
+  # variant landing inside two overlapping regions (e.g. neighbouring genes'
+  # padded windows) was previously returned once per matching region and
+  # bind_rows()'d into two identical rows; SQL's OR doesn't double-count a
+  # row just because more than one disjunct matches it.
   gather <- function(table_name) {
-    if (is.null(regions) || nrow(regions) == 0) return(base_query(table_name))
-    dplyr::bind_rows(lapply(seq_len(nrow(regions)), function(i)
-      base_query(table_name, region = list(
-        chrom = as.character(regions$chrom[i]),
-        start = as.numeric(regions$start[i]),
-        end   = as.numeric(regions$end[i])))))
+    q <- base_query(table_name)
+    if (!is.null(regions) && nrow(regions) > 0) {
+      region_exprs <- lapply(seq_len(nrow(regions)), function(i) {
+        rc <- as.character(regions$chrom[i])
+        rs <- as.numeric(regions$start[i])
+        re <- as.numeric(regions$end[i])
+        rlang::expr(Chromosome == !!rc & Start_Position > !!rs & Start_Position < !!re)
+      })
+      combined <- Reduce(function(a, b) rlang::expr(!!a | !!b), region_exprs)
+      q <- dplyr::filter(q, !!combined)
+    }
+    dplyr::collect(q)
   }
 
   res <- gather("maf")
