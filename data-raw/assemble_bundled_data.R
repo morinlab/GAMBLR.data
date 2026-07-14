@@ -805,11 +805,11 @@ selected_columns <- c(
 )
 
 these_samples <- GAMBLR.data::sample_data$meta %>%
-    filter(cohort %in% c("BL_Thomas")) %>%
+    filter(study %in% c("BL_Thomas")) %>%
     pull(sample_id)
 
 these_samples_dlbcl <- GAMBLR.data::sample_data$meta %>%
-    filter(cohort %in% c("DLBCL_Thomas", "DLBCL_cell_lines")) %>%
+    filter(study %in% c("DLBCL_Thomas", "DLBCL_cell_lines")) %>%
     pull(sample_id)
 
 coding_maf <- read_tsv("/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf") %>% # get from flat maf file to show SSM in hg38 coordinates similar to the original manuscript
@@ -848,7 +848,7 @@ hg38_publication_rows <- bind_rows(
     left_join(coding_maf)
 
 this_study_samples <- GAMBLR.data::sample_data$meta %>%
-    filter(cohort %in% c("FL_Dreval", "DLBCL_cell_lines")) %>%
+    filter(study %in% c("FL_Dreval", "DLBCL_cell_lines")) %>%
     pull(sample_id)
 
 # FLs in grch37
