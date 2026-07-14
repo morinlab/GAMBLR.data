@@ -156,8 +156,16 @@ pulled panel-restricted) and adding back a dedicated, unrestricted
 everyone else. Still tagged `Pipeline = "SLMS-3"` (same underlying pipeline,
 just unrestricted scope for these 5 samples).
 
-Still need to: rebuild and re-run `compare_bundle_changes.R` to confirm the
-cell-line losses are gone.
+**Update**: rebuilt and re-ran -- cell-line losses are gone, confirming the
+fix worked. One more thing surfaced in the same run, another bonus rather
+than a bug: the top of `snv_persample_counts.tsv` now shows several samples
+(e.g. `15-18723_CLC02138`, `15-43891_tumorB`, `07-17613T`) with real gained
+counts (64-630) but `n_lost = 0` and `n_retained = 0` -- meaning they had
+*zero* rows in the old bundle at all, not a mismatch. Confirmed these were
+samples left out of the last release for some reason and are now correctly
+included -- consistent with the pattern already seen for Arthur/Hilton
+(aSHM, SV coverage) where the old per-cohort-block gating silently excluded
+samples that the consolidated pull now correctly picks up.
 
 ## Fix: `study_id` used `patient_id` instead of `sample_id` for Thomas/Dreval/Hilton
 
