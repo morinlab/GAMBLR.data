@@ -7,7 +7,10 @@
 #'
 #' @param projection Genome build / `genome_build` column value. Default "grch37".
 #' @param sample_ids Optional character vector of `Tumor_Sample_Barcode` to keep.
-#' @param tool_name Pipeline to keep (matched case-insensitively). Default
+#' @param tool_name Pipeline to keep, matched case-insensitively (the value
+#'   you pass is lowercased before comparing; the stored Pipeline column is
+#'   itself normalized to lowercase at write time, so this is a plain,
+#'   indexed equality check rather than a function-wrapped one). Default
 #'   "slms-3"; set NULL to skip the Pipeline filter. Resolved via the
 #'   `variant_pipeline` join table (see [gambl_mutations_db()]'s schema
 #'   docs) rather than `maf`/`ashm`'s own Pipeline column, so a variant
@@ -84,11 +87,11 @@ get_ssm_from_db <- function(projection = "grch37",
     if (!is.null(tn)) {
       if (has_variant_pipeline) {
         matching_keys <- dplyr::tbl(con, "variant_pipeline") %>%
-          dplyr::filter(elem == table_name, genome_build == projection, tolower(Pipeline) == tn) %>%
+          dplyr::filter(elem == table_name, genome_build == projection, Pipeline == tn) %>%
           dplyr::distinct(dplyr::across(dplyr::all_of(variant_key_cols)))
         q <- dplyr::semi_join(q, matching_keys, by = variant_key_cols)
       } else {
-        q <- dplyr::filter(q, tolower(Pipeline) == tn)
+        q <- dplyr::filter(q, Pipeline == tn)
       }
     }
     if (coding_only)             q <- dplyr::filter(q, Variant_Classification %in% cc)

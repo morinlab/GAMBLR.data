@@ -26,7 +26,7 @@
 #'
 #' | Table | Rows (typical) | Grain | Key columns |
 #' | --- | --- | --- | --- |
-#' | `maf` | ~3.6M | one somatic mutation call | `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline, genome_build` (+ ~35 more MAF-standard columns) |
+#' | `maf` | ~3.6M | one somatic mutation call | `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. `"slms-3"`/`"publication"` -- normalized at write time so it can be matched with a plain, indexed equality), genome_build` (+ ~35 more MAF-standard columns) |
 #' | `ashm` | ~135k | one mutation call in an aSHM region | same schema as `maf` |
 #' | `seg` | ~126k | one copy-number segment | `ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build` |
 #' | `bedpe` | ~900 | one Manta structural-variant breakpoint pair | `CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build` |
@@ -85,10 +85,11 @@
 #' con <- gambl_mutations_db()
 #' DBI::dbListTables(con)
 #'
-#' # coding mutations in TP53, grch37, one pipeline
+#' # coding mutations in TP53, grch37, one pipeline (Pipeline is stored
+#' # lowercase -- see the Pipeline column note above)
 #' dplyr::tbl(con, "maf") |>
 #'   dplyr::filter(genome_build == "grch37", Hugo_Symbol == "TP53",
-#'                Pipeline == "SLMS-3") |>
+#'                Pipeline == "slms-3") |>
 #'   dplyr::collect()
 #' }
 #' @export

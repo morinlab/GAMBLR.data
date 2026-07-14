@@ -72,20 +72,24 @@ cat("\n== indexes present ==\n")
 # this check always failed regardless of any other change. Fixed here to
 # assert indexes that actually exist.
 idx <- dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='index'")$name
-for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_pipe","idx_seg_sample",
+for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_pipe","idx_maf_variant_key",
+            "idx_ashm_variant_key","idx_seg_sample",
             "idx_bedpe_sample","idx_study_sample","idx_study_study",
-            "idx_vp_sample","idx_vp_pipe"))
+            "idx_vp_sample","idx_vp_pipe","idx_vp_variant_key"))
   check(i %in% idx, sprintf("index %s", i))
 
 cat("\n== pipelines present ==\n")
+# Pipeline is normalized to lowercase at write time (see write_mutations_db.R)
+# so it can be matched with a plain, indexed equality instead of every query
+# needing to wrap the column in LOWER()/tolower().
 pipes <- dbGetQuery(con, "SELECT DISTINCT Pipeline p FROM maf")$p
-for (p in c("SLMS-3","Publication"))
+for (p in c("slms-3","publication"))
   check(p %in% pipes, sprintf("Pipeline '%s' present (all: %s)", p, paste(pipes, collapse=", ")))
 
 cat("\n== spot query: MYC locus, grch37, slms-3 returns variants ==\n")
 myc <- dbGetQuery(con, "SELECT COUNT(*) n FROM maf WHERE genome_build='grch37'
   AND Chromosome='8' AND Start_Position>128723128 AND Start_Position<128774067
-  AND lower(Pipeline)='slms-3'")$n
+  AND Pipeline='slms-3'")$n
 check(myc > 0, sprintf("MYC slms-3 variants found: %d", myc))
 
 cat("\n== build_info counts match actual table counts ==\n")

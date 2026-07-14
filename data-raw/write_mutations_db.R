@@ -75,6 +75,13 @@ write_mutations_db <- function(sample_data,
       if (is.null(x) || !nrow(x)) next
       x <- as.data.frame(x)
       x$genome_build <- b
+      # Normalized to lowercase here, once, at the write boundary -- so
+      # every reader (get_ssm_from_db(), raw SQL, this build's own
+      # variant_pipeline capture below) can match Pipeline with a plain
+      # equality against a plain index, instead of every query needing to
+      # wrap the column in LOWER()/tolower() (which a normal b-tree index
+      # can't be used to satisfy).
+      if ("Pipeline" %in% names(x)) x$Pipeline <- tolower(x$Pipeline)
       if (!is.null(dk) && "Pipeline" %in% names(x)) {
         variant_pipeline_rows[[length(variant_pipeline_rows) + 1]] <<- x %>%
           dplyr::select(dplyr::all_of(dk), genome_build, Pipeline) %>%
@@ -106,12 +113,25 @@ write_mutations_db <- function(sample_data,
 
   # indexes mirroring how the GAMBLR.open accessors query the data.
   # wrapped in try() so a build missing an optional table/column is non-fatal.
+  #
+  # idx_maf_pipe/idx_vp_pipe are plain indexes on Pipeline -- safe because
+  # Pipeline is normalized to lowercase above, at write time, so readers
+  # (get_ssm_from_db(), raw SQL) can match it with a plain equality instead
+  # of wrapping the column in LOWER()/tolower(), which a normal b-tree index
+  # can't be used to satisfy. idx_*_variant_key give the variant_pipeline
+  # semi-join (in get_ssm_from_db()'s tool_name resolution) an index to
+  # actually use on both sides of the join -- without one, that join has to
+  # scan maf/ashm in full for every query with a non-NULL tool_name (the
+  # default), which is most of them.
+  variant_key_ddl <- "Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, Tumor_Seq_Allele2"
   idx <- c(
     "CREATE INDEX idx_maf_pos     ON maf(genome_build, Chromosome, Start_Position)",
     "CREATE INDEX idx_maf_sample  ON maf(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_maf_pipe    ON maf(Pipeline)",
+    sprintf("CREATE INDEX idx_maf_variant_key ON maf(%s)", variant_key_ddl),
     "CREATE INDEX idx_ashm_pos    ON ashm(genome_build, Chromosome, Start_Position)",
     "CREATE INDEX idx_ashm_sample ON ashm(Tumor_Sample_Barcode)",
+    sprintf("CREATE INDEX idx_ashm_variant_key ON ashm(%s)", variant_key_ddl),
     "CREATE INDEX idx_seg_sample  ON seg(genome_build, ID)",
     "CREATE INDEX idx_seg_pos     ON seg(genome_build, chrom, start)",
     "CREATE INDEX idx_bedpe_sample ON bedpe(tumour_sample_id)",
@@ -120,7 +140,8 @@ write_mutations_db <- function(sample_data,
     "CREATE INDEX idx_study_sample ON sample_study(sample_id)",
     "CREATE INDEX idx_study_study  ON sample_study(study)",
     "CREATE INDEX idx_vp_sample ON variant_pipeline(Tumor_Sample_Barcode)",
-    "CREATE INDEX idx_vp_pipe   ON variant_pipeline(elem, genome_build, Pipeline)"
+    "CREATE INDEX idx_vp_pipe   ON variant_pipeline(elem, genome_build, Pipeline)",
+    sprintf("CREATE INDEX idx_vp_variant_key ON variant_pipeline(%s)", variant_key_ddl)
   )
   for (stmt in idx) try(DBI::dbExecute(con, stmt), silent = TRUE)
 
