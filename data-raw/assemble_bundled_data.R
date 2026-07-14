@@ -139,6 +139,54 @@ pull_data <- function(
 }
 
 
+# --- Diagnostics -------------------------------------------------------------
+# Prints per-study row/sample counts at a labeled checkpoint, so a build's
+# log shows exactly where a cohort's count changes (or unexpectedly drops)
+# in real time, instead of only being discoverable afterward via a separate
+# GSC session against the finished DB. sample_col/study_col differ across
+# checkpoints (metadata frames use sample_id + study or cohort; maf-shaped
+# frames use Tumor_Sample_Barcode and carry no inline study column at all --
+# use diag_summary_maf for those).
+diag_summary <- function(df, label, sample_col = "sample_id", study_col = "study") {
+    message(sprintf("[DIAG] %s: %d rows, %d distinct %s", label, nrow(df), n_distinct(df[[sample_col]]), sample_col))
+    if (!is.null(study_col) && study_col %in% names(df)) {
+        summary_tbl <- df %>%
+            group_by(.data[[study_col]]) %>%
+            summarise(n_rows = n(), n_samples = n_distinct(.data[[sample_col]]), .groups = "drop") %>%
+            arrange(desc(n_rows))
+        print(as.data.frame(summary_tbl))
+    }
+    invisible(df)
+}
+
+# Same idea for maf/ashm-shaped frames: no inline study column, so study is
+# looked up via sample_study. A sample in >1 study is counted once per study
+# it belongs to (matching how sample_study itself works), so totals across
+# studies can exceed nrow(df) -- that's expected, not a bug.
+diag_summary_maf <- function(df, label, study_lookup = sample_data$sample_study) {
+    message(sprintf("[DIAG] %s: %d rows, %d distinct Tumor_Sample_Barcode", label, nrow(df), n_distinct(df$Tumor_Sample_Barcode)))
+    summary_tbl <- df %>%
+        left_join(study_lookup %>% select(sample_id, study), by = c("Tumor_Sample_Barcode" = "sample_id")) %>%
+        group_by(study) %>%
+        summarise(n_rows = n(), n_samples = n_distinct(Tumor_Sample_Barcode), .groups = "drop") %>%
+        arrange(desc(n_rows))
+    print(as.data.frame(summary_tbl))
+    invisible(df)
+}
+
+# Prints which of before_ids are missing from after_ids -- for catching
+# silent-filter row loss (e.g. a get_gambl_metadata() re-fetch that quietly
+# drops sample_ids not present in the live source) at the exact step it
+# happens, instead of guessing after the fact.
+diag_missing <- function(before_ids, after_ids, label) {
+    missing <- setdiff(before_ids, after_ids)
+    message(sprintf("[DIAG] %s: %d of %d input ids missing after this step%s",
+                     label, length(missing), length(before_ids),
+                     if (length(missing) > 0) paste0(" (e.g. ", paste(head(missing, 5), collapse = ", "), ")") else ""))
+    invisible(missing)
+}
+
+
 # ============================================================================
 # Phase 1: metadata (and, where genuinely distinct per-paper data exists,
 # Publication-pipeline SSM calls) for every cohort. No SLMS-3 pulling here --
@@ -191,6 +239,8 @@ bl_data$meta_to_bundle <- read_xlsx(
     ) %>%
     mutate(genetic_subgroup = Subgroup) %>%
     select(- Subgroup)
+
+diag_summary(bl_data$meta_to_bundle, "bl_data$meta_to_bundle", study_col = "cohort")
 
 bl_data$ssm_to_bundle <- read_xlsx(
         "inst/extdata/studies/BL_Thomas.xlsx",
@@ -256,6 +306,7 @@ fl_data$meta_to_bundle <- fl_data$meta_to_bundle %>%
     filter(! sample_id == "NA") %>%
     arrange(sample_id)
 
+diag_summary(fl_data$meta_to_bundle, "fl_data$meta_to_bundle", study_col = "cohort")
 
 fl_data$ssm_to_bundle <- read_xlsx(
         "inst/extdata/studies/FL_Dreval.xlsx",
@@ -273,6 +324,8 @@ fl_data$ssm_to_bundle  <- fl_data$ssm_to_bundle %>%
     mutate(!!! new_cols) %>%
     select(names(GAMBLR.helpers:::maf_header[1:45]))
 
+
+diag_summary_maf(fl_data$ssm_to_bundle, "fl_data$ssm_to_bundle (raw, as read from xlsx sheet 2)", study_lookup = data.frame(sample_id = fl_data$meta_to_bundle$sample_id, study = "FL_Dreval"))
 
 fl_data$cnv_to_bundle <- read_xlsx(
         "inst/extdata/studies/FL_Dreval.xlsx",
@@ -317,6 +370,8 @@ colnames(dlbcl_data$meta_to_bundle) <- colnames_for_bundled_meta
 dlbcl_data$meta_to_bundle <- dlbcl_data$meta_to_bundle %>%
     filter(! sample_id == "NA") %>%
     arrange(sample_id)
+
+diag_summary(dlbcl_data$meta_to_bundle, "dlbcl_data$meta_to_bundle", study_col = "cohort")
 
 dlbcl_data$ssm_to_bundle <- read_xlsx(
         "inst/extdata/studies/BL_Thomas.xlsx",
@@ -421,6 +476,9 @@ reddy_data$meta_to_bundle <- left_join(
     reddy_meta_gambl
 )
 
+diag_missing(reddy_meta$sample_id, reddy_data$meta_to_bundle$sample_id[!is.na(reddy_data$meta_to_bundle$cohort)], "Reddy meta -> reddy_meta_gambl join (missing cohort after join)")
+diag_summary(reddy_data$meta_to_bundle, "reddy_data$meta_to_bundle", study_col = "cohort")
+
 schmitz_data$meta <- get_gambl_metadata() %>%
     dplyr::filter(cohort == "dlbcl_schmitz") %>%
     mutate(reference_PMID = pmids$Schmitz_DLBCL) %>%
@@ -454,6 +512,8 @@ all_capture_meta <- bind_rows(
         .,
         reddy_meta_gambl
     )
+
+diag_summary(all_capture_meta, "all_capture_meta", study_col = "cohort")
 
 # No paper-specific ID has been parsed anywhere in this script for these
 # three cohorts (unlike Reddy/Thomas/Dreval/Arthur, they're pulled straight
@@ -495,6 +555,9 @@ cell_lines_data$meta <- get_gambl_metadata(seq_type_filter = "genome") %>%
         "DOHH-2", "SU-DHL-10", "OCI-Ly10", "OCI-Ly3", "SU-DHL-4"
     )) %>%
     arrange(sample_id)
+
+message(sprintf("[DIAG] cell_lines_data$meta: %d rows (expect 5): %s",
+                 nrow(cell_lines_data$meta), paste(cell_lines_data$meta$sample_id, collapse = ", ")))
 
 cell_lines_data$meta_to_bundle <- data.frame(
     cell_lines_data$meta$patient_id,
@@ -571,6 +634,9 @@ arthur_meta <- get_gambl_metadata() %>%
         reference_PMID = pmids$Arthur_DLBCL
     )
 
+diag_missing(arthur_case_ids$patient_id, arthur_meta$patient_id, "Arthur Case ID -> patient_id join (WGS-flagged patients with no matching genome sample in get_gambl_metadata())")
+diag_summary(arthur_meta, "arthur_meta", study_col = "cohort")
+
 arthur_study <- data.frame(
     sample_id = arthur_meta$sample_id,
     study = "Arthur",
@@ -597,6 +663,9 @@ trios_meta <- get_gambl_metadata() %>%
         cohort = "DLBCL_Hilton",
         reference_PMID = pmids$Hilton_DLBCL
     )
+
+diag_missing(trios_samples$DNAseq_sample_id, trios_meta$sample_id, "Hilton trios DNAseq_sample_id -> get_gambl_metadata() (samples in the trios sheet not found live)")
+diag_summary(trios_meta, "trios_meta", study_col = "cohort")
 
 # study_id uses sample_id, not patient_id: Hilton is a trios study, so a
 # single patient can have multiple samples (e.g. LY_RELY_116_tumorA and
@@ -648,21 +717,34 @@ sample_data$meta <- bind_rows(
     trios_meta
 )
 
+diag_summary(sample_data$meta, "sample_data$meta (all cohorts bound, pre metadata-fixing)", study_col = "cohort")
+
 ### begin metadata fixing
 # This preserves the original cohort column and ensures there are no duplicates
 # in the metadata
 fix <- sample_data$meta
 fix <- fix %>% rename(study = cohort)
 
+diag_summary(fix, "fix (post rename cohort->study)", study_col = "study")
+
+pre_join_ids <- fix$sample_id
 fix <- left_join(
     fix,
     get_gambl_metadata() %>%
         select(sample_id, seq_type, cohort)
 )
 
+message(sprintf("[DIAG] fix (post live get_gambl_metadata() join): %d rows (was %d rows pre-join -- any increase means the join fanned out)", nrow(fix), length(pre_join_ids)))
+diag_summary(fix, "fix (post live get_gambl_metadata() join)", study_col = "study")
+
 fix <- fix %>% filter(!is.na(study))
 
+diag_missing(pre_join_ids, fix$sample_id, "fix: post-join !is.na(study) filter (sample_ids dropped here)")
+diag_summary(fix, "fix (post filter !is.na(study))", study_col = "study")
+
 fix <- distinct(fix)
+
+diag_summary(fix, "fix (post distinct -- this becomes sample_data$meta)", study_col = "study")
 
 sample_data$meta <- fix
 ### end metadata fixing
@@ -682,6 +764,8 @@ sample_data$sample_study <- bind_rows(
     arthur_study,
     hilton_study
 ) %>% distinct()
+
+diag_summary(sample_data$sample_study, "sample_data$sample_study", study_col = "study")
 
 
 #add SVs
@@ -812,6 +896,9 @@ these_samples_dlbcl <- GAMBLR.data::sample_data$meta %>%
     filter(study %in% c("DLBCL_Thomas", "DLBCL_cell_lines")) %>%
     pull(sample_id)
 
+message(sprintf("[DIAG] these_samples (BL_Thomas, from installed GAMBLR.data::sample_data): %d ids", length(these_samples)))
+message(sprintf("[DIAG] these_samples_dlbcl (DLBCL_Thomas + DLBCL_cell_lines, from installed GAMBLR.data::sample_data): %d ids", length(these_samples_dlbcl)))
+
 coding_maf <- read_tsv("/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf") %>% # get from flat maf file to show SSM in hg38 coordinates similar to the original manuscript
     filter(Tumor_Sample_Barcode %in% these_samples & # drop BL58 cell line
            ! str_detect(Tumor_Sample_Barcode, "^SP|^06")) %>% # drop ICGC and 1 LLMPP case
@@ -835,6 +922,8 @@ coding_maf <- bind_rows(
     coding_maf_dlbcl
 )
 
+message(sprintf("[DIAG] coding_maf (BL+DLBCL Thomas, hg38 proteinpainter enrichment source): %d rows, %d distinct Tumor_Sample_Barcode", nrow(coding_maf), n_distinct(coding_maf$Tumor_Sample_Barcode)))
+
 # hg38 Publication rows (Thomas BL + Thomas DLBCL), enriched via the
 # proteinpainter-compatibility join above. This used to be applied directly
 # to sample_data$hg38$maf once it existed early in the script; now it's
@@ -847,9 +936,13 @@ hg38_publication_rows <- bind_rows(
     relabel_to_sample_id("Thomas") %>%
     left_join(coding_maf)
 
+diag_summary_maf(hg38_publication_rows, "hg38_publication_rows (Thomas BL+DLBCL, final)")
+
 this_study_samples <- GAMBLR.data::sample_data$meta %>%
     filter(study %in% c("FL_Dreval", "DLBCL_cell_lines")) %>%
     pull(sample_id)
+
+message(sprintf("[DIAG] this_study_samples (FL_Dreval + DLBCL_cell_lines, from installed GAMBLR.data::sample_data): %d ids", length(this_study_samples)))
 
 # FLs in grch37
 coding_maf <- time_it("coding_maf get_ssm_by_samples", {
@@ -862,6 +955,10 @@ coding_maf <- time_it("coding_maf get_ssm_by_samples", {
         )
 })
 
+message(sprintf("[DIAG] coding_maf (FL_Dreval + DLBCL_cell_lines, grch37 proteinpainter enrichment source): %d rows, %d distinct Tumor_Sample_Barcode", nrow(coding_maf), n_distinct(coding_maf$Tumor_Sample_Barcode)))
+
+diag_summary_maf(fl_data$ssm_to_bundle, "fl_data$ssm_to_bundle (pre relabel/enrichment)", study_lookup = data.frame(sample_id = fl_data$meta_to_bundle$sample_id, study = "FL_Dreval"))
+
 fl_data$ssm_to_bundle <- fl_data$ssm_to_bundle %>%
     relabel_to_sample_id("Dreval") %>%
     dplyr::left_join(
@@ -869,11 +966,15 @@ fl_data$ssm_to_bundle <- fl_data$ssm_to_bundle %>%
     ) %>%
     distinct()
 
+diag_summary_maf(fl_data$ssm_to_bundle, "fl_data$ssm_to_bundle (post relabel/enrichment/distinct -- final)", study_lookup = data.frame(sample_id = fl_data$meta_to_bundle$sample_id, study = "FL_Dreval"))
+
 # grch37 Publication rows (Dreval FL + Reddy's original variants).
 grch37_publication_rows <- bind_rows(
     fl_data$ssm_to_bundle %>% mutate(Pipeline = "Publication"),
     reddy_original_maf %>% relabel_to_sample_id("Reddy") %>% mutate(Pipeline = "Publication")
 )
+
+diag_summary_maf(grch37_publication_rows, "grch37_publication_rows (Dreval FL + Reddy original, final)")
 
 setwd(PKG_ROOT)
 
@@ -904,20 +1005,38 @@ setwd(PKG_ROOT)
 all_slms3_meta <- sample_data$meta %>%
     filter(seq_type %in% c("genome", "capture"),
            ! sample_id %in% cell_lines_data$meta$sample_id)
+
+diag_summary(all_slms3_meta, "all_slms3_meta (pre live-metadata refetch)", study_col = "study")
+pre_refetch_ids <- all_slms3_meta$sample_id
+
 all_slms3_meta <- get_gambl_metadata() %>%
     filter(sample_id %in% all_slms3_meta$sample_id)
+
+# The single most important check in this script: if get_gambl_metadata()'s
+# live source is missing sample_ids that sample_data$meta has (e.g. an
+# externally-integrated cohort not fully registered there), this filter
+# silently drops them with no error -- every study's SLMS-3 coverage for
+# those samples goes to zero downstream. diag_missing() catches this by name
+# instead of leaving it to be inferred later from a low mutation count.
+diag_missing(pre_refetch_ids, all_slms3_meta$sample_id, "all_slms3_meta live-metadata refetch (sample_ids dropped because live get_gambl_metadata() doesn't have them)")
+# study isn't in all_slms3_meta itself (it comes straight from
+# get_gambl_metadata(), which has no such column) -- join sample_study just
+# for this diagnostic so the breakdown is by study, not left un-grouped.
+diag_summary_maf(all_slms3_meta %>% rename(Tumor_Sample_Barcode = sample_id), "all_slms3_meta (post live-metadata refetch -- what Phase 4 actually pulls for)")
 
 slms3_grch37 <- bind_rows(
     time_it("SLMS-3 genome grch37", pull_data(all_slms3_meta %>% filter(seq_type == "genome"))),
     time_it("SLMS-3 capture grch37", pull_data(all_slms3_meta %>% filter(seq_type == "capture")))
 ) %>% mutate(Pipeline = "SLMS-3")
 print("Done collecting grch37 SLMS-3")
+diag_summary_maf(slms3_grch37, "slms3_grch37 (panel-restricted pull, pre cell-line union)")
 
 slms3_hg38 <- bind_rows(
     time_it("SLMS-3 genome hg38", pull_data(all_slms3_meta %>% filter(seq_type == "genome"), "hg38")),
     time_it("SLMS-3 capture hg38", pull_data(all_slms3_meta %>% filter(seq_type == "capture"), "hg38"))
 ) %>% mutate(Pipeline = "SLMS-3")
 print("Done collecting hg38 SLMS-3")
+diag_summary_maf(slms3_hg38, "slms3_hg38 (panel-restricted pull, pre cell-line union)")
 
 # Cell lines get their own, separate, genome-WIDE SNV pull -- not restricted
 # to the lymphoma gene panel like every other cohort above. This matches
@@ -941,9 +1060,14 @@ cell_lines_ssm_hg38 <- time_it("cell lines get_ssm_by_samples hg38", {
     ) %>% select(all_of(all_cols)) %>% mutate(Pipeline = "SLMS-3")
 })
 
+message(sprintf("[DIAG] cell_lines_ssm_grch37: %d rows, %d distinct Tumor_Sample_Barcode (expect 5)", nrow(cell_lines_ssm_grch37), n_distinct(cell_lines_ssm_grch37$Tumor_Sample_Barcode)))
+message(sprintf("[DIAG] cell_lines_ssm_hg38: %d rows, %d distinct Tumor_Sample_Barcode (expect 5)", nrow(cell_lines_ssm_hg38), n_distinct(cell_lines_ssm_hg38$Tumor_Sample_Barcode)))
+
 slms3_grch37 <- bind_rows(slms3_grch37, cell_lines_ssm_grch37)
 slms3_hg38 <- bind_rows(slms3_hg38, cell_lines_ssm_hg38)
 print("Done collecting cell line SLMS-3 (genome-wide)")
+diag_summary_maf(slms3_grch37, "slms3_grch37 (final, incl. cell lines)")
+diag_summary_maf(slms3_hg38, "slms3_hg38 (final, incl. cell lines)")
 
 
 # ============================================================================
@@ -960,6 +1084,9 @@ print("Done collecting cell line SLMS-3 (genome-wide)")
 # directly.
 ashm_pull_meta <- get_gambl_metadata() %>%
     filter(sample_id %in% sample_data$meta$sample_id)
+
+diag_missing(sample_data$meta$sample_id, ashm_pull_meta$sample_id, "ashm_pull_meta live-metadata refetch (sample_ids dropped because live get_gambl_metadata() doesn't have them)")
+diag_summary_maf(ashm_pull_meta %>% rename(Tumor_Sample_Barcode = sample_id), "ashm_pull_meta (what Phase 5 actually pulls for)")
 
 regions_bed_grch37 <- create_bed_data(
     grch37_ashm_regions,
@@ -1004,6 +1131,9 @@ hg38_ashm <- hg38_ashm %>%
 sample_data$grch37$ashm <- grch37_ashm %>% distinct()
 sample_data$hg38$ashm <- hg38_ashm %>% distinct()
 
+diag_summary_maf(sample_data$grch37$ashm, "sample_data$grch37$ashm (final)")
+diag_summary_maf(sample_data$hg38$ashm, "sample_data$hg38$ashm (final)")
+
 print("done extracting aSHM mutations from GAMBLR.results")
 
 
@@ -1021,6 +1151,18 @@ sample_data$hg38$maf <- bind_rows(
     hg38_publication_rows,
     slms3_hg38
 )
+
+# The other money diagnostic: per-study coding-classified counts, mirroring
+# what get_all_coding_ssm() showed missing on the GSC -- printed at build
+# time now instead of only being discoverable in a separate later session.
+coding_classes <- c("Missense_Mutation", "Nonsense_Mutation", "Frame_Shift_Del",
+                     "Frame_Shift_Ins", "In_Frame_Del", "In_Frame_Ins",
+                     "Splice_Site", "Splice_Region", "Nonstop_Mutation",
+                     "Translation_Start_Site")
+diag_summary_maf(sample_data$grch37$maf, "sample_data$grch37$maf (final, all Variant_Classifications)")
+diag_summary_maf(sample_data$grch37$maf %>% filter(Variant_Classification %in% coding_classes), "sample_data$grch37$maf (final, coding-classified only)")
+diag_summary_maf(sample_data$hg38$maf, "sample_data$hg38$maf (final, all Variant_Classifications)")
+diag_summary_maf(sample_data$hg38$maf %>% filter(Variant_Classification %in% coding_classes), "sample_data$hg38$maf (final, coding-classified only)")
 
 print("done extracting all mutations in lymphoma genes with GAMBLR.results")
 
