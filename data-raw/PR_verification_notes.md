@@ -137,6 +137,50 @@ check whether the same bare-vs-suffixed pattern explains the
 `DO52686`/`07-35482`-style samples from the earlier, larger (3.1M row)
 loss count.
 
+## Fix: consolidated Phase 4/5 pulls passed sample_data$meta directly to get_ssm_by_regions() -- missing coding calls for hand-built cohorts
+
+`GAMBLR_examples_output.log`'s regenerated run showed a `get_coding_ssm()`
+example for 183 Dreval FL patients (sample_id matching `"SP"`) return **zero
+rows**, when it used to return real coding-classified data. Traced through
+several rounds of elimination (ID matching confirmed fine, `t_alt_count`
+confirmed numeric, `min_read_support` confirmed innocent) to: `coding_only
+= TRUE` alone reduced 28,867 real SLMS-3/grch37 rows for these patients to
+zero -- every one of them was non-coding (`Intron`/`5'Flank`/`3'Flank`/
+`5'UTR`/`3'UTR`). For 183 real FL patients to have literally zero coding
+mutations across the whole lymphoma gene panel is biologically implausible.
+
+Root cause: `unix_group` (and likely other native GAMBL metadata columns)
+is `NA` for every cohort built by hand in this script rather than pulled
+live from `get_gambl_metadata()` -- confirmed directly:
+```r
+filter(sample_data$meta, is.na(unix_group)) %>% count(study)
+#  BL_Thomas 234, DLBCL_Arthur 153, DLBCL_Thomas 43, DLBCL_cell_lines 5, FL_Dreval 443
+filter(sample_data$meta, !is.na(unix_group)) %>% count(study)
+#  DLBCL_Hilton 159, NCI_DLBCL_Golub 124, dlbcl_chapuy 233, dlbcl_reddy 999, dlbcl_schmitz 951
+```
+`get_ssm_by_regions()` apparently relies on columns like `unix_group` to
+determine which underlying merged flat file to read for a sample -- with it
+missing, it was silently returning an incomplete (non-coding-only) subset
+for affected samples instead of erroring. This was specific to Phase 4 (the
+consolidated SLMS-3 pull) and Phase 5 (the consolidated aSHM pull), both of
+which passed `sample_data$meta`-derived subsets directly to
+`get_ssm_by_regions()` -- every *other* GAMBLR.results call site in this
+script (the SV/bedpe block, the cell-lines pull, the Publication-pipeline
+enrichment steps) already re-fetched fresh, complete metadata via
+`get_gambl_metadata()` filtered by `sample_id` first, which is exactly why
+this only surfaced in the two things newly introduced this session.
+
+Fixed both: `sample_data$meta` is now used only to determine which
+`sample_id`s belong in each pull; the actual `these_samples_metadata`
+passed to `get_ssm_by_regions()` is always a fresh `get_gambl_metadata()`
+call filtered to that same `sample_id` set. General principle going
+forward, not just for these two spots: never pass `sample_data$meta` (or
+anything derived from it) directly to a GAMBLR.results function.
+
+Still need to: rebuild and re-check the Dreval `"SP"` patient example, and
+re-run `compare_bundle_changes.R` broadly in case this affected other
+samples/cohorts beyond just the one example that happened to catch it.
+
 ## Fix: cell lines need a separate, genome-wide SNV pull
 
 After the strelka-exclusion fix, `compare_bundle_changes.R` came back clean

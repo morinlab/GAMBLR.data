@@ -891,9 +891,21 @@ setwd(PKG_ROOT)
 # Cell lines are excluded here -- they get their own separate, genome-wide
 # pull below (not restricted to the lymphoma gene panel), so they must not
 # also go through this panel-restricted pull or they'd be pulled twice.
+#
+# sample_data$meta is used ONLY to decide which sample_ids belong in this
+# pull -- never passed directly to a GAMBLR.results call. Cohorts built by
+# hand (BL_Thomas, DLBCL_Thomas, FL_Dreval, DLBCL_cell_lines) don't have
+# every column a fresh get_gambl_metadata() pull would (e.g. unix_group is
+# NA for all of them), which silently caused get_ssm_by_regions() to miss
+# real coding-classified calls for those samples (confirmed: a raw pull for
+# one such sample had real Missense_Mutation/Nonsense_Mutation/Silent rows
+# that never made it into the assembled maf table). Re-fetching complete,
+# live metadata for exactly this sample_id set avoids that entirely.
 all_slms3_meta <- sample_data$meta %>%
     filter(seq_type %in% c("genome", "capture"),
            ! sample_id %in% cell_lines_data$meta$sample_id)
+all_slms3_meta <- get_gambl_metadata() %>%
+    filter(sample_id %in% all_slms3_meta$sample_id)
 
 slms3_grch37 <- bind_rows(
     time_it("SLMS-3 genome grch37", pull_data(all_slms3_meta %>% filter(seq_type == "genome"))),
@@ -942,6 +954,13 @@ print("Done collecting cell line SLMS-3 (genome-wide)")
 # aSHM block (which existed only to compensate for that gap). Arthur gets
 # aSHM coverage for the first time as a result.
 # ============================================================================
+# sample_data$meta is used only to fix the sample_id set -- see the same
+# rationale next to all_slms3_meta above for why a fresh get_gambl_metadata()
+# pull is used for the actual GAMBLR.results call instead of sample_data$meta
+# directly.
+ashm_pull_meta <- get_gambl_metadata() %>%
+    filter(sample_id %in% sample_data$meta$sample_id)
+
 regions_bed_grch37 <- create_bed_data(
     grch37_ashm_regions,
     fix_names = "concat",
@@ -950,7 +969,7 @@ regions_bed_grch37 <- create_bed_data(
 
 grch37_ashm <- time_it("grch37_ashm get_ssm_by_regions", {
     get_ssm_by_regions(
-        these_samples_metadata = sample_data$meta,
+        these_samples_metadata = ashm_pull_meta,
         regions_bed = regions_bed_grch37,
         streamlined = FALSE,
         basic_columns = FALSE
@@ -970,7 +989,7 @@ regions_bed_hg38 <- create_bed_data(
 
 hg38_ashm <- time_it("hg38_ashm get_ssm_by_regions", {
     get_ssm_by_regions(
-        these_samples_metadata = sample_data$meta,
+        these_samples_metadata = ashm_pull_meta,
         regions_bed = regions_bed_hg38,
         projection = "hg38",
         streamlined = FALSE,
