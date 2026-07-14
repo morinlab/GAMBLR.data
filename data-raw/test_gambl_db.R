@@ -74,7 +74,8 @@ cat("\n== indexes present ==\n")
 idx <- dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='index'")$name
 for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_pipe","idx_maf_variant_key",
             "idx_ashm_variant_key","idx_seg_sample",
-            "idx_bedpe_sample","idx_study_sample","idx_study_study",
+            "idx_bedpe_sample","idx_bedpe_pos_a","idx_bedpe_pos_b",
+            "idx_study_sample","idx_study_study",
             "idx_vp_sample","idx_vp_pipe","idx_vp_variant_key"))
   check(i %in% idx, sprintf("index %s", i))
 

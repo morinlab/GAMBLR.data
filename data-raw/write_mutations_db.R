@@ -134,7 +134,19 @@ write_mutations_db <- function(sample_data,
     sprintf("CREATE INDEX idx_ashm_variant_key ON ashm(%s)", variant_key_ddl),
     "CREATE INDEX idx_seg_sample  ON seg(genome_build, ID)",
     "CREATE INDEX idx_seg_pos     ON seg(genome_build, chrom, start)",
-    "CREATE INDEX idx_bedpe_sample ON bedpe(tumour_sample_id)",
+    # bedpe previously only had an index on tumour_sample_id alone -- every
+    # get_sv_from_db()/get_manta_sv() call also filters genome_build first,
+    # and its optional region filter checks both breakpoint ends (CHROM_A/
+    # START_A OR CHROM_B/START_B), none of which had anything to use, meaning
+    # a full table scan regardless of how selective the actual filters were.
+    # tumour_sample_id leads its own index (more selective than genome_build
+    # alone) with genome_build appended so sample-restricted queries resolve
+    # in one lookup; separate genome_build-led indexes on each breakpoint end
+    # let SQLite's OR-optimization use a different index per side of a
+    # region search.
+    "CREATE INDEX idx_bedpe_sample ON bedpe(tumour_sample_id, genome_build)",
+    "CREATE INDEX idx_bedpe_pos_a  ON bedpe(genome_build, CHROM_A, START_A)",
+    "CREATE INDEX idx_bedpe_pos_b  ON bedpe(genome_build, CHROM_B, START_B)",
     "CREATE INDEX idx_meta_sample  ON sample_meta(sample_id)",
     "CREATE INDEX idx_meta_barcode ON sample_meta(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_study_sample ON sample_study(sample_id)",

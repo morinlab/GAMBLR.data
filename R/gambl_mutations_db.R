@@ -71,7 +71,10 @@
 #' (the same logic used to populate these tables) and filter on
 #' `(genome_build, Chromosome, Start_Position)` instead -- see
 #' `GAMBLR.data::get_ssm_from_db()`. `seg`: `(genome_build, ID)`,
-#' `(genome_build, chrom, start)`. `bedpe`: `tumour_sample_id`.
+#' `(genome_build, chrom, start)`. `bedpe`: `(tumour_sample_id,
+#' genome_build)`, `(genome_build, CHROM_A, START_A)`, `(genome_build,
+#' CHROM_B, START_B)` (one per breakpoint end, so a region search that OR's
+#' both ends can use a different index per side).
 #' `sample_meta`: `sample_id`, `Tumor_Sample_Barcode`. `sample_study`:
 #' `sample_id`, `study`. `variant_pipeline`: `Tumor_Sample_Barcode`,
 #' `(elem, genome_build, Pipeline)`.
