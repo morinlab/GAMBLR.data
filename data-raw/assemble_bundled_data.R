@@ -924,10 +924,14 @@ relabel_to_sample_id <- function(df, study_name) {
         select(-.gambl_sample_id)
 }
 
-# This is needed for the proteinpainter compatibility. Reads from the
-# *installed* GAMBLR.data::sample_data (not the locally-built sample_data
-# above) -- a pre-existing, out-of-scope inconsistency, left as-is.
-GAMBLR.data::sample_data$meta$cohort %>% table
+# This is needed for the proteinpainter compatibility. Previously read
+# from the *installed* GAMBLR.data::sample_data rather than the
+# locally-built sample_data above -- a stale-data risk (the installed copy
+# could be out of sync with this run, and is the reason sample_data.rda
+# was still shipped in the package at all) fixed by switching to the local
+# object, which by this point (Phase 2 already ran) has every cohort this
+# block needs.
+sample_data$meta$study %>% table
 
 selected_columns <- c(
         "Tumor_Sample_Barcode", "Hugo_Symbol",
@@ -935,16 +939,16 @@ selected_columns <- c(
         "Tumor_Seq_Allele2", maf_columns_to_keep
 )
 
-these_samples <- GAMBLR.data::sample_data$meta %>%
+these_samples <- sample_data$meta %>%
     filter(study %in% c("BL_Thomas")) %>%
     pull(sample_id)
 
-these_samples_dlbcl <- GAMBLR.data::sample_data$meta %>%
+these_samples_dlbcl <- sample_data$meta %>%
     filter(study %in% c("DLBCL_Thomas", "DLBCL_cell_lines")) %>%
     pull(sample_id)
 
-message(sprintf("[DIAG] these_samples (BL_Thomas, from installed GAMBLR.data::sample_data): %d ids", length(these_samples)))
-message(sprintf("[DIAG] these_samples_dlbcl (DLBCL_Thomas + DLBCL_cell_lines, from installed GAMBLR.data::sample_data): %d ids", length(these_samples_dlbcl)))
+message(sprintf("[DIAG] these_samples (BL_Thomas): %d ids", length(these_samples)))
+message(sprintf("[DIAG] these_samples_dlbcl (DLBCL_Thomas + DLBCL_cell_lines): %d ids", length(these_samples_dlbcl)))
 
 coding_maf <- read_tsv("/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf") %>% # get from flat maf file to show SSM in hg38 coordinates similar to the original manuscript
     filter(Tumor_Sample_Barcode %in% these_samples & # drop BL58 cell line
@@ -985,11 +989,11 @@ hg38_publication_rows <- bind_rows(
 
 diag_summary_maf(hg38_publication_rows, "hg38_publication_rows (Thomas BL+DLBCL, final)")
 
-this_study_samples <- GAMBLR.data::sample_data$meta %>%
+this_study_samples <- sample_data$meta %>%
     filter(study %in% c("FL_Dreval", "DLBCL_cell_lines")) %>%
     pull(sample_id)
 
-message(sprintf("[DIAG] this_study_samples (FL_Dreval + DLBCL_cell_lines, from installed GAMBLR.data::sample_data): %d ids", length(this_study_samples)))
+message(sprintf("[DIAG] this_study_samples (FL_Dreval + DLBCL_cell_lines): %d ids", length(this_study_samples)))
 
 # FLs in grch37
 coding_maf <- time_it("coding_maf get_ssm_by_samples", {
