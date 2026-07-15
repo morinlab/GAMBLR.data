@@ -4,10 +4,15 @@
 \alias{gambl_mutations_db}
 \title{Connect to the GAMBL mutations database.}
 \usage{
-gambl_mutations_db(db_path = NULL)
+gambl_mutations_db(db_path = NULL, auto_download = TRUE)
 }
 \arguments{
 \item{db_path}{Optional explicit path to the .db file.}
+
+\item{auto_download}{When no existing copy is found, download it
+automatically via \code{\link[=download_gambl_mutations_db]{download_gambl_mutations_db()}}. Default \code{TRUE};
+can also be disabled globally with
+\code{options(GAMBLR.data.auto_download = FALSE)}.}
 }
 \value{
 A read-only DBIConnection.
@@ -22,7 +27,8 @@ helper (\code{data-raw/write_mutations_db.R}).
 \details{
 Unlike the small bundled \code{\link[=gambl_reference_db]{gambl_reference_db()}}, this file is large
 (several hundred MB) and is NOT shipped inside the package. It is
-distributed as a cached release asset. The path is resolved in this order:
+distributed as a GitHub Release asset (see \code{\link[=download_gambl_mutations_db]{download_gambl_mutations_db()}})
+and cached locally. The path is resolved in this order:
 \enumerate{
 \item the \code{db_path} argument;
 \item \code{getOption("GAMBLR.data.mutations_db")};
@@ -30,6 +36,11 @@ distributed as a cached release asset. The path is resolved in this order:
 \item the user cache dir, \code{tools::R_user_dir("GAMBLR.data", "cache")};
 \item \code{gambl_mutations.db} in the working directory (development).
 }
+If none of these exist and \code{auto_download} is \code{TRUE} (the default), the
+file is downloaded automatically into the user cache dir via
+\code{\link[=download_gambl_mutations_db]{download_gambl_mutations_db()}}. Set \code{auto_download = FALSE}, or
+\code{options(GAMBLR.data.auto_download = FALSE)} to disable this globally
+(e.g. offline/CI environments) and get an explicit error instead.
 }
 \section{Table reference}{
 Both genome builds are stacked into the same table (not split across
@@ -37,13 +48,14 @@ separate tables); filter on \code{genome_build} (\code{"grch37"} / \code{"hg38"}
 one. \code{maf} and \code{ashm} share the same (curated, 49-column) schema: a reduced
 column set, not the full upstream flatfile MAF.\tabular{llll}{
    Table \tab Rows (typical) \tab Grain \tab Key columns \cr
-   \code{maf} \tab ~3.6M \tab one somatic mutation call \tab \verb{Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline, genome_build} (+ ~35 more MAF-standard columns) \cr
-   \code{ashm} \tab ~135k \tab one mutation call in an aSHM region \tab same schema as \code{maf} \cr
+   \code{maf} \tab ~3.6M \tab one somatic mutation call \tab \code{mutation_id} (surrogate integer key, unique within \code{maf} across both genome builds -- assigned at write time, after deduplication; \code{variant_pipeline} references it as a foreign key), \verb{Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. }"slms-3"\code{/}"publication"\verb{ -- normalized at write time so it can be matched with a plain, indexed equality), genome_build} (+ ~35 more MAF-standard columns) \cr
+   \code{ashm} \tab ~135k \tab one mutation call in an aSHM region \tab same schema as \code{maf} (its own independent \code{mutation_id} sequence) \cr
    \code{seg} \tab ~126k \tab one copy-number segment \tab \verb{ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build} \cr
    \code{bedpe} \tab ~900 \tab one Manta structural-variant breakpoint pair \tab \verb{CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build} \cr
    \code{sample_meta} \tab ~3.3k \tab one sample \tab \verb{patient_id, sample_id, Tumor_Sample_Barcode, seq_type, pathology, cohort, study, ...} (its own \code{genome_build} column records the sample's native alignment build, unrelated to the per-row build stamp used in the other tables) \cr
    \code{sample_study} \tab varies \tab one (sample, study) membership fact -- many-to-many, a sample belonging to N studies is N rows \tab \verb{sample_id, study, study_id, reference_PMID}. \code{study_id} is that study's own identifier for the sample where it differs from GAMBL's \code{sample_id} (e.g. a paper's own case/patient ID); NA where no study-specific ID has been sourced. \cr
-   \code{build_info} \tab 9 \tab key/value \tab provenance (\code{source}, \code{built_at}, \code{builder}) and expected row counts (\code{n_maf}, \code{n_ashm}, \code{n_seg}, \code{n_bedpe}, \code{n_samples}, \code{n_sample_study}) used by the \code{data-raw/test_gambl_db.R} regression checks \cr
+   \code{variant_pipeline} \tab varies \tab one (mutation, Pipeline) fact -- many-to-many, a variant independently called by N pipelines is N rows \tab \verb{mutation_id, elem, Pipeline}. \code{mutation_id} is a foreign key to \code{maf.mutation_id} or \code{ashm.mutation_id} depending on \code{elem} (\code{"maf"} or \code{"ashm"}) -- not a natural key, so this table doesn't repeat the variant's own position/sample columns. \cr
+   \code{build_info} \tab 10 \tab key/value \tab provenance (\code{source}, \code{built_at}, \code{builder}) and expected row counts (\code{n_maf}, \code{n_ashm}, \code{n_seg}, \code{n_bedpe}, \code{n_samples}, \code{n_sample_study}, \code{n_variant_pipeline}) used by the \code{data-raw/test_gambl_db.R} regression checks \cr
 }
 
 
@@ -54,25 +66,42 @@ than one study anyway, and a per-row tag caused the same sample's
 mutations to be pulled and duplicated once per cohort-specific code path
 that claimed it (see \code{GAMBLR.data::get_ssm_from_db()}'s \code{this_study}
 parameter for how to filter by study post-refactor).
+
+Similarly, \code{maf}/\code{ashm} only ever carry ONE \code{Pipeline} value per variant,
+even though the same real mutation can be independently produced by more
+than one pipeline (e.g. a cohort's own published/curated maf and our
+separate SLMS-3 recall both calling the same position) -- when that
+happens, \code{write_mutations_db()}'s write-time dedup keeps one row
+arbitrarily (whichever pipeline's data was assembled first), which would
+otherwise make the variant invisible to a query for the \emph{other} pipeline
+even though it's still fully present in the table. \code{variant_pipeline}
+records every pipeline that actually produced each variant, independent
+of which one "won" as \code{maf}/\code{ashm}'s single representative row; see
+\code{GAMBLR.data::get_ssm_from_db()}'s \code{tool_name} parameter, which resolves
+against this table rather than \code{maf}/\code{ashm}'s own \code{Pipeline} column.
 \subsection{Join keys}{
 
 \code{maf}, \code{ashm}, and \code{bedpe} (via \code{tumour_sample_id}) key to
 \code{sample_meta$Tumor_Sample_Barcode} / \code{sample_meta$sample_id}; \code{seg$ID} keys
 to \code{sample_meta$sample_id}; \code{sample_study$sample_id} keys to
-\code{sample_meta$sample_id}.
+\code{sample_meta$sample_id}; \code{variant_pipeline$mutation_id} keys to
+\code{maf.mutation_id} or \code{ashm.mutation_id}, selecting which one via
+\code{variant_pipeline$elem}.
 }
 
 \subsection{Indexes}{
 
 \code{maf}/\code{ashm}: \verb{(genome_build, Chromosome, Start_Position)},
-\code{Tumor_Sample_Barcode}, \code{Pipeline} (maf only). No index on
+\code{Tumor_Sample_Barcode}, \code{Pipeline}, \code{mutation_id}. No index on
 \code{Hugo_Symbol}: gene-restricted queries resolve the gene to a region first
 (the same logic used to populate these tables) and filter on
 \verb{(genome_build, Chromosome, Start_Position)} instead -- see
 \code{GAMBLR.data::get_ssm_from_db()}. \code{seg}: \verb{(genome_build, ID)},
-\verb{(genome_build, chrom, start)}. \code{bedpe}: \code{tumour_sample_id}.
+\verb{(genome_build, chrom, start)}. \code{bedpe}: \verb{(tumour_sample_id, genome_build)}, \verb{(genome_build, CHROM_A, START_A)}, \verb{(genome_build, CHROM_B, START_B)} (one per breakpoint end, so a region search that OR's
+both ends can use a different index per side).
 \code{sample_meta}: \code{sample_id}, \code{Tumor_Sample_Barcode}. \code{sample_study}:
-\code{sample_id}, \code{study}.
+\code{sample_id}, \code{study}. \code{variant_pipeline}: \code{mutation_id},
+\verb{(elem, Pipeline)}.
 }
 }
 
@@ -81,10 +110,11 @@ to \code{sample_meta$sample_id}; \code{sample_study$sample_id} keys to
 con <- gambl_mutations_db()
 DBI::dbListTables(con)
 
-# coding mutations in TP53, grch37, one pipeline
+# coding mutations in TP53, grch37, one pipeline (Pipeline is stored
+# lowercase -- see the Pipeline column note above)
 dplyr::tbl(con, "maf") |>
   dplyr::filter(genome_build == "grch37", Hugo_Symbol == "TP53",
-               Pipeline == "SLMS-3") |>
+               Pipeline == "slms-3") |>
   dplyr::collect()
 }
 }
