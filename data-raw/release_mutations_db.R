@@ -34,6 +34,25 @@ if (!requireNamespace("piggyback", quietly = TRUE)) {
   stop("Install piggyback first: install.packages(\"piggyback\")")
 }
 
+# The tag is derived from DESCRIPTION's Version on disk, but
+# download_gambl_mutations_db() on every *other* install resolves the same
+# tag from utils::packageVersion("GAMBLR.data") -- i.e. whatever's actually
+# committed and installed elsewhere. If the version bump used to build this
+# tag isn't committed and pushed, every install (including a future
+# reinstall of this exact checkout) will keep resolving the OLD version and
+# never find this release at all.
+git_diff_status <- suppressWarnings(system2("git", c("diff", "--quiet", "--", "DESCRIPTION"), stdout = FALSE, stderr = FALSE))
+git_staged_status <- suppressWarnings(system2("git", c("diff", "--quiet", "--cached", "--", "DESCRIPTION"), stdout = FALSE, stderr = FALSE))
+if (git_diff_status != 0 || git_staged_status != 0) {
+  stop("DESCRIPTION has uncommitted changes. Commit and push the version bump ",
+       "to \"", pkg_version, "\" BEFORE running this script, or every install ",
+       "(including your own) will keep resolving a different version and ",
+       "never find the \"", tag, "\" release you're about to create.",
+       call. = FALSE)
+}
+head_tag_check <- system2("git", c("log", "-1", "--format=%H"), stdout = TRUE, stderr = FALSE)
+message("Releasing from commit ", head_tag_check, " -- make sure this has been pushed to origin.")
+
 message(sprintf("Releasing %s to %s @ %s (%.0f MB)",
                 db_path, repo, tag, file.info(db_path)$size / 1024^2))
 
