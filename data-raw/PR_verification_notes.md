@@ -457,19 +457,36 @@ anything under test here.
 | Stage | Total suite time | `calc_mutation_frequency_bin_regions` |
 | --- | --- | --- |
 | Mid-refactor, before indexing fixes | ~242s (4m22s incl. `run_examples()` overhead) | 142s |
-| After `calc_mutation_frequency_bin_regions` bulk-fetch + `lapply` fix (indexing fixes already included) | ~130s | 30.2s |
+| After `calc_mutation_frequency_bin_regions` bulk-fetch + `lapply` fix (indexing fixes already included), on the GSC | ~130s | 30.2s |
+| Same DB synced to a local laptop, same code, local disk instead of GSC storage | 33.8s (incl. 5.8s package load) | 12.2s |
 
-Remaining largest items (`assign_cn_to_ssm` 23.7s, `get_ashm_count_matrix`
-19.2s) were investigated and are **not** the same class of bug -- both
-already make single, consolidated database calls. Their cost is genuine
-R-side computation (`assign_cn_to_ssm`'s `cool_overlaps()` call is a
-chromosome-level many-to-many join between mutations and CN segments,
-scaling with mutations x segments per chromosome per sample) rather than
-a missing index or a redundant query loop, and would need an algorithmic
-change (e.g. a genuine interval-join data structure) rather than a query
-fix -- out of scope for this pass. `calc_mutation_frequency_bin_regions`'s
-own remaining 30.2s is not yet decomposed between its single bulk query
-and its (now-sequential) per-region windowing computation.
+On the GSC, the next-largest remaining items after the fix above were
+`assign_cn_to_ssm` (23.7s) and `get_ashm_count_matrix` (19.2s). Investigated
+both -- neither has the same "N queries instead of 1" bug already fixed
+above; both already make single, consolidated database calls
+(`get_cn_segments()` + `get_ssm_by_samples()`, and `get_ssm_by_regions()`
+respectively). Initially assessed `assign_cn_to_ssm`'s cost as inherent
+R-side computation (its `cool_overlaps()` call is a chromosome-level
+many-to-many join between mutations and CN segments, scaling with
+mutations x segments per chromosome per sample) rather than something an
+index could fix.
+
+**That assessment was wrong, or at least incomplete** -- the laptop
+comparison above shows `assign_cn_to_ssm` dropping out of the slowest-10
+list entirely (under ~1.1s) on the same DB, same code, local disk. A
+`cool_overlaps()` join being purely CPU-bound R computation wouldn't
+plausibly speed up ~20x just from moving the DB file to local storage; the
+dominant cost on the GSC was disk/network I/O for its two underlying
+queries, not the join itself. `calc_mutation_frequency_bin_regions` shows
+the same pattern to a lesser degree (30.2s -> 12.2s on the identical single
+bulk query + windowing code) -- some of its remaining cost is I/O-bound
+too, not purely the sliding-window computation.
+
+Practical implication: further **code**-level query optimization on the
+GSC has sharply diminishing returns at this point. The larger remaining
+lever is infrastructure -- where `gambl_mutations.db` physically lives on
+GSC storage (e.g. local scratch/SSD vs. a networked home-directory mount)
+-- not something fixable from this refactor.
 
 Not a like-for-like comparison to the original 51.2s baseline: that
 predates `gambl_mutations.db` entirely (in-memory, lazy-loaded
