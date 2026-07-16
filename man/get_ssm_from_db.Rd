@@ -22,8 +22,17 @@ get_ssm_from_db(
 
 \item{sample_ids}{Optional character vector of \code{Tumor_Sample_Barcode} to keep.}
 
-\item{tool_name}{Pipeline to keep (matched case-insensitively). Default
-"slms-3"; set NULL to skip the Pipeline filter.}
+\item{tool_name}{Pipeline to keep, matched case-insensitively (the value
+you pass is lowercased before comparing; the stored Pipeline column is
+itself normalized to lowercase at write time, so this is a plain,
+indexed equality check rather than a function-wrapped one). Default
+"slms-3"; set NULL to skip the Pipeline filter. Resolved via the
+\code{variant_pipeline} join table (see \code{\link[=gambl_mutations_db]{gambl_mutations_db()}}'s schema
+docs) rather than \code{maf}/\code{ashm}'s own Pipeline column, so a variant
+independently called by more than one pipeline is still found by a
+query for either one, even though its single maf/ashm row can only
+carry one Pipeline value. Falls back to filtering the column directly
+against DBs built before variant_pipeline existed.}
 
 \item{include_ashm}{When TRUE, also query the \code{ashm} table and row-bind it.}
 
@@ -42,13 +51,16 @@ supplied; composes with \code{tool_name}/Pipeline exactly as before (e.g.
 while \verb{this_study="Reddy", tool_name="publication"} returns Reddy's
 as-published rows only).}
 
-\item{regions}{Optional data frame with columns \code{chrom}, \code{start}, \code{end}; rows
-are OR-ed (each region is an indexed range scan).}
+\item{regions}{Optional data frame with columns \code{chrom}, \code{start}, \code{end};
+rows are OR-ed and applied as a single combined query (not one query per
+region), so passing hundreds of regions (e.g. one per gene in a panel)
+doesn't cost hundreds of separate round trips.}
 
 \item{con}{Optional DBI connection (defaults to \code{\link[=gambl_mutations_db]{gambl_mutations_db()}}).}
 }
 \value{
-A data frame of MAF rows (the \code{genome_build} helper column is dropped).
+A data frame of MAF rows (the \code{genome_build}/\code{mutation_id} helper
+columns are dropped).
 }
 \description{
 Shared data-access helper that retrieves simple somatic mutations
