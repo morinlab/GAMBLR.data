@@ -8,7 +8,8 @@
 #'
 #' @details Unlike the small bundled [gambl_reference_db()], this file is large
 #' (several hundred MB) and is NOT shipped inside the package. It is
-#' distributed as a cached release asset. The path is resolved in this order:
+#' distributed as a GitHub Release asset (see [download_gambl_mutations_db()])
+#' and cached locally. The path is resolved in this order:
 #' \enumerate{
 #'   \item the `db_path` argument;
 #'   \item `getOption("GAMBLR.data.mutations_db")`;
@@ -16,6 +17,11 @@
 #'   \item the user cache dir, `tools::R_user_dir("GAMBLR.data", "cache")`;
 #'   \item `gambl_mutations.db` in the working directory (development).
 #' }
+#' If none of these exist and `auto_download` is `TRUE` (the default), the
+#' file is downloaded automatically into the user cache dir via
+#' [download_gambl_mutations_db()]. Set `auto_download = FALSE`, or
+#' `options(GAMBLR.data.auto_download = FALSE)` to disable this globally
+#' (e.g. offline/CI environments) and get an explicit error instead.
 #'
 #' # Table reference
 #'
@@ -80,6 +86,10 @@
 #' `(elem, Pipeline)`.
 #'
 #' @param db_path Optional explicit path to the .db file.
+#' @param auto_download When no existing copy is found, download it
+#'   automatically via [download_gambl_mutations_db()]. Default `TRUE`;
+#'   can also be disabled globally with
+#'   `options(GAMBLR.data.auto_download = FALSE)`.
 #'
 #' @return A read-only DBIConnection.
 #'
@@ -96,24 +106,33 @@
 #'   dplyr::collect()
 #' }
 #' @export
-gambl_mutations_db <- function(db_path = NULL) {
+gambl_mutations_db <- function(db_path = NULL, auto_download = TRUE) {
   if (is.null(db_path)) {
     opt <- getOption("GAMBLR.data.mutations_db", default = NULL)
     env <- Sys.getenv("GAMBLR_MUTATIONS_DB", unset = "")
+    cache_path <- file.path(tools::R_user_dir("GAMBLR.data", "cache"), "gambl_mutations.db")
     candidates <- c(
       opt,
       if (nzchar(env)) env,
-      file.path(tools::R_user_dir("GAMBLR.data", "cache"), "gambl_mutations.db"),
+      cache_path,
       "gambl_mutations.db"
     )
     candidates <- candidates[!is.null(candidates)]
     hit <- candidates[file.exists(candidates)]
     if (length(hit) == 0) {
-      stop("gambl_mutations.db not found. Set options(GAMBLR.data.mutations_db = \"/path\"), ",
-           "the GAMBLR_MUTATIONS_DB env var, or place it in ",
-           tools::R_user_dir("GAMBLR.data", "cache"), call. = FALSE)
+      can_auto_download <- isTRUE(auto_download) && isTRUE(getOption("GAMBLR.data.auto_download", TRUE))
+      if (can_auto_download) {
+        db_path <- download_gambl_mutations_db(dest_path = cache_path)
+      } else {
+        stop("gambl_mutations.db not found. Set options(GAMBLR.data.mutations_db = \"/path\"), ",
+             "the GAMBLR_MUTATIONS_DB env var, place it in ",
+             tools::R_user_dir("GAMBLR.data", "cache"),
+             ", or call gambl_mutations_db() with auto_download = TRUE (the default) ",
+             "to fetch it automatically.", call. = FALSE)
+      }
+    } else {
+      db_path <- hit[1]
     }
-    db_path <- hit[1]
   }
   stopifnot(file.exists(db_path))
 

@@ -39,5 +39,6 @@ Imports:
     tidyr
 LazyDataCompression: xz
 Suggests:
+    piggyback,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

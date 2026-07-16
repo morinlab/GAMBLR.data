@@ -4,10 +4,15 @@
 \alias{gambl_mutations_db}
 \title{Connect to the GAMBL mutations database.}
 \usage{
-gambl_mutations_db(db_path = NULL)
+gambl_mutations_db(db_path = NULL, auto_download = TRUE)
 }
 \arguments{
 \item{db_path}{Optional explicit path to the .db file.}
+
+\item{auto_download}{When no existing copy is found, download it
+automatically via \code{\link[=download_gambl_mutations_db]{download_gambl_mutations_db()}}. Default \code{TRUE};
+can also be disabled globally with
+\code{options(GAMBLR.data.auto_download = FALSE)}.}
 }
 \value{
 A read-only DBIConnection.
@@ -22,7 +27,8 @@ helper (\code{data-raw/write_mutations_db.R}).
 \details{
 Unlike the small bundled \code{\link[=gambl_reference_db]{gambl_reference_db()}}, this file is large
 (several hundred MB) and is NOT shipped inside the package. It is
-distributed as a cached release asset. The path is resolved in this order:
+distributed as a GitHub Release asset (see \code{\link[=download_gambl_mutations_db]{download_gambl_mutations_db()}})
+and cached locally. The path is resolved in this order:
 \enumerate{
 \item the \code{db_path} argument;
 \item \code{getOption("GAMBLR.data.mutations_db")};
@@ -30,6 +36,11 @@ distributed as a cached release asset. The path is resolved in this order:
 \item the user cache dir, \code{tools::R_user_dir("GAMBLR.data", "cache")};
 \item \code{gambl_mutations.db} in the working directory (development).
 }
+If none of these exist and \code{auto_download} is \code{TRUE} (the default), the
+file is downloaded automatically into the user cache dir via
+\code{\link[=download_gambl_mutations_db]{download_gambl_mutations_db()}}. Set \code{auto_download = FALSE}, or
+\code{options(GAMBLR.data.auto_download = FALSE)} to disable this globally
+(e.g. offline/CI environments) and get an explicit error instead.
 }
 \section{Table reference}{
 Both genome builds are stacked into the same table (not split across

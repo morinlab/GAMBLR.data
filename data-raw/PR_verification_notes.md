@@ -385,8 +385,115 @@ tagged "Publication"; `tool_name = "publication"` also finds it; and with
 `variant_pipeline` dropped (simulating an old DB), the query correctly
 falls back to the old (narrower, expected) behavior rather than erroring.
 
-**Still to do**: rebuild on the GSC with this fix and re-run
-`get_all_coding_ssm()`/direct SQL against the fresh DB to confirm Dreval's
-SLMS-3-tagged coding counts are healthy through the new join, and re-run
-`compare_bundle_changes.R` for the full per-sample gained/lost view against
-this latest build.
+**Update**: rebuilt and confirmed on the GSC. `get_all_coding_ssm()` and
+direct SQL against the fresh DB both show healthy Dreval SLMS-3-tagged
+coding counts through the `variant_pipeline` join, resolving the original
+symptom.
+
+## Performance: query-layer indexing and GAMBLR.open query patterns
+
+While retesting the fix above, `GAMBLR.open`'s `tools/logExampleOutputs.R`
+example suite runtime came back noticeably regressed against its
+pre-refactor baseline: 51.2s (`b061311`, 2026-06-12, pre-`gambl_mutations.db`
+sample_study/variant_pipeline work) vs. 4m37s-11m35s across several
+mid-refactor reruns. Investigated and fixed several distinct, compounding
+issues:
+
+- **`Pipeline` case mismatch broke every index on it.** `idx_maf_pipe`/
+  `idx_vp_pipe` were plain indexes on the raw `Pipeline` column, but every
+  actual query filters on `tolower(Pipeline)`/`lower(Pipeline)` for
+  case-insensitive matching -- SQLite can't use a plain b-tree index to
+  satisfy a function-wrapped predicate, so these indexes were never
+  actually usable; every `tool_name`-filtered query (the default) fell
+  back to a full table scan. Fixed at the source instead of with
+  expression indexes: `Pipeline` is now normalized to lowercase once, at
+  write time, in both `maf`/`ashm` and `variant_pipeline`, so reads use a
+  plain equality against a plain index.
+- **No index at all on the new `variant_pipeline` semi-join's key.** Added
+  composite indexes on the variant key to both sides of the join.
+- **`variant_pipeline`'s 5-column natural key replaced with a surrogate
+  `mutation_id`** (see "Fix: `variant_pipeline` join table" above) -- a
+  single indexed integer join instead of a 5-column composite (two of them
+  text).
+- **`bedpe` had only one index** (`tumour_sample_id` alone) despite every
+  `get_sv_from_db()`/`get_manta_sv()` call also filtering `genome_build`
+  and its region search checking both breakpoint ends. Added
+  `(tumour_sample_id, genome_build)` and a `genome_build`-led index per
+  breakpoint end.
+- **`get_ssm_from_db()`'s `regions` parameter looped, one query per
+  region.** `get_ssm_by_regions()` commonly passes 100+ regions (one per
+  gene in the aSHM/lymphoma panel) in a single call -- consolidated into
+  one query with a combined OR'd condition instead of N round trips. Also
+  fixed a latent duplicate-row bug this had: a variant inside two
+  overlapping regions was previously returned once per matching region and
+  `bind_rows()`'d into duplicate rows.
+- **`GAMBLR.open::calc_mutation_frequency_bin_regions()` looped over every
+  region calling a function that queries the database per region** (not a
+  `gambl_mutations.db`-side issue, but the single largest cost found: 142s
+  of a ~240s total example-suite run). Its own per-region helper already
+  supported a pre-fetched `maf_data` short-circuit that skipped the
+  database entirely; the plural function just never used it. Fixed to
+  bulk-fetch once via `get_ssm_by_regions()` before the per-region loop.
+  Also replaced `mclapply()` with `lapply()` here, at the user's request --
+  once each iteration is fast in-memory subsetting rather than a database
+  call, there's little left to parallelize, and `mclapply()`'s
+  fork-per-worker model both multiplies peak memory (each fork copies the
+  parent's memory) and forking a live DB connection across processes is a
+  correctness/contention risk this avoids entirely.
+
+All fixes verified with synthetic-data/stubbed-out control-flow tests
+(see individual commits) rather than against the live GSC, since none of
+this repo's automated tests have GSC access.
+
+### Results
+
+Measured with `tools/fast_example_timer.R` (GAMBLR.open), a leaner
+per-example-timed replacement for `logExampleOutputs.R` written during
+this investigation -- `devtools::run_examples()` has `document = TRUE` by
+default, meaning every run also pays for a full roxygen regeneration of
+every `.Rd` file + `NAMESPACE` plus two full package reloads, unrelated to
+anything under test here.
+
+| Stage | Total suite time | `calc_mutation_frequency_bin_regions` |
+| --- | --- | --- |
+| Mid-refactor, before indexing fixes | ~242s (4m22s incl. `run_examples()` overhead) | 142s |
+| After `calc_mutation_frequency_bin_regions` bulk-fetch + `lapply` fix (indexing fixes already included), on the GSC | ~130s | 30.2s |
+| Same DB synced to a local laptop, same code, local disk instead of GSC storage | 33.8s (incl. 5.8s package load) | 12.2s |
+
+On the GSC, the next-largest remaining items after the fix above were
+`assign_cn_to_ssm` (23.7s) and `get_ashm_count_matrix` (19.2s). Investigated
+both -- neither has the same "N queries instead of 1" bug already fixed
+above; both already make single, consolidated database calls
+(`get_cn_segments()` + `get_ssm_by_samples()`, and `get_ssm_by_regions()`
+respectively). Initially assessed `assign_cn_to_ssm`'s cost as inherent
+R-side computation (its `cool_overlaps()` call is a chromosome-level
+many-to-many join between mutations and CN segments, scaling with
+mutations x segments per chromosome per sample) rather than something an
+index could fix.
+
+**That assessment was wrong, or at least incomplete** -- the laptop
+comparison above shows `assign_cn_to_ssm` dropping out of the slowest-10
+list entirely (under ~1.1s) on the same DB, same code, local disk. A
+`cool_overlaps()` join being purely CPU-bound R computation wouldn't
+plausibly speed up ~20x just from moving the DB file to local storage; the
+dominant cost on the GSC was disk/network I/O for its two underlying
+queries, not the join itself. `calc_mutation_frequency_bin_regions` shows
+the same pattern to a lesser degree (30.2s -> 12.2s on the identical single
+bulk query + windowing code) -- some of its remaining cost is I/O-bound
+too, not purely the sliding-window computation.
+
+Practical implication: further **code**-level query optimization on the
+GSC has sharply diminishing returns at this point. The larger remaining
+lever is infrastructure -- where `gambl_mutations.db` physically lives on
+GSC storage (e.g. local scratch/SSD vs. a networked home-directory mount)
+-- not something fixable from this refactor.
+
+Not a like-for-like comparison to the original 51.2s baseline: that
+predates `gambl_mutations.db` entirely (in-memory, lazy-loaded
+`sample_data.rda`, not a SQL database), and cohort sizes have grown
+materially since then regardless (e.g. `DLBCL_Gascoyne` 21->42,
+`DLBCL_GenomeCanada` 59->110). A SQL-backed system pays real per-query
+overhead (connection, parse, plan, result marshaling) on every one of the
+dozens of separate calls across the example suite that an in-memory R
+object never had to pay; indexing closes the "full scan vs. indexed
+lookup" gap, not that architectural difference.
