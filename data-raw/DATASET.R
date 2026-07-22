@@ -548,3 +548,9 @@ usethis::use_data(grch37_adaptive_sampling_targets, overwrite = TRUE)
 hg38_adaptive_sampling_targets = system.file("extdata","adaptive_sampling_targets.hg38.bed",package="GAMBLR.data") %>%
   read_tsv()
 usethis::use_data(hg38_adaptive_sampling_targets, overwrite = TRUE)
+
+lymphgen_genes = readRDS(system.file("extdata", "lymphgen_genes.RDS", package = "GAMBLR.data"))
+usethis::use_data(lymphgen_genes, overwrite = TRUE)
+
+dlbclass_vector = readRDS(system.file("extdata", "dlbclass_features.RDS", package = "GAMBLR.data"))
+usethis::use_data(dlbclass_vector, overwrite = TRUE)

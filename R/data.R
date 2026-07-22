@@ -1156,3 +1156,24 @@
 #' }
 #' @keywords internal
 "hg38_adaptive_sampling_targets"
+
+
+#' LymphGen Genes.
+#'
+#' A named factor of genes used in LymphGen with their subtype association. 
+#'
+#' @format ## `lymphgen_genes`
+#' A character vector of length 86. Names are genes, values are their LymphGen subtype association. Values are a factor with levels consistent with typical subtype ordering. Useful for splitGeneGroups argument to prettyOncoplot. 
+#' @keywords internal
+"lymphgen_genes"
+
+#' DLBclass Features Vector.
+#'
+#' A named factor of features used in DLBclass with their subtype association. 
+#'
+#' @format ## `dlbclass_vector`
+#' A character vector of length 163. Names are features, values are their DLBclass subtype association. Values are a factor with levels consistent with typical subtype ordering. Useful for splitGeneGroups argument to prettyOncoplot. 
+#' 
+#' N.B. Uses DLBclass feature nomenclature, e.g. "MYD88.L265P". May not map automatically to Hugo_Symbol. 
+#' @keywords internal
+"dlbclass_vector"

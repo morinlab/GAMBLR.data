@@ -19,9 +19,11 @@ e.g. MCL, DLBCL, BL.}
 for the curated subset.}
 
 \item{gene_format}{Specify what to return as output. Can be one of:
-* "symbol" (the default): list of gene symbols
-* "ensembl": list of ENSEMBLE IDs
-* "data.frame": data frame with column Gene and per-entity gene status}
+\itemize{
+\item "symbol" (the default): list of gene symbols
+\item "ensembl": list of ENSEMBLE IDs
+\item "data.frame": data frame with column Gene and per-entity gene status
+}}
 
 \item{version}{Specify which version to return. Currently supported versions
 are 0.0 (legacy version from original GAMBLR), 0.1, and _latest. The
