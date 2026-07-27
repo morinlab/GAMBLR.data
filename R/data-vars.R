@@ -19,7 +19,7 @@ if (getRversion() >= "2.15.1") {
     "SCORE", "START_A", "START_B", "Start_Position", "Start_Position.x", 
     "Tumor_Sample_Barcode", "VAF_tumour", "Variant_Classification", 
     "bin", "category", "chrom", "cohort", "colour", "curated", "end", 
-    "ensembl_gene_id", "gambl_metadata", "gene", "genome_build", 
+    "ensembl_gene_id", "gene", "genome_build",
     "grch37_ashm_regions", "group", "head", "hg38_ashm_regions", 
     "hot_spot", "hotspot_regions_grch37", "hotspot_regions_hg38",
     "is_alias", "log.ratio", "mutated", "mutation_count", "n_mut",

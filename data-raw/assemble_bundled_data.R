@@ -774,11 +774,23 @@ fix <- fix %>% rename(study = cohort)
 
 diag_summary(fix, "fix (post rename cohort->study)", study_col = "study")
 
+# Keep only what's genuinely paper-supplement-specific -- everything else
+# (COO_consensus, lymphgen, EBV_status_inf, pathology, sex,
+# Tumor_Sample_Barcode, patient_id, and the ~40 other columns live
+# get_gambl_metadata() provides) comes fresh from the join below instead of
+# whatever narrow/partial copy a given cohort block happened to carry. This
+# is what makes sample_meta (and, downstream, GAMBLR.open::get_gambl_metadata(),
+# which now reads sample_meta directly) actually complete -- mirrors the
+# same select-then-rejoin pattern already used a few lines above for
+# COO_consensus/lymphgen/EBV_status_inf.
+fix <- fix %>%
+    select(sample_id, seq_type, study, genetic_subgroup, reference_PMID)
+
 pre_join_ids <- fix$sample_id
 fix <- left_join(
     fix,
-    get_gambl_metadata() %>%
-        select(sample_id, seq_type, cohort)
+    get_gambl_metadata(),
+    by = c("sample_id", "seq_type")
 )
 
 message(sprintf("[DIAG] fix (post live get_gambl_metadata() join): %d rows (was %d rows pre-join -- any increase means the join fanned out)", nrow(fix), length(pre_join_ids)))
@@ -1221,19 +1233,16 @@ print("done extracting all mutations in lymphoma genes with GAMBLR.results")
 
 
 # --- Persist the assembled data -------------------------------------------
-# Previously this bundled the multi-GB `sample_data.rda`. Instead we now write:
-#   1. a lightweight, bundled `sample_metadata` object (metadata only), and
-#   2. the large per-sample frames to gambl_mutations.db (a release asset,
-#      NOT shipped in the package tarball).
-# This is built straight from the in-memory `sample_data` above, so there is no
-# sample_data.rda round-trip.
-
-# 1. lightweight bundled metadata (replaces sample_data$meta lookups)
-sample_metadata <- sample_data$meta
-usethis::use_data(sample_metadata, overwrite = TRUE, compress = "xz")
+# Previously this bundled the multi-GB `sample_data.rda`, and later a
+# lightweight `sample_metadata` object shipped inside the package itself.
+# That bundled-metadata object is retired: GAMBLR.open::get_gambl_metadata()
+# (its only real consumer) now queries the sample_meta table in
+# gambl_mutations.db directly instead, so metadata and mutation data always
+# come from the same build with no separate reinstall-triggered refresh
+# cadence to drift out of sync. This is built straight from the in-memory
+# `sample_data` above, so there is no sample_data.rda round-trip.
 
 print("Starting sqlite build")
-# 2. large sample-level frames -> SQLite
 source("data-raw/write_mutations_db.R")
 write_mutations_db(
     sample_data,

@@ -9,8 +9,8 @@
 
 A data frame with 60038 rows and 3 columns
 \describe{
-\item{ensembl_gene_id}{ENSEMBL gene id in a format without .<number>.}
-\item{gene_id}{ENSEMBL gene id in a format containing .<number>.}
+\item{ensembl_gene_id}{ENSEMBL gene id in a format without .\if{html}{\out{<number>}}.}
+\item{gene_id}{ENSEMBL gene id in a format containing .\if{html}{\out{<number>}}.}
 \item{hgnc_symbol}{Human-readable gene symbol.}
 }
 }

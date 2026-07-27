@@ -5,7 +5,7 @@
 # the GAMBLR.open accessors.
 #
 # Usage:
-#   Rscript data-raw/test_gambl_db.R [OUT_DB] [SAMPLE_METADATA_RDA] [SAMPLE_DATA_RDA]
+#   Rscript data-raw/test_gambl_db.R [OUT_DB] [SAMPLE_DATA_RDA]
 #
 # Exits non-zero if any critical check fails. The optional SAMPLE_DATA_RDA
 # enables a regression check (DB row counts vs the in-memory frames).
@@ -14,8 +14,7 @@ suppressMessages({ library(DBI); library(RSQLite) })
 
 args   <- commandArgs(trailingOnly = TRUE)
 db     <- if (length(args) >= 1) args[[1]] else "gambl_mutations.db"
-meta   <- if (length(args) >= 2) args[[2]] else "data/sample_metadata.rda"
-rda    <- if (length(args) >= 3) args[[3]] else "data/sample_data.rda"
+rda    <- if (length(args) >= 2) args[[2]] else "data/sample_data.rda"
 
 fails <- 0L
 check <- function(cond, msg) {
@@ -102,13 +101,6 @@ if ("build_info" %in% tbls) {
   check(isTRUE(getbi("n_variant_pipeline") == n("variant_pipeline")),
         sprintf("build_info n_variant_pipeline == COUNT(variant_pipeline)"))
 }
-
-cat("\n== sample_metadata.rda matches sample_meta table ==\n")
-if (file.exists(meta)) {
-  e <- new.env(); load(meta, envir = e); sm <- get("sample_metadata", envir = e)
-  check(nrow(sm) == n("sample_meta"),
-        sprintf("sample_metadata rows (%d) == sample_meta table (%d)", nrow(sm), n("sample_meta")))
-} else cat("  [skip] no", meta, "\n")
 
 cat("\n== regression vs sample_data.rda (optional) ==\n")
 if (file.exists(rda)) {
