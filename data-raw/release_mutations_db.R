@@ -63,7 +63,31 @@ if (!tag %in% existing_releases$tag_name) {
   piggyback::pb_new_release(repo = repo, tag = tag)
 }
 
-piggyback::pb_upload(db_path, repo = repo, tag = tag)
+# GitHub's list-releases endpoint can lag a moment after pb_new_release()
+# creates a tag -- pb_upload() re-fetches that list to confirm the tag
+# exists, and can spuriously fail with "Release not found" if it queries
+# before GitHub's side catches up. piggyback's own pb_upload() has a
+# Sys.sleep()-and-retry fallback for this, but only when interactive(),
+# which Rscript never is -- so retry it here instead.
+upload_with_retry <- function(max_tries = 5) {
+  for (i in seq_len(max_tries)) {
+    ok <- tryCatch({
+      piggyback::pb_upload(db_path, repo = repo, tag = tag)
+      TRUE
+    }, error = function(e) {
+      if (grepl("not found", conditionMessage(e), ignore.case = TRUE) && i < max_tries) {
+        message("Release not yet visible via GitHub's API (attempt ", i, "/", max_tries,
+                "), retrying in ", 2 * i, "s...")
+        Sys.sleep(2 * i)
+        FALSE
+      } else {
+        stop(e)
+      }
+    })
+    if (isTRUE(ok)) return(invisible())
+  }
+}
+upload_with_retry()
 message(sprintf(
   "Done. Users on GAMBLR.data v%s will now auto-download gambl_mutations.db from this release.",
   pkg_version
