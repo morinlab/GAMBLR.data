@@ -824,6 +824,8 @@ fix <- distinct(fix)
 diag_summary(fix, "fix (post distinct -- this becomes sample_data$meta)", study_col = "study")
 
 sample_data$meta <- fix
+message(sprintf("[DIAG-COLS] sample_data$meta right after Phase 2 (should be ~35 cols): %d cols: %s",
+                ncol(sample_data$meta), paste(colnames(sample_data$meta), collapse = ", ")))
 ### end metadata fixing
 
 # sample_study: a many-to-many bridge table (one row per (sample_id, study)
@@ -1261,6 +1263,8 @@ print("done extracting all mutations in lymphoma genes with GAMBLR.results")
 # `sample_data` above, so there is no sample_data.rda round-trip.
 
 print("Starting sqlite build")
+message(sprintf("[DIAG-COLS] sample_data$meta right before write_mutations_db() call (should still be ~35 cols): %d cols: %s",
+                ncol(sample_data$meta), paste(colnames(sample_data$meta), collapse = ", ")))
 source("data-raw/write_mutations_db.R")
 write_mutations_db(
     sample_data,

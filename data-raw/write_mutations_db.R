@@ -28,6 +28,8 @@ write_mutations_db <- function(sample_data,
   # its own PMID); sample_study is the source of truth for that now.
   sample_meta_out <- as.data.frame(sample_data$meta)
   sample_meta_out$reference_PMID <- NULL
+  message(sprintf("[DIAG-COLS] sample_meta_out right before dbWriteTable() (should still be ~34 cols): %d cols: %s",
+                  ncol(sample_meta_out), paste(colnames(sample_meta_out), collapse = ", ")))
   DBI::dbWriteTable(con, "sample_meta", sample_meta_out, overwrite = TRUE)
 
   # sample_study: many-to-many bridge table (sample_id, study) replacing the
