@@ -1,0 +1,61 @@
+# Columns from live GAMBLR.results::get_gambl_metadata() to carry into the
+# public sample_meta table -- and therefore into the publicly-distributed
+# gambl_mutations.db (a GitHub Release asset anyone can download and query
+# directly with SQL), and into GAMBLR.open::get_gambl_metadata()'s output.
+#
+# One column name per line. Lines starting with # are comments; blank
+# lines are ignored. Add a line to include a new column in future builds --
+# no code changes needed, just edit this file and re-run
+# assemble_bundled_data.R.
+#
+# sample_id, seq_type, study, and reference_PMID are always included
+# separately (required for the pipeline's own internal joins/filters) and
+# don't need to be listed here.
+#
+# IMPORTANT: this is a whitelist for a PUBLIC, downloadable database file,
+# not just a filter on one R function -- anyone can query gambl_mutations.db
+# directly, bypassing GAMBLR.open entirely. Only add a column here if it's
+# genuinely safe to distribute publicly (e.g. NOT biopsy_id, data_path,
+# fastq_data_path, fastq_link_name, link_name, library_id, res_id,
+# unix_group, or anything else that's an internal tracking/file-path
+# identifier rather than sample-level scientific metadata). When in doubt,
+# ask before adding.
+#
+# Confirmed list, 2026-07-27. age_group and hiv_status were deliberately
+# left out: neither is actually populated by the current live
+# get_gambl_metadata() (age_group is only computed by the old, unused
+# og_get_gambl_metadata(), gated behind an optional with_outcomes
+# parameter; hiv_status was never implemented anywhere -- its own roxygen
+# entry says {TODO}). Add them here once/if that derivation exists in the
+# current function.
+patient_id
+pathology
+biopsy_res
+genome_build
+pairing_status
+Tumor_Sample_Barcode
+cohort
+COO_consensus
+DHITsig_consensus
+EBV_status_inf
+ffpe_or_frozen
+fl_grade
+bcl2_ba
+bcl2_cn
+bcl6_ba
+bcl6_cn
+myc_ba
+myc_cn
+lymphgen
+lymphgen_cnv_noA53
+lymphgen_no_cnv
+lymphgen_with_cnv
+lymphgen_wright
+normal_sample_id
+sex
+time_point
+TotalDuplicatedreads
+TotalReads
+TotalUniquelyMapped
+TotalUnmappedreads
+transformation

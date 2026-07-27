@@ -774,17 +774,15 @@ fix <- fix %>% rename(study = cohort)
 
 diag_summary(fix, "fix (post rename cohort->study)", study_col = "study")
 
-# Keep only what's genuinely paper-supplement-specific -- everything else
-# (COO_consensus, lymphgen, EBV_status_inf, pathology, sex,
-# Tumor_Sample_Barcode, patient_id, and the ~40 other columns live
-# get_gambl_metadata() provides) comes fresh from the join below instead of
-# whatever narrow/partial copy a given cohort block happened to carry. This
-# is what makes sample_meta (and, downstream, GAMBLR.open::get_gambl_metadata(),
-# which now reads sample_meta directly) actually complete -- mirrors the
-# same select-then-rejoin pattern already used a few lines above for
-# COO_consensus/lymphgen/EBV_status_inf.
+# Keep only sample_id/seq_type/study/reference_PMID/genetic_subgroup from
+# the per-block frames -- everything else comes fresh from the join below
+# instead of whatever narrow/partial copy a given cohort block happened to
+# carry. genetic_subgroup is kept here specifically because it's paper-
+# supplement-specific (from the Thomas/Dreval xlsx sheets, not central
+# tracking) and would NOT be reintroduced by that join -- live
+# get_gambl_metadata() has no such column.
 fix <- fix %>%
-    select(sample_id, seq_type, study, genetic_subgroup, reference_PMID)
+    select(sample_id, seq_type, study, reference_PMID, genetic_subgroup)
 
 pre_join_ids <- fix$sample_id
 fix <- left_join(
@@ -795,6 +793,26 @@ fix <- left_join(
 
 message(sprintf("[DIAG] fix (post live get_gambl_metadata() join): %d rows (was %d rows pre-join -- any increase means the join fanned out)", nrow(fix), length(pre_join_ids)))
 diag_summary(fix, "fix (post live get_gambl_metadata() join)", study_col = "study")
+
+# sample_meta ends up in the PUBLICLY-DISTRIBUTED gambl_mutations.db (a
+# GitHub Release asset anyone can download and query directly with SQL) --
+# restrict it to an explicit whitelist rather than everything live
+# get_gambl_metadata() happens to return, which includes internal-only
+# columns (biopsy_id, data_path, fastq_data_path/fastq_link_name,
+# link_name, library_id, res_id, unix_group, ...) that must never end up
+# in a public artifact. The whitelist lives in a plain text file, not
+# here, so a developer can add a column to future builds by editing that
+# file -- no code change needed. all_of() (not any_of()) deliberately
+# errors on a typo'd/renamed column name rather than silently dropping it.
+public_metadata_cols <- readLines("data-raw/public_sample_meta_columns.txt")
+public_metadata_cols <- trimws(public_metadata_cols)
+public_metadata_cols <- public_metadata_cols[
+    nzchar(public_metadata_cols) & !startsWith(public_metadata_cols, "#")
+]
+fix <- fix %>%
+    select(sample_id, seq_type, study, reference_PMID, all_of(public_metadata_cols))
+
+diag_summary(fix, "fix (post public-column whitelist)", study_col = "study")
 
 fix <- fix %>% filter(!is.na(study))
 
