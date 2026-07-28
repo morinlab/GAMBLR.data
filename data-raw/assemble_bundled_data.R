@@ -971,7 +971,14 @@ sample_data$meta$study %>% table
 selected_columns <- c(
         "Tumor_Sample_Barcode", "Hugo_Symbol",
         "NCBI_Build", "Chromosome", "Start_Position", "End_Position",
-        "Tumor_Seq_Allele2", maf_columns_to_keep
+        "Tumor_Seq_Allele2", "RefSeq", "Protein_position"
+        # Deliberately NOT maf_columns_to_keep (which now also carries
+        # maf_seq_type) -- these are join-source columns for the
+        # proteinpainter-compatibility enrichment below, not the final maf
+        # table. Two of the three sources selected against this (the raw
+        # BL_Thomas manuscript flat file, and the get_ssm_by_samples() FL
+        # pull below) never carry maf_seq_type at all, so all_of() on the
+        # full list would hard-error here every time.
 )
 
 these_samples <- sample_data$meta %>%
