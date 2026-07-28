@@ -14,6 +14,7 @@ get_ssm_from_db(
   min_read_support = 0,
   this_study = NULL,
   regions = NULL,
+  seq_type = NULL,
   con = NULL
 )
 }
@@ -55,6 +56,15 @@ as-published rows only).}
 rows are OR-ed and applied as a single combined query (not one query per
 region), so passing hundreds of regions (e.g. one per gene in a panel)
 doesn't cost hundreds of separate round trips.}
+
+\item{seq_type}{Optional character vector to restrict rows to one or more
+\code{maf_seq_type} values (\code{"genome"}/\code{"capture"}), so a sample_id with both
+can be queried separately instead of getting both back merged together.
+Default \code{NULL} (no filter, matching prior behaviour). Rows predating
+\code{maf_seq_type} (e.g. publication-pipeline rows, which don't carry
+per-row seq_type provenance) have \code{NA} here and are excluded whenever
+this filter is set, same as any other \code{NA} under a \code{\%in\%} filter. Silently
+ignored against a \code{gambl_mutations.db} built before this column existed.}
 
 \item{con}{Optional DBI connection (defaults to \code{\link[=gambl_mutations_db]{gambl_mutations_db()}}).}
 }

@@ -32,7 +32,7 @@
 #'
 #' | Table | Rows (typical) | Grain | Key columns |
 #' | --- | --- | --- | --- |
-#' | `maf` | ~3.6M | one somatic mutation call | `mutation_id` (surrogate integer key, unique within `maf` across both genome builds -- assigned at write time, after deduplication; `variant_pipeline` references it as a foreign key), `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. `"slms-3"`/`"publication"` -- normalized at write time so it can be matched with a plain, indexed equality), genome_build` (+ ~35 more MAF-standard columns) |
+#' | `maf` | ~3.6M | one somatic mutation call | `mutation_id` (surrogate integer key, unique within `maf` across both genome builds -- assigned at write time, after deduplication; `variant_pipeline` references it as a foreign key), `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. `"slms-3"`/`"publication"` -- normalized at write time so it can be matched with a plain, indexed equality), genome_build, maf_seq_type` (`"genome"`/`"capture"`, so a Tumor_Sample_Barcode with both isn't indistinguishable once merged; `NA` for publication-pipeline rows, which don't carry per-row seq_type provenance -- see [get_ssm_from_db()]'s `seq_type` parameter) (+ ~35 more MAF-standard columns) |
 #' | `ashm` | ~135k | one mutation call in an aSHM region | same schema as `maf` (its own independent `mutation_id` sequence) |
 #' | `seg` | ~126k | one copy-number segment | `ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build` |
 #' | `bedpe` | ~900 | one Manta structural-variant breakpoint pair | `CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build` |
@@ -72,7 +72,7 @@
 #'
 #' ## Indexes
 #' `maf`/`ashm`: `(genome_build, Chromosome, Start_Position)`,
-#' `Tumor_Sample_Barcode`, `Pipeline`, `mutation_id`. No index on
+#' `Tumor_Sample_Barcode`, `Pipeline`, `maf_seq_type`, `mutation_id`. No index on
 #' `Hugo_Symbol`: gene-restricted queries resolve the gene to a region first
 #' (the same logic used to populate these tables) and filter on
 #' `(genome_build, Chromosome, Start_Position)` instead -- see

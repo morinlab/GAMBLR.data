@@ -61,7 +61,12 @@ pmids <- list(
 
 maf_columns_to_keep <- c(
     "RefSeq",
-    "Protein_position"
+    "Protein_position",
+    # Carries genome/capture provenance through every select(all_of(all_cols))/
+    # select(any_of(all_cols)) call below, so a sample_id with both seq_types
+    # doesn't become indistinguishable once its rows are merged (see
+    # GAMBLR.results::get_ssm_by_regions(), which now stamps this per-row).
+    "maf_seq_type"
 )
 
 all_cols <- c(
@@ -1132,7 +1137,14 @@ cell_lines_ssm_grch37 <- time_it("cell lines get_ssm_by_samples grch37", {
     get_ssm_by_samples(
         these_samples_metadata = cell_lines_data$meta,
         basic_columns = FALSE
-    ) %>% select(all_of(all_cols)) %>% mutate(Pipeline = "SLMS-3")
+    ) %>%
+        # get_ssm_by_samples() doesn't stamp maf_seq_type the way
+        # get_ssm_by_regions() does (see all_slms3_meta pulls above) --
+        # cell_lines_data$meta is unconditionally get_gambl_metadata(seq_type_filter
+        # = "genome") (see its construction above), so "genome" is correct here,
+        # not a guess.
+        mutate(maf_seq_type = "genome") %>%
+        select(all_of(all_cols)) %>% mutate(Pipeline = "SLMS-3")
 })
 
 cell_lines_ssm_hg38 <- time_it("cell lines get_ssm_by_samples hg38", {
@@ -1140,7 +1152,9 @@ cell_lines_ssm_hg38 <- time_it("cell lines get_ssm_by_samples hg38", {
         these_samples_metadata = cell_lines_data$meta,
         projection = "hg38",
         basic_columns = FALSE
-    ) %>% select(all_of(all_cols)) %>% mutate(Pipeline = "SLMS-3")
+    ) %>%
+        mutate(maf_seq_type = "genome") %>%
+        select(all_of(all_cols)) %>% mutate(Pipeline = "SLMS-3")
 })
 
 message(sprintf("[DIAG] cell_lines_ssm_grch37: %d rows, %d distinct Tumor_Sample_Barcode (expect 5)", nrow(cell_lines_ssm_grch37), n_distinct(cell_lines_ssm_grch37$Tumor_Sample_Barcode)))

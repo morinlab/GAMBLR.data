@@ -48,7 +48,7 @@ separate tables); filter on \code{genome_build} (\code{"grch37"} / \code{"hg38"}
 one. \code{maf} and \code{ashm} share the same (curated, 49-column) schema: a reduced
 column set, not the full upstream flatfile MAF.\tabular{llll}{
    Table \tab Rows (typical) \tab Grain \tab Key columns \cr
-   \code{maf} \tab ~3.6M \tab one somatic mutation call \tab \code{mutation_id} (surrogate integer key, unique within \code{maf} across both genome builds -- assigned at write time, after deduplication; \code{variant_pipeline} references it as a foreign key), \verb{Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. }"slms-3"\code{/}"publication"\verb{ -- normalized at write time so it can be matched with a plain, indexed equality), genome_build} (+ ~35 more MAF-standard columns) \cr
+   \code{maf} \tab ~3.6M \tab one somatic mutation call \tab \code{mutation_id} (surrogate integer key, unique within \code{maf} across both genome builds -- assigned at write time, after deduplication; \code{variant_pipeline} references it as a foreign key), \verb{Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. }"slms-3"\code{/}"publication"\verb{ -- normalized at write time so it can be matched with a plain, indexed equality), genome_build, maf_seq_type} (\code{"genome"}/\code{"capture"}, so a Tumor_Sample_Barcode with both isn't indistinguishable once merged; \code{NA} for publication-pipeline rows, which don't carry per-row seq_type provenance -- see \code{\link[=get_ssm_from_db]{get_ssm_from_db()}}'s \code{seq_type} parameter) (+ ~35 more MAF-standard columns) \cr
    \code{ashm} \tab ~135k \tab one mutation call in an aSHM region \tab same schema as \code{maf} (its own independent \code{mutation_id} sequence) \cr
    \code{seg} \tab ~126k \tab one copy-number segment \tab \verb{ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build} \cr
    \code{bedpe} \tab ~900 \tab one Manta structural-variant breakpoint pair \tab \verb{CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build} \cr
@@ -92,7 +92,7 @@ to \code{sample_meta$sample_id}; \code{sample_study$sample_id} keys to
 \subsection{Indexes}{
 
 \code{maf}/\code{ashm}: \verb{(genome_build, Chromosome, Start_Position)},
-\code{Tumor_Sample_Barcode}, \code{Pipeline}, \code{mutation_id}. No index on
+\code{Tumor_Sample_Barcode}, \code{Pipeline}, \code{maf_seq_type}, \code{mutation_id}. No index on
 \code{Hugo_Symbol}: gene-restricted queries resolve the gene to a region first
 (the same logic used to populate these tables) and filter on
 \verb{(genome_build, Chromosome, Start_Position)} instead -- see

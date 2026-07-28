@@ -46,9 +46,16 @@ write_mutations_db <- function(sample_data,
   # safety net: no cohort-specific pull block should ever again be able to
   # introduce duplicate mutation rows for a sample that's pulled more than
   # once, regardless of the reason.
+  # maf_seq_type is part of the key so a genome-called and capture-called
+  # mutation for the same sample that happen to land on the same
+  # position/allele stay two distinct rows instead of collapsing into one --
+  # dplyr::distinct() treats NA (publication-pipeline rows, which don't carry
+  # per-row seq_type) as matching other NAs, so this doesn't change dedup
+  # behaviour for rows that predate maf_seq_type, only adds separation where
+  # it's actually known.
   dedup_keys <- list(
-    maf  = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2"),
-    ashm = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2")
+    maf  = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2", "maf_seq_type"),
+    ashm = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2", "maf_seq_type")
   )
 
   # variant_pipeline: many-to-many bridge table (mutation_id, Pipeline), same
@@ -144,9 +151,11 @@ write_mutations_db <- function(sample_data,
     "CREATE INDEX idx_maf_pos     ON maf(genome_build, Chromosome, Start_Position)",
     "CREATE INDEX idx_maf_sample  ON maf(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_maf_pipe    ON maf(Pipeline)",
+    "CREATE INDEX idx_maf_seqtype ON maf(maf_seq_type)",
     "CREATE INDEX idx_maf_mutation_id ON maf(mutation_id)",
     "CREATE INDEX idx_ashm_pos    ON ashm(genome_build, Chromosome, Start_Position)",
     "CREATE INDEX idx_ashm_sample ON ashm(Tumor_Sample_Barcode)",
+    "CREATE INDEX idx_ashm_seqtype ON ashm(maf_seq_type)",
     "CREATE INDEX idx_ashm_mutation_id ON ashm(mutation_id)",
     "CREATE INDEX idx_seg_sample  ON seg(genome_build, ID)",
     "CREATE INDEX idx_seg_pos     ON seg(genome_build, chrom, start)",

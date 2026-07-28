@@ -30,6 +30,14 @@
 #'   `this_study="Reddy"` alone returns Reddy's SLMS-3 recall by default,
 #'   while `this_study="Reddy", tool_name="publication"` returns Reddy's
 #'   as-published rows only).
+#' @param seq_type Optional character vector to restrict rows to one or more
+#'   `maf_seq_type` values (`"genome"`/`"capture"`), so a sample_id with both
+#'   can be queried separately instead of getting both back merged together.
+#'   Default `NULL` (no filter, matching prior behaviour). Rows predating
+#'   `maf_seq_type` (e.g. publication-pipeline rows, which don't carry
+#'   per-row seq_type provenance) have `NA` here and are excluded whenever
+#'   this filter is set, same as any other `NA` under a `%in%` filter. Silently
+#'   ignored against a `gambl_mutations.db` built before this column existed.
 #' @param regions Optional data frame with columns `chrom`, `start`, `end`;
 #'   rows are OR-ed and applied as a single combined query (not one query per
 #'   region), so passing hundreds of regions (e.g. one per gene in a panel)
@@ -49,6 +57,7 @@ get_ssm_from_db <- function(projection = "grch37",
                             min_read_support = 0,
                             this_study = NULL,
                             regions = NULL,
+                            seq_type = NULL,
                             con = NULL) {
   if (is.null(con)) con <- gambl_mutations_db()
   cc <- if (include_silent) coding_class else coding_class[coding_class != "Silent"]
@@ -101,6 +110,9 @@ get_ssm_from_db <- function(projection = "grch37",
     if (coding_only)             q <- dplyr::filter(q, Variant_Classification %in% cc)
     if (min_read_support > 0)    q <- dplyr::filter(q, t_alt_count >= min_read_support)
     if (!is.null(sample_ids))    q <- dplyr::filter(q, Tumor_Sample_Barcode %in% sample_ids)
+    if (!is.null(seq_type) && "maf_seq_type" %in% DBI::dbListFields(con, table_name)) {
+      q <- dplyr::filter(q, maf_seq_type %in% seq_type)
+    }
     q
   }
 
