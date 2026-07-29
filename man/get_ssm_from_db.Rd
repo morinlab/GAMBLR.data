@@ -35,7 +35,12 @@ query for either one, even though its single maf/ashm row can only
 carry one Pipeline value. Falls back to filtering the column directly
 against DBs built before variant_pipeline existed.}
 
-\item{include_ashm}{When TRUE, also query the \code{ashm} table and row-bind it.}
+\item{include_ashm}{When TRUE, also query the \code{ashm} table and row-bind it,
+deduplicated against \code{maf} on the same natural key \code{write_mutations_db()}
+uses at write time -- \code{maf} and \code{ashm} dedup independently there, so
+nothing else prevents the same real mutation (same sample/position/
+allele) landing in both when it falls in a gene that's both aSHM-target
+and coding-panel (e.g. BCL2, BCL6, MYC, PIM1). \code{maf}'s copy wins ties.}
 
 \item{coding_only}{When TRUE, keep only coding \code{Variant_Classification}s.}
 
