@@ -7,6 +7,7 @@
 get_genes(
   entities = c("DLBCL", "MCL", "BL"),
   curated_only = TRUE,
+  tier = NULL,
   gene_format = "symbol",
   version = "_latest"
 )
@@ -15,29 +16,45 @@ get_genes(
 \item{entities}{Optional vector specifying one or more lymphoma entities
 e.g. MCL, DLBCL, BL.}
 
-\item{curated_only}{Specify FALSE to retrieve all genes or leave default
-for the curated subset.}
+\item{curated_only}{When TRUE (default) return the curated set (Tier 1 and
+Tier 2) and drop retired Tier 3 genes. Set FALSE to include all tiers.
+Ignored when \code{tier} is supplied.}
+
+\item{tier}{Optional integer vector of confidence tiers to keep, e.g.
+\code{tier = 1} for high-confidence genes only, or \code{tier = c(1, 2)}. When
+supplied it takes precedence over \code{curated_only}.}
 
 \item{gene_format}{Specify what to return as output. Can be one of:
 * "symbol" (the default): list of gene symbols
-* "ensembl": list of ENSEMBLE IDs
-* "data.frame": data frame with column Gene and per-entity gene status}
+* "ensembl": list of Ensembl IDs
+* "data.frame": one row per gene with a \verb{<ENTITY>_Tier} column per
+requested entity (the gene's tier there, or NA if absent). Filter
+these columns to focus on tiers, e.g.
+\code{dplyr::filter(df, DLBCL_Tier == 1, FL_Tier == 1) |> dplyr::pull(Gene)}.}
 
-\item{version}{Specify which version to return. Currently supported versions
-are 0.0 (legacy version from original GAMBLR), 0.1, and _latest. The
-latter will always point to the highest numeric version of the genes.}
+\item{version}{Data version to return. Defaults to "_latest", the current
+LLMPP-sourced version in the reference database. Legacy numeric versions
+(0.0, 0.1) are no longer bundled.}
 }
 \value{
-A character vector of gene symbol or Ensembl IDs or a data frame.
+A character vector of gene symbols or Ensembl IDs, or a data frame.
 }
 \description{
 Retrieve gene names from bundled lymphoma gene lists.
 }
 \details{
-Complete lists of genes described as significantly mutated in large
-lymphoma studies have been curated and provided with this package.
+Gene lists are read from the bundled normalized reference database
+(\code{inst/extdata/gambl_reference.db}), which is built from the LLMPP curated
+lists. Confidence tier and data version are columns in that database, so the
+previous per-entity, per-version \code{.rda} objects are no longer required.
 }
 \examples{
-all_dlbcl_genes <- get_genes(entities = "DLBCL", curated_only = FALSE)
+# high-confidence (Tier 1) DLBCL genes
+dlbcl_tier1 <- get_genes(entities = "DLBCL", tier = 1)
+
+# genes that are Tier 1 in DLBCL, FL and BL simultaneously
+gene_df <- get_genes(entities = c("DLBCL", "FL", "BL"), gene_format = "data.frame")
+shared_tier1 <- dplyr::filter(gene_df, DLBCL_Tier == 1, FL_Tier == 1, BL_Tier == 1)
+
 all_curated_genes <- get_genes()
 }

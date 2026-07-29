@@ -15,3 +15,17 @@ Lab and without GSC access.
 For detailed information about how to install, bundled resources, functionality
 overview, tutorials, frequently asked questions and much more please visit the
 website [morinlab.github.io/GAMBLR.data/](https://morinlab.github.io/GAMBLR.data/)
+
+## Bundled databases
+
+Curated and sample-level data are served from two SQLite databases rather than
+per-object `.rda` files. See `?gambl_reference_db` and `?gambl_mutations_db`
+for the full table reference (columns, join keys, indexes).
+
+- **`gambl_reference_db()`** — small, bundled with the package. Curated gene
+  lists and aSHM regions (from LLMPP); backs [get_genes()].
+- **`gambl_mutations_db()`** — large (several hundred MB), distributed as a
+  cached release asset rather than shipped in the package. MAF, aSHM-region
+  mutation, copy-number segment, and structural-variant calls, plus sample
+  metadata; backs the GAMBLR.open `get_ssm_*`, `get_cn_segments*`, and
+  `get_manta_sv` accessors.

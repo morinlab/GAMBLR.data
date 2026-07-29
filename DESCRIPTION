@@ -1,6 +1,6 @@
 Package: GAMBLR.data
 Title: Collection of Curated Data for Genomic Analysis of Mature B-cell Lymphomas in R
-Version: 1.3
+Version: 1.4
 Authors@R:
     c(
         person(given = "Ryan",
@@ -25,15 +25,20 @@ Description: The package contains manually curated data for the genomic Analysis
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Depends:
     R (>= 3.5)
 LazyData: true
 Imports:
+    DBI,
+    dbplyr,
     dplyr,
     ggplot2,
+    rlang,
+    RSQLite,
     tidyr
 LazyDataCompression: xz
 Suggests:
+    piggyback,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

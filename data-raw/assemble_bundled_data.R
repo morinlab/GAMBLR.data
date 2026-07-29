@@ -1,9 +1,35 @@
-setwd("~/my_dir/repos/GAMBLR.data/")
+# --- Working directory & config -------------------------------------------
+# Run from the GAMBLR.data checkout (holds inst/extdata and data/); override
+# with the GAMBLR_DATA_ROOT env var. No hard-coded paths.
+PKG_ROOT <- Sys.getenv("GAMBLR_DATA_ROOT", unset = getwd())
+stopifnot(dir.exists(PKG_ROOT))
+setwd(PKG_ROOT)
 
 library(readxl)
 library(GAMBLR)
 library(parallel)
 library(tidyverse)
+
+# GAMBLR.results locates GSC data via config.yml (repo_base / project_base).
+# check_config_and_value() looks first in the working directory, then falls back
+# to the copy shipped in GAMBLR.results/inst/extdata. As a last resort (and to
+# cover any direct config::get() calls), point R_CONFIG_FILE at that shipped
+# config when nothing else provides one.
+if (!file.exists("config.yml") && !nzchar(Sys.getenv("R_CONFIG_FILE"))) {
+    Sys.setenv(R_CONFIG_FILE = system.file("extdata", "config.yml",
+                                            package = "GAMBLR.results"))
+}
+
+# get_gambl_metadata()'s min_corrected_cov QC filter (default 15x) can drop
+# samples that were previously part of a released bundle out of a fresh one
+# (e.g. 01-16433_tumorA/B: FFPE genomes with coverage under the bar, silently
+# excluded, taking all their SNVs with them). Disable it for bundle assembly
+# so a rebuild doesn't lose samples that are already in the released dataset.
+# Shadows the package function for the rest of this script, so every call
+# site (there are ~13) picks this up in one place.
+get_gambl_metadata <- function(...) {
+    GAMBLR.results::get_gambl_metadata(..., min_corrected_cov = 0)
+}
 
 # Global variables definition
 colnames_for_bundled_meta <- c(
@@ -35,7 +61,12 @@ pmids <- list(
 
 maf_columns_to_keep <- c(
     "RefSeq",
-    "Protein_position"
+    "Protein_position",
+    # Carries genome/capture provenance through every select(all_of(all_cols))/
+    # select(any_of(all_cols)) call below, so a sample_id with both seq_types
+    # doesn't become indistinguishable once its rows are merged (see
+    # GAMBLR.results::get_ssm_by_regions(), which now stamps this per-row).
+    "maf_seq_type"
 )
 
 all_cols <- c(
@@ -43,11 +74,184 @@ all_cols <- c(
     maf_columns_to_keep
 )
 
-# restrict to the most inclusive DLBCL gene list
-all_lymphoma_genes <- lymphoma_genes_comprehensive$Gene
+# restrict to the most inclusive DLBCL gene list. Expanded to include known
+# aliases (e.g. old/new HGNC histone names) so the Hugo_Symbol %in%
+# all_lymphoma_genes filters below don't drop rows annotated under a gene's
+# other name.
+all_lymphoma_genes <- GAMBLR.utils::expand_gene_aliases(lymphoma_genes_comprehensive$Gene)
+
+# Captured once, up front -- referenced by pull_data()'s diagnostics below.
+# GAMBLR.data:::coding_class is a lazy-loaded internal object; reading it on
+# every pull_data() call (deep into Phase 4) instead of once here means any
+# mid-run change to the installed GAMBLR.data package (e.g. a concurrent
+# devtools::install()) can hit a missing/replaced .rdb file well after this
+# script started, rather than failing fast at startup if at all.
+diag_coding_class <- GAMBLR.data:::coding_class
+
+# Built once, reused by every get_ssm_by_regions() call below that wants only
+# lymphoma-gene mutations. Restricting via tabix -R (region) instead of
+# pulling every mutation for a sample set is the performance win; every call
+# site still adds `filter(Hugo_Symbol %in% all_lymphoma_genes)` afterward on
+# the now-small result, because gene_to_region()'s coordinates and VEP's
+# Hugo_Symbol assignment don't always agree at gene boundaries -- without the
+# post-filter, mutations from overlapping/neighbouring genes and non-coding
+# loci (e.g. AC/AL/AF-prefixed lncRNA transcripts) leak in as false "gains".
+# GENE_PAD_BP widens the tabix window itself so real target-gene mutations
+# just outside gene_to_region()'s exact span (promoter/UTR/annotation-source
+# discrepancies) aren't lost before the Hugo_Symbol filter even sees them;
+# the filter makes over-padding cheap (extra I/O, not incorrect inclusion).
+# 10kb is a 2x margin over VEP's default 5kb upstream/downstream annotation
+# window (the likely source of Hugo_Symbol on these rows) -- e.g. an ID3
+# variant 4.2kb upstream of its TSS (well inside VEP's 5kb default, but
+# outside a 2kb pad) was confirmed lost under the old 2000bp value.
+GENE_PAD_BP <- 10000
+lymphoma_genes_bed_grch37 <- create_bed_data(
+    gene_to_region(gene_symbol = all_lymphoma_genes, projection = "grch37",
+                   return_as = "bed", pad_length = GENE_PAD_BP),
+    genome_build = "grch37"
+)
+lymphoma_genes_bed_hg38 <- create_bed_data(
+    gene_to_region(gene_symbol = all_lymphoma_genes, projection = "hg38",
+                   return_as = "bed", pad_length = GENE_PAD_BP),
+    genome_build = "hg38"
+)
+
+# Wraps an expression, printing its wall-clock time; returns the expression's
+# value unchanged. Used below to benchmark get_ssm_by_samples()
+# (subset_from_merge TRUE vs FALSE, per-sample loop) against
+# get_ssm_by_regions() (tabix -R) at each call site, to decide which
+# approach to standardize on for each use case.
+time_it <- function(label, expr) {
+    t0 <- Sys.time()
+    result <- expr
+    elapsed <- as.numeric(difftime(Sys.time(), t0, units = "secs"))
+    message(sprintf("[TIMING] %-55s %8.1fs", label, elapsed))
+    result
+}
+
+##### Importing SLMS-3 variants
+# Reused by the single consolidated SLMS-3 pull in Phase 4 below (and by
+# nothing else -- every cohort-specific SLMS-3 pull that used to call this
+# once per cohort block has been removed; see Phase 4).
+pull_data <- function(
+        pull_meta,
+        pull_projection = "grch37"
+    ){
+    lymphoma_genes_bed <- if(pull_projection == "grch37") lymphoma_genes_bed_grch37 else lymphoma_genes_bed_hg38
+
+    # label identifies this specific call (projection x seq_type) in the log,
+    # since pull_data() is called 4 times per build (genome/capture x
+    # grch37/hg38) -- without this, diagnostics from different calls would
+    # be indistinguishable in the log.
+    call_label <- sprintf("pull_data(%s, seq_type=%s, n=%d samples)",
+                           pull_projection,
+                           paste(unique(pull_meta$seq_type), collapse = "/"),
+                           n_distinct(pull_meta$sample_id))
+    message(sprintf("[DIAG] %s: starting", call_label))
+    diag_summary(pull_meta, paste0(call_label, ": input metadata"), study_col = NULL)
+
+    raw <- get_ssm_by_regions(
+        regions_bed = lymphoma_genes_bed,
+        these_samples_metadata = pull_meta,
+        basic_columns = FALSE,
+        projection = pull_projection
+    )
+
+    # Catches exactly the kind of silent, no-error data loss this
+    # investigation is chasing: if get_ssm_by_regions() only partially read
+    # an underlying file, readr/vroom's parsing-problem log (normally only
+    # surfaced as a generic console warning) is captured here per-call
+    # instead, so a future run can show precisely which rows/columns had
+    # problems rather than just that "one or more parsing issues" occurred
+    # somewhere in the whole build.
+    probs <- tryCatch(readr::problems(raw), error = function(e) NULL)
+    n_probs <- if (!is.null(probs)) nrow(probs) else NA_integer_
+    message(sprintf("[DIAG] %s: raw get_ssm_by_regions() = %d rows, %d distinct Tumor_Sample_Barcode, %s parsing problem(s)",
+                     call_label, nrow(raw), n_distinct(raw$Tumor_Sample_Barcode),
+                     if (is.na(n_probs)) "unknown (problems() not applicable to this object)" else n_probs))
+    if (!is.null(probs) && nrow(probs) > 0) {
+        message(sprintf("[DIAG] %s: parsing problem detail (up to 20 rows):", call_label))
+        print(utils::head(probs, 20))
+    }
+    diag_summary_maf(raw, paste0(call_label, ": raw, pre Hugo_Symbol filter, all Variant_Classifications"))
+    diag_summary_maf(raw %>% filter(Variant_Classification %in% diag_coding_class),
+                      paste0(call_label, ": raw, pre Hugo_Symbol filter, coding-classified only"))
+
+    slms3 <- raw %>%
+    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
+    select(
+        all_of(all_cols)
+    )
+
+    diag_summary_maf(slms3, paste0(call_label, ": final, post Hugo_Symbol filter, all Variant_Classifications"))
+    diag_summary_maf(slms3 %>% filter(Variant_Classification %in% diag_coding_class),
+                      paste0(call_label, ": final, post Hugo_Symbol filter, coding-classified only"))
+
+    return(slms3)
+}
 
 
-# Importing BL data from Thomas et al
+# --- Diagnostics -------------------------------------------------------------
+# Prints per-study row/sample counts at a labeled checkpoint, so a build's
+# log shows exactly where a cohort's count changes (or unexpectedly drops)
+# in real time, instead of only being discoverable afterward via a separate
+# GSC session against the finished DB. sample_col/study_col differ across
+# checkpoints (metadata frames use sample_id + study or cohort; maf-shaped
+# frames use Tumor_Sample_Barcode and carry no inline study column at all --
+# use diag_summary_maf for those).
+diag_summary <- function(df, label, sample_col = "sample_id", study_col = "study") {
+    message(sprintf("[DIAG] %s: %d rows, %d distinct %s", label, nrow(df), n_distinct(df[[sample_col]]), sample_col))
+    if (!is.null(study_col) && study_col %in% names(df)) {
+        summary_tbl <- df %>%
+            group_by(.data[[study_col]]) %>%
+            summarise(n_rows = n(), n_samples = n_distinct(.data[[sample_col]]), .groups = "drop") %>%
+            arrange(desc(n_rows))
+        print(as.data.frame(summary_tbl))
+    }
+    invisible(df)
+}
+
+# Same idea for maf/ashm-shaped frames: no inline study column, so study is
+# looked up via sample_study. A sample in >1 study is counted once per study
+# it belongs to (matching how sample_study itself works), so totals across
+# studies can exceed nrow(df) -- that's expected, not a bug.
+diag_summary_maf <- function(df, label, study_lookup = sample_data$sample_study) {
+    message(sprintf("[DIAG] %s: %d rows, %d distinct Tumor_Sample_Barcode", label, nrow(df), n_distinct(df$Tumor_Sample_Barcode)))
+    summary_tbl <- df %>%
+        left_join(study_lookup %>% select(sample_id, study), by = c("Tumor_Sample_Barcode" = "sample_id"), relationship = "many-to-many") %>%
+        group_by(study) %>%
+        summarise(n_rows = n(), n_samples = n_distinct(Tumor_Sample_Barcode), .groups = "drop") %>%
+        arrange(desc(n_rows))
+    print(as.data.frame(summary_tbl))
+    invisible(df)
+}
+
+# Prints which of before_ids are missing from after_ids -- for catching
+# silent-filter row loss (e.g. a get_gambl_metadata() re-fetch that quietly
+# drops sample_ids not present in the live source) at the exact step it
+# happens, instead of guessing after the fact.
+diag_missing <- function(before_ids, after_ids, label) {
+    missing <- setdiff(before_ids, after_ids)
+    message(sprintf("[DIAG] %s: %d of %d input ids missing after this step%s",
+                     label, length(missing), length(before_ids),
+                     if (length(missing) > 0) paste0(" (e.g. ", paste(head(missing, 5), collapse = ", "), ")") else ""))
+    invisible(missing)
+}
+
+
+# ============================================================================
+# Phase 1: metadata (and, where genuinely distinct per-paper data exists,
+# Publication-pipeline SSM calls) for every cohort. No SLMS-3 pulling here --
+# that used to happen per-cohort-block, which silently duplicated mutation
+# rows whenever a sample belonged to more than one cohort (confirmed: e.g.
+# the Dreval FL x Hilton trios overlap). Every cohort below also builds a
+# small (sample_id, study, study_id, reference_PMID) frame, assembled into
+# the new sample_study table in Phase 2 -- this replaces the old inline
+# `Study =` tagging on mutation rows entirely, for every pipeline, so cohort
+# membership is tracked once per sample instead of once per mutation row.
+# ============================================================================
+
+# --- Thomas BL (grch37, genome) --------------------------------------------
 # It has more patients and also contains sample ids, not just patient ids
 bl_data <- list()
 
@@ -88,6 +292,8 @@ bl_data$meta_to_bundle <- read_xlsx(
     mutate(genetic_subgroup = Subgroup) %>%
     select(- Subgroup)
 
+diag_summary(bl_data$meta_to_bundle, "bl_data$meta_to_bundle", study_col = "cohort")
+
 bl_data$ssm_to_bundle <- read_xlsx(
         "inst/extdata/studies/BL_Thomas.xlsx",
         sheet = 6
@@ -113,8 +319,20 @@ bl_data$cnv_to_bundle <- read_xlsx(
     filter(ID %in% bl_data$meta_to_bundle$sample_id) %>%
 	mutate(CN = round(2 * 2^log.ratio))
 
+# study_id mirrors sample_id here (not patient_id): the xlsx's own
+# "Genome sample id" column was already adopted directly as sample_id, and
+# patient_id is patient-level, not sample-level -- ambiguous for any cohort
+# where a patient could have more than one sample (see hilton_study below
+# for a case where that ambiguity is real).
+thomas_bl_study <- data.frame(
+    sample_id = bl_data$meta_to_bundle$sample_id,
+    study = "Thomas",
+    study_id = as.character(bl_data$meta_to_bundle$sample_id),
+    reference_PMID = pmids$Thomas_BL
+)
 
-# Importing FL data from Dreval et al
+
+# --- Dreval FL (grch37, genome) ---------------------------------------------
 fl_data <- list()
 
 fl_data$meta <- read_xlsx("inst/extdata/studies/FL_Dreval.xlsx", sheet = 1)
@@ -140,6 +358,7 @@ fl_data$meta_to_bundle <- fl_data$meta_to_bundle %>%
     filter(! sample_id == "NA") %>%
     arrange(sample_id)
 
+diag_summary(fl_data$meta_to_bundle, "fl_data$meta_to_bundle", study_col = "cohort")
 
 fl_data$ssm_to_bundle <- read_xlsx(
         "inst/extdata/studies/FL_Dreval.xlsx",
@@ -158,6 +377,8 @@ fl_data$ssm_to_bundle  <- fl_data$ssm_to_bundle %>%
     select(names(GAMBLR.helpers:::maf_header[1:45]))
 
 
+diag_summary_maf(fl_data$ssm_to_bundle, "fl_data$ssm_to_bundle (raw, as read from xlsx sheet 2)", study_lookup = data.frame(sample_id = fl_data$meta_to_bundle$sample_id, study = "FL_Dreval"))
+
 fl_data$cnv_to_bundle <- read_xlsx(
         "inst/extdata/studies/FL_Dreval.xlsx",
         sheet = 3
@@ -167,9 +388,16 @@ fl_data$cnv_to_bundle <- read_xlsx(
     ) %>%
     mutate(CN = round(2 * 2^log.ratio))
 
+# study_id mirrors sample_id, not patient_id -- see thomas_bl_study above.
+dreval_study <- data.frame(
+    sample_id = fl_data$meta_to_bundle$sample_id,
+    study = "Dreval",
+    study_id = as.character(fl_data$meta_to_bundle$sample_id),
+    reference_PMID = pmids$Dreval_FL
+)
 
 
-# Importing DLBCL data in hg38 from Thomas et al
+# --- Thomas DLBCL (hg38, genome) --------------------------------------------
 dlbcl_data <- list()
 
 dlbcl_data$meta <- read_xlsx("inst/extdata/studies/BL_Thomas.xlsx", sheet = 2)
@@ -195,6 +423,8 @@ dlbcl_data$meta_to_bundle <- dlbcl_data$meta_to_bundle %>%
     filter(! sample_id == "NA") %>%
     arrange(sample_id)
 
+diag_summary(dlbcl_data$meta_to_bundle, "dlbcl_data$meta_to_bundle", study_col = "cohort")
+
 dlbcl_data$ssm_to_bundle <- read_xlsx(
         "inst/extdata/studies/BL_Thomas.xlsx",
         sheet = 6
@@ -219,38 +449,28 @@ dlbcl_data$cnv_to_bundle <- read_xlsx(
     filter(ID %in% dlbcl_data$meta_to_bundle$sample_id) %>%
 	mutate(CN = round(2 * 2^log.ratio))
 
-##### Importing SLMS-3 variants
-pull_data <- function(
-        pull_meta,
-        pull_projection = "grch37"
-    ){
-    slms3 <- get_ssm_by_samples(
-        these_samples_metadata = pull_meta,
-        basic_columns = FALSE,
-        projection = pull_projection
-    ) %>%
-    select(
-        all_of(all_cols)
-    ) %>%
-    filter(
-        Hugo_Symbol %in% all_lymphoma_genes
-    )
-    return(slms3)
-}
+# study_id mirrors sample_id, not patient_id -- see thomas_bl_study above.
+thomas_dlbcl_study <- data.frame(
+    sample_id = dlbcl_data$meta_to_bundle$sample_id,
+    study = "Thomas",
+    study_id = as.character(dlbcl_data$meta_to_bundle$sample_id),
+    reference_PMID = pmids$Thomas_BL
+)
 
 
-# Importing DLBCL capture data
+# --- DLBCL capture cohorts: Reddy, Schmitz, Chapuy, Golub -------------------
 reddy_data <- list()
 schmitz_data <- list()
 chapuy_data <- list()
 golub_data <- list()
 
 # Importing metadata from Reddy et al and updating IDs to be consistent with GAMBL metadata
-reddy_meta <- read_excel(
+reddy_meta_full <- read_excel(
         "inst/extdata/studies/DLBCL_Reddy.xlsx",
         sheet = 1
     ) %>%
     mutate(
+        study_id = `Sample  ID`,
         patient_id = paste0(
             "Reddy_",
             `Sample  ID`
@@ -269,7 +489,18 @@ reddy_meta <- read_excel(
             "UNCLASS",
             COO_consensus
         )
-    ) %>%
+    )
+
+# Reddy's own paper-specific sample identifier ("Sample  ID"), captured
+# before it's dropped by the select() below -- see reddy_study.
+reddy_study <- data.frame(
+    sample_id = reddy_meta_full$sample_id,
+    study = "Reddy",
+    study_id = as.character(reddy_meta_full$study_id),
+    reference_PMID = pmids$Reddy_DLBCL
+)
+
+reddy_meta <- reddy_meta_full %>%
     dplyr::select(
         sample_id,
         patient_id,
@@ -278,13 +509,17 @@ reddy_meta <- read_excel(
         COO_consensus
     )
 
-setwd("/projects/rmorin/projects/gambl-repos/gambl-kdreval/")
+# (config is resolved via config.yml / the GAMBLR.results fallback; no chdir to
+# a gambl repo is needed to locate data — repo_base is absolute)
 
+# patient_id is deliberately retained here (unlike the original version of
+# this select(), which dropped it) so all-capture samples get a real
+# patient_id in sample_data$meta instead of NA.
 reddy_meta_gambl <- get_gambl_metadata() %>%
     dplyr::filter(cohort == "dlbcl_reddy") %>%
     dplyr::select(
-        sample_id, lymphgen, EBV_status_inf, cohort, pathology, seq_type,
-        unix_group, genome_build, pairing_status, normal_sample_id
+        sample_id, patient_id, lymphgen, EBV_status_inf, cohort, pathology,
+        seq_type, unix_group, genome_build, pairing_status, normal_sample_id
     ) %>%
     mutate(reference_PMID = pmids$Reddy_DLBCL)
 
@@ -292,6 +527,9 @@ reddy_data$meta_to_bundle <- left_join(
     reddy_meta,
     reddy_meta_gambl
 )
+
+diag_missing(reddy_meta$sample_id, reddy_data$meta_to_bundle$sample_id[!is.na(reddy_data$meta_to_bundle$cohort)], "Reddy meta -> reddy_meta_gambl join (missing cohort after join)")
+diag_summary(reddy_data$meta_to_bundle, "reddy_data$meta_to_bundle", study_col = "cohort")
 
 schmitz_data$meta <- get_gambl_metadata() %>%
     dplyr::filter(cohort == "dlbcl_schmitz") %>%
@@ -327,11 +565,41 @@ all_capture_meta <- bind_rows(
         reddy_meta_gambl
     )
 
-# warning: this is very slow!
-all_capture_grch37_ssm_to_bundle <- pull_data(all_capture_meta)
-all_capture_hg38_ssm_to_bundle <- pull_data(all_capture_meta, "hg38")
+diag_summary(all_capture_meta, "all_capture_meta", study_col = "cohort")
 
-# Importing DLBCL cell lines
+# No paper-specific ID has been parsed anywhere in this script for these
+# three cohorts (unlike Reddy/Thomas/Dreval/Arthur, they're pulled straight
+# from GAMBL's own metadata, never cross-referenced against each paper's own
+# supplementary sample table) -- study_id is NA until that sourcing is done.
+schmitz_study <- data.frame(
+    sample_id = schmitz_data$meta$sample_id,
+    study = "Schmitz",
+    study_id = NA_character_,
+    reference_PMID = pmids$Schmitz_DLBCL
+)
+chapuy_study <- data.frame(
+    sample_id = chapuy_data$meta$sample_id,
+    study = "Chapuy",
+    study_id = NA_character_,
+    reference_PMID = pmids$Chapuy_DLBCL
+)
+golub_study <- data.frame(
+    sample_id = golub_data$meta$sample_id,
+    study = "NCI_Golub",
+    study_id = NA_character_,
+    reference_PMID = pmids$Chapuy_other
+)
+
+# Add data from Reddy paper's own original variant calls (distinct from the
+# SLMS-3 recall above -- this is the as-published set, kept as its own
+# Publication-pipeline pull, not deduplicated against SLMS-3).
+reddy_original_maf <- read_tsv(
+    "inst/extdata/studies/reddy_original_variants_with_VAF.maf.gz"
+) %>%
+    select(any_of(all_cols))
+
+
+# --- DLBCL cell lines --------------------------------------------------------
 cell_lines_data <- list()
 
 cell_lines_data$meta <- get_gambl_metadata(seq_type_filter = "genome") %>%
@@ -339,6 +607,9 @@ cell_lines_data$meta <- get_gambl_metadata(seq_type_filter = "genome") %>%
         "DOHH-2", "SU-DHL-10", "OCI-Ly10", "OCI-Ly3", "SU-DHL-4"
     )) %>%
     arrange(sample_id)
+
+message(sprintf("[DIAG] cell_lines_data$meta: %d rows (expect 5): %s",
+                 nrow(cell_lines_data$meta), paste(cell_lines_data$meta$sample_id, collapse = ", ")))
 
 cell_lines_data$meta_to_bundle <- data.frame(
     cell_lines_data$meta$patient_id,
@@ -357,42 +628,239 @@ cell_lines_data$meta_to_bundle <- data.frame(
 
 colnames(cell_lines_data$meta_to_bundle) <- colnames_for_bundled_meta
 
-cell_lines_data$grch37$ssm_to_bundle <- get_ssm_by_samples(
+cell_lines_data$grch37$cnv_to_bundle <- get_cn_segments(
     these_samples_metadata = cell_lines_data$meta,
-    basic_columns = FALSE
-) %>% select(all_of(all_cols))
+    projection="grch37"
+) %>%
+    dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
 
-cell_lines_data$hg38$ssm_to_bundle <- get_ssm_by_samples(
+cell_lines_data$hg38$cnv_to_bundle <- get_cn_segments(
     these_samples_metadata = cell_lines_data$meta,
-    projection = "hg38",
-    basic_columns = FALSE
-) %>% select(all_of(all_cols))
+    projection="hg38"
+) %>%
+    dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
 
-cell_lines_data$grch37$cnv_to_bundle <- get_sample_cn_segments(
-    these_sample_ids = cell_lines_data$meta$sample_id
+# No sample_study row for cell lines -- no published cohort applies to them
+# (matches the previous Study=NA behaviour for this group).
+
+
+# --- Arthur (grch37, genome) -------------------------------------------------
+# Previously bundled from a raw, completely unfiltered flat file
+# (inst/extdata/studies/DLBCL_Arthur.maf.gz, tagged Pipeline="strelka") with
+# no sample-list gate and no lymphoma-gene-panel restriction at all --
+# 2.83M rows / 65,121 distinct genes, ~18,480 "mutations" per sample vs
+# ~137 for a properly gene-panel-restricted SLMS-3 sample. That block is
+# removed entirely; Arthur's samples now flow through the same consolidated
+# SLMS-3 pull as every other cohort (Phase 4).
+# Case ID -> patient_id is done as an explicit join (not a
+# `patient_id %in% arthur_case_ids$\`Case ID\`` filter) so a type mismatch
+# between the xlsx's Case ID and GAMBL's patient_id (e.g. numeric vs
+# character -- the same class of bug already fixed for study_id/Reddy's
+# Sample ID elsewhere in this script; read_xlsx() can silently type a
+# leading-zero ID like "08-15460" as numeric) can't silently drop matching
+# patients from a %in% comparison. transmute() keeps only what's needed for
+# the join, since nothing else from this sheet is used downstream.
+arthur_case_ids <- read_xlsx(
+    "inst/extdata/studies/DLBCL_Arthur.xlsx",
+    sheet = 1
+) %>% filter(`WGS data` == 1) %>%
+    transmute(patient_id = as.character(`Case ID`))
+
+# sample_id/Tumor_Sample_Barcode are GAMBL's own real values throughout --
+# never overwritten to the paper's own patient-level ID (as the removed
+# code used to do). Arthur's own "Case ID" is captured separately as
+# study_id in arthur_study below, joined to metadata by sample_id like any
+# other study-specific identifier.
+#
+# No `!grepl("tumor", sample_id)` filter here (the previous version of this
+# block had one): it excluded every sample for any patient with more than
+# one tumor biopsy (e.g. ..._tumorA/..._tumorB -- the same multi-sample-
+# per-patient pattern Hilton has), dropping those patients' SLMS-3 coverage
+# entirely. No other cohort in this script excludes samples this way.
+arthur_meta <- get_gambl_metadata() %>%
+    mutate(patient_id = as.character(patient_id)) %>%
+    inner_join(arthur_case_ids, by = "patient_id") %>%
+    filter(seq_type == "genome") %>%
+    mutate(
+        cohort = "DLBCL_Arthur",
+        reference_PMID = pmids$Arthur_DLBCL
+    )
+
+diag_missing(arthur_case_ids$patient_id, arthur_meta$patient_id, "Arthur Case ID -> patient_id join (WGS-flagged patients with no matching genome sample in get_gambl_metadata())")
+diag_summary(arthur_meta, "arthur_meta", study_col = "cohort")
+
+arthur_study <- data.frame(
+    sample_id = arthur_meta$sample_id,
+    study = "Arthur",
+    study_id = as.character(arthur_meta$patient_id),
+    reference_PMID = pmids$Arthur_DLBCL
 )
 
-cell_lines_data$hg38$cnv_to_bundle <- get_sample_cn_segments(
-    these_sample_ids = cell_lines_data$meta$sample_id,
-    projection = "hg38",
-    with_chr_prefix = TRUE
+
+# --- Hilton trios (genome + capture, both projections) ----------------------
+trios_samples <- read_xlsx(
+    "inst/extdata/studies/DLBCL_Hilton.xlsx"
+) %>%
+drop_na(DNAseq_sample_id)
+
+# (config is resolved via config.yml / the GAMBLR.results fallback; no chdir to
+# a gambl repo is needed to locate data — repo_base is absolute)
+
+trios_meta <- get_gambl_metadata() %>%
+    filter(
+        seq_type %in% c("genome", "capture"),
+        sample_id %in% trios_samples$DNAseq_sample_id
+    ) %>%
+    mutate(
+        cohort = "DLBCL_Hilton",
+        reference_PMID = pmids$Hilton_DLBCL
+    )
+
+diag_missing(trios_samples$DNAseq_sample_id, trios_meta$sample_id, "Hilton trios DNAseq_sample_id -> get_gambl_metadata() (samples in the trios sheet not found live)")
+diag_summary(trios_meta, "trios_meta", study_col = "cohort")
+
+# study_id uses sample_id, not patient_id: Hilton is a trios study, so a
+# single patient can have multiple samples (e.g. LY_RELY_116_tumorA and
+# LY_RELY_116_tumorB) -- patient_id would collapse them to the same
+# study_id, making the two rows ambiguous. sample_id already carries the
+# distinguishing suffix and matches what the paper itself would call each
+# sample.
+hilton_study <- data.frame(
+    sample_id = trios_meta$sample_id,
+    study = "Hilton",
+    study_id = as.character(trios_meta$sample_id),
+    reference_PMID = pmids$Hilton_DLBCL
 )
 
-cell_lines_data$grch37$sv_to_bundle <- get_manta_sv(
-    these_samples_metadata = cell_lines_data$meta,
+
+# ============================================================================
+# Phase 2: assemble sample_data$meta and sample_data$sample_study once, now
+# that every cohort's metadata (including Arthur and Hilton, previously
+# added much later -- after the main aSHM pull had already run without them)
+# is available from the start.
+# ============================================================================
+sample_data <- list()
+
+sample_data$meta <- bind_rows(
+    bl_data$meta_to_bundle,
+    fl_data$meta_to_bundle,
+    dlbcl_data$meta_to_bundle,
+    cell_lines_data$meta_to_bundle
 )
 
-cell_lines_data$hg38$sv_to_bundle <- get_manta_sv(
-    these_samples_metadata = cell_lines_data$meta,
-    projection = "hg38"
+sample_data$meta <- sample_data$meta %>%
+    select(-COO_consensus, -lymphgen, -EBV_status_inf) %>%
+    left_join(
+        .,
+        get_gambl_metadata() %>%
+            select(
+                sample_id,
+                COO_consensus,
+                lymphgen,
+                EBV_status_inf
+            )
+    ) %>%
+    select(all_of(colnames_for_bundled_meta))
+
+sample_data$meta <- bind_rows(
+    sample_data$meta,
+    all_capture_meta,
+    arthur_meta,
+    trios_meta
 )
 
-# Adding the manta SVs for published studies
+diag_summary(sample_data$meta, "sample_data$meta (all cohorts bound, pre metadata-fixing)", study_col = "cohort")
+
+### begin metadata fixing
+# This preserves the original cohort column and ensures there are no duplicates
+# in the metadata
+fix <- sample_data$meta
+fix <- fix %>% rename(study = cohort)
+
+diag_summary(fix, "fix (post rename cohort->study)", study_col = "study")
+
+# Keep only sample_id/seq_type/study/reference_PMID/genetic_subgroup from
+# the per-block frames -- everything else comes fresh from the join below
+# instead of whatever narrow/partial copy a given cohort block happened to
+# carry. genetic_subgroup is kept here specifically because it's paper-
+# supplement-specific (from the Thomas/Dreval xlsx sheets, not central
+# tracking) and would NOT be reintroduced by that join -- live
+# get_gambl_metadata() has no such column.
+fix <- fix %>%
+    select(sample_id, seq_type, study, reference_PMID, genetic_subgroup)
+
+pre_join_ids <- fix$sample_id
+fix <- left_join(
+    fix,
+    get_gambl_metadata(),
+    by = c("sample_id", "seq_type")
+)
+
+message(sprintf("[DIAG] fix (post live get_gambl_metadata() join): %d rows (was %d rows pre-join -- any increase means the join fanned out)", nrow(fix), length(pre_join_ids)))
+diag_summary(fix, "fix (post live get_gambl_metadata() join)", study_col = "study")
+
+# sample_meta ends up in the PUBLICLY-DISTRIBUTED gambl_mutations.db (a
+# GitHub Release asset anyone can download and query directly with SQL) --
+# restrict it to an explicit whitelist rather than everything live
+# get_gambl_metadata() happens to return, which includes internal-only
+# columns (biopsy_id, data_path, fastq_data_path/fastq_link_name,
+# link_name, library_id, res_id, unix_group, ...) that must never end up
+# in a public artifact. The whitelist lives in a plain text file, not
+# here, so a developer can add a column to future builds by editing that
+# file -- no code change needed. all_of() (not any_of()) deliberately
+# errors on a typo'd/renamed column name rather than silently dropping it.
+public_metadata_cols <- readLines("data-raw/public_sample_meta_columns.txt")
+public_metadata_cols <- trimws(public_metadata_cols)
+public_metadata_cols <- public_metadata_cols[
+    nzchar(public_metadata_cols) & !startsWith(public_metadata_cols, "#")
+]
+fix <- fix %>%
+    select(sample_id, seq_type, study, reference_PMID, all_of(public_metadata_cols))
+
+diag_summary(fix, "fix (post public-column whitelist)", study_col = "study")
+
+fix <- fix %>% filter(!is.na(study))
+
+diag_missing(pre_join_ids, fix$sample_id, "fix: post-join !is.na(study) filter (sample_ids dropped here)")
+diag_summary(fix, "fix (post filter !is.na(study))", study_col = "study")
+
+fix <- distinct(fix)
+
+diag_summary(fix, "fix (post distinct -- this becomes sample_data$meta)", study_col = "study")
+
+sample_data$meta <- fix
+### end metadata fixing
+
+# sample_study: a many-to-many bridge table (one row per (sample_id, study)
+# pair, not one row per sample), replacing the old inline `Study =` tagging
+# on mutation rows. A sample belonging to N studies is simply N rows here --
+# no schema change needed as multi-study overlap becomes more common.
+sample_data$sample_study <- bind_rows(
+    thomas_bl_study,
+    thomas_dlbcl_study,
+    dreval_study,
+    reddy_study,
+    schmitz_study,
+    chapuy_study,
+    golub_study,
+    arthur_study,
+    hilton_study
+) %>% distinct()
+
+diag_summary(sample_data$sample_study, "sample_data$sample_study", study_col = "study")
+
+
+#add SVs
+# Adding the manta SVs for published studies. Scoped to sample_data$meta (the
+# metadata just finalized above, for this run) rather than
+# GAMBLR.data::sample_data$meta (whatever happens to be installed) so the SV
+# sample scope is self-consistent with the rest of this bundle instead of
+# drifting with installed-package state across runs.
 full_genome_meta <- get_gambl_metadata(seq_type_filter = "genome")
 
 bundled_meta <- full_genome_meta %>%
     filter(
-        sample_id %in% GAMBLR.data::sample_data$meta$sample_id
+        sample_id %in% sample_data$meta$sample_id
     )
 
 full_sv_to_bundle <- get_manta_sv(
@@ -449,91 +917,80 @@ annotated_sv_keep_grch37 <- left_join(
     filter(!is.na(partner)) %>%
     select(c(1:16))
 
-
-# Combine everything together
-sample_data <- list()
-
-sample_data$meta <- bind_rows(
-    bl_data$meta_to_bundle,
-    fl_data$meta_to_bundle,
-    dlbcl_data$meta_to_bundle,
-    cell_lines_data$meta_to_bundle
-)
-
-sample_data$meta <- sample_data$meta %>%
-    select(-COO_consensus, -lymphgen, -EBV_status_inf) %>%
-    left_join(
-        .,
-        get_gambl_metadata() %>%
-            select(
-                sample_id,
-                COO_consensus,
-                lymphgen,
-                EBV_status_inf
-            )
-    ) %>%
-    select(all_of(colnames_for_bundled_meta))
-
-sample_data$meta <- bind_rows(
-    sample_data$meta,
-    all_capture_meta
-)
-
-sample_data$hg38$maf <- bind_rows(
-    bl_data$ssm_to_bundle %>% mutate(
-        Pipeline = "Publication",
-        Study = "Thomas"
-    ),
-    dlbcl_data$ssm_to_bundle %>% mutate(
-        Pipeline = "Publication",
-        Study = "Thomas"
-    ),
-    cell_lines_data$hg38$ssm %>% mutate(
-        Pipeline = "SLMS-3",
-        Study = NA
-    ),
-    all_capture_hg38_ssm_to_bundle %>% mutate(
-        Pipeline = "SLMS-3",
-        Study = case_when(
-            Tumor_Sample_Barcode %in% reddy_data$meta$sample_id ~ "Reddy",
-            Tumor_Sample_Barcode %in% schmitz_data$meta$sample_id ~ "Schmitz",
-            Tumor_Sample_Barcode %in% chapuy_data$meta$sample_id ~ "Chapuy",
-            Tumor_Sample_Barcode %in% golub_data$meta$sample_id ~ "NCI_Golub"
-        )
-    )
-)
+sample_data$grch37$bedpe <- annotated_sv_keep_grch37
+sample_data$hg38$bedpe <- annotated_sv_keep
 
 sample_data$grch37$seg <- bind_rows(
     fl_data$cnv_to_bundle,
-    cell_lines_data$grch37$cnv
+    cell_lines_data$grch37$cnv_to_bundle
 )
 
 sample_data$hg38$seg <- bind_rows(
     bl_data$cnv_to_bundle,
     dlbcl_data$cnv_to_bundle,
-    cell_lines_data$hg38$cnv
+    cell_lines_data$hg38$cnv_to_bundle
 )
 
-#add SVs
-sample_data$grch37$bedpe <- annotated_sv_keep_grch37
-sample_data$hg38$bedpe <- annotated_sv_keep
 
-# This is needed for the proteinpainter compatibility
-GAMBLR.data::sample_data$meta$cohort %>% table
+# ============================================================================
+# Phase 3: Publication-pipeline SSM data. Genuinely distinct per-paper data
+# (not a redundant SLMS-3 recall), kept as separate, un-deduplicated pulls --
+# tagged Pipeline="Publication" only; cohort membership lives in
+# sample_data$sample_study, not an inline Study column.
+# ============================================================================
+
+# Publication-pipeline data is read directly from each paper's own
+# supplementary file, which isn't guaranteed to use GAMBL's own
+# Tumor_Sample_Barcode convention -- Arthur's now-removed raw dump was the
+# clearest example, using bare patient-style IDs instead of GAMBL's real
+# per-sample naming. Defensive relabel: for any row whose
+# Tumor_Sample_Barcode matches a study's own identifier
+# (sample_study$study_id) rather than GAMBL's real sample_id, replace it
+# with the real sample_id. A no-op wherever Tumor_Sample_Barcode already IS
+# the real sample_id -- true for Thomas/Dreval/Hilton, where study_id
+# mirrors sample_id (see thomas_bl_study above).
+relabel_to_sample_id <- function(df, study_name) {
+    lookup <- sample_data$sample_study %>%
+        filter(study == study_name, !is.na(study_id)) %>%
+        select(study_id, .gambl_sample_id = sample_id)
+    df %>%
+        left_join(lookup, by = c("Tumor_Sample_Barcode" = "study_id")) %>%
+        mutate(Tumor_Sample_Barcode = coalesce(.gambl_sample_id, Tumor_Sample_Barcode)) %>%
+        select(-.gambl_sample_id)
+}
+
+# This is needed for the proteinpainter compatibility. Previously read
+# from the *installed* GAMBLR.data::sample_data rather than the
+# locally-built sample_data above -- a stale-data risk (the installed copy
+# could be out of sync with this run, and is the reason sample_data.rda
+# was still shipped in the package at all) fixed by switching to the local
+# object, which by this point (Phase 2 already ran) has every cohort this
+# block needs.
+sample_data$meta$study %>% table
 
 selected_columns <- c(
         "Tumor_Sample_Barcode", "Hugo_Symbol",
         "NCBI_Build", "Chromosome", "Start_Position", "End_Position",
-        "Tumor_Seq_Allele2", maf_columns_to_keep
+        "Tumor_Seq_Allele2", "RefSeq", "Protein_position"
+        # Deliberately NOT maf_columns_to_keep (which now also carries
+        # maf_seq_type) -- these are join-source columns for the
+        # proteinpainter-compatibility enrichment below, not the final maf
+        # table. Two of the three sources selected against this (the raw
+        # BL_Thomas manuscript flat file, and the get_ssm_by_samples() FL
+        # pull below) never carry maf_seq_type at all, so all_of() on the
+        # full list would hard-error here every time.
 )
 
-these_samples <- GAMBLR.data::sample_data$meta %>%
-    filter(cohort %in% c("BL_Thomas")) %>%
+these_samples <- sample_data$meta %>%
+    filter(study %in% c("BL_Thomas")) %>%
     pull(sample_id)
 
-these_samples_dlbcl <- GAMBLR.data::sample_data$meta %>%
-    filter(cohort %in% c("DLBCL_Thomas", "DLBCL_cell_lines")) %>%
+these_samples_dlbcl <- sample_data$meta %>%
+    filter(study %in% c("DLBCL_Thomas", "DLBCL_cell_lines")) %>%
     pull(sample_id)
+
+message(sprintf("[DIAG] these_samples (BL_Thomas): %d ids", length(these_samples)))
+message(sprintf("[DIAG] these_samples_dlbcl (DLBCL_Thomas + DLBCL_cell_lines): %d ids", length(these_samples_dlbcl)))
 
 coding_maf <- read_tsv("/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf") %>% # get from flat maf file to show SSM in hg38 coordinates similar to the original manuscript
     filter(Tumor_Sample_Barcode %in% these_samples & # drop BL58 cell line
@@ -558,408 +1015,295 @@ coding_maf <- bind_rows(
     coding_maf_dlbcl
 )
 
-dim(GAMBLR.data::sample_data$hg38$maf)
+message(sprintf("[DIAG] coding_maf (BL+DLBCL Thomas, hg38 proteinpainter enrichment source): %d rows, %d distinct Tumor_Sample_Barcode", nrow(coding_maf), n_distinct(coding_maf$Tumor_Sample_Barcode)))
 
-sample_data$hg38$maf <- sample_data$hg38$maf %>%
+# hg38 Publication rows (Thomas BL + Thomas DLBCL), enriched via the
+# proteinpainter-compatibility join above. This used to be applied directly
+# to sample_data$hg38$maf once it existed early in the script; now it's
+# applied to the Publication-only rows before Phase 6 combines them with the
+# consolidated SLMS-3 pull.
+hg38_publication_rows <- bind_rows(
+    bl_data$ssm_to_bundle %>% mutate(Pipeline = "Publication"),
+    dlbcl_data$ssm_to_bundle %>% mutate(Pipeline = "Publication")
+) %>%
+    relabel_to_sample_id("Thomas") %>%
     left_join(coding_maf)
 
-this_study_samples <- GAMBLR.data::sample_data$meta %>%
-    filter(cohort %in% c("FL_Dreval", "DLBCL_cell_lines")) %>%
+diag_summary_maf(hg38_publication_rows, "hg38_publication_rows (Thomas BL+DLBCL, final)")
+
+this_study_samples <- sample_data$meta %>%
+    filter(study %in% c("FL_Dreval", "DLBCL_cell_lines")) %>%
     pull(sample_id)
 
+message(sprintf("[DIAG] this_study_samples (FL_Dreval + DLBCL_cell_lines): %d ids", length(this_study_samples)))
+
 # FLs in grch37
-coding_maf <- get_ssm_by_samples(
-    these_samples_metadata =  get_gambl_metadata() %>%
-            filter(sample_id %in% this_study_samples),
-    basic_columns = FALSE) %>%
-    select(
-        all_of(selected_columns)
-    )
+coding_maf <- time_it("coding_maf get_ssm_by_samples", {
+    get_ssm_by_samples(
+        these_samples_metadata =  get_gambl_metadata() %>%
+                filter(sample_id %in% this_study_samples),
+        basic_columns = FALSE) %>%
+        select(
+            all_of(selected_columns)
+        )
+})
+
+message(sprintf("[DIAG] coding_maf (FL_Dreval + DLBCL_cell_lines, grch37 proteinpainter enrichment source): %d rows, %d distinct Tumor_Sample_Barcode", nrow(coding_maf), n_distinct(coding_maf$Tumor_Sample_Barcode)))
+
+diag_summary_maf(fl_data$ssm_to_bundle, "fl_data$ssm_to_bundle (pre relabel/enrichment)", study_lookup = data.frame(sample_id = fl_data$meta_to_bundle$sample_id, study = "FL_Dreval"))
 
 fl_data$ssm_to_bundle <- fl_data$ssm_to_bundle %>%
+    relabel_to_sample_id("Dreval") %>%
     dplyr::left_join(
         coding_maf
     ) %>%
     distinct()
-    
-sample_data$grch37$maf <- bind_rows(
-    fl_data$ssm_to_bundle %>% mutate(
-        Pipeline = "Publication",
-        Study = "Dreval"
-    ),
-    cell_lines_data$grch37$ssm %>% mutate(
-        Pipeline = "SLMS-3",
-        Study = NA
-    ),
-    all_capture_grch37_ssm_to_bundle %>% mutate(
-        Pipeline = "SLMS-3",
-        Study = case_when(
-            Tumor_Sample_Barcode %in% reddy_data$meta$sample_id ~ "Reddy",
-            Tumor_Sample_Barcode %in% schmitz_data$meta$sample_id ~ "Schmitz",
-            Tumor_Sample_Barcode %in% chapuy_data$meta$sample_id ~ "Chapuy",
-            Tumor_Sample_Barcode %in% golub_data$meta$sample_id ~ "NCI_Golub"
-        )
-    )
+
+diag_summary_maf(fl_data$ssm_to_bundle, "fl_data$ssm_to_bundle (post relabel/enrichment/distinct -- final)", study_lookup = data.frame(sample_id = fl_data$meta_to_bundle$sample_id, study = "FL_Dreval"))
+
+# grch37 Publication rows (Dreval FL + Reddy's original variants).
+grch37_publication_rows <- bind_rows(
+    fl_data$ssm_to_bundle %>% mutate(Pipeline = "Publication"),
+    reddy_original_maf %>% relabel_to_sample_id("Reddy") %>% mutate(Pipeline = "Publication")
 )
 
+diag_summary_maf(grch37_publication_rows, "grch37_publication_rows (Dreval FL + Reddy original, final)")
 
-# Add aSHM mutations for the already released samples
-grch37_ashm <- get_ssm_by_regions(
-    these_samples_metadata = sample_data$meta,
-    regions_bed = GAMBLR.utils::create_bed_data(
-        GAMBLR.data::grch37_ashm_regions,
-        fix_names = "concat",
-        concat_cols = c("gene","region"),sep="-"
-    ),
-    streamlined = FALSE,
-    basic_columns = FALSE
-) %>%
-    select(
-        any_of(c(colnames(sample_data$grch37$maf), maf_columns_to_keep))
-    )
+setwd(PKG_ROOT)
+
+
+# ============================================================================
+# Phase 4: one consolidated SLMS-3 pull for every sample in the bundle,
+# instead of the previous per-cohort blocks (all-capture, cell lines, Hilton
+# trios, Arthur) each independently deciding which samples to pull for --
+# that pattern silently duplicated mutation rows whenever a sample belonged
+# to more than one cohort block. Pulling once per (sample, genome_build),
+# keyed off the now-complete deduplicated sample_data$meta, makes
+# duplication structurally impossible regardless of how many cohorts a
+# sample belongs to.
+# ============================================================================
+# Cell lines are excluded here -- they get their own separate, genome-wide
+# pull below (not restricted to the lymphoma gene panel), so they must not
+# also go through this panel-restricted pull or they'd be pulled twice.
+#
+# sample_data$meta is used ONLY to decide which sample_ids belong in this
+# pull -- never passed directly to a GAMBLR.results call. Cohorts built by
+# hand (BL_Thomas, DLBCL_Thomas, FL_Dreval, DLBCL_cell_lines) don't have
+# every column a fresh get_gambl_metadata() pull would (e.g. unix_group is
+# NA for all of them), which silently caused get_ssm_by_regions() to miss
+# real coding-classified calls for those samples (confirmed: a raw pull for
+# one such sample had real Missense_Mutation/Nonsense_Mutation/Silent rows
+# that never made it into the assembled maf table). Re-fetching complete,
+# live metadata for exactly this sample_id set avoids that entirely.
+all_slms3_meta <- sample_data$meta %>%
+    filter(seq_type %in% c("genome", "capture"),
+           ! sample_id %in% cell_lines_data$meta$sample_id)
+
+diag_summary(all_slms3_meta, "all_slms3_meta (pre live-metadata refetch)", study_col = "study")
+pre_refetch_ids <- all_slms3_meta$sample_id
+
+all_slms3_meta <- get_gambl_metadata() %>%
+    filter(sample_id %in% all_slms3_meta$sample_id)
+
+# The single most important check in this script: if get_gambl_metadata()'s
+# live source is missing sample_ids that sample_data$meta has (e.g. an
+# externally-integrated cohort not fully registered there), this filter
+# silently drops them with no error -- every study's SLMS-3 coverage for
+# those samples goes to zero downstream. diag_missing() catches this by name
+# instead of leaving it to be inferred later from a low mutation count.
+diag_missing(pre_refetch_ids, all_slms3_meta$sample_id, "all_slms3_meta live-metadata refetch (sample_ids dropped because live get_gambl_metadata() doesn't have them)")
+# study isn't in all_slms3_meta itself -- join sample_study just for this
+# diagnostic so the breakdown is by study, not left un-grouped. Drop the
+# existing (unrelated) Tumor_Sample_Barcode column first: get_gambl_metadata()
+# already returns one alongside sample_id, so renaming sample_id would
+# otherwise collide with it.
+diag_summary_maf(all_slms3_meta %>% select(-any_of("Tumor_Sample_Barcode")) %>% rename(Tumor_Sample_Barcode = sample_id), "all_slms3_meta (post live-metadata refetch -- what Phase 4 actually pulls for)")
+
+slms3_grch37 <- bind_rows(
+    time_it("SLMS-3 genome grch37", pull_data(all_slms3_meta %>% filter(seq_type == "genome"))),
+    time_it("SLMS-3 capture grch37", pull_data(all_slms3_meta %>% filter(seq_type == "capture")))
+) %>% mutate(Pipeline = "SLMS-3")
+print("Done collecting grch37 SLMS-3")
+diag_summary_maf(slms3_grch37, "slms3_grch37 (panel-restricted pull, pre cell-line union)")
+
+slms3_hg38 <- bind_rows(
+    time_it("SLMS-3 genome hg38", pull_data(all_slms3_meta %>% filter(seq_type == "genome"), "hg38")),
+    time_it("SLMS-3 capture hg38", pull_data(all_slms3_meta %>% filter(seq_type == "capture"), "hg38"))
+) %>% mutate(Pipeline = "SLMS-3")
+print("Done collecting hg38 SLMS-3")
+diag_summary_maf(slms3_hg38, "slms3_hg38 (panel-restricted pull, pre cell-line union)")
+
+# Cell lines get their own, separate, genome-WIDE SNV pull -- not restricted
+# to the lymphoma gene panel like every other cohort above. This matches
+# their original pre-refactor behaviour, which was lost when they were first
+# folded into the panel-restricted consolidated pull above (confirmed via
+# compare_bundle_changes.R: cell lines showed ~50-65k "lost" rows per sample
+# against the old bundle, correctly diagnosed as a real scope reduction, not
+# a bug worth working around).
+cell_lines_ssm_grch37 <- time_it("cell lines get_ssm_by_samples grch37", {
+    get_ssm_by_samples(
+        these_samples_metadata = cell_lines_data$meta,
+        basic_columns = FALSE
+    ) %>%
+        # get_ssm_by_samples() doesn't stamp maf_seq_type the way
+        # get_ssm_by_regions() does (see all_slms3_meta pulls above) --
+        # cell_lines_data$meta is unconditionally get_gambl_metadata(seq_type_filter
+        # = "genome") (see its construction above), so "genome" is correct here,
+        # not a guess.
+        mutate(maf_seq_type = "genome") %>%
+        select(all_of(all_cols)) %>% mutate(Pipeline = "SLMS-3")
+})
+
+cell_lines_ssm_hg38 <- time_it("cell lines get_ssm_by_samples hg38", {
+    get_ssm_by_samples(
+        these_samples_metadata = cell_lines_data$meta,
+        projection = "hg38",
+        basic_columns = FALSE
+    ) %>%
+        mutate(maf_seq_type = "genome") %>%
+        select(all_of(all_cols)) %>% mutate(Pipeline = "SLMS-3")
+})
+
+message(sprintf("[DIAG] cell_lines_ssm_grch37: %d rows, %d distinct Tumor_Sample_Barcode (expect 5)", nrow(cell_lines_ssm_grch37), n_distinct(cell_lines_ssm_grch37$Tumor_Sample_Barcode)))
+message(sprintf("[DIAG] cell_lines_ssm_hg38: %d rows, %d distinct Tumor_Sample_Barcode (expect 5)", nrow(cell_lines_ssm_hg38), n_distinct(cell_lines_ssm_hg38$Tumor_Sample_Barcode)))
+
+slms3_grch37 <- bind_rows(slms3_grch37, cell_lines_ssm_grch37)
+slms3_hg38 <- bind_rows(slms3_hg38, cell_lines_ssm_hg38)
+print("Done collecting cell line SLMS-3 (genome-wide)")
+diag_summary_maf(slms3_grch37, "slms3_grch37 (final, incl. cell lines)")
+diag_summary_maf(slms3_hg38, "slms3_hg38 (final, incl. cell lines)")
+
+
+# ============================================================================
+# Phase 5: one consolidated aSHM pull, using the now-complete sample_data$meta
+# (includes Arthur + Hilton from the start). This replaces both the old main
+# aSHM block (which ran before Arthur/Hilton were added to sample_data$meta,
+# so neither got any aSHM coverage from it) and Hilton's separate dedicated
+# aSHM block (which existed only to compensate for that gap). Arthur gets
+# aSHM coverage for the first time as a result.
+# ============================================================================
+# sample_data$meta is used only to fix the sample_id set -- see the same
+# rationale next to all_slms3_meta above for why a fresh get_gambl_metadata()
+# pull is used for the actual GAMBLR.results call instead of sample_data$meta
+# directly.
+ashm_pull_meta <- get_gambl_metadata() %>%
+    filter(sample_id %in% sample_data$meta$sample_id)
+
+diag_missing(sample_data$meta$sample_id, ashm_pull_meta$sample_id, "ashm_pull_meta live-metadata refetch (sample_ids dropped because live get_gambl_metadata() doesn't have them)")
+diag_summary_maf(ashm_pull_meta %>% select(-any_of("Tumor_Sample_Barcode")) %>% rename(Tumor_Sample_Barcode = sample_id), "ashm_pull_meta (what Phase 5 actually pulls for)")
+
+regions_bed_grch37 <- create_bed_data(
+    grch37_ashm_regions,
+    fix_names = "concat",
+    concat_cols = c("gene", "region"), sep = "-"
+)
+
+grch37_ashm <- time_it("grch37_ashm get_ssm_by_regions", {
+    get_ssm_by_regions(
+        these_samples_metadata = ashm_pull_meta,
+        regions_bed = regions_bed_grch37,
+        streamlined = FALSE,
+        basic_columns = FALSE
+    ) %>%
+        select(any_of(all_cols))
+})
 
 grch37_ashm <- grch37_ashm %>%
-    filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
+    filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode) %>%
+    mutate(Pipeline = "SLMS-3")
 
-grch37_ashm <- grch37_ashm %>% mutate(Pipeline = "SLMS-3")
-
-studies <- bind_rows(
-    sample_data$grch37$maf %>%
-        distinct(Tumor_Sample_Barcode, Study),
-    sample_data$hg38$maf %>%
-        distinct(Tumor_Sample_Barcode, Study)
-) %>%
-distinct()
-
-grch37_ashm <- left_join(
-    grch37_ashm,
-    studies
+regions_bed_hg38 <- create_bed_data(
+    hg38_ashm_regions,
+    fix_names = "concat",
+    concat_cols = c("gene", "region"), sep = "-"
 )
 
-hg38_ashm <- get_ssm_by_regions(
-    these_samples_metadata = sample_data$meta,
-    regions_bed = GAMBLR.utils::create_bed_data(
-        GAMBLR.data::hg38_ashm_regions,
-        fix_names = "concat",
-        concat_cols = c("gene","region"),sep="-"
-    ),
-    projection = "hg38",
-    streamlined = FALSE,
-    basic_columns = FALSE
-) %>%
-    select(
-        any_of(c(colnames(sample_data$hg38$maf), maf_columns_to_keep))
-    )
+hg38_ashm <- time_it("hg38_ashm get_ssm_by_regions", {
+    get_ssm_by_regions(
+        these_samples_metadata = ashm_pull_meta,
+        regions_bed = regions_bed_hg38,
+        projection = "hg38",
+        streamlined = FALSE,
+        basic_columns = FALSE
+    ) %>%
+        select(any_of(all_cols))
+})
 hg38_ashm <- hg38_ashm %>%
-    filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode)
+    filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode) %>%
+    mutate(Pipeline = "SLMS-3")
 
-hg38_ashm <- hg38_ashm %>% mutate(Pipeline = "SLMS-3")
+grch37_ashm <- grch37_ashm %>% distinct()
+hg38_ashm <- hg38_ashm %>% distinct()
 
-hg38_ashm <- left_join(
-    hg38_ashm,
-    studies
-)
+diag_summary_maf(grch37_ashm, "grch37_ashm (final, pre-merge into maf)")
+diag_summary_maf(hg38_ashm, "hg38_ashm (final, pre-merge into maf)")
 
-sample_data$grch37$ashm <- grch37_ashm
-sample_data$hg38$ashm <- hg38_ashm
-
-
-# Now add the SLMS-3 calls in both projections for those samples that
-# are bundled as publication data
-publication_samples_grch37 <- sample_data$grch37$maf %>%
-    filter(Pipeline == "Publication") %>%
-    pull(Tumor_Sample_Barcode) %>%
-    unique %>% sort
-
-publication_samples_hg38 <- sample_data$hg38$maf %>%
-    filter(Pipeline == "Publication") %>%
-    pull(Tumor_Sample_Barcode) %>%
-    unique %>% sort
-
-publication_samples <- c(
-    publication_samples_grch37,
-    publication_samples_hg38
-)
-
-sample_data$grch37$maf <- get_ssm_by_samples(
-    these_samples_metadata = get_gambl_metadata() %>%
-        filter(sample_id %in% publication_samples),
-    basic_columns = FALSE) %>%
-    filter(
-        Hugo_Symbol %in% all_lymphoma_genes
-    ) %>%
-    mutate(Pipeline = "SLMS-3") %>%
-    left_join(
-        .,
-        studies
-    ) %>%
-    select(colnames(sample_data$grch37$maf)) %>%
-    bind_rows(
-        .,
-        sample_data$grch37$maf
-    )
-
-sample_data$hg38$maf <- get_ssm_by_samples(
-    these_samples_metadata = get_gambl_metadata() %>%
-        filter(sample_id %in% publication_samples),
-    projection = "hg38",
-    basic_columns = FALSE) %>%
-    filter(
-        Hugo_Symbol %in% all_lymphoma_genes
-    ) %>%
-    mutate(Pipeline = "SLMS-3") %>%
-    left_join(
-        .,
-        studies
-    ) %>%
-    select(colnames(sample_data$hg38$maf)) %>%
-    bind_rows(
-        .,
-        sample_data$hg38$maf
-    )
+print("done extracting aSHM mutations from GAMBLR.results")
 
 
-setwd("~/my_dir/repos/GAMBLR.data/")
-
-# Add data from Arthur paper
-arthur_maf <- read_tsv(
-    "inst/extdata/studies/DLBCL_Arthur.maf.gz"
-)
+# ============================================================================
+# Phase 6: final maf assembly -- Publication rows + the consolidated SLMS-3
+# pull + the aSHM-region pull, per genome build. No separate ashm table/slot
+# -- maf and ashm had identical schemas, independent mutation_id sequences,
+# and independent write-time dedup, with no code anywhere querying ashm in
+# isolation (confirmed: GAMBLR.open's only reference is get_ssm_from_db()'s
+# now-removed include_ashm toggle, which always merged it onto maf anyway).
+# Pooled here unconditionally instead -- one table, one dedup pass in
+# write_mutations_db.R. No `Study =` in any mutate() anywhere in this
+# script; cohort membership lives entirely in sample_data$sample_study.
+# ============================================================================
 sample_data$grch37$maf <- bind_rows(
-    sample_data$grch37$maf,
-    arthur_maf %>%
-        mutate(
-            Pipeline = "strelka",
-            Study = "Arthur"
-        )
-)
-
-arthur_meta <- read_xlsx(
-    "inst/extdata/studies/DLBCL_Arthur.xlsx",
-    sheet = 1
-) %>% filter(`WGS data` == 1)
-
-
-arthur_meta <- gambl_metadata %>%
-    filter(
-        patient_id %in% arthur_meta$`Case ID`,
-        seq_type == "genome",
-        ! grepl("tumor", sample_id)
-    ) %>%
-    mutate(
-        sample_id = patient_id,
-        Tumor_Sample_Barcode = patient_id,
-        cohort = "DLBCL_Arthur",
-        reference_PMID = pmids$Arthur_DLBCL
-    )
-
-sample_data$meta <- bind_rows(
-    sample_data$meta,
-    arthur_meta
-)
-
-# Add data from Hilton trios paper
-trios_samples <- read_xlsx(
-    "inst/extdata/studies/DLBCL_Hilton.xlsx"
-) %>%
-drop_na(DNAseq_sample_id)
-
-setwd("/projects/rmorin/projects/gambl-repos/gambl-kdreval/")
-
-trios_meta <- get_gambl_metadata() %>%
-    filter(
-        seq_type %in% c("genome", "capture"),
-        sample_id %in% trios_samples$DNAseq_sample_id
-    ) %>%
-    select(any_of(colnames(sample_data$meta))) %>%
-    mutate(
-        cohort = "DLBCL_Hilton",
-        reference_PMID = pmids$Hilton_DLBCL
-    )
-
-sample_data$meta <- bind_rows(
-    sample_data$meta,
-    trios_meta
-)
-
-### begin metadata fixing
-# This preserves the original cohort column and ensures there are no duplicates
-# in the metadata
-fix <- sample_data$meta
-fix <- fix %>% rename(study = cohort)
-
-fix <- left_join(
-    fix,
-    get_gambl_metadata() %>%
-        select(sample_id, seq_type, cohort)
-)
-
-fix <- fix %>% filter(!is.na(study))
-
-fix <- distinct(fix)
-
-sample_data$meta <- fix
-### end metadata fixing
-
-# trios grch37 ssm
-genome_trios_ssm_grch37 <- get_ssm_by_samples(
-    these_samples_metadata = trios_meta %>%
-        filter(seq_type == "genome"),
-    basic_columns = FALSE,
-    subset_from_merge = TRUE
-) %>%
-    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
-    ) %>%
-    select(all_of(colnames(sample_data$grch37$maf)))
-
-capture_trios_ssm_grch37 <- get_ssm_by_samples(
-    these_samples_metadata = trios_meta %>%
-        filter(seq_type == "capture"),
-    basic_columns = FALSE,
-    subset_from_merge = TRUE
-) %>%
-    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
-    ) %>%
-    select(all_of(colnames(sample_data$grch37$maf)))
-
-trios_ssm_grch37 <- bind_rows(
-    genome_trios_ssm_grch37,
-    capture_trios_ssm_grch37
-)
-
-# trios hg38 ssm
-genome_trios_ssm_hg38 <- get_ssm_by_samples(
-    these_samples_metadata = trios_meta %>%
-        filter(seq_type == "genome"),
-    basic_columns = FALSE,
-    subset_from_merge = TRUE,
-    projection = "hg38"
-) %>%
-    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
-    ) %>%
-    select(all_of(colnames(sample_data$hg38$maf)))
-
-capture_trios_ssm_hg38 <- get_ssm_by_samples(
-    these_samples_metadata = trios_meta %>%
-        filter(seq_type == "capture"),
-    basic_columns = FALSE,
-    subset_from_merge = TRUE,
-    projection = "hg38"
-) %>%
-    filter(Hugo_Symbol %in% all_lymphoma_genes) %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
-    ) %>%
-    select(all_of(colnames(sample_data$hg38$maf)))
-
-trios_ssm_hg38 <- bind_rows(
-    genome_trios_ssm_hg38,
-    capture_trios_ssm_hg38
-)
-
-sample_data$grch37$maf <- bind_rows(
-    sample_data$grch37$maf,
-    trios_ssm_grch37
+    grch37_publication_rows,
+    slms3_grch37,
+    grch37_ashm
 )
 
 sample_data$hg38$maf <- bind_rows(
-    sample_data$hg38$maf,
-    trios_ssm_hg38
+    hg38_publication_rows,
+    slms3_hg38,
+    hg38_ashm
 )
 
-regions_bed <- create_bed_data(
-    grch37_ashm_regions,
-    fix_names = "concat",
-    concat_cols = c("gene", "region"),
-    sep = "-"
-)
+# The other money diagnostic: per-study coding-classified counts, mirroring
+# what get_all_coding_ssm() showed missing on the GSC -- printed at build
+# time now instead of only being discoverable in a separate later session.
+coding_classes <- c("Missense_Mutation", "Nonsense_Mutation", "Frame_Shift_Del",
+                     "Frame_Shift_Ins", "In_Frame_Del", "In_Frame_Ins",
+                     "Splice_Site", "Splice_Region", "Nonstop_Mutation",
+                     "Translation_Start_Site")
+diag_summary_maf(sample_data$grch37$maf, "sample_data$grch37$maf (final, all Variant_Classifications)")
+diag_summary_maf(sample_data$grch37$maf %>% filter(Variant_Classification %in% coding_classes), "sample_data$grch37$maf (final, coding-classified only)")
+diag_summary_maf(sample_data$hg38$maf, "sample_data$hg38$maf (final, all Variant_Classifications)")
+diag_summary_maf(sample_data$hg38$maf %>% filter(Variant_Classification %in% coding_classes), "sample_data$hg38$maf (final, coding-classified only)")
 
-trios_ashm_grch37 <- get_ssm_by_regions(
-    these_samples_metadata = trios_meta,
-    regions_bed = regions_bed,
-    streamlined = FALSE,
-    basic_columns = FALSE
-)
-
-trios_ashm_grch37 <- trios_ashm_grch37 %>%
-    filter(Tumor_Sample_Barcode %in% trios_meta$Tumor_Sample_Barcode)
-
-trios_ashm_grch37 <- trios_ashm_grch37 %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
-    ) %>%
-    select(all_of(colnames(sample_data$grch37$maf)))
+print("done extracting all mutations in lymphoma genes with GAMBLR.results")
 
 
-sample_data$grch37$ashm <- bind_rows(
-    sample_data$grch37$ashm,
-    trios_ashm_grch37
-) %>% distinct
+# --- Persist the assembled data -------------------------------------------
+# Previously this bundled the multi-GB `sample_data.rda`, and later a
+# lightweight `sample_metadata` object shipped inside the package itself.
+# That bundled-metadata object is retired: GAMBLR.open::get_gambl_metadata()
+# (its only real consumer) now queries the sample_meta table in
+# gambl_mutations.db directly instead, so metadata and mutation data always
+# come from the same build with no separate reinstall-triggered refresh
+# cadence to drift out of sync. This is built straight from the in-memory
+# `sample_data` above, so there is no sample_data.rda round-trip.
 
-
-
-regions_bed <- create_bed_data(
-    hg38_ashm_regions,
-    fix_names = "concat",
-    concat_cols = c("gene", "region"),
-    sep = "-"
-)
-
-trios_ashm_hg38 <- get_ssm_by_regions(
-    these_samples_metadata = trios_meta,
-    regions_bed = regions_bed,
-    projection = "hg38",
-    streamlined = FALSE,
-    basic_columns = FALSE
-)
-trios_ashm_hg38 <- trios_ashm_hg38 %>%
-    filter(Tumor_Sample_Barcode %in% trios_meta$Tumor_Sample_Barcode)
-
-trios_ashm_hg38 <- trios_ashm_hg38 %>%
-    mutate(
-        Pipeline = "SLMS-3",
-        Study = "Hilton"
-    ) %>%
-    select(all_of(colnames(sample_data$hg38$maf)))
-
-sample_data$hg38$ashm <- bind_rows(
-    sample_data$hg38$ashm,
-    trios_ashm_hg38
-) %>% distinct
-
-setwd("~/my_dir/repos/GAMBLR.data/")
-
-# Add data from Reddy paper
-reddy_original_maf <- read_tsv(
-    "inst/extdata/studies/reddy_original_variants_with_VAF.maf.gz"
-) %>%
-select(any_of(colnames(sample_data$grch37$maf)))
-
-sample_data$grch37$maf <- bind_rows(
-    sample_data$grch37$maf,
-    reddy_original_maf %>%
-        mutate(
-            Pipeline = "Publication",
-            Study = "Reddy"
-        )
-)
-
-usethis::use_data(
+print("Starting sqlite build")
+source("data-raw/write_mutations_db.R")
+write_mutations_db(
     sample_data,
-    overwrite = TRUE,
-    compress = "xz"
+    out_db = "gambl_mutations.db",
+    source_desc = paste0("assemble_bundled_data.R @ ", format(Sys.Date()))
 )
+
+# During the transition you may still want the legacy monolithic object
+# (e.g. until other GAMBLR packages are audited off sample_data). Flip to TRUE
+# to also write data/sample_data.rda.
+WRITE_LEGACY_SAMPLE_DATA <- FALSE
+if (WRITE_LEGACY_SAMPLE_DATA) {
+    usethis::use_data(sample_data, overwrite = TRUE, compress = "xz")
+}
 
 library(data.tree)
 
