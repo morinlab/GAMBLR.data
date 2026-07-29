@@ -31,7 +31,7 @@ write_mutations_db <- function(sample_data,
   DBI::dbWriteTable(con, "sample_meta", sample_meta_out, overwrite = TRUE)
 
   # sample_study: many-to-many bridge table (sample_id, study) replacing the
-  # old inline Study column on maf/ashm rows -- guarded so older sample_data
+  # old inline Study column on maf rows -- guarded so older sample_data
   # objects that predate this table (e.g. via the legacy .rda adapter) don't
   # hard-crash a build that simply won't have cohort-membership data.
   n_sample_study <- 0L
@@ -54,13 +54,12 @@ write_mutations_db <- function(sample_data,
   # behaviour for rows that predate maf_seq_type, only adds separation where
   # it's actually known.
   dedup_keys <- list(
-    maf  = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2", "maf_seq_type"),
-    ashm = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2", "maf_seq_type")
+    maf = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2", "maf_seq_type")
   )
 
   # variant_pipeline: many-to-many bridge table (mutation_id, Pipeline), same
   # pattern as sample_study (sample_id, study). A single Pipeline column on
-  # maf/ashm can only hold one value per variant, but the same real mutation
+  # maf can only hold one value per variant, but the same real mutation
   # can legitimately be produced by more than one pipeline (e.g. a cohort's
   # own published/curated maf and our independent SLMS-3 recall both calling
   # the same position) -- when that happens the dedup below collapses them
@@ -68,17 +67,20 @@ write_mutations_db <- function(sample_data,
   # query for the other pipeline even though the variant itself is still
   # fully present in the table. Captured here, before dedup, so no
   # pipeline's claim to a variant is ever lost regardless of which row
-  # "wins" as maf/ashm's single representative copy.
+  # "wins" as maf's single representative copy.
   #
-  # mutation_id is a surrogate integer key assigned to each deduped maf/ashm
-  # row (unique within an elem, across both genome builds), and
-  # variant_pipeline references it as a plain foreign key instead of
-  # repeating the 5-column natural key on every row. Matching pre-dedup
-  # pipeline claims back to their surviving row still requires the natural
-  # key -- that cost doesn't disappear, it just moves here, to a one-time
-  # write-time join, instead of every read-time query in get_ssm_from_db()
-  # having to join on a 5-column composite (two of them text) instead of a
-  # single indexed integer column.
+  # mutation_id is a surrogate integer key assigned to each deduped maf
+  # row (unique across both genome builds), and variant_pipeline references
+  # it as a plain foreign key instead of repeating the 5-column natural key
+  # on every row. Matching pre-dedup pipeline claims back to their surviving
+  # row still requires the natural key -- that cost doesn't disappear, it
+  # just moves here, to a one-time write-time join, instead of every
+  # read-time query in get_ssm_from_db() having to join on a 5-column
+  # composite (two of them text) instead of a single indexed integer column.
+  # (No elem column here -- that only ever existed to disambiguate maf's and
+  # ashm's independent mutation_id spaces; maf and ashm were merged into one
+  # table with one mutation_id sequence, so there's nothing left to
+  # disambiguate.)
   variant_pipeline_rows <- list()
 
   # genome-build-stamped frames; append per build to keep peak memory low
@@ -115,8 +117,7 @@ write_mutations_db <- function(sample_data,
             dplyr::select(dplyr::all_of(dk), Pipeline) %>%
             dplyr::distinct() %>%
             dplyr::inner_join(id_lookup, by = dk) %>%
-            dplyr::select(mutation_id, Pipeline) %>%
-            dplyr::mutate(elem = elem)
+            dplyr::select(mutation_id, Pipeline)
         }
         x <- deduped
       }
@@ -126,7 +127,7 @@ write_mutations_db <- function(sample_data,
     }
     total
   }
-  counts <- vapply(c("maf", "ashm", "seg", "bedpe"), write_element, integer(1))
+  counts <- vapply(c("maf", "seg", "bedpe"), write_element, integer(1))
 
   n_variant_pipeline <- 0L
   if (length(variant_pipeline_rows)) {
@@ -145,7 +146,7 @@ write_mutations_db <- function(sample_data,
   # can't be used to satisfy. idx_*_mutation_id give the variant_pipeline
   # semi-join (in get_ssm_from_db()'s tool_name resolution) an index to
   # actually use on both sides of the join -- without one, that join has to
-  # scan maf/ashm in full for every query with a non-NULL tool_name (the
+  # scan maf in full for every query with a non-NULL tool_name (the
   # default), which is most of them.
   idx <- c(
     "CREATE INDEX idx_maf_pos     ON maf(genome_build, Chromosome, Start_Position)",
@@ -153,10 +154,6 @@ write_mutations_db <- function(sample_data,
     "CREATE INDEX idx_maf_pipe    ON maf(Pipeline)",
     "CREATE INDEX idx_maf_seqtype ON maf(maf_seq_type)",
     "CREATE INDEX idx_maf_mutation_id ON maf(mutation_id)",
-    "CREATE INDEX idx_ashm_pos    ON ashm(genome_build, Chromosome, Start_Position)",
-    "CREATE INDEX idx_ashm_sample ON ashm(Tumor_Sample_Barcode)",
-    "CREATE INDEX idx_ashm_seqtype ON ashm(maf_seq_type)",
-    "CREATE INDEX idx_ashm_mutation_id ON ashm(mutation_id)",
     "CREATE INDEX idx_seg_sample  ON seg(genome_build, ID)",
     "CREATE INDEX idx_seg_pos     ON seg(genome_build, chrom, start)",
     # bedpe previously only had an index on tumour_sample_id alone -- every
@@ -176,7 +173,7 @@ write_mutations_db <- function(sample_data,
     "CREATE INDEX idx_meta_barcode ON sample_meta(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_study_sample ON sample_study(sample_id)",
     "CREATE INDEX idx_study_study  ON sample_study(study)",
-    "CREATE INDEX idx_vp_pipe   ON variant_pipeline(elem, Pipeline)",
+    "CREATE INDEX idx_vp_pipe   ON variant_pipeline(Pipeline)",
     "CREATE INDEX idx_vp_mutation_id ON variant_pipeline(mutation_id)"
   )
   for (stmt in idx) try(DBI::dbExecute(con, stmt), silent = TRUE)
@@ -184,11 +181,11 @@ write_mutations_db <- function(sample_data,
   # self-describing provenance / expected-counts table (used by the tests)
   DBI::dbWriteTable(con, "build_info", data.frame(
     key = c("source", "built_at", "builder",
-            "n_maf", "n_ashm", "n_seg", "n_bedpe", "n_samples", "n_sample_study", "n_variant_pipeline"),
+            "n_maf", "n_seg", "n_bedpe", "n_samples", "n_sample_study", "n_variant_pipeline"),
     value = c(source_desc,
               format(Sys.time(), tz = "UTC", usetz = TRUE),
               "write_mutations_db",
-              counts[["maf"]], counts[["ashm"]], counts[["seg"]],
+              counts[["maf"]], counts[["seg"]],
               counts[["bedpe"]], nrow(sample_data$meta), n_sample_study, n_variant_pipeline),
     stringsAsFactors = FALSE
   ), overwrite = TRUE)
@@ -196,9 +193,9 @@ write_mutations_db <- function(sample_data,
   DBI::dbExecute(con, "VACUUM")
   DBI::dbExecute(con, "ANALYZE")
 
-  message(sprintf("Wrote %s (%.0f MB)  maf=%d ashm=%d seg=%d bedpe=%d samples=%d",
+  message(sprintf("Wrote %s (%.0f MB)  maf=%d seg=%d bedpe=%d samples=%d",
                   out_db, file.info(out_db)$size / 1024^2,
-                  counts[["maf"]], counts[["ashm"]], counts[["seg"]],
+                  counts[["maf"]], counts[["seg"]],
                   counts[["bedpe"]], nrow(sample_data$meta)))
   invisible(out_db)
 }

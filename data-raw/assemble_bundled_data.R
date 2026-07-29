@@ -1232,28 +1232,36 @@ hg38_ashm <- hg38_ashm %>%
     filter(Tumor_Sample_Barcode %in% sample_data$meta$Tumor_Sample_Barcode) %>%
     mutate(Pipeline = "SLMS-3")
 
-sample_data$grch37$ashm <- grch37_ashm %>% distinct()
-sample_data$hg38$ashm <- hg38_ashm %>% distinct()
+grch37_ashm <- grch37_ashm %>% distinct()
+hg38_ashm <- hg38_ashm %>% distinct()
 
-diag_summary_maf(sample_data$grch37$ashm, "sample_data$grch37$ashm (final)")
-diag_summary_maf(sample_data$hg38$ashm, "sample_data$hg38$ashm (final)")
+diag_summary_maf(grch37_ashm, "grch37_ashm (final, pre-merge into maf)")
+diag_summary_maf(hg38_ashm, "hg38_ashm (final, pre-merge into maf)")
 
 print("done extracting aSHM mutations from GAMBLR.results")
 
 
 # ============================================================================
 # Phase 6: final maf assembly -- Publication rows + the consolidated SLMS-3
-# pull, per genome build. No `Study =` in any mutate() anywhere in this
+# pull + the aSHM-region pull, per genome build. No separate ashm table/slot
+# -- maf and ashm had identical schemas, independent mutation_id sequences,
+# and independent write-time dedup, with no code anywhere querying ashm in
+# isolation (confirmed: GAMBLR.open's only reference is get_ssm_from_db()'s
+# now-removed include_ashm toggle, which always merged it onto maf anyway).
+# Pooled here unconditionally instead -- one table, one dedup pass in
+# write_mutations_db.R. No `Study =` in any mutate() anywhere in this
 # script; cohort membership lives entirely in sample_data$sample_study.
 # ============================================================================
 sample_data$grch37$maf <- bind_rows(
     grch37_publication_rows,
-    slms3_grch37
+    slms3_grch37,
+    grch37_ashm
 )
 
 sample_data$hg38$maf <- bind_rows(
     hg38_publication_rows,
-    slms3_hg38
+    slms3_hg38,
+    hg38_ashm
 )
 
 # The other money diagnostic: per-study coding-classified counts, mirroring

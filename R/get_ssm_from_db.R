@@ -13,22 +13,16 @@
 #'   indexed equality check rather than a function-wrapped one). Default
 #'   "slms-3"; set NULL to skip the Pipeline filter. Resolved via the
 #'   `variant_pipeline` join table (see [gambl_mutations_db()]'s schema
-#'   docs) rather than `maf`/`ashm`'s own Pipeline column, so a variant
+#'   docs) rather than `maf`'s own Pipeline column, so a variant
 #'   independently called by more than one pipeline is still found by a
-#'   query for either one, even though its single maf/ashm row can only
+#'   query for either one, even though its single maf row can only
 #'   carry one Pipeline value. Falls back to filtering the column directly
 #'   against DBs built before variant_pipeline existed.
-#' @param include_ashm When TRUE, also query the `ashm` table and row-bind it,
-#'   deduplicated against `maf` on the same natural key `write_mutations_db()`
-#'   uses at write time -- `maf` and `ashm` dedup independently there, so
-#'   nothing else prevents the same real mutation (same sample/position/
-#'   allele) landing in both when it falls in a gene that's both aSHM-target
-#'   and coding-panel (e.g. BCL2, BCL6, MYC, PIM1). `maf`'s copy wins ties.
 #' @param coding_only When TRUE, keep only coding `Variant_Classification`s.
 #' @param include_silent When FALSE (and `coding_only`), drop Silent mutations.
 #' @param min_read_support Keep only variants with `t_alt_count` >= this value.
 #' @param this_study Optional single study to restrict to, matched against
-#'   `sample_study$study` (not a `maf`/`ashm` column -- see
+#'   `sample_study$study` (not a `maf` column -- see
 #'   [gambl_mutations_db()]'s schema docs). Resolves to the set of sample_ids
 #'   belonging to that study, intersected with `sample_ids` if both are
 #'   supplied; composes with `tool_name`/Pipeline exactly as before (e.g.
@@ -56,7 +50,6 @@
 get_ssm_from_db <- function(projection = "grch37",
                             sample_ids = NULL,
                             tool_name = "slms-3",
-                            include_ashm = FALSE,
                             coding_only = FALSE,
                             include_silent = TRUE,
                             min_read_support = 0,
@@ -71,7 +64,7 @@ get_ssm_from_db <- function(projection = "grch37",
   # this_study resolves to sample_ids via a join against sample_study, done
   # once here rather than as a per-query filter inside base_query() -- reuses
   # the existing sample_ids/Tumor_Sample_Barcode machinery below instead of
-  # requiring maf/ashm to carry their own Study column (they don't; see
+  # requiring maf to carry its own Study column (it doesn't; see
   # gambl_mutations_db()'s schema docs), and keeps this_study (which
   # samples) and tool_name/Pipeline (which rows for those samples) composable
   # exactly as they were.
@@ -86,16 +79,20 @@ get_ssm_from_db <- function(projection = "grch37",
 
   # A variant that's independently produced by more than one pipeline (e.g. a
   # cohort's own published maf and our SLMS-3 recall both calling the same
-  # position) only has room for one Pipeline value on its single maf/ashm
+  # position) only has room for one Pipeline value on its single maf
   # row -- write_mutations_db() picks one arbitrarily when it deduplicates.
-  # variant_pipeline (mutation_id, elem, Pipeline) records every pipeline
+  # variant_pipeline (mutation_id, Pipeline) records every pipeline
   # that actually produced each variant, keyed on the surrogate mutation_id
   # surviving rows are assigned at write time (not the 5-column natural key
   # -- see write_mutations_db.R for why), so tool_name is resolved against
-  # it via a single-column semi-join instead of the maf/ashm row's own
+  # it via a single-column semi-join instead of the maf row's own
   # (possibly-not-representative) Pipeline value. Falls back to the old
   # direct-column filter against DBs built before this table existed.
   has_variant_pipeline <- !is.null(tn) && "variant_pipeline" %in% DBI::dbListTables(con)
+  # elem distinguished maf's and ashm's independent mutation_id spaces before
+  # the two tables were merged into one -- only present on a DB built before
+  # that merge, kept here purely for backward compatibility with one.
+  has_vp_elem <- has_variant_pipeline && "elem" %in% DBI::dbListFields(con, "variant_pipeline")
 
   # apply the filters that are common to every query against this table,
   # regardless of how many regions (if any) are requested
@@ -104,9 +101,13 @@ get_ssm_from_db <- function(projection = "grch37",
       dplyr::filter(genome_build == projection)
     if (!is.null(tn)) {
       if (has_variant_pipeline) {
-        matching_ids <- dplyr::tbl(con, "variant_pipeline") %>%
-          dplyr::filter(elem == table_name, Pipeline == tn) %>%
-          dplyr::distinct(mutation_id)
+        matching_ids <- dplyr::tbl(con, "variant_pipeline")
+        matching_ids <- if (has_vp_elem) {
+          dplyr::filter(matching_ids, elem == table_name, Pipeline == tn)
+        } else {
+          dplyr::filter(matching_ids, Pipeline == tn)
+        }
+        matching_ids <- dplyr::distinct(matching_ids, mutation_id)
         q <- dplyr::semi_join(q, matching_ids, by = "mutation_id")
       } else {
         q <- dplyr::filter(q, Pipeline == tn)
@@ -148,11 +149,6 @@ get_ssm_from_db <- function(projection = "grch37",
   }
 
   res <- gather("maf")
-  if (include_ashm) {
-    res <- dplyr::bind_rows(res, gather("ashm")) %>%
-      dplyr::distinct(Tumor_Sample_Barcode, Chromosome, Start_Position,
-                       End_Position, Tumor_Seq_Allele2, .keep_all = TRUE)
-  }
   res$genome_build <- NULL
   res$mutation_id <- NULL
   res

@@ -8,7 +8,6 @@ get_ssm_from_db(
   projection = "grch37",
   sample_ids = NULL,
   tool_name = "slms-3",
-  include_ashm = FALSE,
   coding_only = FALSE,
   include_silent = TRUE,
   min_read_support = 0,
@@ -29,18 +28,11 @@ itself normalized to lowercase at write time, so this is a plain,
 indexed equality check rather than a function-wrapped one). Default
 "slms-3"; set NULL to skip the Pipeline filter. Resolved via the
 \code{variant_pipeline} join table (see \code{\link[=gambl_mutations_db]{gambl_mutations_db()}}'s schema
-docs) rather than \code{maf}/\code{ashm}'s own Pipeline column, so a variant
+docs) rather than \code{maf}'s own Pipeline column, so a variant
 independently called by more than one pipeline is still found by a
-query for either one, even though its single maf/ashm row can only
+query for either one, even though its single maf row can only
 carry one Pipeline value. Falls back to filtering the column directly
 against DBs built before variant_pipeline existed.}
-
-\item{include_ashm}{When TRUE, also query the \code{ashm} table and row-bind it,
-deduplicated against \code{maf} on the same natural key \code{write_mutations_db()}
-uses at write time -- \code{maf} and \code{ashm} dedup independently there, so
-nothing else prevents the same real mutation (same sample/position/
-allele) landing in both when it falls in a gene that's both aSHM-target
-and coding-panel (e.g. BCL2, BCL6, MYC, PIM1). \code{maf}'s copy wins ties.}
 
 \item{coding_only}{When TRUE, keep only coding \code{Variant_Classification}s.}
 
@@ -49,7 +41,7 @@ and coding-panel (e.g. BCL2, BCL6, MYC, PIM1). \code{maf}'s copy wins ties.}
 \item{min_read_support}{Keep only variants with \code{t_alt_count} >= this value.}
 
 \item{this_study}{Optional single study to restrict to, matched against
-\code{sample_study$study} (not a \code{maf}/\code{ashm} column -- see
+\code{sample_study$study} (not a \code{maf} column -- see
 \code{\link[=gambl_mutations_db]{gambl_mutations_db()}}'s schema docs). Resolves to the set of sample_ids
 belonging to that study, intersected with \code{sample_ids} if both are
 supplied; composes with \code{tool_name}/Pipeline exactly as before (e.g.
