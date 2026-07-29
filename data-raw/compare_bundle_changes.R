@@ -2,7 +2,7 @@
 #
 # Compares the OLD bundled sample_data.rda against a NEW gambl_mutations.db
 # build at the level of individual events (not just row totals), for each of
-# three data types: SNV (maf + ashm), CNV (seg), SV (bedpe). For each type:
+# three data types: SNV (maf), CNV (seg), SV (bedpe). For each type:
 #   - counts, per sample_id, how many events are NEW (gained: present in the
 #     new build but not the old) and how many are LOST (missing: present in
 #     the old build but not the new)
@@ -106,18 +106,16 @@ write_counts <- function(per_sample, path) {
   message("wrote per-sample counts to ", path)
 }
 
-# --- SNV: maf + ashm combined ------------------------------------------------
-# maf and ashm are built by different code paths in assemble_bundled_data.R
-# (gene-region-restricted pull vs aSHM-region-restricted pull) -- .source
-# records which table each row came from so gained/lost examples can be
-# traced back to the right code path instead of being lumped together as
-# an undifferentiated "SNV". Not part of the comparison key: a row that
-# moved from one table to the other between builds still counts as
-# retained if its sample/position match.
-new_snv <- bind_rows(
-  dbGetQuery(con, "SELECT * FROM maf")  %>% mutate(.source = "maf"),
-  dbGetQuery(con, "SELECT * FROM ashm") %>% mutate(.source = "ashm")
-)
+# --- SNV: maf (which now also absorbs what used to be a separate ashm pull,
+# deduplicated against it at write time -- see write_mutations_db.R) --------
+# .source records which table/pull each row came from on the OLD side so
+# gained/lost examples can still be traced back to the right code path.
+# The new side no longer has that distinction to make (maf and ashm were
+# merged into one table with no retained provenance column -- deliberately;
+# nothing consumed it), so .source is uniformly "maf" there. Not part of the
+# comparison key either way: a row that moved from one source to the other
+# between builds still counts as retained if its sample/position match.
+new_snv <- dbGetQuery(con, "SELECT * FROM maf") %>% mutate(.source = "maf")
 old_snv <- bind_rows(
   old_sd$grch37$maf  %>% mutate(genome_build = "grch37", .source = "maf"),
   old_sd$hg38$maf    %>% mutate(genome_build = "hg38", .source = "maf"),
@@ -136,7 +134,7 @@ old_snv <- bind_rows(
 old_snv <- old_snv %>% filter(is.na(Pipeline) | Pipeline != "strelka")
 
 snv_key <- c("Tumor_Sample_Barcode", "genome_build", "Chromosome", "Start_Position", "End_Position")
-snv_cmp <- compare_events(old_snv, new_snv, "Tumor_Sample_Barcode", snv_key, "SNV (maf+ashm)")
+snv_cmp <- compare_events(old_snv, new_snv, "Tumor_Sample_Barcode", snv_key, "SNV (maf, incl. aSHM-region pull)")
 write_examples(snv_cmp$gained, "Tumor_Sample_Barcode", file.path(outdir, "snv_gained_examples.log"))
 write_examples(snv_cmp$lost, "Tumor_Sample_Barcode", file.path(outdir, "snv_lost_examples.log"))
 write_counts(snv_cmp$per_sample, file.path(outdir, "snv_persample_counts.tsv"))

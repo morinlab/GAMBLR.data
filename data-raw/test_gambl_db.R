@@ -31,17 +31,18 @@ cols <- function(t) dbListFields(con, t)
 builds_in <- function(t) sort(dbGetQuery(con, sprintf("SELECT DISTINCT genome_build g FROM %s", t))$g)
 
 cat("== tables present ==\n")
-for (t in c("maf","ashm","seg","bedpe","sample_meta","sample_study","variant_pipeline","build_info"))
+for (t in c("maf","seg","bedpe","sample_meta","sample_study","variant_pipeline","build_info"))
   check(t %in% tbls, sprintf("table %s exists", t))
+check(!("ashm" %in% tbls), "table ashm does NOT exist (merged into maf)")
 
 cat("\n== row counts (all > 0) ==\n")
-for (t in c("maf","ashm","seg","bedpe","sample_meta","sample_study","variant_pipeline")) {
+for (t in c("maf","seg","bedpe","sample_meta","sample_study","variant_pipeline")) {
   cnt <- if (t %in% tbls) n(t) else 0
   check(cnt > 0, sprintf("%-11s has %d rows", t, cnt))
 }
 
 cat("\n== both genome builds present ==\n")
-for (t in c("maf","ashm","seg","bedpe"))
+for (t in c("maf","seg","bedpe"))
   if (t %in% tbls)
     check(all(c("grch37","hg38") %in% builds_in(t)),
           sprintf("%-6s has builds: %s", t, paste(builds_in(t), collapse=", ")))
@@ -54,7 +55,7 @@ req <- list(
   bedpe = c("tumour_sample_id","CHROM_A","START_A","CHROM_B","START_B","VAF_tumour","SCORE","FILTER","genome_build"),
   sample_meta = c("sample_id","Tumor_Sample_Barcode","seq_type","study"),
   sample_study = c("sample_id","study","study_id","reference_PMID"),
-  variant_pipeline = c("mutation_id","elem","Pipeline")
+  variant_pipeline = c("mutation_id","Pipeline")
 )
 for (t in names(req)) if (t %in% tbls) {
   missing <- setdiff(req[[t]], cols(t))
@@ -71,7 +72,7 @@ cat("\n== indexes present ==\n")
 # assert indexes that actually exist.
 idx <- dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='index'")$name
 for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_pipe","idx_maf_mutation_id",
-            "idx_ashm_mutation_id","idx_seg_sample",
+            "idx_seg_sample",
             "idx_bedpe_sample","idx_bedpe_pos_a","idx_bedpe_pos_b",
             "idx_study_sample","idx_study_study",
             "idx_vp_pipe","idx_vp_mutation_id"))
@@ -95,7 +96,7 @@ cat("\n== build_info counts match actual table counts ==\n")
 if ("build_info" %in% tbls) {
   bi <- dbGetQuery(con, "SELECT key, value FROM build_info")
   getbi <- function(k) as.numeric(bi$value[bi$key == k])
-  for (t in c("maf","ashm","seg","bedpe"))
+  for (t in c("maf","seg","bedpe"))
     check(isTRUE(getbi(paste0("n_", t)) == n(t)),
           sprintf("build_info n_%s == COUNT(%s)", t, t))
   check(isTRUE(getbi("n_variant_pipeline") == n("variant_pipeline")),
@@ -105,11 +106,23 @@ if ("build_info" %in% tbls) {
 cat("\n== regression vs sample_data.rda (optional) ==\n")
 if (file.exists(rda)) {
   e <- new.env(); load(rda, envir = e); sd <- get("sample_data", envir = e)
-  for (t in c("maf","ashm","seg","bedpe")) {
-    expect <- sum(vapply(c("grch37","hg38"),
-                         function(b) { x <- sd[[b]][[t]]; if (is.null(x)) 0L else nrow(x) }, integer(1)))
+  rda_rows <- function(t) sum(vapply(c("grch37","hg38"),
+                       function(b) { x <- sd[[b]][[t]]; if (is.null(x)) 0L else nrow(x) }, integer(1)))
+  for (t in c("seg","bedpe")) {
+    expect <- rda_rows(t)
     check(expect == n(t), sprintf("%-6s DB rows (%d) == sample_data rows (%d)", t, n(t), expect))
   }
+  # maf no longer has an exact-equality invariant against the legacy .rda:
+  # the DB's maf now also absorbs what used to be a separate ashm pull,
+  # deduplicated against it at write time (see write_mutations_db.R), so the
+  # new count is expected to be somewhere between the old maf alone (nothing
+  # was ever removed from maf's own content) and old maf + old ashm combined
+  # (the ceiling, only reached if the two pulls never overlapped at all).
+  old_maf <- rda_rows("maf")
+  old_ashm <- rda_rows("ashm")
+  check(n("maf") >= old_maf && n("maf") <= old_maf + old_ashm,
+        sprintf("maf DB rows (%d) within [old maf (%d), old maf+ashm (%d)]",
+                n("maf"), old_maf, old_maf + old_ashm))
 } else cat("  [skip] no", rda, "(fresh GSC build has no legacy .rda — expected)\n")
 
 cat(sprintf("\n==== %s: %d check(s) failed ====\n", if (fails==0) "ALL PASSED" else "FAILURES", fails))
