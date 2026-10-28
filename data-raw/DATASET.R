@@ -539,3 +539,12 @@ gencode_to_symbol <- system.file(
     ) %>%
     read_tsv()
 usethis::use_data(gencode_to_symbol, overwrite = TRUE)
+
+# BED panel of adaptive sampling targets
+grch37_adaptive_sampling_targets = system.file("extdata","adaptive_sampling_targets.grch37.bed",package="GAMBLR.data") %>%
+  read_tsv()
+usethis::use_data(grch37_adaptive_sampling_targets, overwrite = TRUE)
+
+hg38_adaptive_sampling_targets = system.file("extdata","adaptive_sampling_targets.hg38.bed",package="GAMBLR.data") %>%
+  read_tsv()
+usethis::use_data(hg38_adaptive_sampling_targets, overwrite = TRUE)
