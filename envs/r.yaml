@@ -149,6 +149,7 @@ dependencies:
   - r-rmarkdown=2.25
   - r-roxygen2=7.2.3
   - r-rprojroot=2.0.3
+  - r-rsqlite=2.3.7=r43h0d4f4ea_0
   - r-rstudioapi=0.15.0
   - r-rversions=2.1.2
   - r-sass=0.4.7
