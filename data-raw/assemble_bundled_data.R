@@ -596,7 +596,9 @@ golub_study <- data.frame(
 reddy_original_maf <- read_tsv(
     "inst/extdata/studies/reddy_original_variants_with_VAF.maf.gz"
 ) %>%
-    select(any_of(all_cols))
+    select(any_of(all_cols)) %>%
+    # the published file's grch37 chromosomes are chr-prefixed (chr3); GAMBL's grch37 calls aren't (3)
+    mutate(Chromosome = sub("^chr", "", as.character(Chromosome)))
 
 
 # --- DLBCL cell lines --------------------------------------------------------
