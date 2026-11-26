@@ -16,7 +16,9 @@ download_gambl_mutations_db(
 standard cache location, \code{tools::R_user_dir("GAMBLR.data", "cache")}.}
 
 \item{tag}{GitHub release tag to download from. Defaults to
-\code{paste0("data-v", utils::packageVersion("GAMBLR.data"))}.}
+\code{paste0("data-v", utils::packageVersion("GAMBLR.data"))}, or, if that
+release has no \code{gambl_mutations.db}, the newest earlier data release
+that does (see details).}
 
 \item{repo}{GitHub repo in \code{"owner/repo"} form.}
 
@@ -43,4 +45,10 @@ built for its own schema, not whatever happens to be the newest release
 step (admin-only, run manually after a fresh build; bump
 \code{DESCRIPTION}'s \code{Version} and cut a matching release whenever the schema
 changes, so the two stay in lockstep).
+
+Not every package version gets its own data release. When \code{tag} isn't
+given and the release for this package version has no
+\code{gambl_mutations.db} (or doesn't exist), the newest \verb{data-v*} release at
+or below this package version that has one is used instead, with a
+message saying which. A \code{tag} given explicitly is used as is.
 }
