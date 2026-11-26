@@ -19,10 +19,11 @@ A read-only DBIConnection.
 }
 \description{
 Returns a (cached) read-only DBI connection to \code{gambl_mutations.db},
-the SQLite database holding the large sample-level frames (MAF, seg,
-bedpe) built from the in-memory \code{sample_data} object assembled by
-\code{data-raw/assemble_bundled_data.R}, via the shared \code{write_mutations_db()}
-helper (\code{data-raw/write_mutations_db.R}).
+the SQLite database holding the large sample-level frames (sample
+metadata, MAF, seg, bedpe), built by \code{data-raw/assemble_bundled_data.R}
+via the shared \code{write_mutations_db()} helper
+(\code{data-raw/write_mutations_db.R}). It replaces the lazy-loaded
+\code{sample_data} object earlier versions of the package bundled.
 }
 \details{
 Unlike the small bundled \code{\link[=gambl_reference_db]{gambl_reference_db()}}, this file is large

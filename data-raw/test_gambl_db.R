@@ -5,16 +5,15 @@
 # the GAMBLR.open accessors.
 #
 # Usage:
-#   Rscript data-raw/test_gambl_db.R [OUT_DB] [SAMPLE_DATA_RDA]
+#   Rscript data-raw/test_gambl_db.R [OUT_DB]
 #
-# Exits non-zero if any critical check fails. The optional SAMPLE_DATA_RDA
-# enables a regression check (DB row counts vs the in-memory frames).
+# Exits non-zero if any critical check fails. For a regression check against
+# the previous build, run data-raw/compare_bundle_changes.R.
 
 suppressMessages({ library(DBI); library(RSQLite) })
 
 args   <- commandArgs(trailingOnly = TRUE)
 db     <- if (length(args) >= 1) args[[1]] else "gambl_mutations.db"
-rda    <- if (length(args) >= 2) args[[2]] else "data/sample_data.rda"
 
 fails <- 0L
 check <- function(cond, msg) {
@@ -103,27 +102,6 @@ if ("build_info" %in% tbls) {
         sprintf("build_info n_variant_pipeline == COUNT(variant_pipeline)"))
 }
 
-cat("\n== regression vs sample_data.rda (optional) ==\n")
-if (file.exists(rda)) {
-  e <- new.env(); load(rda, envir = e); sd <- get("sample_data", envir = e)
-  rda_rows <- function(t) sum(vapply(c("grch37","hg38"),
-                       function(b) { x <- sd[[b]][[t]]; if (is.null(x)) 0L else nrow(x) }, integer(1)))
-  for (t in c("seg","bedpe")) {
-    expect <- rda_rows(t)
-    check(expect == n(t), sprintf("%-6s DB rows (%d) == sample_data rows (%d)", t, n(t), expect))
-  }
-  # maf no longer has an exact-equality invariant against the legacy .rda:
-  # the DB's maf now also absorbs what used to be a separate ashm pull,
-  # deduplicated against it at write time (see write_mutations_db.R), so the
-  # new count is expected to be somewhere between the old maf alone (nothing
-  # was ever removed from maf's own content) and old maf + old ashm combined
-  # (the ceiling, only reached if the two pulls never overlapped at all).
-  old_maf <- rda_rows("maf")
-  old_ashm <- rda_rows("ashm")
-  check(n("maf") >= old_maf && n("maf") <= old_maf + old_ashm,
-        sprintf("maf DB rows (%d) within [old maf (%d), old maf+ashm (%d)]",
-                n("maf"), old_maf, old_maf + old_ashm))
-} else cat("  [skip] no", rda, "(fresh GSC build has no legacy .rda — expected)\n")
 
 cat(sprintf("\n==== %s: %d check(s) failed ====\n", if (fails==0) "ALL PASSED" else "FAILURES", fails))
 if (fails > 0) quit(status = 1)

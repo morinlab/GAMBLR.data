@@ -1321,13 +1321,6 @@ write_mutations_db(
     source_desc = paste0("assemble_bundled_data.R @ ", format(Sys.Date()))
 )
 
-# During the transition you may still want the legacy monolithic object
-# (e.g. until other GAMBLR packages are audited off sample_data). Flip to TRUE
-# to also write data/sample_data.rda.
-WRITE_LEGACY_SAMPLE_DATA <- FALSE
-if (WRITE_LEGACY_SAMPLE_DATA) {
-    usethis::use_data(sample_data, overwrite = TRUE, compress = "xz")
-}
 
 library(data.tree)
 

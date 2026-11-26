@@ -1,8 +1,9 @@
 # compare_bundle_changes.R
 #
-# Compares the OLD bundled sample_data.rda against a NEW gambl_mutations.db
-# build at the level of individual events (not just row totals), for each of
-# three data types: SNV (maf), CNV (seg), SV (bedpe). For each type:
+# Compares a PREVIOUS gambl_mutations.db (e.g. the current release, as cached by
+# GAMBLR.data::gambl_mutations_db()) against a NEW build at the level of
+# individual events (not just row totals), for each of three data types: SNV
+# (maf), CNV (seg), SV (bedpe). For each type:
 #   - counts, per sample_id, how many events are NEW (gained: present in the
 #     new build but not the old) and how many are LOST (missing: present in
 #     the old build but not the new)
@@ -19,23 +20,32 @@
 # "Same event" is determined by an exact match on a type-specific key (sample
 # id + genome_build + genomic coordinates), NOT by row position or count --
 # two rows only count as "the same" if every key column matches exactly.
+# Chromosome names are compared without a "chr" prefix, so a build that only
+# changed naming (e.g. grch37 rows once stored as chr1) doesn't show as
+# lost/gained.
 #
-# Usage: Rscript data-raw/compare_bundle_changes.R [gambl_mutations.db] [old sample_data.rda] [output dir]
+# (Until the sqlite database replaced it, the old side was the bundled
+# sample_data.rda object; that object has been retired.)
+#
+# Usage: Rscript data-raw/compare_bundle_changes.R [new gambl_mutations.db] [previous gambl_mutations.db] [output dir]
+#   previous defaults (when missing or "") to the cached release, tools::R_user_dir("GAMBLR.data", "cache")/gambl_mutations.db
 
 suppressMessages({library(DBI); library(dplyr)})
 
 args    <- commandArgs(trailingOnly = TRUE)
 db      <- if (length(args) >= 1) args[[1]] else "gambl_mutations.db"
-old_rda <- if (length(args) >= 2) args[[2]] else "data/sample_data.rda"
+old_db  <- if (length(args) >= 2 && nzchar(args[[2]])) args[[2]] else file.path(tools::R_user_dir("GAMBLR.data", "cache"), "gambl_mutations.db")
 outdir  <- if (length(args) >= 3) args[[3]] else "."
 dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
 
-con <- DBI::dbConnect(RSQLite::SQLite(), db)
+stopifnot(file.exists(db), file.exists(old_db))
+if (normalizePath(db) == normalizePath(old_db)) stop("the new and previous databases are the same file")
+con <- DBI::dbConnect(RSQLite::SQLite(), db, flags = RSQLite::SQLITE_RO)
 on.exit(DBI::dbDisconnect(con), add = TRUE)
-
-e <- new.env()
-load(old_rda, envir = e)
-old_sd <- get("sample_data", envir = e)
+old_con <- DBI::dbConnect(RSQLite::SQLite(), old_db, flags = RSQLite::SQLITE_RO)
+on.exit(DBI::dbDisconnect(old_con), add = TRUE)
+message("new: ", db, "\nprevious: ", old_db)
+unprefix <- function(df, cols) { for (cc in cols) df[[cc]] <- sub("^chr", "", as.character(df[[cc]])); df }
 
 # Generic per-sample gained/lost comparison for one data type.
 #   old_df, new_df : data frames (already build-stamped with genome_build if
@@ -106,45 +116,19 @@ write_counts <- function(per_sample, path) {
   message("wrote per-sample counts to ", path)
 }
 
-# --- SNV: maf (which now also absorbs what used to be a separate ashm pull,
-# deduplicated against it at write time -- see write_mutations_db.R) --------
-# .source records which table/pull each row came from on the OLD side so
-# gained/lost examples can still be traced back to the right code path.
-# The new side no longer has that distinction to make (maf and ashm were
-# merged into one table with no retained provenance column -- deliberately;
-# nothing consumed it), so .source is uniformly "maf" there. Not part of the
-# comparison key either way: a row that moved from one source to the other
-# between builds still counts as retained if its sample/position match.
-new_snv <- dbGetQuery(con, "SELECT * FROM maf") %>% mutate(.source = "maf")
-old_snv <- bind_rows(
-  old_sd$grch37$maf  %>% mutate(genome_build = "grch37", .source = "maf"),
-  old_sd$hg38$maf    %>% mutate(genome_build = "hg38", .source = "maf"),
-  old_sd$grch37$ashm %>% mutate(genome_build = "grch37", .source = "ashm"),
-  old_sd$hg38$ashm   %>% mutate(genome_build = "hg38", .source = "ashm")
-)
-
-# Pipeline == "strelka" (Arthur's old, unfiltered raw-flat-file dump) is
-# intentionally and entirely gone from the new bundle -- that source file
-# isn't read anymore. Confirmed (twice: 08-15460, DO52686) that its
-# Tumor_Sample_Barcode values are the raw file's own non-standard IDs, not
-# GAMBL's real sample_id, so every one of these rows is expected to show up
-# as "lost" regardless of anything else in the pipeline. Excluded here so
-# that expected, already-understood disappearance doesn't drown out
-# genuinely new findings on every run.
-old_snv <- old_snv %>% filter(is.na(Pipeline) | Pipeline != "strelka")
+# --- SNV: maf (aSHM-region mutations included; maf and ashm are one table) ---
+new_snv <- dbGetQuery(con, "SELECT * FROM maf") %>% unprefix("Chromosome")
+old_snv <- dbGetQuery(old_con, "SELECT * FROM maf") %>% unprefix("Chromosome")
 
 snv_key <- c("Tumor_Sample_Barcode", "genome_build", "Chromosome", "Start_Position", "End_Position")
-snv_cmp <- compare_events(old_snv, new_snv, "Tumor_Sample_Barcode", snv_key, "SNV (maf, incl. aSHM-region pull)")
+snv_cmp <- compare_events(old_snv, new_snv, "Tumor_Sample_Barcode", snv_key, "SNV (maf, incl. aSHM regions)")
 write_examples(snv_cmp$gained, "Tumor_Sample_Barcode", file.path(outdir, "snv_gained_examples.log"))
 write_examples(snv_cmp$lost, "Tumor_Sample_Barcode", file.path(outdir, "snv_lost_examples.log"))
 write_counts(snv_cmp$per_sample, file.path(outdir, "snv_persample_counts.tsv"))
 
 # --- CNV: seg -----------------------------------------------------------------
-new_cnv <- dbGetQuery(con, "SELECT * FROM seg")
-old_cnv <- bind_rows(
-  old_sd$grch37$seg %>% mutate(genome_build = "grch37"),
-  old_sd$hg38$seg   %>% mutate(genome_build = "hg38")
-)
+new_cnv <- dbGetQuery(con, "SELECT * FROM seg") %>% unprefix("chrom")
+old_cnv <- dbGetQuery(old_con, "SELECT * FROM seg") %>% unprefix("chrom")
 cnv_key <- c("ID", "genome_build", "chrom", "start", "end")
 cnv_cmp <- compare_events(old_cnv, new_cnv, "ID", cnv_key, "CNV (seg)")
 write_examples(cnv_cmp$gained, "ID", file.path(outdir, "cnv_gained_examples.log"))
@@ -152,11 +136,8 @@ write_examples(cnv_cmp$lost, "ID", file.path(outdir, "cnv_lost_examples.log"))
 write_counts(cnv_cmp$per_sample, file.path(outdir, "cnv_persample_counts.tsv"))
 
 # --- SV: bedpe ------------------------------------------------------------------
-new_sv <- dbGetQuery(con, "SELECT * FROM bedpe")
-old_sv <- bind_rows(
-  old_sd$grch37$bedpe %>% mutate(genome_build = "grch37"),
-  old_sd$hg38$bedpe   %>% mutate(genome_build = "hg38")
-)
+new_sv <- dbGetQuery(con, "SELECT * FROM bedpe") %>% unprefix(c("CHROM_A", "CHROM_B"))
+old_sv <- dbGetQuery(old_con, "SELECT * FROM bedpe") %>% unprefix(c("CHROM_A", "CHROM_B"))
 sv_key <- c("tumour_sample_id", "genome_build", "CHROM_A", "START_A", "CHROM_B", "START_B")
 sv_cmp <- compare_events(old_sv, new_sv, "tumour_sample_id", sv_key, "SV (bedpe)")
 write_examples(sv_cmp$gained, "tumour_sample_id", file.path(outdir, "sv_gained_examples.log"))

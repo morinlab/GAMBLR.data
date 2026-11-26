@@ -1,10 +1,11 @@
 #' @title Connect to the GAMBL mutations database.
 #'
 #' @description Returns a (cached) read-only DBI connection to `gambl_mutations.db`,
-#' the SQLite database holding the large sample-level frames (MAF, seg,
-#' bedpe) built from the in-memory `sample_data` object assembled by
-#' `data-raw/assemble_bundled_data.R`, via the shared `write_mutations_db()`
-#' helper (`data-raw/write_mutations_db.R`).
+#' the SQLite database holding the large sample-level frames (sample
+#' metadata, MAF, seg, bedpe), built by `data-raw/assemble_bundled_data.R`
+#' via the shared `write_mutations_db()` helper
+#' (`data-raw/write_mutations_db.R`). It replaces the lazy-loaded
+#' `sample_data` object earlier versions of the package bundled.
 #'
 #' @details Unlike the small bundled [gambl_reference_db()], this file is large
 #' (several hundred MB) and is NOT shipped inside the package. It is

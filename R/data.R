@@ -633,22 +633,6 @@
 "lymphoma_genes_mcl_v_latest"
 
 
-#' Sample Data
-#'
-#' Sample data bundled as a list of 3 elements. Metadata (data frame) and sample data from two projections (grch37 and hg38),
-#' Each projection is organized as a list of 3 elements; maf, seg, and bedpe (all data frames).
-#'
-#' @format ## `sample_data`
-#' A list of three elements.
-#' Two elements are lists with three data frames in each list and the last element (metadata) is a data frame.
-#' \describe{
-#'   \item{meta}{A data frame with metadata.}
-#'   \item{grch37}{A list containing 3 data frames; maf, seg, and bedpe. All in respect to grch37.}
-#'   \item{hg38}{A list containing 3 data frames; maf, seg, and bedpe. All in respect to hg38.}
-#' }
-#' @keywords internal
-"sample_data"
-
 
 #' Somatic Hypermutation Locations GRCh37 v0.0
 #'
