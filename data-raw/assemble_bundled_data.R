@@ -28,7 +28,23 @@ if (!file.exists("config.yml") && !nzchar(Sys.getenv("R_CONFIG_FILE"))) {
 # Shadows the package function for the rest of this script, so every call
 # site (there are ~13) picks this up in one place.
 get_gambl_metadata <- function(...) {
-    GAMBLR.results::get_gambl_metadata(..., min_corrected_cov = 0)
+    GAMBLR.results::get_gambl_metadata(..., min_corrected_cov = 0) %>%
+        standardize_coo()
+}
+
+# The gambl metadata spells an unclassified COO call both "UNCLASS" and
+# "Unclassified" (and the published sheets vary too). Force one spelling,
+# UNCLASS, everywhere in the bundle so COO groupings don't split in two.
+# Applied in the wrapper above and again to the final public sample_meta.
+standardize_coo <- function(df, cols = c("COO_consensus")) {
+    for (col in intersect(cols, colnames(df))) {
+        df[[col]] <- ifelse(
+            grepl("^unclass(ified)?$", trimws(df[[col]]), ignore.case = TRUE),
+            "UNCLASS",
+            df[[col]]
+        )
+    }
+    df
 }
 
 # Global variables definition
@@ -826,7 +842,10 @@ fix <- fix %>% filter(!is.na(study))
 diag_missing(pre_join_ids, fix$sample_id, "fix: post-join !is.na(study) filter (sample_ids dropped here)")
 diag_summary(fix, "fix (post filter !is.na(study))", study_col = "study")
 
-fix <- distinct(fix)
+fix <- standardize_coo(fix) %>% distinct()
+message("[DIAG] COO_consensus values in sample_meta: ",
+        paste(names(table(fix$COO_consensus, useNA = "ifany")),
+              table(fix$COO_consensus, useNA = "ifany"), sep = "=", collapse = ", "))
 
 diag_summary(fix, "fix (post distinct -- this becomes sample_data$meta)", study_col = "study")
 
