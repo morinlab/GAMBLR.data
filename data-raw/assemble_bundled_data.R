@@ -994,7 +994,17 @@ these_samples_dlbcl <- sample_data$meta %>%
 message(sprintf("[DIAG] these_samples (BL_Thomas): %d ids", length(these_samples)))
 message(sprintf("[DIAG] these_samples_dlbcl (DLBCL_Thomas + DLBCL_cell_lines): %d ids", length(these_samples_dlbcl)))
 
-coding_maf <- read_tsv("/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf") %>% # get from flat maf file to show SSM in hg38 coordinates similar to the original manuscript
+# Thomas BL manuscript's hg38 coding MAF: source of RefSeq/Protein_position for the BL publication calls (the
+# proteinpainter-compatibility join below; the calls themselves come from the manuscript xlsx). On the GSC it's at the
+# default path; elsewhere, copy it locally and point GAMBLR_BL_HG38_MAF at the copy.
+bl_hg38_maf_path <- Sys.getenv("GAMBLR_BL_HG38_MAF",
+                               unset = "/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf")
+if (!file.exists(bl_hg38_maf_path)) {
+    stop("BL.hg38.CDS.maf not found at ", bl_hg38_maf_path, ". Copy it from ",
+         "/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf on the GSC and set the ",
+         "GAMBLR_BL_HG38_MAF environment variable to the local copy.")
+}
+coding_maf <- read_tsv(bl_hg38_maf_path) %>% # get from flat maf file to show SSM in hg38 coordinates similar to the original manuscript
     filter(Tumor_Sample_Barcode %in% these_samples & # drop BL58 cell line
            ! str_detect(Tumor_Sample_Barcode, "^SP|^06")) %>% # drop ICGC and 1 LLMPP case
     select(
@@ -1039,12 +1049,24 @@ this_study_samples <- sample_data$meta %>%
 
 message(sprintf("[DIAG] this_study_samples (FL_Dreval + DLBCL_cell_lines): %d ids", length(this_study_samples)))
 
-# FLs in grch37
-coding_maf <- time_it("coding_maf get_ssm_by_samples", {
-    get_ssm_by_samples(
+# FLs in grch37. Only the SLMS-3 rows at the positions of Dreval's published calls can match the join below, so
+# those positions (+/- 1 bp) are the regions: get_ssm_by_regions() pulls just them from the indexed merged MAFs
+# with tabix, instead of get_ssm_by_samples() reading every sample's whole MAF (which, off the GSC, means fetching
+# each one over ssh). Same defaults (augmented, min_read_support, blacklist) as get_ssm_by_samples().
+fl_positions_bed <- fl_data$ssm_to_bundle %>%
+    transmute(chrom = sub("^chr", "", as.character(Chromosome)),
+              start = as.numeric(Start_Position) - 1,
+              end = as.numeric(End_Position) + 1) %>%
+    distinct() %>%
+    arrange(chrom, start) %>%
+    create_bed_data(genome_build = "grch37")
+coding_maf <- time_it("coding_maf get_ssm_by_regions", {
+    get_ssm_by_regions(
+        regions_bed = fl_positions_bed,
         these_samples_metadata =  get_gambl_metadata() %>%
                 filter(sample_id %in% this_study_samples),
-        basic_columns = FALSE) %>%
+        basic_columns = FALSE,
+        projection = "grch37") %>%
         select(
             all_of(selected_columns)
         )
