@@ -37,6 +37,10 @@ Tumor_Sample_Barcode
 cohort
 COO_consensus
 DHITsig_consensus
+# cell of origin and DHITsig combined, as GAMBLR.results::get_gambl_metadata() builds it: "ABC" for ABC
+# DLBCLs, otherwise the DHITsig call ("DHITsigPos"/"DHITsigNeg"); NA outside DLBCL. DHITsig is a GCB signature,
+# so use this (not DHITsig_consensus, which also labels ABC tumours) to compare DHITsig groups. Added 2026-11-26.
+consensus_coo_dhitsig
 EBV_status_inf
 ffpe_or_frozen
 fl_grade
