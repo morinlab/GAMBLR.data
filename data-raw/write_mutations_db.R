@@ -41,6 +41,14 @@ write_mutations_db <- function(sample_data,
     n_sample_study <- nrow(sample_data$sample_study)
   }
 
+  # patient_outcomes: one row per patient (outcome columns whitelisted in data-raw/public_outcome_columns.txt);
+  # guarded like sample_study so sample_data objects without it still build
+  n_patient_outcomes <- 0L
+  if (!is.null(sample_data$patient_outcomes) && nrow(sample_data$patient_outcomes)) {
+    DBI::dbWriteTable(con, "patient_outcomes", as.data.frame(sample_data$patient_outcomes), overwrite = TRUE)
+    n_patient_outcomes <- nrow(sample_data$patient_outcomes)
+  }
+
   # Natural mutation-call key, reused from GAMBLR.open::get_ssm_by_region()
   # (which already applies the same distinct() at read time) as a write-time
   # safety net: no cohort-specific pull block should ever again be able to
@@ -205,6 +213,8 @@ write_mutations_db <- function(sample_data,
     "CREATE INDEX idx_meta_barcode ON sample_meta(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_study_sample ON sample_study(sample_id)",
     "CREATE INDEX idx_study_study  ON sample_study(study)",
+    "CREATE UNIQUE INDEX idx_outcomes_patient ON patient_outcomes(patient_id)",
+    "CREATE INDEX idx_meta_patient ON sample_meta(patient_id)",
     "CREATE INDEX idx_vp_pipe   ON variant_pipeline(Pipeline)",
     "CREATE INDEX idx_vp_mutation_id ON variant_pipeline(mutation_id)"
   )
@@ -213,12 +223,14 @@ write_mutations_db <- function(sample_data,
   # self-describing provenance / expected-counts table (used by the tests)
   DBI::dbWriteTable(con, "build_info", data.frame(
     key = c("source", "built_at", "builder",
-            "n_maf", "n_seg", "n_bedpe", "n_samples", "n_sample_study", "n_variant_pipeline"),
+            "n_maf", "n_seg", "n_bedpe", "n_samples", "n_sample_study", "n_variant_pipeline",
+            "n_patient_outcomes"),
     value = c(source_desc,
               format(Sys.time(), tz = "UTC", usetz = TRUE),
               "write_mutations_db",
               counts[["maf"]], counts[["seg"]],
-              counts[["bedpe"]], nrow(sample_data$meta), n_sample_study, n_variant_pipeline),
+              counts[["bedpe"]], nrow(sample_data$meta), n_sample_study, n_variant_pipeline,
+              n_patient_outcomes),
     stringsAsFactors = FALSE
   ), overwrite = TRUE)
 

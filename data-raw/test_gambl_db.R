@@ -30,12 +30,12 @@ cols <- function(t) dbListFields(con, t)
 builds_in <- function(t) sort(dbGetQuery(con, sprintf("SELECT DISTINCT genome_build g FROM %s", t))$g)
 
 cat("== tables present ==\n")
-for (t in c("maf","seg","bedpe","sample_meta","sample_study","variant_pipeline","build_info"))
+for (t in c("maf","seg","bedpe","sample_meta","sample_study","variant_pipeline","patient_outcomes","build_info"))
   check(t %in% tbls, sprintf("table %s exists", t))
 check(!("ashm" %in% tbls), "table ashm does NOT exist (merged into maf)")
 
 cat("\n== row counts (all > 0) ==\n")
-for (t in c("maf","seg","bedpe","sample_meta","sample_study","variant_pipeline")) {
+for (t in c("maf","seg","bedpe","sample_meta","sample_study","variant_pipeline","patient_outcomes")) {
   cnt <- if (t %in% tbls) n(t) else 0
   check(cnt > 0, sprintf("%-11s has %d rows", t, cnt))
 }
@@ -54,7 +54,9 @@ req <- list(
   bedpe = c("tumour_sample_id","CHROM_A","START_A","CHROM_B","START_B","VAF_tumour","SCORE","FILTER","genome_build"),
   sample_meta = c("sample_id","Tumor_Sample_Barcode","seq_type","study"),
   sample_study = c("sample_id","study","study_id","reference_PMID"),
-  variant_pipeline = c("mutation_id","Pipeline")
+  variant_pipeline = c("mutation_id","Pipeline"),
+  # the columns every released study has (others depend on data-raw/public_outcome_studies.tsv)
+  patient_outcomes = c("patient_id","CODE_OS","OS_YEARS")
 )
 for (t in names(req)) if (t %in% tbls) {
   missing <- setdiff(req[[t]], cols(t))
@@ -74,8 +76,18 @@ for (i in c("idx_maf_pos","idx_maf_sample","idx_maf_pipe","idx_maf_mutation_id",
             "idx_seg_sample",
             "idx_bedpe_sample","idx_bedpe_pos_a","idx_bedpe_pos_b",
             "idx_study_sample","idx_study_study",
-            "idx_vp_pipe","idx_vp_mutation_id"))
+            "idx_vp_pipe","idx_vp_mutation_id","idx_outcomes_patient"))
   check(i %in% idx, sprintf("index %s", i))
+
+cat("\n== patient_outcomes ==\n")
+if ("patient_outcomes" %in% tbls) {
+  check(dbGetQuery(con, "SELECT COUNT(*) - COUNT(DISTINCT patient_id) d FROM patient_outcomes")$d == 0,
+        "patient_outcomes has one row per patient")
+  check(dbGetQuery(con, "SELECT COUNT(*) n FROM patient_outcomes WHERE patient_id NOT IN (SELECT patient_id FROM sample_meta)")$n == 0,
+        "every patient_outcomes patient is in sample_meta")
+  check(!any(c("sex", "cause_of_death", "hiv_status", "tx_primary") %in% cols("patient_outcomes")),
+        "patient_outcomes has no excluded columns (sex, cause_of_death, hiv_status, tx_primary)")
+}
 
 cat("\n== pipelines present ==\n")
 # Pipeline is normalized to lowercase at write time (see write_mutations_db.R)

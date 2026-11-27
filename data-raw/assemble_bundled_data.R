@@ -815,6 +815,32 @@ fix <- left_join(
 )
 
 message(sprintf("[DIAG] fix (post live get_gambl_metadata() join): %d rows (was %d rows pre-join -- any increase means the join fanned out)", nrow(fix), length(pre_join_ids)))
+
+# Per-sample SLMS-3 mutation burden from the GAMBLR.results collate cache (the mutation_burden table of
+# collate_results_db(), computed at the GSC and synced to project_base; set GAMBLR_COLLATED_DB to use another
+# copy). Read-only: collate_results_db() itself would compute missing rows from the local MAFs, which can be out of
+# date. burden_kit is the capture kit whose unpadded targets were the territory (NA for genomes and for exomes of
+# unknown kit, which use the protein-coding CDS); the cache's source description carries GSC paths, so it isn't
+# published. burden values of unmatched samples include germline variants (see pairing_status).
+collated_db_path <- Sys.getenv("GAMBLR_COLLATED_DB",
+    unset = paste0(GAMBLR.helpers::check_config_and_value("project_base"),
+                   GAMBLR.helpers::check_config_and_value("results_merged$collated_db")))
+if (!file.exists(collated_db_path)) {
+    stop("Collate cache not found at ", collated_db_path, ". Sync it from the GSC (sync_gambl_results.py, group ",
+         "collated_db) or set GAMBLR_COLLATED_DB.", call. = FALSE)
+}
+collated_con <- DBI::dbConnect(RSQLite::SQLite(), collated_db_path, flags = RSQLite::SQLITE_RO)
+mutation_burden <- DBI::dbReadTable(collated_con, "mutation_burden") %>%
+    transmute(sample_id, seq_type, n_ssm, burden_per_mb, burden_snv_per_mb, burden_indel_per_mb,
+              burden_territory, burden_mb,
+              burden_kit = ifelse(burden_territory %in% "capture_targets",
+                                  sub(" unpadded targets.*$", "", burden_territory_source), NA_character_))
+DBI::dbDisconnect(collated_con)
+fix <- left_join(fix, mutation_burden, by = c("sample_id", "seq_type"))
+message(sprintf("[DIAG] mutation burden from %s: %d of %d samples have a value (genome %d, capture %d)",
+                collated_db_path, sum(!is.na(fix$burden_per_mb)), nrow(fix),
+                sum(!is.na(fix$burden_per_mb) & fix$seq_type == "genome"),
+                sum(!is.na(fix$burden_per_mb) & fix$seq_type == "capture")))
 diag_summary(fix, "fix (post live get_gambl_metadata() join)", study_col = "study")
 
 # sample_meta ends up in the PUBLICLY-DISTRIBUTED gambl_mutations.db (a
@@ -851,6 +877,16 @@ diag_summary(fix, "fix (post distinct -- this becomes sample_data$meta)", study_
 
 sample_data$meta <- fix
 ### end metadata fixing
+
+# patient_outcomes: one row per public patient with outcomes (OS/PFS/..., IPI, treatment class), from
+# GAMBLR.results::get_gambl_outcomes(). The columns are whitelisted in data-raw/public_outcome_columns.txt, which
+# must mention every column get_gambl_outcomes() returns (the build stops otherwise). sex isn't repeated here:
+# sample_meta's sex already comes from the same patient-level table.
+source("data-raw/patient_outcomes.R")
+sample_data$patient_outcomes <- assemble_patient_outcomes(GAMBLR.results::get_gambl_outcomes(), sample_data$meta)
+message(sprintf("[DIAG] patient_outcomes: %d patients (of %d in sample_meta), %d with OS",
+                nrow(sample_data$patient_outcomes), dplyr::n_distinct(sample_data$meta$patient_id),
+                sum(!is.na(sample_data$patient_outcomes$OS_YEARS))))
 
 # sample_study: a many-to-many bridge table (one row per (sample_id, study)
 # pair, not one row per sample), replacing the old inline `Study =` tagging

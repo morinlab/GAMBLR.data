@@ -1,0 +1,14 @@
+# Which outcome data each study's patients may have in the public patient_outcomes table of gambl_mutations.db.
+# Only what the study (or a paper that published its patients) released: a study not listed here gets no outcome
+# rows. Groups (see data-raw/patient_outcomes.R): OS = CODE_OS, OS_YEARS, alive; PFS = CODE_PFS, PFS_YEARS;
+# IPI = IPI. A patient in more than one study gets the groups of all of them. Every column here must also be
+# included in data-raw/public_outcome_columns.txt.
+#
+# Decided 2026-11-27. Not released for this build: FL_Dreval and DLBCL_Arthur (outcomes weren't released with
+# those studies). Undecided: dlbcl_reddy (OS in Reddy et al. 2017 Table S1) and NCI_DLBCL_Golub (OS, PFS and IPI
+# in Chapuy et al. 2018 Table 2a).
+study	groups	source
+BL_Thomas	OS,PFS	published with the study
+dlbcl_chapuy	OS,PFS,IPI	Chapuy et al. 2018 (Nat Med) Supplementary Table 2a
+dlbcl_schmitz	OS,PFS	Schmitz et al. 2018 (NEJM) supplementary table
+DLBCL_Hilton	OS	public patient table of the paper (LCR-BCCRC/DLBCL-tumor-evolution)
