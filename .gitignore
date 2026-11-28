@@ -1,2 +1,7 @@
 .Rproj.user
 gambl_mutations.db
+gambl_expression.tsv.bgz
+gambl_expression.tsv.bgz.tbi
+gambl_expression_samples.tsv
+gambl_expression_genes.tsv
+gambl_expression_build_info.tsv

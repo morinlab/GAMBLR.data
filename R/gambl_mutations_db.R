@@ -1,10 +1,11 @@
 #' @title Connect to the GAMBL mutations database.
 #'
 #' @description Returns a (cached) read-only DBI connection to `gambl_mutations.db`,
-#' the SQLite database holding the large sample-level frames (MAF, seg,
-#' bedpe) built from the in-memory `sample_data` object assembled by
-#' `data-raw/assemble_bundled_data.R`, via the shared `write_mutations_db()`
-#' helper (`data-raw/write_mutations_db.R`).
+#' the SQLite database holding the large sample-level frames (sample
+#' metadata, MAF, seg, bedpe), built by `data-raw/assemble_bundled_data.R`
+#' via the shared `write_mutations_db()` helper
+#' (`data-raw/write_mutations_db.R`). It replaces the lazy-loaded
+#' `sample_data` object earlier versions of the package bundled.
 #'
 #' @details Unlike the small bundled [gambl_reference_db()], this file is large
 #' (several hundred MB) and is NOT shipped inside the package. It is
@@ -36,7 +37,7 @@
 #' | Table | Rows (typical) | Grain | Key columns |
 #' | --- | --- | --- | --- |
 #' | `maf` | ~3.7M | one somatic mutation call | `mutation_id` (surrogate integer key, unique within `maf` across both genome builds -- assigned at write time, after deduplication; `variant_pipeline` references it as a foreign key), `Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. `"slms-3"`/`"publication"` -- normalized at write time so it can be matched with a plain, indexed equality), genome_build, maf_seq_type` (`"genome"`/`"capture"`, so a Tumor_Sample_Barcode with both isn't indistinguishable once merged; `NA` for publication-pipeline rows, which don't carry per-row seq_type provenance -- see [get_ssm_from_db()]'s `seq_type` parameter) (+ ~35 more MAF-standard columns) |
-#' | `seg` | ~126k | one copy-number segment | `ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build` |
+#' | `seg` | ~756k | one copy-number segment | `ID, chrom, start, end, LOH_flag, log.ratio, CN, seg_seq_type, cn_pipeline` (the GAMBL pipeline chosen for the sample by GAMBLR.results' preference rule), `cn_type` (absolute, or relative when a gatk_cnv/cnvkit sample couldn't be calibrated), `genome_build` |
 #' | `bedpe` | ~900 | one Manta structural-variant breakpoint pair | `CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build` |
 #' | `sample_meta` | ~3.3k | one sample | `patient_id, sample_id, Tumor_Sample_Barcode, seq_type, pathology, cohort, study, ...` (its own `genome_build` column records the sample's native alignment build, unrelated to the per-row build stamp used in the other tables) |
 #' | `sample_study` | varies | one (sample, study) membership fact -- many-to-many, a sample belonging to N studies is N rows | `sample_id, study, study_id, reference_PMID`. `study_id` is that study's own identifier for the sample where it differs from GAMBL's `sample_id` (e.g. a paper's own case/patient ID); NA where no study-specific ID has been sourced. |

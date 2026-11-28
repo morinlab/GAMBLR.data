@@ -39,6 +39,9 @@ Imports:
     tidyr
 LazyDataCompression: xz
 Suggests:
+    GenomicRanges,
+    IRanges,
     piggyback,
+    Rsamtools,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

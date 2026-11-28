@@ -19,10 +19,11 @@ A read-only DBIConnection.
 }
 \description{
 Returns a (cached) read-only DBI connection to \code{gambl_mutations.db},
-the SQLite database holding the large sample-level frames (MAF, seg,
-bedpe) built from the in-memory \code{sample_data} object assembled by
-\code{data-raw/assemble_bundled_data.R}, via the shared \code{write_mutations_db()}
-helper (\code{data-raw/write_mutations_db.R}).
+the SQLite database holding the large sample-level frames (sample
+metadata, MAF, seg, bedpe), built by \code{data-raw/assemble_bundled_data.R}
+via the shared \code{write_mutations_db()} helper
+(\code{data-raw/write_mutations_db.R}). It replaces the lazy-loaded
+\code{sample_data} object earlier versions of the package bundled.
 }
 \details{
 Unlike the small bundled \code{\link[=gambl_reference_db]{gambl_reference_db()}}, this file is large
@@ -52,7 +53,7 @@ BCL6, MYC, PIM1 -- collapses to one row, not two; see
 \code{\link[=get_ssm_from_db]{get_ssm_from_db()}}).\tabular{llll}{
    Table \tab Rows (typical) \tab Grain \tab Key columns \cr
    \code{maf} \tab ~3.7M \tab one somatic mutation call \tab \code{mutation_id} (surrogate integer key, unique within \code{maf} across both genome builds -- assigned at write time, after deduplication; \code{variant_pipeline} references it as a foreign key), \verb{Hugo_Symbol, Chromosome, Start_Position, End_Position, Tumor_Sample_Barcode, Variant_Classification, HGVSp_Short, t_alt_count, n_alt_count, Pipeline (lowercase, e.g. }"slms-3"\code{/}"publication"\verb{ -- normalized at write time so it can be matched with a plain, indexed equality), genome_build, maf_seq_type} (\code{"genome"}/\code{"capture"}, so a Tumor_Sample_Barcode with both isn't indistinguishable once merged; \code{NA} for publication-pipeline rows, which don't carry per-row seq_type provenance -- see \code{\link[=get_ssm_from_db]{get_ssm_from_db()}}'s \code{seq_type} parameter) (+ ~35 more MAF-standard columns) \cr
-   \code{seg} \tab ~126k \tab one copy-number segment \tab \verb{ID, chrom, start, end, LOH_flag, log.ratio, CN, genome_build} \cr
+   \code{seg} \tab ~756k \tab one copy-number segment \tab \verb{ID, chrom, start, end, LOH_flag, log.ratio, CN, seg_seq_type, cn_pipeline} (the GAMBL pipeline chosen for the sample by GAMBLR.results' preference rule), \code{cn_type} (absolute, or relative when a gatk_cnv/cnvkit sample couldn't be calibrated), \code{genome_build} \cr
    \code{bedpe} \tab ~900 \tab one Manta structural-variant breakpoint pair \tab \verb{CHROM_A, START_A, END_A, CHROM_B, START_B, END_B, manta_name, SCORE, STRAND_A, STRAND_B, tumour_sample_id, normal_sample_id, VAF_tumour, DP, pair_status, FILTER, genome_build} \cr
    \code{sample_meta} \tab ~3.3k \tab one sample \tab \verb{patient_id, sample_id, Tumor_Sample_Barcode, seq_type, pathology, cohort, study, ...} (its own \code{genome_build} column records the sample's native alignment build, unrelated to the per-row build stamp used in the other tables) \cr
    \code{sample_study} \tab varies \tab one (sample, study) membership fact -- many-to-many, a sample belonging to N studies is N rows \tab \verb{sample_id, study, study_id, reference_PMID}. \code{study_id} is that study's own identifier for the sample where it differs from GAMBL's \code{sample_id} (e.g. a paper's own case/patient ID); NA where no study-specific ID has been sourced. \cr

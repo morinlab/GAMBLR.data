@@ -1,0 +1,45 @@
+# Columns of GAMBLR.results::get_gambl_outcomes() for the public patient_outcomes table in gambl_mutations.db (a
+# GitHub Release asset anyone can download and query with SQL) and GAMBLR.open::get_gambl_outcomes().
+#
+# Every column get_gambl_outcomes() returns must be listed here, either to include it (the bare name) or to
+# exclude it (the name prefixed with "-"). assemble_bundled_data.R stops on any column that isn't listed, so a
+# new column in the GAMBL outcome table can't reach the public database without a decision. patient_id is always
+# included (the join key) and doesn't need listing.
+#
+# IMPORTANT: as for public_sample_meta_columns.txt, only include a column that is safe to distribute publicly.
+# When in doubt, ask before adding.
+#
+# Decided 2026-11-27.
+
+# patient characteristics
+age
+is_adult
+IPI
+FLIPI
+
+# primary treatment, collapsed to classes (see GAMBLR.results::get_gambl_outcomes())
+tx_primary_class
+tx_ritu_maintenance
+
+# outcomes: event codes (1 = event, 0 = censored) and times in years
+alive
+CODE_OS
+OS_YEARS
+CODE_PFS
+PFS_YEARS
+CODE_DSS
+DSS_YEARS
+CODE_TTP
+TTP_YEARS
+CODE_TTT
+TTT_YEARS
+
+# excluded
+# sex is a sample_meta column (patient-level, from the same table); a second copy here would become a join key
+-sex
+-sex_source
+# raw regimen codes and free text; tx_primary_class is the public version
+-tx_primary
+# free text, mostly "LYMPHOMA, UNSPECIFIED"
+-cause_of_death
+-hiv_status

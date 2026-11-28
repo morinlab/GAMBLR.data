@@ -41,6 +41,14 @@ write_mutations_db <- function(sample_data,
     n_sample_study <- nrow(sample_data$sample_study)
   }
 
+  # patient_outcomes: one row per patient (outcome columns whitelisted in data-raw/public_outcome_columns.txt);
+  # guarded like sample_study so sample_data objects without it still build
+  n_patient_outcomes <- 0L
+  if (!is.null(sample_data$patient_outcomes) && nrow(sample_data$patient_outcomes)) {
+    DBI::dbWriteTable(con, "patient_outcomes", as.data.frame(sample_data$patient_outcomes), overwrite = TRUE)
+    n_patient_outcomes <- nrow(sample_data$patient_outcomes)
+  }
+
   # Natural mutation-call key, reused from GAMBLR.open::get_ssm_by_region()
   # (which already applies the same distinct() at read time) as a write-time
   # safety net: no cohort-specific pull block should ever again be able to
@@ -49,10 +57,10 @@ write_mutations_db <- function(sample_data,
   # maf_seq_type is part of the key so a genome-called and capture-called
   # mutation for the same sample that happen to land on the same
   # position/allele stay two distinct rows instead of collapsing into one --
-  # dplyr::distinct() treats NA (publication-pipeline rows, which don't carry
-  # per-row seq_type) as matching other NAs, so this doesn't change dedup
-  # behaviour for rows that predate maf_seq_type, only adds separation where
-  # it's actually known.
+  # Publication-pipeline rows don't carry a per-row seq_type, so it's filled
+  # from the sample metadata below before dedup -- left as NA it would never
+  # match the SLMS-3 call of the same variant, which defeats the merge into
+  # one row with both pipelines in variant_pipeline.
   dedup_keys <- list(
     maf = c("Tumor_Sample_Barcode", "Chromosome", "Start_Position", "End_Position", "Tumor_Seq_Allele2", "maf_seq_type")
   )
@@ -101,8 +109,40 @@ write_mutations_db <- function(sample_data,
       # can't be used to satisfy).
       if ("Pipeline" %in% names(x)) x$Pipeline <- tolower(x$Pipeline)
 
+      if (elem == "maf") {
+        # Chromosome naming per build -- grch37 unprefixed (1, X), hg38
+        # prefixed (chr1, chrX) -- whatever the source MAF used (Reddy's
+        # published calls arrive as chr1 in grch37). Without this, identical
+        # calls differ on the dedup key below and are stored twice, and a
+        # grch37 region query (unprefixed) can't find the prefixed ones.
+        if ("Chromosome" %in% names(x)) {
+          chrom <- sub("^chr", "", as.character(x$Chromosome))
+          x$Chromosome <- if (b == "grch37") chrom else paste0("chr", chrom)
+        }
+        # Publication-pipeline rows carry no maf_seq_type. It's part of the
+        # dedup key, so an NA there never matches the SLMS-3 call of the same
+        # variant and the two are never merged (variant_pipeline then never
+        # records a second pipeline for anything). Fill it from the sample's
+        # seq_type in the bundled metadata.
+        if ("maf_seq_type" %in% names(x) && "seq_type" %in% names(sample_data$meta)) {
+          meta_type <- stats::setNames(as.character(sample_data$meta$seq_type), sample_data$meta$sample_id)
+          fill <- is.na(x$maf_seq_type)
+          x$maf_seq_type[fill] <- unname(meta_type[as.character(x$Tumor_Sample_Barcode[fill])])
+          still_na <- unique(x$Tumor_Sample_Barcode[is.na(x$maf_seq_type)])
+          if (length(still_na)) {
+            message(sprintf("[write_mutations_db] maf/%s: no seq_type in the metadata for %d sample(s), maf_seq_type left NA: %s",
+                            b, length(still_na), paste(utils::head(still_na, 10), collapse = ", ")))
+          }
+        }
+      }
+
       if (!is.null(dk)) {
         before <- nrow(x)
+        # where pipelines agree on a variant, keep the SLMS-3 row as maf's
+        # representative copy (consistent annotation and read counts across
+        # samples); every pipeline's claim is still recorded in
+        # variant_pipeline below
+        if ("Pipeline" %in% names(x)) x <- x[order(x$Pipeline != "slms-3"), , drop = FALSE]
         deduped <- dplyr::distinct(x, dplyr::across(dplyr::all_of(dk)), .keep_all = TRUE)
         if (nrow(deduped) < before) {
           message(sprintf("[write_mutations_db] %s/%s: dropped %d duplicate row(s)",
@@ -173,6 +213,8 @@ write_mutations_db <- function(sample_data,
     "CREATE INDEX idx_meta_barcode ON sample_meta(Tumor_Sample_Barcode)",
     "CREATE INDEX idx_study_sample ON sample_study(sample_id)",
     "CREATE INDEX idx_study_study  ON sample_study(study)",
+    "CREATE UNIQUE INDEX idx_outcomes_patient ON patient_outcomes(patient_id)",
+    "CREATE INDEX idx_meta_patient ON sample_meta(patient_id)",
     "CREATE INDEX idx_vp_pipe   ON variant_pipeline(Pipeline)",
     "CREATE INDEX idx_vp_mutation_id ON variant_pipeline(mutation_id)"
   )
@@ -181,12 +223,14 @@ write_mutations_db <- function(sample_data,
   # self-describing provenance / expected-counts table (used by the tests)
   DBI::dbWriteTable(con, "build_info", data.frame(
     key = c("source", "built_at", "builder",
-            "n_maf", "n_seg", "n_bedpe", "n_samples", "n_sample_study", "n_variant_pipeline"),
+            "n_maf", "n_seg", "n_bedpe", "n_samples", "n_sample_study", "n_variant_pipeline",
+            "n_patient_outcomes"),
     value = c(source_desc,
               format(Sys.time(), tz = "UTC", usetz = TRUE),
               "write_mutations_db",
               counts[["maf"]], counts[["seg"]],
-              counts[["bedpe"]], nrow(sample_data$meta), n_sample_study, n_variant_pipeline),
+              counts[["bedpe"]], nrow(sample_data$meta), n_sample_study, n_variant_pipeline,
+              n_patient_outcomes),
     stringsAsFactors = FALSE
   ), overwrite = TRUE)
 

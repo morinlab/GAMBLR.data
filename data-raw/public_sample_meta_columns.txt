@@ -37,6 +37,10 @@ Tumor_Sample_Barcode
 cohort
 COO_consensus
 DHITsig_consensus
+# cell of origin and DHITsig combined, as GAMBLR.results::get_gambl_metadata() builds it: "ABC" for ABC
+# DLBCLs, otherwise the DHITsig call ("DHITsigPos"/"DHITsigNeg"); NA outside DLBCL. DHITsig is a GCB signature,
+# so use this (not DHITsig_consensus, which also labels ABC tumours) to compare DHITsig groups. Added 2026-11-26.
+consensus_coo_dhitsig
 EBV_status_inf
 ffpe_or_frozen
 fl_grade
@@ -58,4 +62,24 @@ TotalDuplicatedreads
 TotalReads
 TotalUniquelyMapped
 TotalUnmappedreads
+# mean coverage after duplicate removal (GAMBLR.results QC); GAMBLR.results' get_gambl_metadata() drops samples
+# under min_corrected_cov (15x) by default. Added 2026-11-27.
+MeanCorrectedCoverage
 transformation
+# genetic subgroup from the source paper's supplement, set per cohort in assemble_bundled_data.R (not by
+# get_gambl_metadata()): BL_Thomas (DGG-BL, IC-BL, Q53-BL, DLBCL-A/B/C) and FL_Dreval (cFL, dFL); NA for other
+# studies, whose LymphGen calls are in the lymphgen and lymphgen_wright columns. Added 2026-11-27.
+genetic_subgroup
+# Per-sample SLMS-3 mutation burden (GAMBLR.results collate cache, mutation_burden table). Added 2026-11-27.
+# n_ssm: all calls (not comparable between genomes and exomes); burden_per_mb (pooled), burden_snv_per_mb and
+# burden_indel_per_mb: calls in the territory / its size; burden_territory: genome, capture_targets or
+# coding_fallback; burden_mb: territory size; burden_kit: capture kit for capture_targets. Values of unmatched
+# samples (pairing_status) include germline variants.
+# Samples under 15x MeanCorrectedCoverage have no burden values (the cache was computed for samples at or above it).
+n_ssm
+burden_per_mb
+burden_snv_per_mb
+burden_indel_per_mb
+burden_territory
+burden_mb
+burden_kit

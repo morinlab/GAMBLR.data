@@ -28,7 +28,23 @@ if (!file.exists("config.yml") && !nzchar(Sys.getenv("R_CONFIG_FILE"))) {
 # Shadows the package function for the rest of this script, so every call
 # site (there are ~13) picks this up in one place.
 get_gambl_metadata <- function(...) {
-    GAMBLR.results::get_gambl_metadata(..., min_corrected_cov = 0)
+    GAMBLR.results::get_gambl_metadata(..., min_corrected_cov = 0) %>%
+        standardize_coo()
+}
+
+# The gambl metadata spells an unclassified COO call both "UNCLASS" and
+# "Unclassified" (and the published sheets vary too). Force one spelling,
+# UNCLASS, everywhere in the bundle so COO groupings don't split in two.
+# Applied in the wrapper above and again to the final public sample_meta.
+standardize_coo <- function(df, cols = c("COO_consensus")) {
+    for (col in intersect(cols, colnames(df))) {
+        df[[col]] <- ifelse(
+            grepl("^unclass(ified)?$", trimws(df[[col]]), ignore.case = TRUE),
+            "UNCLASS",
+            df[[col]]
+        )
+    }
+    df
 }
 
 # Global variables definition
@@ -306,19 +322,6 @@ bl_data$ssm_to_bundle <- read_xlsx(
     filter(Tumor_Sample_Barcode %in% bl_data$meta_to_bundle$sample_id)
 
 
-bl_data$cnv_to_bundle <- read_xlsx(
-        "inst/extdata/studies/BL_Thomas.xlsx",
-        sheet = 4
-    ) %>%
-    select(-normal_biospecimen_id) %>%
-    rename(
-        "ID" = "tumor_biospecimen_id",
-        "log.ratio" = "depth.ratio"
-    ) %>%
-    mutate(LOH_flag = NA, .after = end) %>%
-    filter(ID %in% bl_data$meta_to_bundle$sample_id) %>%
-	mutate(CN = round(2 * 2^log.ratio))
-
 # study_id mirrors sample_id here (not patient_id): the xlsx's own
 # "Genome sample id" column was already adopted directly as sample_id, and
 # patient_id is patient-level, not sample-level -- ambiguous for any cohort
@@ -379,15 +382,6 @@ fl_data$ssm_to_bundle  <- fl_data$ssm_to_bundle %>%
 
 diag_summary_maf(fl_data$ssm_to_bundle, "fl_data$ssm_to_bundle (raw, as read from xlsx sheet 2)", study_lookup = data.frame(sample_id = fl_data$meta_to_bundle$sample_id, study = "FL_Dreval"))
 
-fl_data$cnv_to_bundle <- read_xlsx(
-        "inst/extdata/studies/FL_Dreval.xlsx",
-        sheet = 3
-    ) %>%
-    rename(
-        "ID" = "Tumor_Sample_Barcode"
-    ) %>%
-    mutate(CN = round(2 * 2^log.ratio))
-
 # study_id mirrors sample_id, not patient_id -- see thomas_bl_study above.
 dreval_study <- data.frame(
     sample_id = fl_data$meta_to_bundle$sample_id,
@@ -435,19 +429,6 @@ dlbcl_data$ssm_to_bundle <- read_xlsx(
     ) %>%
     select(names(GAMBLR.helpers:::maf_header[1:45])) %>%
     filter(Tumor_Sample_Barcode %in% dlbcl_data$meta_to_bundle$sample_id)
-
-dlbcl_data$cnv_to_bundle <- read_xlsx(
-        "inst/extdata/studies/BL_Thomas.xlsx",
-        sheet = 4
-    ) %>%
-    select(-normal_biospecimen_id) %>%
-    rename(
-        "ID" = "tumor_biospecimen_id",
-        "log.ratio" = "depth.ratio"
-    ) %>%
-    mutate(LOH_flag = NA, .after = end) %>%
-    filter(ID %in% dlbcl_data$meta_to_bundle$sample_id) %>%
-	mutate(CN = round(2 * 2^log.ratio))
 
 # study_id mirrors sample_id, not patient_id -- see thomas_bl_study above.
 thomas_dlbcl_study <- data.frame(
@@ -596,7 +577,9 @@ golub_study <- data.frame(
 reddy_original_maf <- read_tsv(
     "inst/extdata/studies/reddy_original_variants_with_VAF.maf.gz"
 ) %>%
-    select(any_of(all_cols))
+    select(any_of(all_cols)) %>%
+    # the published file's grch37 chromosomes are chr-prefixed (chr3); GAMBL's grch37 calls aren't (3)
+    mutate(Chromosome = sub("^chr", "", as.character(Chromosome)))
 
 
 # --- DLBCL cell lines --------------------------------------------------------
@@ -627,18 +610,6 @@ cell_lines_data$meta_to_bundle <- data.frame(
 )
 
 colnames(cell_lines_data$meta_to_bundle) <- colnames_for_bundled_meta
-
-cell_lines_data$grch37$cnv_to_bundle <- get_cn_segments(
-    these_samples_metadata = cell_lines_data$meta,
-    projection="grch37"
-) %>%
-    dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
-
-cell_lines_data$hg38$cnv_to_bundle <- get_cn_segments(
-    these_samples_metadata = cell_lines_data$meta,
-    projection="hg38"
-) %>%
-    dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
 
 # No sample_study row for cell lines -- no published cohort applies to them
 # (matches the previous Study=NA behaviour for this group).
@@ -797,6 +768,32 @@ fix <- left_join(
 )
 
 message(sprintf("[DIAG] fix (post live get_gambl_metadata() join): %d rows (was %d rows pre-join -- any increase means the join fanned out)", nrow(fix), length(pre_join_ids)))
+
+# Per-sample SLMS-3 mutation burden from the GAMBLR.results collate cache (the mutation_burden table of
+# collate_results_db(), computed at the GSC and synced to project_base; set GAMBLR_COLLATED_DB to use another
+# copy). Read-only: collate_results_db() itself would compute missing rows from the local MAFs, which can be out of
+# date. burden_kit is the capture kit whose unpadded targets were the territory (NA for genomes and for exomes of
+# unknown kit, which use the protein-coding CDS); the cache's source description carries GSC paths, so it isn't
+# published. burden values of unmatched samples include germline variants (see pairing_status).
+collated_db_path <- Sys.getenv("GAMBLR_COLLATED_DB",
+    unset = paste0(GAMBLR.helpers::check_config_and_value("project_base"),
+                   GAMBLR.helpers::check_config_and_value("results_merged$collated_db")))
+if (!file.exists(collated_db_path)) {
+    stop("Collate cache not found at ", collated_db_path, ". Sync it from the GSC (sync_gambl_results.py, group ",
+         "collated_db) or set GAMBLR_COLLATED_DB.", call. = FALSE)
+}
+collated_con <- DBI::dbConnect(RSQLite::SQLite(), collated_db_path, flags = RSQLite::SQLITE_RO)
+mutation_burden <- DBI::dbReadTable(collated_con, "mutation_burden") %>%
+    transmute(sample_id, seq_type, n_ssm, burden_per_mb, burden_snv_per_mb, burden_indel_per_mb,
+              burden_territory, burden_mb,
+              burden_kit = ifelse(burden_territory %in% "capture_targets",
+                                  sub(" unpadded targets.*$", "", burden_territory_source), NA_character_))
+DBI::dbDisconnect(collated_con)
+fix <- left_join(fix, mutation_burden, by = c("sample_id", "seq_type"))
+message(sprintf("[DIAG] mutation burden from %s: %d of %d samples have a value (genome %d, capture %d)",
+                collated_db_path, sum(!is.na(fix$burden_per_mb)), nrow(fix),
+                sum(!is.na(fix$burden_per_mb) & fix$seq_type == "genome"),
+                sum(!is.na(fix$burden_per_mb) & fix$seq_type == "capture")))
 diag_summary(fix, "fix (post live get_gambl_metadata() join)", study_col = "study")
 
 # sample_meta ends up in the PUBLICLY-DISTRIBUTED gambl_mutations.db (a
@@ -824,12 +821,25 @@ fix <- fix %>% filter(!is.na(study))
 diag_missing(pre_join_ids, fix$sample_id, "fix: post-join !is.na(study) filter (sample_ids dropped here)")
 diag_summary(fix, "fix (post filter !is.na(study))", study_col = "study")
 
-fix <- distinct(fix)
+fix <- standardize_coo(fix) %>% distinct()
+message("[DIAG] COO_consensus values in sample_meta: ",
+        paste(names(table(fix$COO_consensus, useNA = "ifany")),
+              table(fix$COO_consensus, useNA = "ifany"), sep = "=", collapse = ", "))
 
 diag_summary(fix, "fix (post distinct -- this becomes sample_data$meta)", study_col = "study")
 
 sample_data$meta <- fix
 ### end metadata fixing
+
+# patient_outcomes: one row per public patient with outcomes (OS/PFS/..., IPI, treatment class), from
+# GAMBLR.results::get_gambl_outcomes(). The columns are whitelisted in data-raw/public_outcome_columns.txt, which
+# must mention every column get_gambl_outcomes() returns (the build stops otherwise). sex isn't repeated here:
+# sample_meta's sex already comes from the same patient-level table.
+source("data-raw/patient_outcomes.R")
+sample_data$patient_outcomes <- assemble_patient_outcomes(GAMBLR.results::get_gambl_outcomes(), sample_data$meta)
+message(sprintf("[DIAG] patient_outcomes: %d patients (of %d in sample_meta), %d with OS",
+                nrow(sample_data$patient_outcomes), dplyr::n_distinct(sample_data$meta$patient_id),
+                sum(!is.na(sample_data$patient_outcomes$OS_YEARS))))
 
 # sample_study: a many-to-many bridge table (one row per (sample_id, study)
 # pair, not one row per sample), replacing the old inline `Study =` tagging
@@ -920,16 +930,38 @@ annotated_sv_keep_grch37 <- left_join(
 sample_data$grch37$bedpe <- annotated_sv_keep_grch37
 sample_data$hg38$bedpe <- annotated_sv_keep
 
-sample_data$grch37$seg <- bind_rows(
-    fl_data$cnv_to_bundle,
-    cell_lines_data$grch37$cnv_to_bundle
-)
-
-sample_data$hg38$seg <- bind_rows(
-    bl_data$cnv_to_bundle,
-    dlbcl_data$cnv_to_bundle,
-    cell_lines_data$hg38$cnv_to_bundle
-)
+# --- copy number: GAMBL's segments for every bundled genome and capture sample -------------------------------
+# One segmentation per sample from GAMBLR.results, chosen by its "preference" rule: purity-corrected pipelines first
+# (capture: purecn, gatk_cnv, cnvkit; genomes: battenberg, sequenza, controlfreec), skipping a pipeline that fails the
+# QC gates (no genome-wide baseline, contradictory deep loss, over-segmented). Relative-CN segments (gatk_cnv, cnvkit)
+# are calibrated to absolute CN against the sample's purecn or battenberg segmentation where one passes QC
+# (cn_type "absolute"; otherwise they stay "relative"). The grch37 choice is reused for hg38, so a sample has the same
+# pipeline in both builds. Overlapping segments (present in some merges) are resolved. cn_pipeline records each
+# sample's pipeline. This replaces the segments formerly read from the BL/FL/DLBCL papers' supplementary tables.
+# dlbcl_reddy (a targeted panel) is left out: panel copy number isn't usable genome-wide
+cn_meta <- get_gambl_metadata() %>%
+    filter(sample_id %in% sample_data$meta$sample_id, seq_type %in% c("genome", "capture"),
+           cohort != "dlbcl_reddy")
+seg_cols <- c("ID", "chrom", "start", "end", "LOH_flag", "log.ratio", "CN", "seg_seq_type", "cn_pipeline", "cn_type")
+pull_cn_segments <- function(projection, source_rule) {
+    segs <- GAMBLR.results::get_cn_segments(these_samples_metadata = cn_meta, projection = projection,
+                                            source_rule = source_rule, calibrate = TRUE)
+    selection <- attr(segs, "selection")
+    segs <- GAMBLR.utils::resolve_segment_overlaps(as.data.frame(segs))
+    segs$cn_pipeline <- segs$pipeline
+    if (!"cn_type" %in% names(segs)) segs$cn_type <- NA_character_
+    list(seg = as.data.frame(segs)[, seg_cols], selection = selection)
+}
+cn_grch37 <- time_it("CN grch37 (preference, calibrated)", pull_cn_segments("grch37", "preference"))
+cn_hg38 <- time_it("CN hg38 (grch37 selection, calibrated)", pull_cn_segments("hg38", cn_grch37$selection))
+sample_data$grch37$seg <- cn_grch37$seg
+sample_data$hg38$seg <- cn_hg38$seg
+cn_summary <- unique(cn_grch37$seg[, c("ID", "seg_seq_type", "cn_pipeline", "cn_type")])
+message(sprintf("[DIAG] CN segments for %d of %d genome/capture samples (grch37) and %d (hg38); by pipeline: %s; cn_type: %s",
+                length(unique(cn_grch37$seg$ID)), nrow(distinct(cn_meta, sample_id)), length(unique(cn_hg38$seg$ID)),
+                paste(names(table(cn_summary$cn_pipeline)), table(cn_summary$cn_pipeline), collapse = ", "),
+                paste(names(table(cn_summary$cn_type, useNA = "ifany")), table(cn_summary$cn_type, useNA = "ifany"),
+                      collapse = ", ")))
 
 
 # ============================================================================
@@ -992,7 +1024,17 @@ these_samples_dlbcl <- sample_data$meta %>%
 message(sprintf("[DIAG] these_samples (BL_Thomas): %d ids", length(these_samples)))
 message(sprintf("[DIAG] these_samples_dlbcl (DLBCL_Thomas + DLBCL_cell_lines): %d ids", length(these_samples_dlbcl)))
 
-coding_maf <- read_tsv("/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf") %>% # get from flat maf file to show SSM in hg38 coordinates similar to the original manuscript
+# Thomas BL manuscript's hg38 coding MAF: source of RefSeq/Protein_position for the BL publication calls (the
+# proteinpainter-compatibility join below; the calls themselves come from the manuscript xlsx). On the GSC it's at the
+# default path; elsewhere, copy it locally and point GAMBLR_BL_HG38_MAF at the copy.
+bl_hg38_maf_path <- Sys.getenv("GAMBLR_BL_HG38_MAF",
+                               unset = "/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf")
+if (!file.exists(bl_hg38_maf_path)) {
+    stop("BL.hg38.CDS.maf not found at ", bl_hg38_maf_path, ". Copy it from ",
+         "/projects/adult_blgsp/results_manuscript/BL.hg38.CDS.maf on the GSC and set the ",
+         "GAMBLR_BL_HG38_MAF environment variable to the local copy.")
+}
+coding_maf <- read_tsv(bl_hg38_maf_path) %>% # get from flat maf file to show SSM in hg38 coordinates similar to the original manuscript
     filter(Tumor_Sample_Barcode %in% these_samples & # drop BL58 cell line
            ! str_detect(Tumor_Sample_Barcode, "^SP|^06")) %>% # drop ICGC and 1 LLMPP case
     select(
@@ -1037,12 +1079,24 @@ this_study_samples <- sample_data$meta %>%
 
 message(sprintf("[DIAG] this_study_samples (FL_Dreval + DLBCL_cell_lines): %d ids", length(this_study_samples)))
 
-# FLs in grch37
-coding_maf <- time_it("coding_maf get_ssm_by_samples", {
-    get_ssm_by_samples(
+# FLs in grch37. Only the SLMS-3 rows at the positions of Dreval's published calls can match the join below, so
+# those positions (+/- 1 bp) are the regions: get_ssm_by_regions() pulls just them from the indexed merged MAFs
+# with tabix, instead of get_ssm_by_samples() reading every sample's whole MAF (which, off the GSC, means fetching
+# each one over ssh). Same defaults (augmented, min_read_support, blacklist) as get_ssm_by_samples().
+fl_positions_bed <- fl_data$ssm_to_bundle %>%
+    transmute(chrom = sub("^chr", "", as.character(Chromosome)),
+              start = as.numeric(Start_Position) - 1,
+              end = as.numeric(End_Position) + 1) %>%
+    distinct() %>%
+    arrange(chrom, start) %>%
+    create_bed_data(genome_build = "grch37")
+coding_maf <- time_it("coding_maf get_ssm_by_regions", {
+    get_ssm_by_regions(
+        regions_bed = fl_positions_bed,
         these_samples_metadata =  get_gambl_metadata() %>%
                 filter(sample_id %in% this_study_samples),
-        basic_columns = FALSE) %>%
+        basic_columns = FALSE,
+        projection = "grch37") %>%
         select(
             all_of(selected_columns)
         )
@@ -1297,13 +1351,6 @@ write_mutations_db(
     source_desc = paste0("assemble_bundled_data.R @ ", format(Sys.Date()))
 )
 
-# During the transition you may still want the legacy monolithic object
-# (e.g. until other GAMBLR packages are audited off sample_data). Flip to TRUE
-# to also write data/sample_data.rda.
-WRITE_LEGACY_SAMPLE_DATA <- FALSE
-if (WRITE_LEGACY_SAMPLE_DATA) {
-    usethis::use_data(sample_data, overwrite = TRUE, compress = "xz")
-}
 
 library(data.tree)
 
