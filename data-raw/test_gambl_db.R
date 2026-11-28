@@ -50,7 +50,7 @@ cat("\n== required columns present (what the accessors filter on) ==\n")
 req <- list(
   maf   = c("mutation_id","Chromosome","Start_Position","End_Position","Tumor_Sample_Barcode",
             "Pipeline","Hugo_Symbol","Variant_Classification","t_alt_count","genome_build"),
-  seg   = c("ID","chrom","start","end","CN","genome_build"),
+  seg   = c("ID","chrom","start","end","CN","seg_seq_type","cn_pipeline","cn_type","genome_build"),
   bedpe = c("tumour_sample_id","CHROM_A","START_A","CHROM_B","START_B","VAF_tumour","SCORE","FILTER","genome_build"),
   sample_meta = c("sample_id","Tumor_Sample_Barcode","seq_type","study"),
   sample_study = c("sample_id","study","study_id","reference_PMID"),

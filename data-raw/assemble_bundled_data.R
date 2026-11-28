@@ -322,19 +322,6 @@ bl_data$ssm_to_bundle <- read_xlsx(
     filter(Tumor_Sample_Barcode %in% bl_data$meta_to_bundle$sample_id)
 
 
-bl_data$cnv_to_bundle <- read_xlsx(
-        "inst/extdata/studies/BL_Thomas.xlsx",
-        sheet = 4
-    ) %>%
-    select(-normal_biospecimen_id) %>%
-    rename(
-        "ID" = "tumor_biospecimen_id",
-        "log.ratio" = "depth.ratio"
-    ) %>%
-    mutate(LOH_flag = NA, .after = end) %>%
-    filter(ID %in% bl_data$meta_to_bundle$sample_id) %>%
-	mutate(CN = round(2 * 2^log.ratio))
-
 # study_id mirrors sample_id here (not patient_id): the xlsx's own
 # "Genome sample id" column was already adopted directly as sample_id, and
 # patient_id is patient-level, not sample-level -- ambiguous for any cohort
@@ -395,15 +382,6 @@ fl_data$ssm_to_bundle  <- fl_data$ssm_to_bundle %>%
 
 diag_summary_maf(fl_data$ssm_to_bundle, "fl_data$ssm_to_bundle (raw, as read from xlsx sheet 2)", study_lookup = data.frame(sample_id = fl_data$meta_to_bundle$sample_id, study = "FL_Dreval"))
 
-fl_data$cnv_to_bundle <- read_xlsx(
-        "inst/extdata/studies/FL_Dreval.xlsx",
-        sheet = 3
-    ) %>%
-    rename(
-        "ID" = "Tumor_Sample_Barcode"
-    ) %>%
-    mutate(CN = round(2 * 2^log.ratio))
-
 # study_id mirrors sample_id, not patient_id -- see thomas_bl_study above.
 dreval_study <- data.frame(
     sample_id = fl_data$meta_to_bundle$sample_id,
@@ -451,19 +429,6 @@ dlbcl_data$ssm_to_bundle <- read_xlsx(
     ) %>%
     select(names(GAMBLR.helpers:::maf_header[1:45])) %>%
     filter(Tumor_Sample_Barcode %in% dlbcl_data$meta_to_bundle$sample_id)
-
-dlbcl_data$cnv_to_bundle <- read_xlsx(
-        "inst/extdata/studies/BL_Thomas.xlsx",
-        sheet = 4
-    ) %>%
-    select(-normal_biospecimen_id) %>%
-    rename(
-        "ID" = "tumor_biospecimen_id",
-        "log.ratio" = "depth.ratio"
-    ) %>%
-    mutate(LOH_flag = NA, .after = end) %>%
-    filter(ID %in% dlbcl_data$meta_to_bundle$sample_id) %>%
-	mutate(CN = round(2 * 2^log.ratio))
 
 # study_id mirrors sample_id, not patient_id -- see thomas_bl_study above.
 thomas_dlbcl_study <- data.frame(
@@ -645,18 +610,6 @@ cell_lines_data$meta_to_bundle <- data.frame(
 )
 
 colnames(cell_lines_data$meta_to_bundle) <- colnames_for_bundled_meta
-
-cell_lines_data$grch37$cnv_to_bundle <- get_cn_segments(
-    these_samples_metadata = cell_lines_data$meta,
-    projection="grch37"
-) %>%
-    dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
-
-cell_lines_data$hg38$cnv_to_bundle <- get_cn_segments(
-    these_samples_metadata = cell_lines_data$meta,
-    projection="hg38"
-) %>%
-    dplyr::select(all_of(c("ID","chrom","start","end","LOH_flag","log.ratio","CN","seg_seq_type")))
 
 # No sample_study row for cell lines -- no published cohort applies to them
 # (matches the previous Study=NA behaviour for this group).
@@ -977,16 +930,38 @@ annotated_sv_keep_grch37 <- left_join(
 sample_data$grch37$bedpe <- annotated_sv_keep_grch37
 sample_data$hg38$bedpe <- annotated_sv_keep
 
-sample_data$grch37$seg <- bind_rows(
-    fl_data$cnv_to_bundle,
-    cell_lines_data$grch37$cnv_to_bundle
-)
-
-sample_data$hg38$seg <- bind_rows(
-    bl_data$cnv_to_bundle,
-    dlbcl_data$cnv_to_bundle,
-    cell_lines_data$hg38$cnv_to_bundle
-)
+# --- copy number: GAMBL's segments for every bundled genome and capture sample -------------------------------
+# One segmentation per sample from GAMBLR.results, chosen by its "preference" rule: purity-corrected pipelines first
+# (capture: purecn, gatk_cnv, cnvkit; genomes: battenberg, sequenza, controlfreec), skipping a pipeline that fails the
+# QC gates (no genome-wide baseline, contradictory deep loss, over-segmented). Relative-CN segments (gatk_cnv, cnvkit)
+# are calibrated to absolute CN against the sample's purecn or battenberg segmentation where one passes QC
+# (cn_type "absolute"; otherwise they stay "relative"). The grch37 choice is reused for hg38, so a sample has the same
+# pipeline in both builds. Overlapping segments (present in some merges) are resolved. cn_pipeline records each
+# sample's pipeline. This replaces the segments formerly read from the BL/FL/DLBCL papers' supplementary tables.
+# dlbcl_reddy (a targeted panel) is left out: panel copy number isn't usable genome-wide
+cn_meta <- get_gambl_metadata() %>%
+    filter(sample_id %in% sample_data$meta$sample_id, seq_type %in% c("genome", "capture"),
+           cohort != "dlbcl_reddy")
+seg_cols <- c("ID", "chrom", "start", "end", "LOH_flag", "log.ratio", "CN", "seg_seq_type", "cn_pipeline", "cn_type")
+pull_cn_segments <- function(projection, source_rule) {
+    segs <- GAMBLR.results::get_cn_segments(these_samples_metadata = cn_meta, projection = projection,
+                                            source_rule = source_rule, calibrate = TRUE)
+    selection <- attr(segs, "selection")
+    segs <- GAMBLR.utils::resolve_segment_overlaps(as.data.frame(segs))
+    segs$cn_pipeline <- segs$pipeline
+    if (!"cn_type" %in% names(segs)) segs$cn_type <- NA_character_
+    list(seg = as.data.frame(segs)[, seg_cols], selection = selection)
+}
+cn_grch37 <- time_it("CN grch37 (preference, calibrated)", pull_cn_segments("grch37", "preference"))
+cn_hg38 <- time_it("CN hg38 (grch37 selection, calibrated)", pull_cn_segments("hg38", cn_grch37$selection))
+sample_data$grch37$seg <- cn_grch37$seg
+sample_data$hg38$seg <- cn_hg38$seg
+cn_summary <- unique(cn_grch37$seg[, c("ID", "seg_seq_type", "cn_pipeline", "cn_type")])
+message(sprintf("[DIAG] CN segments for %d of %d genome/capture samples (grch37) and %d (hg38); by pipeline: %s; cn_type: %s",
+                length(unique(cn_grch37$seg$ID)), nrow(distinct(cn_meta, sample_id)), length(unique(cn_hg38$seg$ID)),
+                paste(names(table(cn_summary$cn_pipeline)), table(cn_summary$cn_pipeline), collapse = ", "),
+                paste(names(table(cn_summary$cn_type, useNA = "ifany")), table(cn_summary$cn_type, useNA = "ifany"),
+                      collapse = ", ")))
 
 
 # ============================================================================

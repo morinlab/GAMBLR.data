@@ -66,19 +66,37 @@ download_gambl_mutations_db <- function(
     "Downloading gambl_mutations.db from %s @ %s into %s -- this is a large file (several hundred MB) and may take a while...",
     repo, tag, dirname(dest_path)
   ))
+  # Download into a temporary folder beside the destination, then move it into place: overwriting the database in place
+  # while this session (or another) has it open leaves that connection reading a mix of old and new pages, with the old
+  # table definitions (e.g. missing new columns, and queries that wrongly return nothing).
+  tmp_dir <- tempfile("gambl_db_download_", tmpdir = dirname(dest_path))
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
   piggyback::pb_download(
     "gambl_mutations.db",
     repo = repo,
     tag = tag,
-    dest = dirname(dest_path),
+    dest = tmp_dir,
     overwrite = TRUE
   )
-  if (!file.exists(dest_path)) {
-    stop("Download appeared to succeed but ", dest_path, " still doesn't exist -- ",
+  downloaded <- file.path(tmp_dir, "gambl_mutations.db")
+  if (!file.exists(downloaded)) {
+    stop("Download appeared to succeed but no gambl_mutations.db arrived -- ",
          "check that the release tag \"", tag, "\" actually has a gambl_mutations.db asset.",
          call. = FALSE)
   }
-  message("Done: ", dest_path)
+  # close this session's cached connection to the old file, so the next gambl_mutations_db() opens the new one
+  cached <- getOption("gamblr.mutations.con")
+  if (!is.null(cached) && file.exists(dest_path) &&
+      identical(normalizePath(cached@dbname, mustWork = FALSE), normalizePath(dest_path, mustWork = FALSE))) {
+    if (DBI::dbIsValid(cached)) DBI::dbDisconnect(cached)
+    options(gamblr.mutations.con = NULL)
+  }
+  if (!file.rename(downloaded, dest_path)) {
+    stop("Couldn't move the downloaded database to ", dest_path, call. = FALSE)
+  }
+  message("Done: ", dest_path, ". Packages that cache data from it (e.g. GAMBLR.chat; clear_gambl_cache()) ",
+          "or other R sessions with it open should be restarted to see the new data.")
   invisible(dest_path)
 }
 
