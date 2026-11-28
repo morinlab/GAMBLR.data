@@ -7,7 +7,10 @@
 #                                      then one column per RNA sample (VST, 3 decimals); bgzipped and tabix-indexed
 #                                      so a gene's line can be read with an HTTP range request
 #   gambl_expression_samples.tsv       one row per RNA sample: mrna_sample_id, patient_id, genome_sample_id,
-#                                      capture_sample_id, protocol, ffpe_or_frozen, study
+#                                      capture_sample_id, protocol, ffpe_or_frozen, study, vst_zero (what the VST
+#                                      makes of a zero count in that sample: its most common value, shared by the
+#                                      hundreds of genes with no reads; not its minimum, since batch correction pushes
+#                                      some values below it). Used to tell unexpressed genes apart.
 #   gambl_expression_genes.tsv         the gene index: ensembl_gene_id, hgnc_symbol, chrom, start, end
 #   gambl_expression_build_info.tsv    provenance (source matrix, its md5, counts, date)
 #
@@ -74,6 +77,10 @@ coords <- coords[order(ensembl_gene_id, chrom == "Y", chrom, start)][!duplicated
 m <- merge(coords, m, by = "ensembl_gene_id")
 if (anyDuplicated(m$ensembl_gene_id)) stop("duplicated ensembl_gene_id after the coordinate join")
 for (s in links$public_id) set(m, j = s, value = round(m[[s]], 3))
+vst_zero <- vapply(links$public_id, function(s) {
+  tab <- table(m[[s]])
+  as.numeric(names(tab)[which.max(tab)])
+}, numeric(1))
 setcolorder(m, c("chrom", "start", "end", "ensembl_gene_id", "hgnc_symbol", links$public_id))
 setorder(m, chrom, start, end)
 message(sprintf("[expression] %d genes x %d samples", nrow(m), length(links$public_id)))
@@ -90,11 +97,16 @@ unlink(tsv)
 # --- small tables ---------------------------------------------------------------------------------------------------
 samples <- data.frame(mrna_sample_id = links$public_id, patient_id = links$patient_id,
                       genome_sample_id = links$genome_sample_id, capture_sample_id = links$capture_sample_id,
-                      protocol = links$protocol, ffpe_or_frozen = links$ffpe_or_frozen, study = links$study)
+                      protocol = links$protocol, ffpe_or_frozen = links$ffpe_or_frozen, study = links$study,
+                      vst_zero = unname(vst_zero))
 fwrite(samples, file.path(out_dir, "gambl_expression_samples.tsv"), sep = "\t", na = "NA")
 fwrite(m[, .(ensembl_gene_id, hgnc_symbol, chrom, start, end)], file.path(out_dir, "gambl_expression_genes.tsv"),
        sep = "\t", na = "NA")
+# the build is the expression file and its small tables together
 build_id <- unname(tools::md5sum(bgz))
+build_id <- paste(substr(build_id, 1, 16),
+                  substr(unname(tools::md5sum(file.path(out_dir, "gambl_expression_samples.tsv"))), 1, 8),
+                  substr(unname(tools::md5sum(file.path(out_dir, "gambl_expression_genes.tsv"))), 1, 8), sep = "")
 fwrite(data.frame(key = c("build_id", "source_matrix", "source_md5", "n_genes", "n_samples", "transformation",
                           "par_y_rows_dropped", "built_at"),
                   value = c(build_id, basename(dirname(vst_path)), unname(tools::md5sum(vst_path)), nrow(m),

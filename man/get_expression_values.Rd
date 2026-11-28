@@ -33,7 +33,8 @@ the cache, or NULL (default) to delete the whole cache.}
 hgnc_symbol, mrna_sample_id and expression, one row per gene and sample.
 
 \code{expression_samples()}: the RNA samples (mrna_sample_id, patient_id,
-genome_sample_id, capture_sample_id, protocol, ffpe_or_frozen, study).
+genome_sample_id, capture_sample_id, protocol, ffpe_or_frozen, study and,
+in newer builds, vst_zero: the sample's value for a zero count).
 
 \code{expression_genes()}: the genes (ensembl_gene_id, hgnc_symbol,
 chrom, start, end; hg38).

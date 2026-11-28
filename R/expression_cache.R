@@ -79,7 +79,8 @@ get_expression_values <- function(ensembl_gene_ids) {
 
 #' @rdname get_expression_values
 #' @return `expression_samples()`: the RNA samples (mrna_sample_id, patient_id,
-#'   genome_sample_id, capture_sample_id, protocol, ffpe_or_frozen, study).
+#'   genome_sample_id, capture_sample_id, protocol, ffpe_or_frozen, study and,
+#'   in newer builds, vst_zero: the sample's value for a zero count).
 #' @export
 expression_samples <- function() expression_small_table("samples")
 
@@ -202,6 +203,7 @@ expression_small_table <- function(which) {
     x <- utils::read.delim(if (is_remote(f)) url(f) else f, stringsAsFactors = FALSE, na.strings = c("NA", ""),
                            colClasses = "character")
     if (which == "genes") { x$start <- as.numeric(x$start); x$end <- as.numeric(x$end) }
+    if ("vst_zero" %in% names(x)) x$vst_zero <- as.numeric(x$vst_zero)
     x
   }
   if (!expression_cache_enabled()) return(read_it())
